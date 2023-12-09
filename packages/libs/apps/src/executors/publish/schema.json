@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "version": 2,
+  "cli": "nx",
+  "title": "Publish executor",
+  "description": "",
+  "type": "object",
+  "properties": {
+    "url": {
+      "description": "The url of the app-server server",
+      "type": "string",
+      "default": "http://localhost:3333"
+    }
+  },
+  "required": []
+}

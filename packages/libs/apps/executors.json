@@ -1,0 +1,14 @@
+{
+  "executors": {
+    "pack": {
+      "implementation": "./src/executors/pack/executor",
+      "schema": "./src/executors/pack/schema.json",
+      "description": "pack executor"
+    },
+    "publish": {
+      "implementation": "./src/executors/publish/executor",
+      "schema": "./src/executors/publish/schema.json",
+      "description": "publish executor"
+    }
+  }
+}
