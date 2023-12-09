@@ -1,1 +1,1 @@
-import('./bootstrap').catch((err) => console.error(err));
+import('./App').catch((err) => console.error(err));
