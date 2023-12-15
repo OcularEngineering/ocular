@@ -1,17 +1,9 @@
-import { useAdminStore } from "medusa-react"
+// import { useAdminStore } from "medusa-react"
 import React, { useState } from "react"
 
-import BuildingsIcon from "../../fundamentals/icons/buildings-icon"
 import CartIcon from "../../fundamentals/icons/cart-icon"
-import CashIcon from "../../fundamentals/icons/cash-icon"
 import GearIcon from "../../fundamentals/icons/gear-icon"
-import GiftIcon from "../../fundamentals/icons/gift-icon"
-import SaleIcon from "../../fundamentals/icons/sale-icon"
-import SquaresPlus from "../../fundamentals/icons/squares-plus"
-import SwatchIcon from "../../fundamentals/icons/swatch-icon"
 import TagIcon from "../../fundamentals/icons/tag-icon"
-import UsersIcon from "../../fundamentals/icons/users-icon"
-
 import SidebarMenuItem from "../../molecules/sidebar-menu-item"
 // import UserMenu from "../../molecules/user-menu"
 
@@ -19,7 +11,7 @@ const ICON_SIZE = 20
 
 const Sidebar: React.FC = () => {
   const [currentlyOpen, setCurrentlyOpen] = useState(-1)
-  const { store } = useAdminStore()
+  // const { store } = useAdminStore()
 
   const triggerHandler = () => {
     const id = triggerHandler.id++
@@ -38,7 +30,7 @@ const Sidebar: React.FC = () => {
         <div className="flex justify-between px-2">
           <div className="rounded-circle flex h-8 w-8 items-center justify-center border border-solid border-gray-300">
             {/* <UserMenu /> */}
-            <div>UserMenu - To be Added.</div>
+            <div>User Menu: Implement Once BackEnd Is Up</div>
           </div>
         </div>
         <div className="my-base flex flex-col px-2">
@@ -47,6 +39,7 @@ const Sidebar: React.FC = () => {
           </span>
           <span className="text-grey-90 text-medium font-medium">
             {/* {store?.name} */}
+            <div>Request OrgName From BackEnd Once Logged In</div>
             <div>Org Name</div>
           </span>
         </div>
@@ -60,7 +53,7 @@ const Sidebar: React.FC = () => {
           <SidebarMenuItem
             pageLink={"/a/apps"}
             icon={<TagIcon size={ICON_SIZE} />}
-            text={"AppStore"}
+            text={"Apps"}
             triggerHandler={triggerHandler}
           />
           <SidebarMenuItem

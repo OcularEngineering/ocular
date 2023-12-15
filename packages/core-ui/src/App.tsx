@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react"
+import { lazy } from "react"
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -6,13 +6,16 @@ import {
   RouterProvider,
 } from "react-router-dom"
 
+const NotFound = lazy(() => import("./pages/404"))
 const Dashboard = lazy(() => import("./pages/a"))
+const IndexPage = lazy(() => import("./pages/index"))
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
-      <Route path="a/*" element={ <Dashboard />}
-      />
+      <Route path="/" element={<IndexPage />} />
+      <Route path="a/*" element={ <Dashboard />}/>
+      <Route path="*" element={<NotFound />} />
     </>
   ),
   {
@@ -20,9 +23,11 @@ const router = createBrowserRouter(
   }
 )
 
-const App = () => (
+const App = () => {
+  return (
     <RouterProvider router={router} />
-)
+  )
+}
 
 export default App
 

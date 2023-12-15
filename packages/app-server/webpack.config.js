@@ -8,6 +8,12 @@ module.exports = composePlugins(
   (config) => {
     // Update the webpack config as needed here.
     // e.g. `config.plugins.push(new MyPlugin())`
-    return config;
+      // Set mode to development
+      return merge(config,{
+        mode: 'development',
+        optimization: {
+          minimize: false
+        }
+      })
   }
 );

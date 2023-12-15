@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react"
-import { useHotkeys } from "react-hotkeys-hook"
 import { useLocation } from "react-router-dom"
 import SearchIcon from "../fundamentals/icons/search-icon"
 import SearchModal from "../templates/search-modal"
@@ -8,11 +7,11 @@ const SearchBar: React.FC = () => {
   const [showSearchModal, setShowSearchModal] = useState(false)
   const location = useLocation()
 
-  const toggleSearch = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setShowSearchModal((show) => !show)
-  }
+  // const toggleSearch = (e) => {
+  //   e.preventDefault()
+  //   e.stopPropagation()
+  //   setShowSearchModal((show) => !show)
+  // }
 
   const closeModal = () => {
     setShowSearchModal(false)
@@ -33,7 +32,7 @@ const SearchBar: React.FC = () => {
           Search anything...
         </span>
       </button>
-      {showSearchModal && <SearchModal handleClose={closeModal} />}
+      {/* {showSearchModal && <SearchModal handleClose={closeModal} />} */}
     </>
   )
 }

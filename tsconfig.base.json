@@ -17,8 +17,10 @@
     "paths": {
       "@autoflow-ai/apps": ["packages/libs/apps/src/index.ts"],
       "@autoflow-ai/core": ["packages/libs/core/src/index.ts"],
+      "@autoflow-ai/core-config": ["packages/core-backend/core-config.ts"],
       "app-2/Module": ["packages/apps/app-2/src/remote-entry.ts"],
-      "example-app/Module": ["packages/apps/example-app/src/remote-entry.ts"]
+      "example-app/Module": ["packages/apps/example-app/src/remote-entry.ts"],
+      "react": ["./node_modules/@types/react"]
     }
   },
   "exclude": ["node_modules", "tmp"]
