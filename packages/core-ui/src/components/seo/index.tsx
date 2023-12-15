@@ -4,8 +4,8 @@ import { Helmet } from "react-helmet-async"
 const site = {
   siteMetadata: {
     title: `Admin`,
-    description: `The best ecommerce software.`,
-    author: `@medusajs`,
+    description: `The best AI software stack management software.`,
+    author: `@autoflow-core-ui`,
   },
 }
 

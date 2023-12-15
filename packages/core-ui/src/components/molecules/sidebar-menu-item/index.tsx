@@ -31,9 +31,9 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> & {
     "group py-1.5 my-0.5 rounded-rounded flex text-grey-50 hover:bg-grey-10 items-center px-2"
   const activeStyles = "bg-grey-10 is-active"
   const classNameFn = useCallback(
-    ({ isActive }) => (isActive ? `${styles} ${activeStyles}` : styles),
-    []
-  )
+    ({ isActive }: { isActive: boolean }) => (isActive ? `${styles} ${activeStyles}` : styles),
+    [styles, activeStyles]
+  );
 
   return (
     <Collapsible
@@ -63,10 +63,11 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> & {
 const SubItem = ({ pageLink, text }: SidebarMenuSubitemProps) => {
   const styles = "py-0.5 px-1 my-0.5 rounded-base flex hover:bg-grey-10"
   const activeStyles = "bg-grey-10 font-semibold"
+
   const classNameFn = useCallback(
-    ({ isActive }) => (isActive ? `${styles} ${activeStyles}` : styles),
-    []
-  )
+    ({ isActive }: { isActive: boolean }) => (isActive ? `${styles} ${activeStyles}` : styles),
+    [styles, activeStyles]
+  );
 
   return (
     <NavLink className={classNameFn} to={pageLink}>

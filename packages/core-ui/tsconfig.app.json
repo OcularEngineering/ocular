@@ -4,7 +4,6 @@
     "outDir": "../../dist/out-tsc",
     "types": [
       "node",
-
       "@nx/react/typings/cssmodule.d.ts",
       "@nx/react/typings/image.d.ts"
     ]
@@ -20,5 +19,5 @@
     "src/**/*.spec.jsx",
     "src/**/*.test.jsx"
   ],
-  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
+  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx", "src/components/molecules/user-menu/index", "src/components/templates/search-modal/section-collapsible", "src/components/templates/search-modal/results/search-results"]
 }

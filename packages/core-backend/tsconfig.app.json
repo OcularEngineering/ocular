@@ -1,0 +1,34 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "types": ["node", "express"],
+    "lib": ["es2020", "dom"],
+    "target": "es2015",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "declaration": true,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "noImplicitReturns": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitThis": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "downlevelIteration": true, // to use ES5 specific tooling
+    "resolveJsonModule": true
+  },
+  "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts",    
+  "./dist/**/*",
+  "./src/**/__tests__",
+  "./src/**/__mocks__",
+  "./src/**/__fixtures__",
+  "node_modules"],
+  "include": ["src/**/*.ts","src/**/**/*.ts,", "index.d.ts"]
+}

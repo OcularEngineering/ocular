@@ -24,24 +24,24 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const handleClick = (e) => {
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       if (!loading && attributes.onClick) {
         attributes.onClick(e)
       }
     }
 
     const variantClassname = clsx({
-      ["btn-primary"]: variant === "primary",
-      ["btn-secondary"]: variant === "secondary",
-      ["btn-ghost"]: variant === "ghost",
-      ["btn-danger"]: variant === "danger",
-      ["btn-nuclear"]: variant === "nuclear",
+      "btn-primary": variant === "primary",
+      "btn-secondary": variant === "secondary",
+      "btn-ghost": variant === "ghost",
+      "btn-danger": variant === "danger",
+      "btn-nuclear": variant === "nuclear",
     })
 
     const sizeClassname = clsx({
-      ["btn-large"]: size === "large",
-      ["btn-medium"]: size === "medium",
-      ["btn-small"]: size === "small",
+      "btn-large": size === "large",
+      "btn-medium": size === "medium",
+      "btn-small": size === "small",
     })
 
     return (

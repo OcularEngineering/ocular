@@ -13,7 +13,7 @@
         "outputPath": "dist/packages/core-ui",
         "index": "packages/core-ui/src/index.html",
         "baseHref": "/",
-        "main": "packages/core-ui/src/main.ts",
+        "main": "packages/core-ui/src/index.tsx",
         "tsConfig": "packages/core-ui/tsconfig.app.json",
         "assets": [
           "packages/core-ui/src/favicon.ico",
@@ -21,6 +21,7 @@
         ],
         "styles": [],
         "scripts": [],
+        "isolatedConfig": true,
         "webpackConfig": "packages/core-ui/webpack.config.ts"
       },
       "configurations": {
