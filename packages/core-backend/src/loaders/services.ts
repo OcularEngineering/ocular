@@ -9,16 +9,15 @@ import formatRegistrationName from "../utils/format-registration-name"
 type Options = {
   container: AutoflowContainer
   configModule: ConfigModule
-  isTest?: boolean
 }
 
 /**
  * Registers all services in the services directory
- */
-export default ({ container, configModule, isTest }: Options): void => {
-  const useMock = isDefined(isTest) ? isTest : process.env.NODE_ENV === "test"
+ */ 
+export default ({ container, configModule}: Options): void => {
 
-  const corePath = useMock ? "../services/__mocks__/*.js" : "../services/*.js"
+
+  const corePath = "../services/*.js"
   const coreFull = path.join(__dirname, corePath)
 
   const core = glob.sync(coreFull, { cwd: __dirname })

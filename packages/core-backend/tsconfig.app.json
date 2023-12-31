@@ -1,34 +1,43 @@
+// {
+//   "extends": "./tsconfig.json",
+//   "compilerOptions": {
+//     "lib": ["es5", "es6", "es2019"],
+//     "target": "es5",
+//     "outDir": "./dist",
+//     "esModuleInterop": true,
+//     "declaration": true,
+//     "module": "ES2015",
+//     "moduleResolution": "Bundler",
+//     "emitDecoratorMetadata": true,
+//     "experimentalDecorators": true,
+//     "sourceMap": true,
+//     "noImplicitReturns": true,
+//     "strictNullChecks": true,
+//     "strictFunctionTypes": true,
+//     "noImplicitThis": true,
+//     "skipLibCheck": true,
+//     "downlevelIteration": true, // to use ES5 specific tooling
+//     "resolveJsonModule": true,
+//     // "paths": {
+//     //   "@autoflow-ai/core": ["../packages/libs/core/src/index.ts"],
+//     // }
+//   },
+//   "include": ["src/**/*.ts"],
+//   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts",    
+//   "./dist/**/*",
+//   "./src/**/__tests__",
+//   "./src/**/__mocks__",
+//   "./src/**/__fixtures__",
+//   "node_modules"],
+// }
+
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "outDir": "dist",
     "module": "commonjs",
-    "types": ["node", "express"],
-    "lib": ["es2020", "dom"],
-    "target": "es2015",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "importHelpers": true,
-    "skipDefaultLibCheck": true,
-    "baseUrl": ".",
-    "outDir": "./dist",
-    "esModuleInterop": true,
-    "declaration": true,
-    "moduleResolution": "node",
-    "sourceMap": true,
-    "noImplicitReturns": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "noImplicitThis": true,
-    "allowJs": true,
-    "skipLibCheck": true,
-    "downlevelIteration": true, // to use ES5 specific tooling
-    "resolveJsonModule": true
+    "types": ["node"]
   },
-  "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts",    
-  "./dist/**/*",
-  "./src/**/__tests__",
-  "./src/**/__mocks__",
-  "./src/**/__fixtures__",
-  "node_modules"],
-  "include": ["src/**/*.ts","src/**/**/*.ts,", "index.d.ts"]
+  "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
+  "include": ["src/**/*.ts"]
 }

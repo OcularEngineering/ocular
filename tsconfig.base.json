@@ -2,26 +2,28 @@
   "compileOnSave": false,
   "compilerOptions": {
     "rootDir": ".",
+    "baseUrl": "./",
     "sourceMap": true,
-    "declaration": false,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
-    "lib": ["es2020", "dom"],
+    "lib": ["es2017", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "baseUrl": ".",
+    "inlineSources": true,
     "paths": {
       "@autoflow-ai/apps": ["packages/libs/apps/src/index.ts"],
       "@autoflow-ai/core": ["packages/libs/core/src/index.ts"],
+      "@autoflow-ai/core-backend": ["packages/core-backend/src/index.ts"],
       "@autoflow-ai/core-config": ["packages/core-backend/core-config.ts"],
       "app-2/Module": ["packages/apps/app-2/src/remote-entry.ts"],
       "example-app/Module": ["packages/apps/example-app/src/remote-entry.ts"],
       "react": ["./node_modules/@types/react"]
     }
   },
-  "exclude": ["node_modules", "tmp"]
+  "include": ["packages"],
+  "exclude": ["node_modules", "tmp"],
 }

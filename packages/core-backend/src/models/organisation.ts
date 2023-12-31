@@ -11,7 +11,7 @@ import { User } from "./user";
 
 @Entity()
 export class Organisation extends BaseEntity {
-  @Column({ default: "Org" })
+  @Column({ default: "Org", type: "varchar" })
   name: string
 
   @OneToMany(() => User, (user) => user?.organisation)

@@ -1,13 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AwilixContainer } from "awilix"
 import {
   DataSource,
-  DataSourceOptions,
-  Repository,
-  TreeRepository,
+  DataSourceOptions
 } from "typeorm"
 import { ConfigModule } from "../types/config-module"
-import "../utils/naming-strategy"
-import { handlePostgresDatabaseError } from "./../utils/handle-postgres-database-error"
+import "../utils/naming-strategy.js"
+import { handlePostgresDatabaseError } from "../utils/handle-postgres-database-error.js"
 
 type Options = {
   configModule: ConfigModule
@@ -19,19 +18,6 @@ type Options = {
 }
 
 export let dataSource: DataSource
-
-// TODO: With the latest version of typeorm, the datasource is expected to be
-// available globally. During the integration test, the medusa
-// files are imported from @medusajs/medusa, therefore, the repositories are
-// evaluated at the same time, unfortunately, the integration tests have their
-// own way to load and at the moment, the datasource does not exists. This is
-// why we are mocking them here
-if (process.env.NODE_ENV === "test") {
-  dataSource = {
-    getRepository: (target) => new Repository(target, {} as any) as any,
-    getTreeRepository: (target) => new TreeRepository(target, {} as any) as any,
-  } as unknown as DataSource
-}
 
 export default async ({
   container,
@@ -60,13 +46,13 @@ export default async ({
 
   await dataSource.initialize().catch(handlePostgresDatabaseError)
 
-  // If migrations are not included in the config, we assume you are attempting to start the server
-  // Therefore, throw if the database is not migrated
-  if (!dataSource.migrations?.length) {
-    await dataSource
-      .query(`select * from migrations`)
-      .catch(handlePostgresDatabaseError)
-  }
+  // // If migrations are not included in the config, we assume you are attempting to start the server
+  // // Therefore, throw if the database is not migrated
+  // if (!dataSource.migrations?.length) {
+  //   await dataSource
+  //     .query(`select * from migrations`)
+  //     .catch(handlePostgresDatabaseError)
+  // }
 
   return dataSource
 }

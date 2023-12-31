@@ -1,5 +1,6 @@
 import { parse } from "path"
-import { toCamelCase, upperCaseFirst } from "@medusajs/utils"
+import  {upperCaseFirst}  from "./upper-case-first"
+import {toCamelCase} from"./to-camel-case"
 
 /**
  * Formats a filename into the correct container resolution name.

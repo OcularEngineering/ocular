@@ -1,6 +1,5 @@
 import  getConfigFile  from "../utils/get-config-file"
 import  {ConfigModule}  from "../types/config-module"
-// import logger from "./logger"
 
 const isProduction = ["production", "prod"].includes(process.env.NODE_ENV || "")
 
@@ -10,22 +9,15 @@ const errorHandler = isProduction
     }
   : console.log
 
-export const handleConfigError = (error: Error): void => {
-  // logger.error(`Error in loading config: ${error.message}`)
-  if (error.stack) {
-    // logger.error(error.stack)
-  }
-  process.exit(1)
-}
 
 export default (rootDirectory: string): ConfigModule => {
   const { configModule, error } = getConfigFile<ConfigModule>(
     rootDirectory,
-    `core-config`
+    `core-config.js`
   )
 
   if (error) {
-    handleConfigError(error)
+    console.log("Error Loading Config",error)
   }
 
   if (!configModule?.projectConfig?.redis_url) {

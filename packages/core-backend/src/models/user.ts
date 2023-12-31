@@ -31,20 +31,20 @@ export class User extends BaseEntity {
   role: UserRoles
 
   @Index({ unique: true, where: "deleted_at IS NULL" })
-  @Column()
+  @Column({ type: "varchar" })
   email: string
 
-  @Column({ nullable: true })
+  @Column({ type: "varchar",nullable: true })
   first_name: string
 
-  @Column({ nullable: true })
+  @Column({ type: "varchar", nullable: true })
   last_name: string
 
   @DbAwareColumn({ type: "jsonb", nullable: true })
   metadata: Record<string, unknown>
 
   @Index("UserOrganisationId")
-  @Column({ nullable: true })
+  @Column({ type: "varchar", nullable: true })
   organisation_id?: string;
 
   @ManyToOne(() => Organisation, (organisation) => organisation.members)
