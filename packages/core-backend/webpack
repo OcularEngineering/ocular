@@ -1,0 +1,33 @@
+const { composePlugins, withNx } = require('@nx/webpack');
+const { merge } = require('webpack-merge');
+const TranspilePlugin = require('transpile-webpack-plugin');
+const path = require('path');
+
+module.exports = composePlugins(
+  (config) => {
+    const updatedConfig = merge(config, {
+      mode: 'development',
+      stats: 'verbose',
+      optimization: {
+        minimize: false
+      },
+      devtool: 'source-map',
+      output: {
+        filename: 'bundle.js',
+        path: path.resolve(__dirname, '../../dist'), // Ensure this path matches the output path in Nx configuration
+      },
+      plugins: [
+        new TranspilePlugin({    
+          longestCommonDir: __dirname + '/src',
+          extensionMapping: { '.ts': '.js', '.tsx': '.js', '.mjs': '.js' },
+        })
+      ],
+    });
+    console.log(updatedConfig); // Add this line to inspect the configuration
+    return updatedConfig;
+  },
+  withNx({
+    target: 'node',
+  }),
+);
+

@@ -7,8 +7,9 @@ import { Router } from "express"
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default (container, config) => {
   const app = Router()
-  app.use("/")
+  // app.use("/")
 
+  console.log("Api ready to be hit")
   // const appCors = config.admin_cors || ""
   // app.use(
   //   cors({

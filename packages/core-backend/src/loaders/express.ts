@@ -4,7 +4,7 @@ import { Express } from "express"
 import session from "express-session"
 import morgan from "morgan"
 import Redis from "ioredis"
-import { ConfigModule } from "../types/global"
+import { ConfigModule } from "../types/config-module"
 
 type Options = {
   app: Express

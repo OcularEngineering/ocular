@@ -7,6 +7,7 @@ import {
   Resolver,
 } from "awilix"
 
+
 export type AutoflowContainer = AwilixContainer & {
   registerAdd: <T>(name: string, registration: T) => AutoflowContainer
   createScope: () => AutoflowContainer

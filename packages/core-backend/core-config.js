@@ -27,21 +27,15 @@ const ADMIN_CORS = process.env.ADMIN_CORS || "http://localhost:7001";
 // CORS to avoid issues when consuming Medusa from a client
 const STORE_CORS = process.env.STORE_CORS || "http://localhost:8000";
 
-const DATABASE_URL =
-  process.env.DATABASE_URL || "postgres://localhost/autoflow2";
-
 /** @type {import('./src/types/config-module').ConfigModule} */
 module.exports = {
   projectConfig: {
     jwtSecret: process.env.JWT_SECRET,
     cookieSecret: process.env.COOKIE_SECRET,
-    database_url: DATABASE_URL,
+    database_url: process.env.DATABASE_URL,
+    database_database: process.env.DATABASE_NAME,
     database_type: "postgres",
     store_cors: STORE_CORS,
-    admin_cors: ADMIN_CORS,
-    database_extra:
-      process.env.NODE_ENV !== "development"
-        ? { ssl: { rejectUnauthorized: false } }
-        : {},
+    admin_cors: ADMIN_CORS
   },
 };
