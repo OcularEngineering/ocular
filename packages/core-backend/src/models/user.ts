@@ -40,6 +40,12 @@ export class User extends BaseEntity {
   @Column({ type: "varchar", nullable: true })
   last_name: string
 
+    /**
+   * @apiIgnore
+   */
+    @Column({ nullable: true, select: false })
+    password_hash: string
+
   @DbAwareColumn({ type: "jsonb", nullable: true })
   metadata: Record<string, unknown>
 

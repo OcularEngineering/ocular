@@ -1,4 +1,5 @@
 import "reflect-metadata"
+import { FindManyOptions, FindOneOptions, FindOptionsOrder, FindOptionsRelations, FindOptionsSelect, FindOptionsWhere } from "typeorm"
 
 export interface FindConfig<Entity> {
   select?: (keyof Entity)[]
@@ -29,4 +30,18 @@ export type RequestQueryFields = {
    * The field to sort the data by. By default, the sort order is ascending. To change the order to descending, prefix the field name with `-`.
    */
   order?: string
+}
+
+export type Constructor<T> = new (...args: any[]) => T
+
+export type ExtendedFindConfig<TEntity> = (
+  | Omit<FindOneOptions<TEntity>, "where" | "relations" | "select">
+  | Omit<FindManyOptions<TEntity>, "where" | "relations" | "select">
+) & {
+  select?: FindOptionsSelect<TEntity>
+  relations?: FindOptionsRelations<TEntity>
+  where: FindOptionsWhere<TEntity> | FindOptionsWhere<TEntity>[]
+  order?: FindOptionsOrder<TEntity>
+  skip?: number
+  take?: number
 }
