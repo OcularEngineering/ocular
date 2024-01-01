@@ -18,7 +18,8 @@
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
-    "passport-custom": "^1.1.1"
+    "passport-custom": "^1.1.1",
+    "typeorm": "^0.3.17"
   },
   "devDependencies": {
     "nodemon": "^3.0.2",

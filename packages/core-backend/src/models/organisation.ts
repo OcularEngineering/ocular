@@ -18,7 +18,7 @@ export class Organisation extends BaseEntity {
   members?: User[];
 
   @Column({ nullable: true, type: "text" })
-  invite_link_template: string | null
+  invite_link_template?: string | null
 
   @DbAwareColumn({ type: "jsonb", nullable: true })
   metadata: Record<string, unknown> | null

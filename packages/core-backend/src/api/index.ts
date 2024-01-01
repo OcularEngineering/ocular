@@ -2,23 +2,26 @@
 import { Router } from "express"
 // import errorHandler from "./middlewares/error-handler"
 // import { parseCorsOrigins } from "medusa-core-utils"
-// import authRoutes from "./auth"
+import routes from "./routes"
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default (container, config) => {
   const app = Router()
-  // app.use("/")
+  // const httpCompressionOptions = compressionOptions(config)
 
-  console.log("Api ready to be hit")
-  // const appCors = config.admin_cors || ""
-  // app.use(
-  //   cors({
-  //     origin: parseCorsOrigins(appCors),
-  //     credentials: true,
-  //   })
-  // )
+  // if (httpCompressionOptions.enabled) {
+  //   app.use(
+  //     compression({
+  //       filter: shouldCompressResponse,
+  //       ...httpCompressionOptions,
+  //     })
+  //   )
+  // }
+  // app.use("/v1")
+  routes(app,container,config)
 
   // app.use(errorHandler())
+
   return app
 }
 
