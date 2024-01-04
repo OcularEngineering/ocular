@@ -19,7 +19,7 @@ export function handlePostgresDatabaseError(err: any): never {
     throw new Error(
       `Failed to establish a connection to PostgreSQL. Please ensure the following is true and try again:
       - You have a PostgreSQL database running
-      - You have passed the correct credentials in medusa-config.js
+      - You have passed the correct credentials in core-config.js
       - You have formatted the database connection string correctly. See below:
       "postgres://[username]:[password]@[host]:[post]/[db_name]" - If there is no password, you can omit it from the connection string
       ${EOL}
@@ -41,7 +41,7 @@ export function handlePostgresDatabaseError(err: any): never {
 
   if (DatabaseErrorCode.migrationMissing === err.code) {
     throw new Error(
-      `Migrations missing. Please run 'medusa migrations run' and try again.`
+      `Migrations missing. Please run 'npm typeorm:migrate' and try again.`
     )
   }
 
