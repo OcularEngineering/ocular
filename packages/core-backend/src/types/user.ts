@@ -1,5 +1,5 @@
 import { UserRoles } from "../models/user"
-// import { PartialPick } from "./common"
+import { CreateOrganisationInput } from "./organisation"
 
 export interface CreateUserInput {
   id?: string
@@ -9,7 +9,7 @@ export interface CreateUserInput {
   api_token?: string
   role?: UserRoles
   metadata?: Record<string, unknown>
-  organisation_id?:string
+  organisation?: CreateOrganisationInput
 }
 
 export interface UpdateUserInput {

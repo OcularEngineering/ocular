@@ -132,6 +132,9 @@ class UserService extends TransactionBaseService {
   // User has organisation associated with them.
   // Information passed should have organisation info.
   async create(user: CreateUserInput, password: string): Promise<User> {
+    console.log("Creating User", user)
+
+    
     return await this.atomicPhase_(async (manager: EntityManager) => {
       const userRepo = manager.withRepository(this.userRepository_)
 
@@ -158,17 +161,17 @@ class UserService extends TransactionBaseService {
       }
       
       // Create Organisation
-      const createOrganisatonData = { ...user } as CreateOrganisationInput
+      const createOrganisatonData = { ...user.organisation} as CreateOrganisationInput
       const organisationService = this.organisationService_.withTransaction(manager)
       const organisation = await organisationService.create(createOrganisatonData)
 
       // Create User
       createUserData.email = validatedEmail
-      createUserData.organisation_id = organisation.id
       const created = userRepo.create(createUserData)
+      created.organisation = organisation
       const newUser = await userRepo.save(created)
 
-      return newUser
+      return created
     })
   }
 

@@ -46,11 +46,11 @@ export default async ({
 
   // If migrations are not included in the config, we assume you are attempting to start the server
   // Therefore, throw if the database is not migrated
-  // if (!dataSource.migrations?.length) {
-  //   await dataSource.initialize().catch(handlePostgresDatabaseError)
-  //   await dataSource
-  //     .query(`select * from migrations`)
-  //     .catch(handlePostgresDatabaseError)
-  // }
+  if (!dataSource.migrations?.length) {
+    await dataSource.initialize().catch(handlePostgresDatabaseError)
+    await dataSource
+      .query(`select * from migrations`)
+      .catch(handlePostgresDatabaseError)
+  }
   return dataSource
 }

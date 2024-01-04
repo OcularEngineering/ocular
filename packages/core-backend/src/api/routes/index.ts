@@ -2,11 +2,11 @@ import { Router } from "express"
 import auth from "./auth"
 import {unauthenticatedUserRoutes} from "./users"
 
-const route = Router()
+
 
 export default (app, container, config) => {
+  const route = Router()
   app.use("/v1",route)
-  
   // const adminCors = config.admin_cors || ""
   // route.use(
   //   cors({
@@ -15,9 +15,12 @@ export default (app, container, config) => {
   //   })
   // )
 
-  // Unauthenticated routes
-  auth(route)
+  // Allows unathenticated requests to the /users endpoint for creating user signups
   unauthenticatedUserRoutes(route)
+
+  // Unauthenticated routes
+  // auth(route)
+
 
   // 
   // users(route)

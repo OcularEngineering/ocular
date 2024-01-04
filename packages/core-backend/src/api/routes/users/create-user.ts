@@ -1,5 +1,16 @@
-import { IsEmail, IsEnum, IsOptional, IsString, ValidateNested } from "class-validator"
-
+import { 
+  IsEmail, 
+  IsEnum, 
+  IsBoolean,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  Min,
+  ValidateNested,} from "class-validator"
+  import { Type } from "class-transformer"
 import { UserRoles } from "../../../models/user"
 import UserService from "../../../services/user"
 import _ from "lodash"
@@ -8,7 +19,7 @@ import { EntityManager } from "typeorm"
 
 //"Create a User.
 export default async (req, res) => {
-  const validated = await validator(UserCreateUserRequest, req.body)
+  const validated = await validator(UserCreateUserReq, req.body)
 
   const userService: UserService = req.scope.resolve("userService")
   const data = _.omit(validated, ["password"])
@@ -23,12 +34,12 @@ export default async (req, res) => {
   res.status(200).json({ user: _.omit(user, ["password_hash"]) })
 }
 
-export class OrganisationCreateRequest {
+class OrganisationCreateReq {
   @IsString()
   name: string
 }
 
-export class UserCreateUserRequest {
+export class UserCreateUserReq{
   @IsEmail()
   email: string
 
@@ -46,7 +57,10 @@ export class UserCreateUserRequest {
   @IsString()
   password: string
 
+  @IsObject()
+  @ValidateNested()
+  @Type(() => OrganisationCreateReq)
   @ValidateNested({ each: true })
-  organisation: OrganisationCreateRequest
+  organisation: OrganisationCreateReq
 }
 

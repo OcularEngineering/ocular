@@ -26,6 +26,6 @@ export default async ({ app, container, configModule }: Options) => {
 
   app.use(bodyParser.json())
   app.use("/", routes(container, configModule.projectConfig))
-
+  
   return app
 }
