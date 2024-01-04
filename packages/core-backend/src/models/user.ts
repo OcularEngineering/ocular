@@ -30,7 +30,7 @@ export class User extends BaseEntity {
   })
   role: UserRoles
 
-  @Index({ unique: true, where: "deleted_at IS NULL" })
+  @Index({ unique: true })
   @Column({ type: "varchar" })
   email: string
 

@@ -9,8 +9,8 @@ import "../utils/naming-strategy.js"
 import { handlePostgresDatabaseError } from "../utils/handle-postgres-database-error.js"
 
 type Options = {
-  configModule: ConfigModule
   container: AwilixContainer
+  configModule: ConfigModule
   customOptions?: {
     migrations: DataSourceOptions["migrations"]
     logging: DataSourceOptions["logging"]
@@ -44,15 +44,13 @@ export default async ({
       (configModule.projectConfig.database_logging || false),
   } as DataSourceOptions)
 
-  await dataSource.initialize().catch(handlePostgresDatabaseError)
-
-  // // If migrations are not included in the config, we assume you are attempting to start the server
-  // // Therefore, throw if the database is not migrated
+  // If migrations are not included in the config, we assume you are attempting to start the server
+  // Therefore, throw if the database is not migrated
   // if (!dataSource.migrations?.length) {
+  //   await dataSource.initialize().catch(handlePostgresDatabaseError)
   //   await dataSource
   //     .query(`select * from migrations`)
   //     .catch(handlePostgresDatabaseError)
   // }
-
   return dataSource
 }
