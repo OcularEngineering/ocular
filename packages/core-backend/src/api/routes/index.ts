@@ -1,5 +1,5 @@
 import { Router } from "express"
-import auth from "./auth"
+import authRoutes from "./auth"
 import {unauthenticatedUserRoutes} from "./users"
 
 
@@ -16,10 +16,11 @@ export default (app, container, config) => {
   // )
 
   // Allows unathenticated requests to the /users endpoint for creating user signups
+  authRoutes(route)
   unauthenticatedUserRoutes(route)
 
   // Unauthenticated routes
-  // auth(route)
+  
 
 
   // 

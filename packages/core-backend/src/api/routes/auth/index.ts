@@ -9,6 +9,18 @@ export default (app) => {
 
   route.post("/", middlewares.wrap(require("./create-session").default))
 
+  route.get(
+    "/",
+    middlewares.authenticate(),
+    middlewares.wrap(require("./get-session").default)
+  )
+
+  route.delete(
+    "/",
+    middlewares.authenticate(),
+    middlewares.wrap(require("./delete-session").default)
+  )
+
   return app
 }
 
@@ -21,3 +33,5 @@ export type AdminBearerAuthRes = {
 }
 
 export * from "./create-session"
+export * from "./get-session"
+export * from "./delete-session"

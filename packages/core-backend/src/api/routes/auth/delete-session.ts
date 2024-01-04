@@ -8,17 +8,10 @@
  * x-codegen:
  *   method: deleteSession
  * x-codeSamples:
- *   - lang: JavaScript
- *     label: JS Client
- *     source: |
- *       import Medusa from "@medusajs/medusa-js"
- *       const medusa = new Medusa({ baseUrl: MEDUSA_BACKEND_URL, maxRetries: 3 })
- *       // must be previously logged in
- *       medusa.admin.auth.deleteSession()
  *   - lang: Shell
  *     label: cURL
  *     source: |
- *       curl -X DELETE '{backend_url}/admin/auth' \
+ *       curl -X DELETE '{backend_url}/v1/auth' \
  *       -H 'x-medusa-access-token: {api_token}'
  * security:
  *   - api_token: []
@@ -43,13 +36,7 @@
  *    $ref: "#/components/responses/500_error"
  */
 export default async (req, res) => {
-  if (req.session.customer_id) {
-    // if we are also logged in as a customer, persist that session
-    delete req.session.user_id
-  } else {
-    // otherwise, destroy the session
-    req.session.destroy()
-  }
-
+  delete req.session.user_id
+  req.session.destroy()
   res.sendStatus(200)
 }
