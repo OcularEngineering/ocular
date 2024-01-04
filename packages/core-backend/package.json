@@ -7,9 +7,9 @@
     "watch": "tsc --build --watch",
     "prepublishOnly": "cross-env NODE_ENV=production tsc --build",
     "build": "rimraf dist && tsc --build",
-    "start": "nodemon dist/packages/core-backend/src/main.js",
+    "start": "npm run build && nodemon dist/packages/core-backend/src/main.js",
     "test": "jest --runInBand --bail --detectOpenHandles --forceExit",
-    "typeorm": "typeorm-ts-node-esm -d dist/packages/core-backend/src/data-source.js"
+    "typeorm": "npm run build && typeorm-ts-node-esm -d dist/packages/core-backend/src/data-source.js"
   },
   "keywords": [
     "core",

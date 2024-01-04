@@ -9,7 +9,7 @@ import { resolveDbType } from "../../utils/db-aware-column"
  * Base abstract entity for all entities
  */
 export abstract class BaseEntity {
-  @PrimaryColumn({ type: 'uuid' }) 
+  @PrimaryColumn()
   id: string
 
   @CreateDateColumn({ type: resolveDbType("timestamptz") })
