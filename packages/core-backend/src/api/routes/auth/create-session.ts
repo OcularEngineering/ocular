@@ -6,6 +6,8 @@ import { EntityManager } from "typeorm"
 import { validator } from "../../../utils/validator"
 import { AuthService } from "../../../services"
 
+// * description: "Log a User in and includes the Cookie session in the response header. The cookie session can be used in subsequent requests to authorize the user to perform admin functionalities.
+
 export default async (req, res) => {
   const validated = await validator(AdminPostAuthReq, req.body)
 

@@ -9,7 +9,6 @@ import { Logger } from "@medusajs/types"
 type InjectedDependencies = {
   manager: EntityManager
   userService: UserService
-  logger: Logger
 }
 
 /**
@@ -17,14 +16,12 @@ type InjectedDependencies = {
  */
 class AuthService extends TransactionBaseService {
   protected readonly userService_: UserService
-  protected readonly logger_: Logger
 
-  constructor({ userService, logger }: InjectedDependencies) {
+  constructor({ userService}: InjectedDependencies) {
     // eslint-disable-next-line prefer-rest-params
     super(arguments[0])
 
     this.userService_ = userService
-    this.logger_ = logger
   }
 
   /**
@@ -79,7 +76,7 @@ class AuthService extends TransactionBaseService {
           }
         }
       } catch (error) {
-        this.logger_.log("error ->", error)
+        console.log("error ->", error)
         // ignore
       }
 
