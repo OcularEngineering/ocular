@@ -12,6 +12,7 @@ import {buildQuery} from "../utils/build-query"
 import { FindConfig } from "../types/common"
 import OrganisationService from "./organisation"
 import { CreateOrganisationInput } from "../types/organisation"
+import { isDefined } from "../utils/is-defined"
 
 
 
@@ -54,35 +55,35 @@ class UserService extends TransactionBaseService {
   //   return await userRepo.find(buildQuery(selector, config))
   // }
 
-  // /**
-  //  * Gets a user by id.
-  //  * Throws in case of DB Error and if user was not found.
-  //  * @param {string} userId - the id of the user to get.
-  //  * @param {FindConfig} config - query configs
-  //  * @return {Promise<User>} the user document.
-  //  */
-  // async retrieve(userId: string, config: FindConfig<User> = {}): Promise<User> {
-  //   if (!isDefined(userId)) {
-  //     throw new MedusaError(
-  //       MedusaError.Types.NOT_FOUND,
-  //       `"userId" must be defined`
-  //     )
-  //   }
+  /**
+   * Gets a user by id.
+   * Throws in case of DB Error and if user was not found.
+   * @param {string} userId - the id of the user to get.
+   * @param {FindConfig} config - query configs
+   * @return {Promise<User>} the user document.
+   */
+  async retrieve(userId: string, config: FindConfig<User> = {}): Promise<User> {
+    if (!isDefined(userId)) {
+      throw new AutoflowAiError(
+        AutoflowAiError.Types.NOT_FOUND,
+        `"userId" must be defined`
+      )
+    }
 
-  //   const userRepo = this.activeManager_.withRepository(this.userRepository_)
-  //   const query = buildQuery({ id: userId }, config)
+    const userRepo = this.activeManager_.withRepository(this.userRepository_)
+    const query = buildQuery({ id: userId }, config)
 
-  //   const users = await userRepo.find(query)
+    const users = await userRepo.find(query)
 
-  //   if (!users.length) {
-  //     throw new MedusaError(
-  //       MedusaError.Types.NOT_FOUND,
-  //       `User with id: ${userId} was not found`
-  //     )
-  //   }
+    if (!users.length) {
+      throw new AutoflowAiError(
+        AutoflowAiError.Types.NOT_FOUND,
+        `User with id: ${userId} was not found`
+      )
+    }
 
-  //   return users[0]
-  // }
+    return users[0]
+  }
 
   /**
    * Gets a user by email.

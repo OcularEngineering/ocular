@@ -72,10 +72,10 @@ export default async ({
   console.log(`Services initialized${EOL}`)
 
 
-  // console.log(`Initializing Express`)
+  console.log(`Initializing Express`)
   await expressLoader({ app: expressApp, configModule })
-  // await passportLoader({ app: expressApp, container, configModule })
-  // console.log(`Express Initialized${EOL}`)
+  await passportLoader({ app: expressApp, container, configModule })
+  console.log(`Express Initialized${EOL}`)
 
   // Add the registered services to the request scope
   expressApp.use((req: Request, res: Response, next: NextFunction) => {
