@@ -5,6 +5,8 @@ import { ExtractJwt, Strategy as JWTStrategy } from "passport-jwt"
 import { Strategy as LocalStrategy } from "passport-local"
 import { ConfigModule } from "../types/config-module"
 import {  AutoflowContainer} from "../types/autoflow-container"
+import { AuthService } from "../services"
+import { AutoflowRequest } from "../types/routing"
 
 export default async ({
   app,
@@ -15,39 +17,39 @@ export default async ({
   container: AutoflowContainer
   configModule: ConfigModule
 }): Promise<void> => {
-  // const authService = container.resolve<AuthService>("authService")
+  const authService = container.resolve<AuthService>("authService")
 
-  // // For good old email password authentication
-  // passport.use(
-  //   new LocalStrategy(
-  //     {
-  //       usernameField: "email",
-  //       passwordField: "password",
-  //     },
-  //     async (email, password, done) => {
-  //       try {
-  //         const { success, user } = await authService.authenticate(
-  //           email,
-  //           password
-  //         )
-  //         if (success) {
-  //           return done(null, user)
-  //         } else {
-  //           return done("Incorrect Username / Password")
-  //         }
-  //       } catch (error) {
-  //         return done(error)
-  //       }
-  //     }
-  //   )
-  // )
+  // For good old email password authentication
+  passport.use(
+    new LocalStrategy(
+      {
+        usernameField: "email",
+        passwordField: "password",
+      },
+      async (email, password, done) => {
+        try {
+          const { success, user } = await authService.authenticate(
+            email,
+            password
+          )
+          if (success) {
+            return done(null, user)
+          } else {
+            return done("Incorrect Username / Password")
+          }
+        } catch (error) {
+          return done(error)
+        }
+      }
+    )
+  )
 
   // After a user has authenticated a JWT will be placed on a cookie, all
   // calls will be authenticated based on the JWT
   const { jwt_secret } = configModule.projectConfig
   passport.use(
-    "session",
-    new CustomStrategy(async (req, done) => {
+    "user-session",
+    new CustomStrategy(async (req:AutoflowRequest, done) => {
       // @ts-ignore
       if (req.session?.user_id) {
         // @ts-ignore
@@ -60,7 +62,7 @@ export default async ({
 
   // Bearer JWT token authentication strategy, best suited for web SPAs or mobile apps
   passport.use(
-    "bearer",
+    "bearer-token",
     new JWTStrategy(
       {
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

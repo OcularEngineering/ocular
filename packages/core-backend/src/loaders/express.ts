@@ -38,17 +38,17 @@ export default async ({ app, configModule }: Options): Promise<Express> => {
     store: null,
   }
 
-  if (configModule?.projectConfig?.redis_url) {
-    const RedisStore = createStore(session)
-    const redisClient = new Redis(
-      configModule.projectConfig.redis_url, 
-      configModule.projectConfig.redis_options ?? {}
-    )
-    sessionOpts.store = new RedisStore({
-      client: redisClient,
-      prefix: `${configModule?.projectConfig?.redis_prefix ?? ""}sess:`,
-    })
-  }
+  // if (configModule?.projectConfig?.redis_url) {
+  //   const RedisStore = createStore(session)
+  //   const redisClient = new Redis(
+  //     configModule.projectConfig.redis_url, 
+  //     configModule.projectConfig.redis_options ?? {}
+  //   )
+  //   sessionOpts.store = new RedisStore({
+  //     client: redisClient,
+  //     prefix: `${configModule?.projectConfig?.redis_prefix ?? ""}sess:`,
+  //   })
+  // }
 
   app.set("trust proxy", 1)
   app.use(
@@ -58,7 +58,7 @@ export default async ({ app, configModule }: Options): Promise<Express> => {
   )
   app.use(cookieParser())
   app.use(session(sessionOpts))
-
+  
   app.get("/health", (req, res) => {
     res.status(200).send("OK")
   })
