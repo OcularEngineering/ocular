@@ -1,7 +1,6 @@
 import { Router } from "express"
-import { Invite } from "../../../../models/invite"
-import { DeleteResponse } from "../../../../types/common"
-import middlewares from "../../../middlewares"
+import { Invite } from "../../../models/invite"
+import middlewares from "../../middlewares"
 import "reflect-metadata"
 
 export const unauthenticatedInviteRoutes = (app) => {
