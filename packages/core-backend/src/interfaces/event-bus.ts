@@ -1,7 +1,8 @@
-import { EmitData, Subscriber, SubscriberContext, SubscriberDescriptor } from "../../types/event-bus"
+import { EmitData, EventBusModule, Subscriber, SubscriberContext, SubscriberDescriptor } from "../types/event-bus"
 import { ulid } from "ulid"
+import {TransactionBaseService} from "./transaction-base-service"
 
-export abstract class AbstractEventBusModuleService
+export abstract class AbstractEventBusModuleService implements EventBusModule
 {
   protected eventToSubscribersMap_: Map<
     string | symbol,
@@ -20,6 +21,7 @@ export abstract class AbstractEventBusModuleService
     data: T,
     options: Record<string, unknown>
   ): Promise<void>
+  
   abstract emit<T>(data: EmitData<T>[]): Promise<void>
 
   protected storeSubscribers({

@@ -1,8 +1,8 @@
-import { EmitData, Logger } from "../types"
-import { AbstractEventBusModuleService } from "./abstract-modules/event-bus"
+import {  Logger } from "../types"
+import { AbstractEventBusModuleService } from "../interfaces/event-bus"
 import { BulkJobOptions, JobsOptions, Queue, Worker } from "bullmq"
 import { Redis } from "ioredis"
-import { BullJob, EmitOptions, EventBusRedisModuleOptions } from "../types/event-bus"
+import { BullJob, EmitData, EmitOptions, EventBusRedisModuleOptions } from "../types/event-bus"
 
 type InjectedDependencies = {
   logger: Logger
@@ -14,7 +14,7 @@ type InjectedDependencies = {
  * subscribers when events happen. Events will run asynchronously.
  */
 // eslint-disable-next-line max-len
-export default class RedisEventBusService extends AbstractEventBusModuleService {
+export default class EventBusModule extends AbstractEventBusModuleService {
   protected readonly logger_: Logger
 
   protected queue_: Queue
