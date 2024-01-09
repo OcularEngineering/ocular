@@ -14,14 +14,17 @@ import { EOL } from "os"
 import { Connection } from "typeorm"
 import { AutoflowContainer } from "../types/global"
 import apiLoader from "./api"
+import Logger from "./logger"
 
 // import defaultsLoader from "./defaults"
 import expressLoader from "./express"
 import modelsLoader from "./models.js"
+import modulesLoader from "./module"
 import passportLoader from "./passport"
 import repositoriesLoader from "./repositories"
 // import searchIndexLoader from "./search-index"
 import servicesLoader from "./services.js"
+import redisLoader from './redis';
 
 type Options = {
   directory: string
@@ -37,29 +40,33 @@ export default async ({
   app: Express
 }> => {
   // Load and Register Config into Container
-  console.log("Initializing configModule")
   const configModule = configLoader(rootDirectory)
   const container = createAutoflowContainer()
   container.register(
     ContainerRegistrationKeys.CONFIG_MODULE,
     asValue(configModule)
   )
-  console.log(`Config Module initialized ${EOL}`)
+ 
+  container.register({
+    [ContainerRegistrationKeys.LOGGER]: asValue(Logger),
+  })
 
-  console.log(`Initializing models`)
+  await redisLoader({ container, configModule, logger: Logger })
+
+  const modelsActivity = Logger.activity(`Initializing models${EOL}`)
   modelsLoader({ container})
-  console.log(`Models initialized${EOL}`)
+  const mAct = Logger.success(modelsActivity, "Models initialized") || {}
 
-  console.log(`Initializing database`)
+  const dbActivity = Logger.activity(`Initializing database${EOL}`)
   const dbConnection = await databaseLoader({
     container,
     configModule,
   })
-  console.log(`Database initialized ${EOL}`)
+  const dbAct = Logger.success(dbActivity, "Database initialized") || {}
 
-  console.log(`Initializing repositories${EOL}`)
+  const repoActivity = Logger.activity(`Initializing repositories${EOL}`)
   repositoriesLoader({ container })
-  console.log("Repositories initialized")
+  const rAct = Logger.success(repoActivity, "Repositories initialized") || {}
 
   container.register({
     [ContainerRegistrationKeys.MANAGER]: asValue(dataSource.manager),
@@ -67,15 +74,18 @@ export default async ({
 
   container.register("remoteQuery", asValue(null)) // ensure remoteQuery is always registered
 
-  console.log(`Initializing Services`)
+  const servicesActivity = Logger.activity(`Initializing services${EOL}`)
   servicesLoader({ container, configModule})
-  console.log(`Services initialized${EOL}`)
+  const servAct = Logger.success(servicesActivity, "Services initialized") || {}
 
+  const modulesActivity = Logger.activity(`Initializing modules${EOL}`)
+  modulesLoader({ container, configModule})
+  const modAct = Logger.success(modulesActivity, "Modules initialized") || {}
 
-  console.log(`Initializing Express`)
+  const expActivity = Logger.activity(`Initializing express${EOL}`)
   await expressLoader({ app: expressApp, configModule })
   await passportLoader({ app: expressApp, container, configModule })
-  console.log(`Express Initialized${EOL}`)
+  const exAct = Logger.success(expActivity, "Express intialized") || {}
 
   // Add the registered services to the request scope
   expressApp.use((req: Request, res: Response, next: NextFunction) => {
@@ -84,9 +94,9 @@ export default async ({
     next()
   })
 
-  console.log("Initializing API's")
+  const apiActivity = Logger.activity(`Initializing API${EOL}`)
   await apiLoader({ container, app: expressApp, configModule })
-  console.log("API initialized")
+  const apiAct = Logger.success(apiActivity, "API initialized") || {}
 
   return {
     container,

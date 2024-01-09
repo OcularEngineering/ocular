@@ -7,6 +7,7 @@ import express from "express"
 import path from "path"
 import  {GracefulShutdownServer}  from "./utils/graceful-shutdown-server"
 import loaders from "./loaders/index.js";
+import Logger from "./loaders/logger"
 
 const app = express()
 const rootDirectory = path.resolve(`.`)   
@@ -17,10 +18,10 @@ async function start() {
   try {
 
     await loaders({ directory:rootDirectory, expressApp: app })
-    console.log(`Creating server`)
+    const serverActivity = Logger.activity(`Creating server`)
     const server = GracefulShutdownServer.create(
       app.listen(port,() => {
-        console.log(`Server is ready on port: ${port}`);
+        Logger.success(serverActivity, `Server is ready on port: ${port}`)
       }).on("error", (err) => {
         console.log("Error starting server", err)
       })
@@ -32,18 +33,18 @@ async function start() {
       server
         .shutdown()
         .then(() => {
-         console.log("Gracefully stopping the server.")
+          Logger.info("Gracefully stopping the server.")
           process.exit(0)
         })
         .catch((e) => {
-          console.log("Error received when shutting down the server.", e)
+          Logger.error("Error received when shutting down the server.", e)
           process.exit(1)
         })
     }
     process.on("SIGTERM", gracefulShutDown)
     process.on("SIGINT", gracefulShutDown)
   } catch (err) {
-    console.log("Error starting server", err)
+    Logger.error("Error starting server", err)
     process.exit(1)
   }
 }

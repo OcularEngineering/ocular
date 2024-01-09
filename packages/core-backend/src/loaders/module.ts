@@ -15,8 +15,7 @@ type Options = {
  */ 
 export default ({ container, configModule}: Options): void => {
 
-
-  const corePath = "../services/*.js"
+  const corePath = "../modules/*.js"
   const coreFull = path.join(__dirname, corePath)
 
   const core = glob.sync(coreFull, { cwd: __dirname })
