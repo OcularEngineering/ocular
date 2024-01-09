@@ -8,6 +8,7 @@ import { BaseEntity } from "../interfaces/models/base-entity"
 import { DbAwareColumn } from "../utils/db-aware-column"
 import { generateEntityId } from "../utils/generate-entity-id"
 import { User } from "./user";
+import { Invite } from "./invite";
 
 @Entity()
 export class Organisation extends BaseEntity {
@@ -16,6 +17,9 @@ export class Organisation extends BaseEntity {
 
   @OneToMany(() => User, (user) => user?.organisation)
   members?: User[];
+
+  @OneToMany(() => Invite, invite => invite?.organisation)
+  invites?: Invite[];
 
   @Column({ nullable: true, type: "text" })
   invite_link_template?: string | null
