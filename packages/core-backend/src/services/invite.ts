@@ -7,8 +7,8 @@ import { UserRoles } from "../models/user"
 import { InviteRepository } from "../repositories/invite"
 import { UserRepository } from "../repositories/user"
 import { ConfigModule } from "../types/config-module"
-// import { ListInvite } from "../types/invites"
-// import { buildQuery } from "../utils"
+import { ListInvite } from "../types/invite"
+import { buildQuery } from "../utils/build-query"
 import {EventBusService} from "../types"
 import AutoflowAiError from "../utils/error"
 
@@ -56,7 +56,11 @@ class InviteService extends TransactionBaseService {
     this.userRepo_ = userRepository
     this.inviteRepository_ = inviteRepository
     this.eventBus_ = eventBusService
-    this.loggedInUser_ = loggedInUser
+    try {
+      this.loggedInUser_ = loggedInUser
+    } catch (e) {
+      // avoid errors when backend first runs
+    }
   }
 
   generateToken(data): string {
@@ -68,6 +72,13 @@ class InviteService extends TransactionBaseService {
       AutoflowAiError.Types.INVALID_DATA,
       "Please configure jwt_secret"
     )
+  }
+
+  async list(selector, config = {}): Promise<ListInvite[]> {
+    const inviteRepo = this.activeManager_.withRepository(InviteRepository)
+    selector.organisation_id = this.loggedInUser_.organisation_id
+    const query = buildQuery(selector, config)
+    return await inviteRepo.find(query)
   }
 
 
@@ -105,21 +116,23 @@ class InviteService extends TransactionBaseService {
       })
       // if user is trying to send another invite for the same account + email, but with a different role
       // then change the role on the invite as long as the invite has not been accepted yet
-      if (invite && !invite.accepted && invite.role !== role) {
-        invite.role = role
-
-        invite = await inviteRepository.save(invite)
-      } else if (!invite) {
+      if (invite && !invite.accepted) {
+        throw new AutoflowAiError(
+          AutoflowAiError.Types.INVALID_DATA,
+          "Can't invite a user with a pending invite"
+        )
+      }
+      
         // if no invite is found, create a new one
         const created = inviteRepository.create({
           role,
           token: "",
           user_email: user,
-          organisation_id: this.loggedInUser_.organisation.id,
+          organisation_id: this.loggedInUser_.organisation_id,
         })
 
         invite = await inviteRepository.save(created)
-      }
+      
 
       invite.token = this.generateToken({
         invite_id: invite.id,
@@ -144,6 +157,78 @@ class InviteService extends TransactionBaseService {
           user_email: invite.user_email,
         })
     })
+  }
+
+  async accept(token, user_): Promise<User> {
+    let decoded
+    try {
+      decoded = this.verifyToken(token)
+    } catch (err) {
+      throw new AutoflowAiError(
+        AutoflowAiError.Types.INVALID_DATA,
+        "Token is not valid"
+      )
+    }
+
+    const { invite_id, user_email } = decoded
+
+    return await this.atomicPhase_(async (m) => {
+      const userRepo = m.withRepository(this.userRepo_)
+      const inviteRepo: typeof InviteRepository = m.withRepository(
+        this.inviteRepository_
+      )
+
+      const invite = await inviteRepo.findOne({ where: { id: invite_id }, relations: ["organisation"] })
+
+      if (
+        !invite ||
+        invite?.user_email !== user_email ||
+        new Date() > invite.expires_at
+      ) {
+        throw new AutoflowAiError(AutoflowAiError.Types.INVALID_DATA, `Invalid invite`)
+      }
+
+      const exists = await userRepo.findOne({
+        where: { email: user_email.toLowerCase() },
+        select: ["id"],
+      })
+
+      if (exists) {
+        throw new AutoflowAiError(
+          AutoflowAiError.Types.INVALID_DATA,
+          "User already joined"
+        )
+      }
+
+      // use the email of the user who actually accepted the invite
+      const user = await this.userService_.withTransaction(m).create(
+        {
+          email: invite.user_email,
+          role: invite.role,
+          first_name: user_.first_name,
+          last_name: user_.last_name,
+          organisation: invite.organisation,
+        },
+        user_.password,
+        true
+      )
+
+      await inviteRepo.delete({ id: invite.id })
+
+      return user
+    }, "SERIALIZABLE")
+  }
+
+
+  verifyToken(token): JwtPayload | string {
+    const { jwt_secret } = this.configModule_.projectConfig
+    if (jwt_secret) {
+      return jwt.verify(token, jwt_secret)
+    }
+    throw new AutoflowAiError(
+      AutoflowAiError.Types.INVALID_DATA,
+      "Please configure jwt_secret"
+    )
   }
 }
 
