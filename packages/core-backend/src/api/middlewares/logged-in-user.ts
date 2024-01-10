@@ -2,7 +2,7 @@ import { UserRepository } from "../../repositories/user"
 import { User } from "../../models/user"
 
 export  default async (req, res, next) =>  {
-  let loggedInUser: User;
+  let loggedInUser: User | null = null
 
   if (req.user && req.user.userId) {
 
