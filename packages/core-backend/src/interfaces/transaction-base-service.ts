@@ -1,7 +1,9 @@
 import { EntityManager } from "typeorm"
 import { IsolationLevel } from "typeorm/driver/types/IsolationLevel"
+import { Lifetime } from "awilix"
 
 export abstract class TransactionBaseService {
+  static LIFE_TIME = Lifetime.SCOPED
   protected manager_: EntityManager
   protected transactionManager_: EntityManager | undefined
 

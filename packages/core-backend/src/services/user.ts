@@ -132,10 +132,7 @@ class UserService extends TransactionBaseService {
   // User is the admin
   // User has organisation associated with them.
   // Information passed should have organisation info.
-  async create(user: CreateUserInput, password: string): Promise<User> {
-    console.log("Creating User", user)
-
-    
+  async create(user: CreateUserInput, password: string, invite:boolean = false ): Promise<User> {
     return await this.atomicPhase_(async (manager: EntityManager) => {
       const userRepo = manager.withRepository(this.userRepository_)
 
@@ -160,18 +157,29 @@ class UserService extends TransactionBaseService {
         const hashedPassword = await this.hashPassword_(password)
         createUserData.password_hash = hashedPassword
       }
-      
-      // Create Organisation
-      const createOrganisatonData = { ...user.organisation} as CreateOrganisationInput
-      const organisationService = this.organisationService_.withTransaction(manager)
-      const organisation = await organisationService.create(createOrganisatonData)
 
-      // Create User
+
       createUserData.email = validatedEmail
       const created = userRepo.create(createUserData)
-      created.organisation = organisation
-      const newUser = await userRepo.save(created)
 
+      // If invite is true, then we are inviting a user to an existing organisation else we are creating a new organisation.
+      if(invite) {
+        const organisation = await this.organisationService_.retrieve(user.organisation_id)
+        if(!organisation) {
+          throw new AutoflowAiError(
+            AutoflowAiError.Types.INVALID_DATA,
+            "A user has invited to an existing organisation."
+          )
+        }
+        created.organisation = organisation
+      }else{
+        const createOrganisatonData = { ...user.organisation} as CreateOrganisationInput
+        const organisationService = this.organisationService_.withTransaction(manager)
+        const organisation = await organisationService.create(createOrganisatonData)
+        created.organisation = organisation 
+      }
+  
+      const newUser = await userRepo.save(created)
       return created
     })
   }
