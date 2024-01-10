@@ -9,6 +9,7 @@ export interface CreateUserInput {
   api_token?: string
   role?: UserRoles
   metadata?: Record<string, unknown>
+  organisation_id?: string
   organisation?: CreateOrganisationInput
 }
 

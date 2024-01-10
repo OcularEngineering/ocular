@@ -2,7 +2,7 @@ import { Router } from "express"
 import authRoutes from "./auth"
 import {unauthenticatedUserRoutes} from "./users"
 import middlewares from "../middlewares"
-import invites from "./invites"
+import invites, { unauthenticatedInviteRoutes } from "./invites"
 
 
 
@@ -18,9 +18,11 @@ export default (app, container, config) => {
   // )
 
   // Allows unathenticated requests to the /users endpoint for creating user signups
+  
   authRoutes(route)
   unauthenticatedUserRoutes(route)
-
+  route.use(middlewares.registeredLoggedinUser)
+  unauthenticatedInviteRoutes(route)
 
   // Authenticated routes
   route.use(middlewares.authenticate())
