@@ -22,9 +22,10 @@ import modelsLoader from "./models.js"
 import modulesLoader from "./module"
 import passportLoader from "./passport"
 import repositoriesLoader from "./repositories"
-// import searchIndexLoader from "./search-index"
+import searchEngineLoader from "./search"
 import servicesLoader from "./services.js"
 import redisLoader from './redis';
+import subscribersLoader from "./subscribers"
 
 type Options = {
   directory: string
@@ -93,6 +94,14 @@ export default async ({
     ;(req as any).scope = container.createScope()
     next()
   })
+
+  const subActivity = Logger.activity(`Initializing subscribers${EOL}`)
+  await subscribersLoader({ container })
+  const subAct = Logger.success(subActivity, "Subscribers initialized") || {}
+
+  const searActivity = Logger.activity(`Initializing Search Engine${EOL}`)
+  await searchEngineLoader({container, configModule})
+  const searAct = Logger.success(searActivity, "Search Engine initialized") || {}
 
   const apiActivity = Logger.activity(`Initializing API${EOL}`)
   await apiLoader({ container, app: expressApp, configModule })

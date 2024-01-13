@@ -5,7 +5,7 @@ import { TransactionBaseService } from "../interfaces"
 import { User } from "../models"
 import { UserRepository } from "../repositories/user"
 import {
-    CreateUserInput,
+    CreateUserInput, FilterableUserProps,
 } from "../types/user"
 import { validateEmail } from "../utils/is-email"
 import {buildQuery} from "../utils/build-query"
@@ -35,6 +35,9 @@ class UserService extends TransactionBaseService {
 
   protected readonly userRepository_: typeof UserRepository
   protected readonly organisationService_: OrganisationService
+
+  static readonly IndexName = `users`
+
   constructor({
     userRepository,
     organisationService
@@ -44,6 +47,16 @@ class UserService extends TransactionBaseService {
     this.userRepository_ = userRepository
     this.organisationService_ = organisationService
   }
+
+    /**
+   * @param {FilterableUserProps} selector - the query object for find
+   * @param {Object} config - the configuration object for the query
+   * @return {Promise} the result of the find operation
+   */
+    async list(selector: FilterableUserProps, config = {}): Promise<User[]> {
+      const userRepo = this.activeManager_.withRepository(this.userRepository_)
+      return await userRepo.find(buildQuery(selector, config))
+    }
 
   // /**
   //  * @param {FilterableUserProps} selector - the query object for find
