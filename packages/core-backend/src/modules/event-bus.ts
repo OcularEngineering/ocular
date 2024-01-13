@@ -94,7 +94,7 @@ export default class EventBusModule extends AbstractEventBusModuleService {
             },
           },
         ]
-
+   
     await this.queue_.addBulk(events)
   }
 

@@ -9,11 +9,12 @@ import { sleep } from "../utils"
 import StagedJobService from "./staged-job"
 import { FindConfig } from "../types/common"
 import { EOL } from "os"
-import { EmitData, EventBusService as EventBusServiceInterface, EventBusModule, Subscriber, SubscriberContext } from "../types/event-bus"
+import { EmitData, IEventBusService as EventBusServiceInterface, IEventBusModule, Subscriber, SubscriberContext } from "../types/event-bus"
+import { copyFileSync } from "fs"
 
 type InjectedDependencies = {
   stagedJobService: StagedJobService
-  eventBusModule:  EventBusModule
+  eventBusModule:  IEventBusModule
   logger: Logger
 }
 
@@ -27,7 +28,7 @@ export default class EventBusService
 {
   protected readonly config_: ConfigModule
   protected readonly stagedJobService_: StagedJobService
-  protected readonly eventBusModule_:  EventBusModule
+  protected readonly eventBusModule_:  IEventBusModule
   // // eslint-disable-next-line max-len
   // protected get eventBusModuleService_(): EventBusModuleService {
   //   return this.__container__.eventBusModuleService

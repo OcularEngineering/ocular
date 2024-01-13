@@ -35,7 +35,34 @@ module.exports = {
     database_url: process.env.DATABASE_URL,
     database_database: process.env.DATABASE_NAME,
     database_type: "postgres",
+    redis_url: process.env.REDIS_URL,
     store_cors: STORE_CORS,
-    admin_cors: ADMIN_CORS
+    admin_cors: ADMIN_CORS,
+    search_options: {
+      applicationId: process.env.ALGOLIA_APP_ID,
+      adminApiKey: process.env.ALGOLIA_ADMIN_API_KEY,
+      settings: {
+        users: {
+          indexSettings: {
+            searchableAttributes: [
+              "first_name",
+              "last_name",
+            ],
+            attributesToRetrieve: [
+              "objectID",
+              "first_name",
+              "last_name",
+            ],
+          },
+          primaryKey: "id",
+          transformer: (user) => ({
+            objectID : user.id, 
+            first_name: user.first_name,
+            last_name: user.last_name,
+            // other attributes...
+          }),
+        },
+      },
+    },
   },
 };
