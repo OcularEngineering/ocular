@@ -1,4 +1,5 @@
-import { UserRoles } from "../models/user"
+import { User, UserRoles } from "../models/user"
+import { PartialPick } from "./common"
 import { CreateOrganisationInput } from "./organisation"
 
 export interface CreateUserInput {
@@ -28,12 +29,12 @@ export enum UserRole {
   ADMIN = "admin"
 }
 
-// export type FilterableUserProps = PartialPick<
-//   User,
-//   | "email"
-//   | "first_name"
-//   | "last_name"
-//   | "created_at"
-//   | "updated_at"
-//   | "deleted_at"
-// >
+export type FilterableUserProps = PartialPick<
+  User,
+  | "id"
+  | "email"
+  | "first_name"
+  | "last_name"
+  | "created_at"
+  | "updated_at"
+>

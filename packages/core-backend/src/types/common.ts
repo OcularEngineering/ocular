@@ -45,3 +45,7 @@ export type ExtendedFindConfig<TEntity> = (
   skip?: number
   take?: number
 }
+
+export type PartialPick<T, K extends keyof T> = {
+  [P in K]?: T[P]
+}

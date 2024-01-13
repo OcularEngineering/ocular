@@ -1,7 +1,7 @@
 import { Subscriber, SubscriberContext } from "."
 import { TransactionBaseService } from "../../interfaces/transaction-base-service"
 
-export interface EventBusService extends TransactionBaseService {
+export interface IEventBusService extends TransactionBaseService {
   subscribe(
     eventName: string | symbol,
     subscriber: Subscriber,

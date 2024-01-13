@@ -1,5 +1,6 @@
 import { RedisOptions } from "ioredis"
 import { LoggerOptions } from "typeorm"
+import { AlgoliaPluginOptions } from "./search/algolia"
 
 type SessionOptions = {
   name?: string
@@ -42,6 +43,7 @@ export type ProjectConfigOptions = {
   }
   store_cors?: string
   admin_cors?: string
+  search_options?: AlgoliaPluginOptions
 }
 
 export type ConfigModule = {
