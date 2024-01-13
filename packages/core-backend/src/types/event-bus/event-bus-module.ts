@@ -1,6 +1,6 @@
 import { EmitData, Subscriber, SubscriberContext } from "./common"
 
-export interface EventBusModule {
+export interface IEventBusModule {
   emit<T>(
     eventName: string,
     data: T,

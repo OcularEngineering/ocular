@@ -9,7 +9,7 @@ import { UserRepository } from "../repositories/user"
 import { ConfigModule } from "../types/config-module"
 import { ListInvite } from "../types/invite"
 import { buildQuery } from "../utils/build-query"
-import {EventBusService} from "../types"
+import {IEventBusService} from "../types"
 import AutoflowAiError from "../utils/error"
 
 // 7 days
@@ -20,7 +20,7 @@ type InviteServiceProps = {
   userService: UserService
   userRepository: typeof UserRepository
   inviteRepository: typeof InviteRepository
-  eventBusService: EventBusService
+  eventBusService: IEventBusService
   loggedInUser: User
 }
 
@@ -32,7 +32,7 @@ class InviteService extends TransactionBaseService {
   protected readonly userService_: UserService
   protected readonly userRepo_: typeof UserRepository
   protected readonly inviteRepository_: typeof InviteRepository
-  protected readonly eventBus_:  EventBusService
+  protected readonly eventBus_:  IEventBusService
   protected readonly loggedInUser_: User
 
   protected readonly configModule_: ConfigModule
