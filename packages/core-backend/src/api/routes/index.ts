@@ -3,6 +3,7 @@ import authRoutes from "./auth"
 import {unauthenticatedUserRoutes} from "./users"
 import middlewares from "../middlewares"
 import invites, { unauthenticatedInviteRoutes } from "./invites"
+import search from "./search"
 
 
 
@@ -28,8 +29,8 @@ export default (app, container, config) => {
   route.use(middlewares.authenticate())
   route.use(middlewares.registeredLoggedinUser)
   invites(route)
+  search(route)
   
-
 
   // 
   // users(route)
