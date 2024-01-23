@@ -4,8 +4,8 @@ import {Organisation} from "../models"
 import { OrganisationRepository } from "../repositories/organisation"
 import { FindConfig } from "../types/common"
 import { buildQuery} from "../utils/build-query"
-import {CreateOrganisationInput} from "../types/organisation"
-import { isDefined} from "medusa-core-utils"
+import {CreateOrganisationInput, FilterableOrganisationProps} from "../types/organisation"
+import { isDefined} from "../utils/is-defined"
 import AutoflowAiError from "../utils/error"
 
 type InjectedDependencies = {
@@ -64,6 +64,11 @@ class OrganisationService extends TransactionBaseService {
     }
 
     return organisations[0]
+  }
+
+  async list(selector: FilterableOrganisationProps, config = {}): Promise<Organisation[]> {
+    const organisationRepo = this.activeManager_.withRepository(this.organisationRepository_)
+    return await organisationRepo.find(buildQuery(selector, config))
   }
 }
 export default OrganisationService;

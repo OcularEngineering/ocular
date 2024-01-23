@@ -6,9 +6,10 @@ export type SearchOptions = {
   additionalOptions: Record<string, unknown>
 }
 
-export type AlgoliaPluginOptions = {
-  applicationId: string
-  adminApiKey: string
+export type SearchEngineOptions = {
+  apiKey: string
+  endpoint: string
+  batchSize: number
   /**
    * Index settings
    */

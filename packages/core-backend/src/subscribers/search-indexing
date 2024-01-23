@@ -1,6 +1,5 @@
 import { IEventBusService, ISearchService } from "../types"
 import { defaultSearchIndexingProductRelations, indexTypes } from "../utils/search"
-import { SEARCH_INDEX_EVENT } from "../loaders/search"
 import OrganisationService from "../services/organisation"
 import { UserService } from "../services"
 import { User } from "../models"
@@ -8,6 +7,7 @@ import { User } from "../models"
 type InjectedDependencies = {
   eventBusService: IEventBusService
   searchService: ISearchService
+  vectorSearchService: ISearchService
   organisationService: OrganisationService
   userService: UserService
 }
@@ -17,30 +17,44 @@ class SearchIndexingSubscriber {
   private readonly searchService_: ISearchService
   private readonly organisationService_: OrganisationService
   private readonly userService_: UserService
+  private readonly vectorSearchService_: ISearchService
 
   constructor({
     eventBusService,
     searchService,
     organisationService,
     userService,
+    vectorSearchService,
   }: InjectedDependencies) {
     this.eventBusService_ = eventBusService
     this.searchService_ = searchService
+    this.vectorSearchService_ = vectorSearchService
     this.organisationService_ = organisationService
     this.userService_ = userService
 
-    this.eventBusService_.subscribe(SEARCH_INDEX_EVENT, this.indexOrganisationUsers)
+    // this.eventBusService_.subscribe(INDEX_CORE_EVENT, this.indexOrganisationUsers)
   }
 
   indexOrganisationUsers = async (): Promise<void> => {
     const users = await this.userService_.list({})
+
+    // SearchService Indexing
     if(users) {
       await this.searchService_.addDocuments(
         UserService.IndexName,
         users,
         indexTypes.USERS
       )
-   }
+    }
+
+    // Vector Search Indexing
+    if(users) {
+      await this.vectorSearchService_.addDocuments(
+        UserService.IndexName,
+        users,
+        indexTypes.USERS
+      )
+    }
     
     // const TAKE = (this.searchService_?.options?.batch_size as number) ?? 1000
     // let hasMore = true
