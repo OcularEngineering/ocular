@@ -1,3 +1,11 @@
+import { Organisation } from "../models/organisation"
+import { PartialPick } from "./common"
+
 export interface CreateOrganisationInput {
   name?: string
 }
+
+export type FilterableOrganisationProps = PartialPick<
+  Organisation,
+  | "name"
+>

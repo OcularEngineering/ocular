@@ -1,7 +1,8 @@
-import { SearchTypes } from "@medusajs/types"
+import { ISearchService } from "../types/search"
+import { Writable } from "stream"
 
 export abstract class AbstractSearchService
-  implements SearchTypes.ISearchService
+  implements ISearchService
 {
   static _isSearchService = true
 

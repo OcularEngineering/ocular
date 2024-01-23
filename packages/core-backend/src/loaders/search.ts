@@ -1,35 +1,47 @@
-import {SearchService} from "../services"
-import { ConfigModule, IEventBusService } from "../types"
-import { AutoflowContainer } from "../utils/autoflow-container"
-
-export const SEARCH_INDEX_EVENT = "SEARCH_INDEX_EVENT"
-
-async function loadProductsIntoSearchEngine(
-  container: AutoflowContainer
-): Promise<void> {
-  const eventBusService: IEventBusService = container.resolve("eventBusService")
-  void eventBusService.emit(SEARCH_INDEX_EVENT, {}).catch((err) => {
-    console.error(err)
-    console.error(
-      "Something went wrong while emitting the search indexing event."
-    )
-  })
-}
+import { asValue } from "awilix"
+import Redis from "ioredis"
+import FakeRedis from "ioredis-mock"
+import { EOL } from "os"
+import { Logger, AutoflowContainer } from "../types/global"
+import { ConfigModule }  from "../types/config-module"
+import { SearchEngineOptions } from "../types/search/options"
+import { SearchIndexClient, AzureKeyCredential } from "@azure/search-documents";
 
 type Options = {
   container: AutoflowContainer
   configModule: ConfigModule
+  logger: Logger
 }
 
-export default async ({ container, configModule}: Options) => {
-    const algoliaService: SearchService = container.resolve("searchService")
+// Loads a search client into the container for use by the indexer and the search engine.
+async function searchLoader({
+  container,
+  configModule,
+  logger,
+}: Options): Promise<void> {
 
-    const { settings } = configModule.projectConfig.search_options
+  const { apiKey, endpoint } = configModule.projectConfig.search_engine_options as SearchEngineOptions
 
-    await Promise.all(
-      Object.entries(settings || {}).map(async ([indexName, value]) => {
-        return await algoliaService.updateSettings(indexName, value)
-      })
-    )
-  await loadProductsIntoSearchEngine(container)
+  if (!apiKey) {
+    throw new Error("Please provide a valid search apiKey")
+  }
+
+  if (!endpoint) {
+    throw new Error("Please provide a valid search Endpoint")
+  }
+
+  const searchIndexClient = new SearchIndexClient(endpoint, new AzureKeyCredential(apiKey));
+
+  try {
+    await searchIndexClient.getServiceStatistics()
+    logger?.info(`Connection to Search Client established`)
+  } catch (err) {
+    logger?.error(`An error occurred while connecting to Search Client:${EOL} ${err}`)
+  }
+
+  container.register({
+    searchIndexClient: asValue(searchIndexClient),
+  })
 }
+
+export default searchLoader
