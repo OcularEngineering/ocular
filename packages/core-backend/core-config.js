@@ -38,9 +38,10 @@ module.exports = {
     redis_url: process.env.REDIS_URL,
     store_cors: STORE_CORS,
     admin_cors: ADMIN_CORS,
-    search_options: {
-      applicationId: process.env.ALGOLIA_APP_ID,
-      adminApiKey: process.env.ALGOLIA_ADMIN_API_KEY,
+    search_engine_options: {
+      apiKey: process.env.AZURE_SEARCH_API_KEY,
+      endpoint: process.env.AZURE_SEARCH_ENDPOINT,
+      batchSize: 1,
       settings: {
         users: {
           indexSettings: {
@@ -64,5 +65,8 @@ module.exports = {
         },
       },
     },
+    vector_search_options: {
+      apiKey: process.env.PINECONE_API_KEY,
+    }
   },
 };

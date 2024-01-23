@@ -45,7 +45,6 @@ export default (
               container.register({
                 [name]: asClass(val as ClassConstructor<unknown>),
               })
-
               container.registerAdd("db_entities", asValue(val))
             }
             models.push(val)
