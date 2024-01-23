@@ -1,6 +1,7 @@
 import { RedisOptions } from "ioredis"
 import { LoggerOptions } from "typeorm"
-import { AlgoliaPluginOptions } from "./search/algolia"
+import { SearchEngineOptions } from "./search/options"
+import { PineConePluginOptions } from "./search/pinecone"
 
 type SessionOptions = {
   name?: string
@@ -43,9 +44,14 @@ export type ProjectConfigOptions = {
   }
   store_cors?: string
   admin_cors?: string
-  search_options?: AlgoliaPluginOptions
+  search_engine_options?:SearchEngineOptions
+  vector_search_options?: PineConePluginOptions
 }
 
 export type ConfigModule = {
   projectConfig: ProjectConfigOptions
+}
+
+export type PartialPick<T, K extends keyof T> = {
+  [P in K]?: T[P]
 }

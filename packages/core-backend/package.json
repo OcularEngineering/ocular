@@ -19,6 +19,8 @@
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
+    "@azure/search-documents": "^12.0.0",
+    "@pinecone-database/pinecone": "^2.0.1",
     "algoliasearch": "^4.22.1",
     "passport-custom": "^1.1.1",
     "ts-node": "^10.9.2",

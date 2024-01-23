@@ -2,31 +2,66 @@ import { IndexSettings } from "../types/search"
 import {indexTypes}  from "../utils/search"
 import Algolia, { SearchClient } from "algoliasearch"
 import { AbstractSearchService } from "../interfaces/search"
-import { AlgoliaPluginOptions, SearchOptions } from "../types/search/algolia"
-import { ConfigModule } from "../types"
+import { SearchEngineOptions, SearchOptions } from "../types/search/options"
+import { ConfigModule, Logger } from "../types"
+import { RegisterOcularParameters } from "../types/ocular/ocular"
+import OrganisationService from "./organisation"
+import IndexerScript from "../scripts/indexer"
+import { pipeline } from "stream"
+import { SearchIndexClient } from "@azure/search-documents"
+
+type InjectedDependencies = {
+  organisationService: OrganisationService
+  searchIndexClient: SearchIndexClient
+  logger: Logger
+}
 
 class SearchService extends AbstractSearchService {
   isDefault = false
 
   protected readonly config_: ConfigModule
   protected readonly client_: SearchClient
+  protected readonly organisationService_: OrganisationService
+  protected readonly searchIndexClient_: SearchIndexClient
+  protected readonly logger_: Logger
 
-  constructor(_, config) {
-    super(_, config)
-
+  private oculars: Record<string, RegisterOcularParameters>;
+  constructor(container, config) {
+    super(container, config)
     this.config_ = config
+    this.oculars = {};
 
-    const { applicationId, adminApiKey, settings } = this.config_.projectConfig.search_options as AlgoliaPluginOptions
+    // const { applicationId, adminApiKey, settings } = this.config_.projectConfig.search_engine_options as SearchEngineOptions
 
-    if (!applicationId) {
-      throw new Error("Please provide a valid Application ID")
-    }
+    // if (!applicationId) {
+    //   throw new Error("Please provide a valid Application ID")
+    // }
 
-    if (!adminApiKey) {
-      throw new Error("Please provide a valid Admin Api Key")
-    }
+    // if (!adminApiKey) {
+    //   throw new Error("Please provide a valid Admin Api Key")
+    // }
 
-    this.client_ = Algolia(applicationId, adminApiKey)
+    // this.client_ = Algolia(applicationId, adminApiKey)
+    this.organisationService_ = container.organisationService
+    this.searchIndexClient_ = container.searchIndexClient
+    this.logger_ = container.logger
+  }
+
+  /**
+   * Makes the Search Engine Aware of an Ocular for Indexing Purposes.
+   */
+  addOcular(options: RegisterOcularParameters): void {
+    const { factory, schedule } = options;
+    console.log(
+      `Added ${factory.constructor.name} ocular factory for type ${factory.type}`,
+    );
+    this.oculars[factory.type] = {
+      factory,
+      schedule,
+    };
+    // this.documentTypes[factory.type] = {
+    //   visibilityPermission: factory.visibilityPermission,
+    // };
   }
 
   /**
@@ -168,18 +203,58 @@ class SearchService extends AbstractSearchService {
     switch (type) {
       case indexTypes.PRODUCTS:
         const productsTransformer =
-          this.config_.projectConfig.search_options.settings?.[indexTypes.PRODUCTS]
+          this.config_.projectConfig.search_engine_options.settings?.[indexTypes.PRODUCTS]
             ?.transformer
         return documents.map(productsTransformer)
       case indexTypes.USERS:
         const usersTransformer =
-          this.config_.projectConfig.search_options.settings?.[indexTypes.USERS]
+          this.config_.projectConfig.search_engine_options.settings?.[indexTypes.USERS]
             ?.transformer
         return documents.map(usersTransformer)
       default:
         return documents
     }
   }
+
+  async build() {
+    console.log("Index Builder Build")
+    // For each Org
+    // Iterate though all apps installed in an org
+    // For each app find an ocular and schedule an indexing job that takes in the Org, Oauth, Index name for indexing.
+
+    // Iterate through all the Orgs
+    const orgs =  await this.organisationService_.list({})
+
+    // for(const org of orgs){
+    for (let i = 0; i < 3; i++) {
+       // Default Backend Ocular
+       const type = "core-backend"
+       const collator = await this.oculars[type].factory.getOcular(orgs[i]);
+
+       console.log(`Collating documents for ${type} organisation ${orgs[i].name} via ${this.oculars[type].factory.constructor.name}`,);
+      
+      // Indexer should be instatiated with a config and org info so that it knows where to
+      // index the documents released by the ocular.
+      // More efficeint because we create one connecting for each occulation
+      // Indexer should be a reusable script and not a service.
+      const indexer = new IndexerScript({searchIndexClient:this.searchIndexClient_, configModule: this.config_, organisation: orgs[i], logger: this.logger_ })
+       pipeline(
+        [collator, indexer],
+        (error: NodeJS.ErrnoException | null) => {
+          if (error) {
+            console.error(
+              `Collating documents for ${type} failed: ${error}`,
+            );
+            // reject(error);
+          } else {
+            // Signal index pipeline completion!
+            console.log(`Collating documents for ${type} succeeded`);
+            // resolve();
+          }
+        },
+      );
+    }
+  }  
 }
 
 export default SearchService
