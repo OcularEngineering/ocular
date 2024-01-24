@@ -22,13 +22,16 @@ export default async (req, res) => {
   const paginationOptions = { offset, limit }
 
   const searchService: SearchService = req.scope.resolve("searchService")
+  const loggedInUser = req.scope.resolve("loggedInUser")
 
-  const results = await searchService.search(UserService.IndexName, q, {
+  
+
+  const results = await searchService.search(loggedInUser.organisation_id.toLowerCase().substring(4), q, {
     paginationOptions,
     filter,
     additionalOptions: options,
   })
-
+ 
   res.status(200).send(results)
 }
 
