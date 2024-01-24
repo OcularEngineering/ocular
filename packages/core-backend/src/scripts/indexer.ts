@@ -126,7 +126,7 @@ class IndexerScript extends BatchSearchEngineIndexer{
         },
       ],
     }
-    await this.searchIndexClient_.createIndex(searchIndex);
+    await this.searchIndexClient_.createOrUpdateIndex(searchIndex);
   }
 
   async index(documents: IndexableDocument[]): Promise<void> {

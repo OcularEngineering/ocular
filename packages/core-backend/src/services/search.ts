@@ -9,6 +9,7 @@ import OrganisationService from "./organisation"
 import IndexerScript from "../scripts/indexer"
 import { pipeline } from "stream"
 import { SearchIndexClient } from "@azure/search-documents"
+import JobSchedulerService from "./job-scheduler"
 
 type InjectedDependencies = {
   organisationService: OrganisationService
@@ -24,6 +25,7 @@ class SearchService extends AbstractSearchService {
   protected readonly organisationService_: OrganisationService
   protected readonly searchIndexClient_: SearchIndexClient
   protected readonly logger_: Logger
+  protected readonly jobSchedulerService_: JobSchedulerService
 
   private oculars: Record<string, RegisterOcularParameters>;
   constructor(container, config) {
@@ -45,6 +47,7 @@ class SearchService extends AbstractSearchService {
     this.organisationService_ = container.organisationService
     this.searchIndexClient_ = container.searchIndexClient
     this.logger_ = container.logger
+    this.jobSchedulerService_ = container.jobSchedulerService
   }
 
   /**
@@ -59,9 +62,6 @@ class SearchService extends AbstractSearchService {
       factory,
       schedule,
     };
-    // this.documentTypes[factory.type] = {
-    //   visibilityPermission: factory.visibilityPermission,
-    // };
   }
 
   /**
@@ -164,19 +164,16 @@ class SearchService extends AbstractSearchService {
     query: string,
     options: SearchOptions & Record<string, unknown>
   ) {
-    const { paginationOptions, filter, additionalOptions } = options
-
-    // fit our pagination options to what Algolia expects
-    if ("limit" in paginationOptions && paginationOptions.limit != null) {
-      paginationOptions["length"] = paginationOptions.limit
-      delete paginationOptions.limit
-    }
-
-    return await this.client_.initIndex(indexName).search(query, {
-      filters: filter,
-      ...paginationOptions,
-      ...additionalOptions,
+    const searchClient = this.searchIndexClient_.getSearchClient(indexName);
+    const searchResults = await searchClient.search(query, {
+      select: ["id", "title", "source", "content", "updated_at", "location"],
     })
+    // Convert the PagedAsyncIterableIterator to an array
+    let resultsArray = [];
+    for await (const result of searchResults.results) {
+      resultsArray.push(result);
+    }
+    return resultsArray;
   }
 
   /**
@@ -216,6 +213,7 @@ class SearchService extends AbstractSearchService {
     }
   }
 
+  // Schedules jobs that index a companies data.
   async build() {
     console.log("Index Builder Build")
     // For each Org
@@ -227,32 +225,42 @@ class SearchService extends AbstractSearchService {
 
     // for(const org of orgs){
     for (let i = 0; i < 3; i++) {
-       // Default Backend Ocular
-       const type = "core-backend"
-       const collator = await this.oculars[type].factory.getOcular(orgs[i]);
-
-       console.log(`Collating documents for ${type} organisation ${orgs[i].name} via ${this.oculars[type].factory.constructor.name}`,);
-      
       // Indexer should be instatiated with a config and org info so that it knows where to
       // index the documents released by the ocular.
       // More efficeint because we create one connecting for each occulation
       // Indexer should be a reusable script and not a service.
       const indexer = new IndexerScript({searchIndexClient:this.searchIndexClient_, configModule: this.config_, organisation: orgs[i], logger: this.logger_ })
-       pipeline(
-        [collator, indexer],
-        (error: NodeJS.ErrnoException | null) => {
-          if (error) {
-            console.error(
-              `Collating documents for ${type} failed: ${error}`,
-            );
-            // reject(error);
-          } else {
-            // Signal index pipeline completion!
-            console.log(`Collating documents for ${type} succeeded`);
-            // resolve();
-          }
-        },
-      );
+
+      // For each Ocular
+       // Default Backend Ocular
+       const occularType = "core-backend"
+       const occular = await this.oculars[occularType].factory.getOcular(orgs[i]);
+
+       console.log(`Collating documents for ${occularType} organisation ${orgs[i].name} via ${this.oculars[occularType].factory.constructor.name}`,);
+      
+    
+      this.jobSchedulerService_.create(
+        `publish-products-${occularType}-${orgs[i].id}`,
+        {occularType}, 
+        "* * * * *", 
+        async () => {
+        pipeline(
+          [occular, indexer],
+          (error: NodeJS.ErrnoException | null) => {
+            if (error) {
+              console.error(
+                `Collating documents for ${occularType} failed: ${error}`,
+              );
+              // reject(error);
+            } else {
+              // Signal index pipeline completion!
+              console.log(`Collating documents for ${occularType} succeeded`);
+              // resolve();
+            }
+          },
+        );
+        }
+      )
     }
   }  
 }
