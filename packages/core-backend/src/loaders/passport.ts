@@ -4,7 +4,7 @@ import { Strategy as CustomStrategy } from "passport-custom"
 import { ExtractJwt, Strategy as JWTStrategy } from "passport-jwt"
 import { Strategy as LocalStrategy } from "passport-local"
 import { ConfigModule } from "../types/config-module"
-import {  AutoflowContainer} from "../types/autoflow-container"
+import {  AutoflowContainer} from "../../../types/src/common/autoflow-container"
 import { AuthService } from "../services"
 import { AutoflowRequest } from "../types/routing"
 

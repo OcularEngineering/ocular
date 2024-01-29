@@ -5,7 +5,7 @@ import { ConfigModule } from "../types/config-module";
 import { SearchEngineOptions } from "../types/search/options";
 import { SearchIndexClient, AzureKeyCredential,SearchIndex,SearchClient, SearchIndexingBufferedSender} from "@azure/search-documents";
 import { Lifetime } from "awilix"
-import { Logger } from "../types/logger";
+import { Logger } from "@ocular-ai/types";
 import e from "express";
 import { Organisation } from "../models";
 
