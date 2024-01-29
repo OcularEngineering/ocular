@@ -12,12 +12,13 @@ import { asValue } from "awilix"
 import { createAutoflowContainer } from "../utils/autoflow-container"
 import { EOL } from "os"
 import { Connection } from "typeorm"
-import { AutoflowContainer } from "../types/global"
+import { AutoflowContainer } from "@ocular-ai/types"
 import apiLoader from "./api"
 import Logger from "./logger"
 
 // import defaultsLoader from "./defaults"
 import expressLoader from "./express"
+import loadOcularApp from "./ocular-app"
 import modelsLoader from "./models.js"
 import modulesLoader from "./module"
 import passportLoader from "./passport"
@@ -88,6 +89,14 @@ export default async ({
   await expressLoader({ app: expressApp, configModule })
   await passportLoader({ app: expressApp, container, configModule })
   const exAct = Logger.success(expActivity, "Express intialized") || {}
+
+  // // Load Modules such as the CATALOG, Kubernetes onto the Ocular App
+  // const externalmodulesActivity = Logger.activity(`Initializing external modules${EOL}`)
+  // await loadOcularApp({
+  //   configModule,
+  //   container,
+  // })
+  // const externalmodAct = Logger.success(externalmodulesActivity, "External modules initialized") || {}
 
   // Add the registered services to the request scope
   expressApp.use((req: Request, res: Response, next: NextFunction) => {

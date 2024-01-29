@@ -1,5 +1,5 @@
 import { User, UserRoles } from "../models/user"
-import { PartialPick } from "../../../types/src/common/common"
+import { PartialPick } from "../types/common"
 import { CreateOrganisationInput } from "./organisation"
 
 export interface CreateUserInput {

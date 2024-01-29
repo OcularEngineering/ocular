@@ -1,5 +1,5 @@
 import { Organisation } from "../models/organisation"
-import { PartialPick } from "../../../types/src/common/common"
+import { PartialPick } from "../types/common"
 
 export interface CreateOrganisationInput {
   name?: string

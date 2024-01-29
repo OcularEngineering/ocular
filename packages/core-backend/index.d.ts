@@ -1,1 +1,1 @@
-declare module "autoflow-ai-interfaces"
+export * from "./src/models"

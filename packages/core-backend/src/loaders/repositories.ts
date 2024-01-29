@@ -2,7 +2,7 @@ import glob from "glob"
 import path from "path"
 
 import formatRegistrationName from "../utils/format-registration-name"
-import {AutoflowContainer } from "../types/global"
+import {AutoflowContainer } from "@ocular-ai/types"
 import { asValue } from "awilix"
 
 /**

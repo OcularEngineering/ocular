@@ -39,5 +39,5 @@
     "types": ["node"],
   },
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
-  "include": ["src/**/*.ts", "../types/src/common/autoflow-container.ts", "src/models/batch-job", "src/services/batch-job", "src/services/index-builder", "src/subscribers/search-indexing", "src/repositories/batch-job", "src/services/indexer", "src/services/vector-search", "src/services/invite", "src/api/routes/invites/index", "src/api/routes/invites/create-invite", "src/api/routes/users/list-users", "../types/src/logger/logger.ts", "../types/src/common/common.ts"]
+  "include": ["src/**/*.ts"]
 }

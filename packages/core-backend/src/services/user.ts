@@ -9,7 +9,7 @@ import {
 } from "../types/user"
 import { validateEmail } from "../utils/is-email"
 import {buildQuery} from "../utils/build-query"
-import { FindConfig } from "@ocular-ai/types"
+import { FindConfig } from "../types/common"
 import OrganisationService from "./organisation"
 import { CreateOrganisationInput } from "../types/organisation"
 import { isDefined } from "../utils/is-defined"
