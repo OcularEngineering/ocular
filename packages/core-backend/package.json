@@ -1,5 +1,5 @@
 {
-  "name": "core-backend",
+  "name": "@ocular-ai/core-backend",
   "version": "1.0.0",
   "description": "Description of your core-backend project",
   "main": "dist/app.js",
@@ -20,6 +20,7 @@
   "license": "MIT",
   "dependencies": {
     "@azure/search-documents": "^12.0.0",
+    "@ocular-ai/modules-sdk": "file:../modules-sdk",
     "@ocular-ai/types": "file:../types",
     "@pinecone-database/pinecone": "^2.0.1",
     "algoliasearch": "^4.22.1",

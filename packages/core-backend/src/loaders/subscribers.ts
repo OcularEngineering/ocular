@@ -1,7 +1,7 @@
 import glob from "glob"
 import path from "path"
 import { asFunction } from "awilix"
-import { AutoflowContainer} from "../types/global"
+import { AutoflowContainer} from "@ocular-ai/types"
 
 /**
  * Registers all subscribers in the subscribers directory

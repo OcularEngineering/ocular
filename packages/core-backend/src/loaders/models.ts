@@ -1,7 +1,8 @@
 import { formatRegistrationName } from "../utils/format-registration-name"
 import glob from "glob"
 import path from "path"
-import { ClassConstructor, AutoflowContainer } from "../types/global"
+import { ClassConstructor} from "../types/global"
+import { AutoflowContainer } from "@ocular-ai/types"
 import { EntitySchema } from "typeorm"
 import { asClass, asValue } from "awilix"
 

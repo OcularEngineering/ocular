@@ -13,7 +13,7 @@ import {
   MoreThan,
   MoreThanOrEqual,
 } from "typeorm"
-import { ExtendedFindConfig, FindConfig } from "@ocular-ai/types"
+import { ExtendedFindConfig, FindConfig } from "../types/common"
 
 import { FindOptionsOrder } from "typeorm/find-options/FindOptionsOrder"
 import { buildOrder, buildRelations, buildSelects } from "@medusajs/utils"

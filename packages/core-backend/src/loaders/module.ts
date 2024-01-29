@@ -1,7 +1,7 @@
 import { asFunction } from "awilix"
 import glob from "glob"
 import path from "path"
-import { AutoflowContainer } from "../types/global"
+import { AutoflowContainer } from "@ocular-ai/types"
 import  {ConfigModule} from "../types/config-module"
 import formatRegistrationName from "../utils/format-registration-name"
 
