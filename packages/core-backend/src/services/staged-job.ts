@@ -1,6 +1,6 @@
 import { DeepPartial, EntityManager, In } from "typeorm"
 
-import { FindConfig } from "../types/common"
+import { FindConfig } from "../../../types/src/common/common"
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { StagedJob } from "../models"
 import { StagedJobRepository } from "../repositories/staged-job"

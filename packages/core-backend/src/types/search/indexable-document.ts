@@ -47,7 +47,7 @@ export type IndexableDocument = {
  location: string;
 };
 
-export const indexFields = [
+export const indexFields = ([
     {
       name: "id",
       type: "Edm.String",
@@ -87,4 +87,4 @@ export const indexFields = [
       type: "Edm.String",
       searchable: false,
     },
-  ];
+  ]);
