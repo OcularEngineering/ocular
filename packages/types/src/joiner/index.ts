@@ -4,7 +4,7 @@ export type JoinerRelationship = {
   primaryKey: string
   serviceName: string
   /**
-   * If true, the relationship is an internal service from the medusa core
+   * If true, the relationship is an internal service from the core
    * TODO: Remove when there are no more "internal" services
    */
   isInternalService?: boolean

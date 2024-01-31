@@ -4,7 +4,7 @@ import {
   ModuleDefinition,
 } from "@ocular-ai/types"
 
-import { upperCaseFirst } from "@medusajs/utils"
+import { upperCaseFirst } from "@ocular-ai/utils"
 
 export enum Modules {
   CATALOG = "catalog",

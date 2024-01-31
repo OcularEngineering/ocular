@@ -1,6 +1,6 @@
 {
   "name": "@ocular-ai/types",
-  "version": "1.11.11",
+  "version": "0.0.0",
   "description": "Ocualar Types definition",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -15,7 +15,7 @@
   "files": [
     "dist"
   ],
-  "author": "Medusa",
+  "author": "Louis Luxa Murerwa",
   "license": "MIT",
   "devDependencies": {
     "awilix": "^8.0.0",
