@@ -1,0 +1,35 @@
+{
+  "name": "@ocular-ai/types",
+  "version": "0.0.0",
+  "description": "Ocualar Types definition",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OcularEngineering/OcularAI",
+    "directory": "packages/types"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "files": [
+    "dist"
+  ],
+  "author": "Louis Luxa Murerwa",
+  "license": "MIT",
+  "devDependencies": {
+    "awilix": "^8.0.0",
+    "cross-env": "^5.2.1",
+    "ioredis": "^5.2.5",
+    "rimraf": "^5.0.1",
+    "typeorm": "^0.3.16",
+    "typescript": "^5.1.6",
+    "winston": "^3.8.2"
+  },
+  "scripts": {
+    "prepublishOnly": "cross-env NODE_ENV=production tsc --build",
+    "build": "rimraf dist && tsc --build",
+    "watch": "tsc --build --watch",
+    "test": "exit 0"
+  }
+}
