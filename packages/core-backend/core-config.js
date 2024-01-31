@@ -67,6 +67,6 @@ module.exports = {
     },
     vector_search_options: {
       apiKey: process.env.PINECONE_API_KEY,
-    }
+    },
   },
 };

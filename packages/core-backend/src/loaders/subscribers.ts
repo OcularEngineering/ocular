@@ -1,7 +1,9 @@
-import glob from "glob"
+// Glob only works with require
+const glob = require("glob");
+
 import path from "path"
 import { asFunction } from "awilix"
-import { AutoflowContainer} from "../types/global"
+import { AutoflowContainer} from "@ocular-ai/types"
 
 /**
  * Registers all subscribers in the subscribers directory

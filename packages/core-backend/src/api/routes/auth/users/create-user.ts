@@ -11,10 +11,10 @@ import {
   Min,
   ValidateNested,} from "class-validator"
   import { Type } from "class-transformer"
-import { UserRoles } from "../../../models/user"
-import UserService from "../../../services/user"
+import { UserRoles } from "../../../../models/user"
+import UserService from "../../../../services/user"
 import _ from "lodash"
-import { validator } from "../../../utils/validator"
+import { validator } from "../../../../utils/validator"
 import { EntityManager } from "typeorm"
 
 //"Create a User.

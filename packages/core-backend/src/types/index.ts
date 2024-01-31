@@ -1,5 +1,5 @@
 export * from "./auth"
 export * from "./config-module"
-export * from "./logger"
+export * from "../../../types/src/logger/logger"
 export * from "./event-bus"
 export * from "./search"

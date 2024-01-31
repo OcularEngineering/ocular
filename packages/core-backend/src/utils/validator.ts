@@ -1,7 +1,7 @@
 import { ClassConstructor, plainToInstance } from "class-transformer"
 import { validate, ValidationError, ValidatorOptions } from "class-validator"
-import AutoflowAiError from "./error"
-import { Constructor } from "../types/common"
+import {AutoflowAiError} from "@ocular-ai/utils"
+import { Constructor } from "@ocular-ai/types"
 
 const extendedValidators: Map<string, Constructor<any>> = new Map()
 

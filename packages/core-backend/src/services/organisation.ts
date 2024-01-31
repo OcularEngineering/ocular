@@ -6,7 +6,7 @@ import { FindConfig } from "../types/common"
 import { buildQuery} from "../utils/build-query"
 import {CreateOrganisationInput, FilterableOrganisationProps} from "../types/organisation"
 import { isDefined} from "../utils/is-defined"
-import AutoflowAiError from "../utils/error"
+import {AutoflowAiError} from "@ocular-ai/utils"
 
 type InjectedDependencies = {
   manager: EntityManager

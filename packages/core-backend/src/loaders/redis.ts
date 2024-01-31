@@ -2,7 +2,7 @@ import { asValue } from "awilix"
 import Redis from "ioredis"
 import FakeRedis from "ioredis-mock"
 import { EOL } from "os"
-import { Logger, AutoflowContainer } from "../types/global"
+import { Logger, AutoflowContainer } from "@ocular-ai/types"
 import  {ConfigModule}  from "../types/config-module"
 
 type Options = {
