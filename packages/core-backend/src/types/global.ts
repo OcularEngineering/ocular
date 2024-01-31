@@ -1,5 +1,5 @@
 import { Request } from "express"
-import { AutoflowContainer as coreAutoflowContainer} from "./autoflow-container"
+import { AutoflowContainer as coreAutoflowContainer} from "@ocular-ai/types"
 import {  User } from "../models"
 import { FindConfig, RequestQueryFields } from "./common"
 
@@ -44,6 +44,3 @@ export type Logger = {
   warn: (message) => void
   log: (...args) => void
 }
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Constructor<T> = new (...args: any[]) => T

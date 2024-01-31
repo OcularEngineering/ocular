@@ -1,4 +1,4 @@
-import AutoflowAiError from "../utils/error"
+import { AutoflowAiError } from "@ocular-ai/utils"
 import Scrypt from "scrypt-kdf"
 import { EntityManager } from "typeorm"
 import { TransactionBaseService } from "../interfaces"

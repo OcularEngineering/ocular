@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express"
 
 import type { User } from "../models"
-import type { AutoflowContainer } from "./global"
+import type { AutoflowContainer } from "@ocular-ai/types"
 
 export interface AutoflowRequest extends Request {
   user?: (User) & { userId?: string }

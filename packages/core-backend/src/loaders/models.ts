@@ -1,9 +1,12 @@
 import { formatRegistrationName } from "../utils/format-registration-name"
-import glob from "glob"
+// import glob from "glob"
 import path from "path"
-import { ClassConstructor, AutoflowContainer } from "../types/global"
+import { ClassConstructor} from "../types/global"
+import { AutoflowContainer } from "@ocular-ai/types"
 import { EntitySchema } from "typeorm"
 import { asClass, asValue } from "awilix"
+// Glob only works with require
+const glob = require("glob");
 
 type ModelLoaderParams = {
   container: AutoflowContainer
@@ -24,7 +27,7 @@ export default (
 ) => {
   const coreModelsFullGlob = path.join(__dirname, corePathGlob)
   const models: (ClassConstructor<unknown> | EntitySchema)[] = []
-
+  
   const coreModels = glob.sync(coreModelsFullGlob, {
     cwd: __dirname,
     ignore: ["**/index.js", "**/index.ts", "**/index.js.map"],

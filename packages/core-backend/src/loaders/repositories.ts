@@ -1,8 +1,10 @@
-import glob from "glob"
+// Glob only works with require
+const glob = require("glob");
+
 import path from "path"
 
 import formatRegistrationName from "../utils/format-registration-name"
-import {AutoflowContainer } from "../types/global"
+import {AutoflowContainer } from "@ocular-ai/types"
 import { asValue } from "awilix"
 
 /**

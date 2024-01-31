@@ -1,4 +1,4 @@
-import { Logger, AutoflowContainer } from "../types/global"
+import { Logger, AutoflowContainer } from "@ocular-ai/types"
 import { ConfigModule }  from "../types/config-module"
 import { CoreBackendOcular } from "../oculars/core-backend-ocular"
 

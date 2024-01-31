@@ -9,6 +9,7 @@
     "@nestjs/core": "^10.0.2",
     "@nestjs/platform-express": "^10.0.2",
     "@nx/devkit": "17.2.3",
+    "@ocular-ai/types": "file:packages/types",
     "@prisma/client": "^5.7.0",
     "@radix-ui/react-collapsible": "^1.0.3",
     "@reduxjs/toolkit": "^2.0.1",

@@ -1,5 +1,5 @@
 import { isEmail } from "class-validator"
-import  AutoflowAiError  from "./error"
+import {AutoflowAiError} from "@ocular-ai/utils"
 
 /**
  * Used to validate user email.
