@@ -1,0 +1,4 @@
+
+> @ocular-ai/types@1.11.11 build /Users/louismurerwa/Desktop/LuxaInvestmentsProjects/autoflow-ai/packages/types
+> rimraf dist && tsc --build
+
