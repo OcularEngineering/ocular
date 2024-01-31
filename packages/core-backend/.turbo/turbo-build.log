@@ -1,0 +1,4 @@
+
+> @ocular-ai/core-backend@1.0.0 build /Users/louismurerwa/Desktop/LuxaInvestmentsProjects/autoflow-ai/packages/core-backend
+> rimraf dist && tsc --build
+
