@@ -1,0 +1,36 @@
+{
+  "name": "@ocular-ai/utils",
+  "version": "0.0.0",
+  "description": "Ocular utilities functions shared by Ocular CoreBackend and Modules",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OcularEngineering/OcularAI",
+    "directory": "packages/utils"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
+  "author": "Louis Luxa Murerwa",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {
+    "knew": "0.0.0",
+    "knex": "^3.1.0",
+    "tsc": "^2.0.4",
+    "typescript": "^5.3.3"
+  },
+  "scripts": {
+    "prepublishOnly": "cross-env NODE_ENV=production tsc --build",
+    "build": "rimraf dist && tsc --build",
+    "watch": "tsc --build --watch",
+    "test": "jest --runInBand --bail --forceExit"
+  }
+}
