@@ -21,7 +21,7 @@ export type InternalModuleDeclaration = {
   scope: MODULE_SCOPE.INTERNAL
   resources: MODULE_RESOURCE_TYPE
   dependencies?: string[]
-  definition?: ModuleDefinition // That represent the definition of the module, such as the one we have for the medusa supported modules. This property is used for custom made modules.
+  definition?: ModuleDefinition // That represent the definition of the module, such as the one we have for the supported modules. This property is used for custom made modules.
   resolve?: string | ModuleExports
   options?: Record<string, unknown>
   /**
@@ -36,7 +36,7 @@ export type InternalModuleDeclaration = {
 
 export type ExternalModuleDeclaration = {
   scope: MODULE_SCOPE.EXTERNAL
-  definition?: ModuleDefinition // That represent the definition of the module, such as the one we have for the medusa supported modules. This property is used for custom made modules.
+  definition?: ModuleDefinition // That represent the definition of the module, such as the one we have for the supported modules. This property is used for custom made modules.
   server?: {
     type: "http"
     url: string
@@ -188,7 +188,7 @@ export type ModuleJoinerConfig = Omit<
 
 export declare type ModuleJoinerRelationship = JoinerRelationship & {
   /**
-   * If true, the relationship is an internal service from the medusa core TODO: Remove when there are no more "internal" services
+   * If true, the relationship is an internal service from the core TODO: Remove when there are no more "internal" services
    */
   isInternalService?: boolean
   /**

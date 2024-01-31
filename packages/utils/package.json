@@ -22,6 +22,7 @@
   "license": "MIT",
   "devDependencies": {},
   "dependencies": {
+    "@ocular-ai/types": "file:../types",
     "knew": "0.0.0",
     "knex": "^3.1.0",
     "tsc": "^2.0.4",
