@@ -7,7 +7,7 @@ import {
 import { fileURLToPath } from 'url';
 import path, { dirname, join } from 'path';
 import configLoader from './loaders/config';
-import { createAutoflowContainer } from "./utils/autoflow-container";
+import { createAutoflowContainer } from "@ocular-ai/utils";
 import databaseLoader from "./loaders/database"
 import modelsLoader from "./loaders/models"
 import  getConfigFile  from "./utils/get-config-file"

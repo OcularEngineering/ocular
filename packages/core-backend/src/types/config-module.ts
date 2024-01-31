@@ -55,8 +55,10 @@ export type ProjectConfigOptions = {
 export type ConfigModule = {
   projectConfig: ProjectConfigOptions
   modules?: Record<
-    string,
-    boolean | Partial<InternalModuleDeclaration | ExternalModuleDeclaration>
+  string,
+  | false
+  | string
+  | Partial<InternalModuleDeclaration | ExternalModuleDeclaration>
   >
 }
 

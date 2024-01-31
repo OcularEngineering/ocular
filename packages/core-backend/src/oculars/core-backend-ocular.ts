@@ -4,7 +4,7 @@ import { OcularFactory } from '../types/ocular/interface';
 import { IndexableDocument } from '../types/search';
 import { ConfigModule, Logger } from '../types';
 import { Organisation, User } from '../models';
-import { AutoflowContainer } from '../utils/autoflow-container';
+import { AutoflowContainer } from '@ocular-ai/utils';
 import { UserService } from '../services';
 import { AppType } from '../types/apps';
 

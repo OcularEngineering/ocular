@@ -10,7 +10,7 @@ import { ConfigModule } from "../types/config-module"
 import { ListInvite } from "../types/invite"
 import { buildQuery } from "../utils/build-query"
 import {IEventBusService} from "../types"
-import AutoflowAiError from "../utils/error"
+import { AutoflowAiError , AutoflowAiErrorTypes } from "@ocular-ai/utils"
 
 // 7 days
 const DEFAULT_VALID_DURATION = 1000 * 60 * 60 * 24 * 7
@@ -69,7 +69,7 @@ class InviteService extends TransactionBaseService {
       return jwt.sign(data, jwt_secret)
     }
     throw new AutoflowAiError(
-      AutoflowAiError.Types.INVALID_DATA,
+      AutoflowAiErrorTypes.INVALID_DATA,
       "Please configure jwt_secret"
     )
   }
@@ -226,7 +226,7 @@ class InviteService extends TransactionBaseService {
       return jwt.verify(token, jwt_secret)
     }
     throw new AutoflowAiError(
-      AutoflowAiError.Types.INVALID_DATA,
+      AutoflowAiErrorTypes.INVALID_DATA,
       "Please configure jwt_secret"
     )
   }
