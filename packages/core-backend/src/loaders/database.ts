@@ -44,13 +44,16 @@ export default async ({
       (configModule.projectConfig.database_logging || false),
   } as DataSourceOptions)
 
+  await dataSource.initialize().catch(handlePostgresDatabaseError)
+
   // If migrations are not included in the config, we assume you are attempting to start the server
   // Therefore, throw if the database is not migrated
-  if (!dataSource.migrations?.length) {
-    await dataSource.initialize().catch(handlePostgresDatabaseError)
-    await dataSource
-      .query(`select * from migrations`)
-      .catch(handlePostgresDatabaseError)
-  }
+  // if (!dataSource.migrations?.length) {
+  //   console.log("Migrations", dataSource.migrations)
+    
+  //   await dataSource
+  //     .query(`select * from migrations`)
+  //     .catch(handlePostgresDatabaseError)
+  // }
   return dataSource
 }
