@@ -87,13 +87,13 @@ export default async ({
   modulesLoader({ container, configModule})
   const modAct = Logger.success(modulesActivity, "Modules initialized") || {}
 
-  const modsActivity = Logger.activity(`Initializing modules${EOL}`)
-  await moduleLoader({
-    container,
-    moduleResolutions: registerModules(configModule.modules),
-    logger: Logger,
-  })
-  const modsAct = Logger.success(modsActivity, "Modules initialized") || {}
+  // const modsActivity = Logger.activity(`Initializing modules${EOL}`)
+  // await moduleLoader({
+  //   container,
+  //   moduleResolutions: registerModules(configModule.modules),
+  //   logger: Logger,
+  // })
+  // const modsAct = Logger.success(modsActivity, "Modules initialized") || {}
 
 
   const expActivity = Logger.activity(`Initializing express${EOL}`)

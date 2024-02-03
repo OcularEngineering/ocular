@@ -1,6 +1,5 @@
 import {  Logger } from "../types"
 import { DatabaseErrorCode, EventBusUtils } from "@medusajs/utils"
-import { EntityManager } from "typeorm"
 import { TransactionBaseService } from "../interfaces"
 import { StagedJob } from "../models"
 import { ConfigModule } from  "../types"
@@ -10,7 +9,6 @@ import StagedJobService from "./staged-job"
 import { FindConfig } from "../types/common"
 import { EOL } from "os"
 import { EmitData, IEventBusService as EventBusServiceInterface, IEventBusModule, Subscriber, SubscriberContext } from "../types/event-bus"
-import { copyFileSync } from "fs"
 
 type InjectedDependencies = {
   stagedJobService: StagedJobService
