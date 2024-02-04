@@ -30,7 +30,7 @@ export default ({ container, configModule}: Options): void => {
       container.register({
         [name]: asFunction(
           (cradle) => new loaded(cradle, configModule)
-        ).singleton(),
+        ).scoped(),
       })
     }
   })

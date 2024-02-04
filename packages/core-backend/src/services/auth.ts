@@ -4,7 +4,6 @@ import { User } from "../models"
 import { TransactionBaseService } from "../interfaces"
 import UserService from "./user"
 import { EntityManager } from "typeorm"
-import { Logger } from "@medusajs/types"
 
 type InjectedDependencies = {
   manager: EntityManager

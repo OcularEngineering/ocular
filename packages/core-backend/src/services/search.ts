@@ -1,7 +1,7 @@
 import { IndexSettings } from "../types/search"
 import {indexTypes}  from "../utils/search"
 import Algolia, { SearchClient } from "algoliasearch"
-import { AbstractSearchService } from "../interfaces/search"
+import { AbstractSearchService } from "../interfaces"
 import { SearchEngineOptions, SearchOptions } from "../types/search/options"
 import { ConfigModule, Logger } from "../types"
 import { RegisterOcularParameters } from "../types/ocular/ocular"
@@ -169,7 +169,7 @@ class SearchService extends AbstractSearchService {
       select: ["id", "title", "source", "content", "updated_at", "location"],
     })
     // Convert the PagedAsyncIterableIterator to an array
-    let resultsArray = [];
+    const resultsArray = [];
     for await (const result of searchResults.results) {
       resultsArray.push(result);
     }
@@ -221,47 +221,48 @@ class SearchService extends AbstractSearchService {
     // For each app find an ocular and schedule an indexing job that takes in the Org, Oauth, Index name for indexing.
 
     // Iterate through all the Orgs
-    const orgs =  await this.organisationService_.list({})
+    // const orgs =  await this.organisationService_.list({})
+    // const orgs = {}
 
-    // for(const org of orgs){
-    for (let i = 0; i < 3; i++) {
-      // Indexer should be instatiated with a config and org info so that it knows where to
-      // index the documents released by the ocular.
-      // More efficeint because we create one connecting for each occulation
-      // Indexer should be a reusable script and not a service.
-      const indexer = new IndexerScript({searchIndexClient:this.searchIndexClient_, configModule: this.config_, organisation: orgs[i], logger: this.logger_ })
+    // // for(const org of orgs){
+    // for (let i = 0; i < 3; i++) {
+    //   // Indexer should be instatiated with a config and org info so that it knows where to
+    //   // index the documents released by the ocular.
+    //   // More efficeint because we create one connecting for each occulation
+    //   // Indexer should be a reusable script and not a service.
+    //   const indexer = new IndexerScript({searchIndexClient:this.searchIndexClient_, configModule: this.config_, organisation: orgs[i], logger: this.logger_ })
 
-      // For each Ocular
-       // Default Backend Ocular
-       const occularType = "core-backend"
-       const occular = await this.oculars[occularType].factory.getOcular(orgs[i]);
+    //   // For each Ocular
+    //    // Default Backend Ocular
+    //    const occularType = "core-backend"
+    //    const occular = await this.oculars[occularType].factory.getOcular(orgs[i]);
 
-       console.log(`Collating documents for ${occularType} organisation ${orgs[i].name} via ${this.oculars[occularType].factory.constructor.name}`,);
+    //    console.log(`Collating documents for ${occularType} organisation ${orgs[i].name} via ${this.oculars[occularType].factory.constructor.name}`,);
       
     
-      this.jobSchedulerService_.create(
-        `publish-products-${occularType}-${orgs[i].id}`,
-        {occularType}, 
-        "* * * * *", 
-        async () => {
-        pipeline(
-          [occular, indexer],
-          (error: NodeJS.ErrnoException | null) => {
-            if (error) {
-              console.error(
-                `Collating documents for ${occularType} failed: ${error}`,
-              );
-              // reject(error);
-            } else {
-              // Signal index pipeline completion!
-              console.log(`Collating documents for ${occularType} succeeded`);
-              // resolve();
-            }
-          },
-        );
-        }
-      )
-    }
+    //   this.jobSchedulerService_.create(
+    //     `publish-products-${occularType}-${orgs[i].id}`,
+    //     {occularType}, 
+    //     "* * * * *", 
+    //     async () => {
+    //     pipeline(
+    //       [occular, indexer],
+    //       (error: NodeJS.ErrnoException | null) => {
+    //         if (error) {
+    //           console.error(
+    //             `Collating documents for ${occularType} failed: ${error}`,
+    //           );
+    //           // reject(error);
+    //         } else {
+    //           // Signal index pipeline completion!
+    //           console.log(`Collating documents for ${occularType} succeeded`);
+    //           // resolve();
+    //         }
+    //       },
+    //     );
+    //     }
+    //   )
+    // }
   }  
 }
 
