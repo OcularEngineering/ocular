@@ -2,7 +2,7 @@ import { EntityManager } from "typeorm"
 import { TransactionBaseService } from "../interfaces"
 import EventBusService from "./event-bus"
 import { AutoflowContainer } from "@ocular-ai/types"
-import { AutoflowAiError } from "@ocular-ai/utils"
+import { AutoflowAiError,AutoflowAiErrorTypes } from "@ocular-ai/utils"
 import { App, User } from "../models"
 import { buildQuery } from "../utils/build-query"
 import { CreateOAuthInput } from "../types/oauth"
@@ -54,7 +54,7 @@ class OAuthService extends TransactionBaseService {
   async list(selector: Selector<OAuth>): Promise<OAuth[]> {
     if(!this.loggedInUser_ || !this.loggedInUser_.organisation){
       throw new AutoflowAiError(
-        AutoflowAiError.Types.NOT_FOUND,
+        AutoflowAiErrorTypes.NOT_FOUND,
         `User must belong to an "organisation" so as to get components`
       )
     }
@@ -69,7 +69,7 @@ class OAuthService extends TransactionBaseService {
 
     if(!this.loggedInUser_ || !this.loggedInUser_.organisation){
       throw new AutoflowAiError(
-        AutoflowAiError.Types.NOT_FOUND,
+        AutoflowAiErrorTypes.NOT_FOUND,
         `User must belong to an "organisation" must be defined so as to add a component`
       )
     }
@@ -77,25 +77,6 @@ class OAuthService extends TransactionBaseService {
     const application = oauthRepo.create({organisation: this.loggedInUser_.organisation, ...app} )
     return await oauthRepo.save(application)
   }
-
-  // async update(id: string, update: UpdateAppInput): Promise<App> {
-
-  //   if(!this.loggedInUser_ || !this.loggedInUser_.organisation){
-  //     throw new AutoflowAiError(
-  //       AutoflowAiError.Types.NOT_FOUND,
-  //       `User must belong to an "organisation" must be defined so as to add a component`
-  //     )
-  //   }
-
-  //   const appRepo = this.activeManager_.withRepository(this.appRepository_)
-  //   const app = await this.retrieve(id)
-
-  //   if ("data" in update) {
-  //     app.data = update.data
-  //   }
-
-  //   return await appRepo.save(app)
-  // }
 
   async generateToken(
     appName: string,
@@ -105,31 +86,30 @@ class OAuthService extends TransactionBaseService {
     // Check If User Generating the Token Belongs To An Organisation
     if(!this.loggedInUser_ || !this.loggedInUser_.organisation){
       throw new AutoflowAiError(
-        AutoflowAiError.Types.NOT_FOUND,
+        AutoflowAiErrorTypes.NOT_FOUND,
         `User must belong to an "organisation" so as to get components`
       )
     }
 
-    // Get App By Name
     const app:App = await this.appService_.retrieveByName(appName)
     
     if(!app){
       throw new AutoflowAiError(
-        AutoflowAiError.Types.NOT_FOUND,
+        AutoflowAiErrorTypes.NOT_FOUND,
         `Application ${appName} not found`
       )
     }
     const service = this.container_[`${app.name}Oauth`]
     if (!service) {
       throw new AutoflowAiError(
-        AutoflowAiError.INVALID_DATA,
+        AutoflowAiErrorTypes.INVALID_DATA,
         `An OAuth handler for ${app.name} could not be found make sure the app is registered in the Ocular Core.`
       )
     }
 
     // if (!(app.data.state === state)) {
     //   throw new AutoflowAiError(
-    //     AutoflowAiError.Types.NOT_ALLOWED,
+    //     AutoflowAiErrorTypes.NOT_ALLOWED,
     //     `${app.display_name} could not match state`
     //   )
     // }

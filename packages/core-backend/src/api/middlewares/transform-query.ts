@@ -11,7 +11,7 @@ import { BaseEntity } from "../../interfaces/models/base-entity"
 import { FindConfig, QueryConfig, RequestQueryFields } from "../../types/common"
 import { omit } from "lodash"
 import { removeUndefinedProperties } from "../../utils"
-import { buildSelects, objectToStringPath } from "@medusajs/utils"
+import { buildSelects, objectToStringPath } from "@ocular-ai/utils"
 
 /**
  * Middleware that transform the query input for the api end points
