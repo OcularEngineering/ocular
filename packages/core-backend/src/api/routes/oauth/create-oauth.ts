@@ -9,7 +9,7 @@ export default async (req, res) => {
   const data = await oauthService.generateToken(
     validated.application_name,
     validated.code,
-    validated.state
+    // validated.state
   )
   res.status(200).json({ apps: data })
 }
