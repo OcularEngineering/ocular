@@ -3,7 +3,7 @@ import { Express } from "express"
 import fs from "fs"
 import { sync as existsSync } from "fs-exists-cached"
 import _ from "lodash"
-import { createRequireFromPath } from "medusa-core-utils"
+import createRequireFromPath from "../utils/create-require-from-path"
 
 import { EOL } from "os"
 import path from "path"
