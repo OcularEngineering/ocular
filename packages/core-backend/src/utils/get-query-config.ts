@@ -1,6 +1,7 @@
 import { pick } from "lodash"
 import { FindConfig, QueryConfig, RequestQueryFields } from "../types/common"
-import { isDefined, MedusaError } from "medusa-core-utils"
+import { isDefined,} from "./is-defined"
+import { AutoflowAiError } from "@ocular-ai/utils"
 import { BaseEntity } from "../interfaces/models/base-entity"
 
 export function pickByConfig<TModel extends BaseEntity>(
@@ -120,8 +121,8 @@ export function prepareListQuery<
       queryConfig?.allowedFields?.length &&
       !queryConfig?.allowedFields.includes(orderField)
     ) {
-      throw new MedusaError(
-        MedusaError.Types.INVALID_DATA,
+      throw new AutoflowAiError(
+        AutoflowAiError.Types.INVALID_DATA,
         `Order field ${orderField} is not valid`
       )
     }
@@ -182,8 +183,8 @@ function validateRelations(
   })
 
   if (disallowedRelationsFound.length) {
-    throw new MedusaError(
-      MedusaError.Types.INVALID_DATA,
+    throw new AutoflowAiError(
+      AutoflowAiError.Types.INVALID_DATA,
       `Relations [${disallowedRelationsFound.join(", ")}] are not valid`
     )
   }
@@ -198,8 +199,8 @@ function validateFields(fields: string[], allowed: string[]): void | never {
   })
 
   if (disallowedFieldsFound.length) {
-    throw new MedusaError(
-      MedusaError.Types.INVALID_DATA,
+    throw new AutoflowAiError(
+      AutoflowAiError.Types.INVALID_DATA,
       `Fields [${disallowedFieldsFound.join(", ")}] are not valid`
     )
   }

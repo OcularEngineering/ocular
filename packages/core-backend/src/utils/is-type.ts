@@ -7,7 +7,7 @@ import {
   ValidationOptions,
 } from "class-validator"
 import { isDate } from "lodash"
-import { MedusaError } from "medusa-core-utils"
+import { AutoflowAiError } from "@ocular-ai/utils"
 import { validator } from "./validator"
 import  {promiseAll} from "../utils/promise-all"
 
@@ -18,24 +18,24 @@ async function typeValidator(
   switch (typedClass) {
     case String:
       if (!isString(plain)) {
-        throw new MedusaError(
-          MedusaError.Types.INVALID_DATA,
+        throw new AutoflowAiError(
+          AutoflowAiError.Types.INVALID_DATA,
           `String validation failed: ${plain} is not a string`
         )
       }
       return true
     case Number:
       if (!isNumber(Number(plain))) {
-        throw new MedusaError(
-          MedusaError.Types.INVALID_DATA,
+        throw new AutoflowAiError(
+          AutoflowAiError.Types.INVALID_DATA,
           `Number validation failed: ${plain} is not a number`
         )
       }
       return true
     case Date:
       if (!isDate(new Date(plain as string))) {
-        throw new MedusaError(
-          MedusaError.Types.INVALID_DATA,
+        throw new AutoflowAiError(
+          AutoflowAiError.Types.INVALID_DATA,
           `Date validation failed: ${plain} is not a date`
         )
       }
@@ -59,8 +59,8 @@ async function typeValidator(
           return true
         }
 
-        throw new MedusaError(
-          MedusaError.Types.INVALID_DATA,
+        throw new AutoflowAiError(
+          AutoflowAiError.Types.INVALID_DATA,
           Object.fromEntries(errors.entries())
         )
       }
@@ -95,8 +95,8 @@ export function IsType(types: any[], validationOptions?: ValidationOptions) {
             return true
           }
 
-          throw new MedusaError(
-            MedusaError.Types.INVALID_DATA,
+          throw new AutoflowAiError(
+            AutoflowAiError.Types.INVALID_DATA,
             JSON.stringify({
               message: `${args.property} must be one of: ${types.map(
                 (t) => `${t.name || (Array.isArray(t) ? t[0]?.name : "")}`
