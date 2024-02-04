@@ -7,7 +7,7 @@ import { AutoflowAiError } from "@ocular-ai/utils"
 import { isDefined } from "../utils/is-defined"
 import { App, User } from "../models"
 import { buildQuery } from "../utils/build-query"
-import { CreateAppInput } from "../types/app"
+import { CreateAppInput,RegisterAppInput } from "../types/app"
 import { FindConfig, Selector } from "../types/common"
 
 
@@ -32,6 +32,24 @@ class AppService extends TransactionBaseService {
     this.eventBus_ = container.eventBusService
   }
 
+  async registerAppOnStartUp(registerInput: RegisterAppInput): Promise<App> {
+    const { name } = registerInput
+    const app = await this.retrieveByName(name)
+
+    if (app) {
+      throw new AutoflowAiError(
+        AutoflowAiError.Types.NOT_FOUND,
+        `"AppName" must be defined`
+      )
+    }
+    
+    app.install_url = registerInput.install_url
+    app.uninstall_url = registerInput.uninstall_url
+
+    const appRepo = this.activeManager_.withRepository(this.appRepository_)
+    return await appRepo.save(app)
+  }
+
   async retrieveByName(appName: string): Promise<App> {
 
     if (!isDefined(appName)) {
@@ -41,7 +59,6 @@ class AppService extends TransactionBaseService {
       )
     }
 
-    //Select only apps that belong to the logged in user's organisation
     const appRepo = this.activeManager_.withRepository(this.appRepository_)
     const query = buildQuery({  application_name: appName} )
 
