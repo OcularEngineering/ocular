@@ -48,7 +48,6 @@ export const defaultAppRelations = [
 export const defaultAppFields: (keyof App)[] = [
   "id",
   "name",
-  "identifier",
   "install_url",
   "uninstall_url",
   "created_at",

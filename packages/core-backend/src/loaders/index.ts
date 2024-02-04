@@ -17,6 +17,7 @@ import apiLoader from "./api"
 import Logger from "./logger"
 
 // import defaultsLoader from "./defaults"
+import appsLoader from "./apps"
 import expressLoader from "./express"
 // import loadOcularApp from "./ocular-app"
 import modelsLoader from "./models.js"
@@ -101,13 +102,24 @@ export default async ({
   await passportLoader({ app: expressApp, container, configModule })
   const exAct = Logger.success(expActivity, "Express intialized") || {}
 
-  
+
   // Add the registered services to the request scope
   expressApp.use((req: Request, res: Response, next: NextFunction) => {
     container.register({ manager: asValue(dataSource.manager) })
     ;(req as any).scope = container.createScope()
     next()
   })
+
+  const appsActivity = Logger.activity(`Initializing plugins${EOL}`)
+  await appsLoader({
+    container,
+    rootDirectory,
+    configModule,
+    app: expressApp,
+    activityId: appsActivity,
+  })
+  const aAct = Logger.success(appsActivity, "Apps intialized") || {}
+
 
   const subActivity = Logger.activity(`Initializing subscribers${EOL}`)
   await subscribersLoader({ container })

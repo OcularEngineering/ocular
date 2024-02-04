@@ -6,9 +6,7 @@ import { OAuth } from "./oauth"
 
 @Entity()
 export class App extends BaseEntity {
-  @Column()
-  identifier: string
-
+  
   @Index({ unique: true })
   @Column()
   name: string
