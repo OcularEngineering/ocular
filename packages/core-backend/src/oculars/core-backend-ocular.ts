@@ -6,7 +6,7 @@ import { ConfigModule, Logger } from '../types';
 import { Organisation, User } from '../models';
 import { AutoflowContainer } from '@ocular-ai/utils';
 import { UserService } from '../services';
-import { AppType } from '../types/apps';
+import { AppType } from '../types/app';
 
 
 /**

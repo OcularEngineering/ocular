@@ -1,5 +1,5 @@
 
-import {AppType} from "../apps";
+import {AppType} from "../app";
 
 type Content = {
   text: string;

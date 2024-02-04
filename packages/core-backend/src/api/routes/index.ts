@@ -4,6 +4,8 @@ import {unauthenticatedUserRoutes} from "./auth/users"
 import middlewares from "../middlewares"
 import invites, { unauthenticatedInviteRoutes } from "./invites"
 import search from "./search"
+import components from "./components"
+import apps from "./apps"
 
 export default (app, container, config) => {
   const route = Router()
@@ -26,11 +28,14 @@ export default (app, container, config) => {
   // Authenticated routes
   route.use(middlewares.authenticate())
   route.use(middlewares.registeredLoggedinUser)
+
+  apps(route)
+  components(route)
   invites(route)
   search(route)
   
 
-  // 
+  
   // users(route)
   return app
 }

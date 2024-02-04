@@ -11,7 +11,7 @@ import { createAutoflowContainer } from "@ocular-ai/utils";
 import databaseLoader from "./loaders/database"
 import modelsLoader from "./loaders/models"
 import  getConfigFile  from "./utils/get-config-file"
-import glob from "glob"
+const glob = require("glob");
 
 const rootDirectory = path.resolve(`.`)   
 

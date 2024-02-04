@@ -1,5 +1,5 @@
 import { Subscriber, SubscriberContext } from "."
-import { TransactionBaseService } from "../../interfaces/transaction-base-service"
+import { TransactionBaseService } from "../../interfaces"
 
 export interface IEventBusService extends TransactionBaseService {
   subscribe(
