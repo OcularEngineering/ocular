@@ -1,5 +1,5 @@
 import {  Logger } from "../types"
-import { DatabaseErrorCode, EventBusUtils } from "@medusajs/utils"
+import { DatabaseErrorCode } from "../utils/handle-postgres-database-error"
 import { TransactionBaseService } from "../interfaces"
 import { StagedJob } from "../models"
 import { ConfigModule } from  "../types"
