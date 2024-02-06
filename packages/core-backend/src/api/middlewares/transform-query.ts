@@ -7,7 +7,7 @@ import {
   prepareListQuery,
   prepareRetrieveQuery,
 } from "../../utils/get-query-config"
-import { BaseEntity } from "../../types/interfaces/models/base-entity"
+import { BaseEntity } from "@ocular-ai/types/src/interfaces/models/base-entity"
 import { FindConfig, QueryConfig, RequestQueryFields } from "../../types/common"
 import { omit } from "lodash"
 import { removeUndefinedProperties } from "../../utils"

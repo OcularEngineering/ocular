@@ -1,7 +1,7 @@
 import { BeforeInsert, Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne } from "typeorm"
-import { DbAwareColumn, resolveDbType } from "../utils/db-aware-column"
+import { DbAwareColumn, resolveDbType } from "../../../utils/src/db-aware-column"
 
-import { SoftDeletableEntity } from "../types/interfaces/models/soft-deletable-entity"
+import { SoftDeletableEntity } from "@ocular-ai/types"
 import { UserRoles } from "./user"
 import { generateEntityId } from "../utils/generate-entity-id"
 import { Organisation } from "./organisation"

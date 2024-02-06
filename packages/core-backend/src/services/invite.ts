@@ -2,7 +2,7 @@ import jwt, { JwtPayload } from "jsonwebtoken"
 import { EntityManager } from "typeorm"
 import { UserService } from "."
 import { User } from "../models/user"
-import { TransactionBaseService } from "../types/interfaces"
+import { TransactionBaseService } from "@ocular-ai/types"
 import { UserRoles } from "../models/user"
 import { InviteRepository } from "../repositories/invite"
 import { UserRepository } from "../repositories/user"
@@ -201,7 +201,7 @@ class InviteService extends TransactionBaseService {
       }
 
       // use the email of the user who actually accepted the invite
-      const user = await this.userService_.withTransaction(m).create(
+      const user = await this.userService_.withTransaction(m).createInvitedUser(
         {
           email: invite.user_email,
           role: invite.role,
@@ -209,8 +209,7 @@ class InviteService extends TransactionBaseService {
           last_name: user_.last_name,
           organisation: invite.organisation,
         },
-        user_.password,
-        true
+        user_.password
       )
 
       await inviteRepo.delete({ id: invite.id })

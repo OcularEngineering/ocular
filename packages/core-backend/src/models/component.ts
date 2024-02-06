@@ -1,8 +1,8 @@
 import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne } from "typeorm"
-import { BaseEntity } from "../types/interfaces/models/base-entity"
+import { BaseEntity } from "@ocular-ai/types"
 import { generateEntityId } from "../utils/generate-entity-id"
 import { Organisation } from "./organisation"
-import { DbAwareColumn } from "../utils/db-aware-column"
+import { DbAwareColumn } from "../../../utils/src/db-aware-column"
 
 
 /**

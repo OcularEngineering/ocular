@@ -1,5 +1,5 @@
-import {BatchSearchEngineIndexer} from "../types/interfaces";
-import { IndexableDocument, indexFields } from '../types/search';
+import {BatchSearchEngineIndexer} from "@ocular-ai/types/src/interfaces";
+import { IndexableDocument, indexFields } from '@ocular-ai/types';
 import { Readable } from 'stream';
 import { ConfigModule } from "../types/config-module";
 import { SearchEngineOptions } from "../types/search/options";

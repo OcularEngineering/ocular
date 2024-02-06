@@ -19,7 +19,7 @@
     // "downlevelIteration": true, // to use ES5 specific tooling
     // "resolveJsonModule": true
   },
-  "include": ["./src/**/*", "index.d.ts", "../utils/src/autoflow-container.ts", "../utils/src/common/errors.ts", "../utils/src/common/container.ts", "../utils/src/is-object.ts", "src/types/interfaces"],
+  "include": ["./src/**/*"],
   "exclude": [
     "./dist/**/*",
     "./src/**/__tests__",
