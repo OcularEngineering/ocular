@@ -1,4 +1,4 @@
-import { EmitData, IEventBusModule, Subscriber, SubscriberContext, SubscriberDescriptor } from "../types/event-bus"
+import { EmitData, IEventBusModule, Subscriber, SubscriberContext, SubscriberDescriptor } from "../event-bus"
 import { ulid } from "ulid"
 import {TransactionBaseService} from "./transaction-base-service"
 

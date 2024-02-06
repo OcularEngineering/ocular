@@ -1,6 +1,6 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, BeforeInsert } from "typeorm"
 import { Organisation } from "./organisation";
-import { BaseEntity } from "../interfaces/models/base-entity";
+import { BaseEntity } from "../types/interfaces/models/base-entity";
 import { DbAwareColumn } from "../utils/db-aware-column";
 import { generateEntityId } from "../utils/generate-entity-id";
 

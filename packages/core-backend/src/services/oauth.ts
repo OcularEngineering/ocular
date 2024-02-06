@@ -1,5 +1,5 @@
 import { EntityManager } from "typeorm"
-import { TransactionBaseService } from "../interfaces"
+import { TransactionBaseService } from "../types/interfaces"
 import EventBusService from "./event-bus"
 import { AutoflowContainer } from "@ocular-ai/types"
 import { AutoflowAiError,AutoflowAiErrorTypes } from "@ocular-ai/utils"

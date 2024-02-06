@@ -1,4 +1,4 @@
-import { IndexableDocument } from '../types/search';
+import { IndexableDocument } from '../search';
 import { Writable } from 'stream';
 import {AutoflowAiError} from "@ocular-ai/utils"
 

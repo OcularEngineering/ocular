@@ -1,4 +1,4 @@
-import { ISearchService } from "../types/search"
+import { ISearchService } from "../search"
 import { Writable } from "stream"
 
 export abstract class AbstractSearchService

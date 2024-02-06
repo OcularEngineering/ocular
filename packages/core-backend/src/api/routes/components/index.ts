@@ -7,7 +7,7 @@ import { Component } from "../../../models"
 
 export default (app) => {
   const route = Router()
-  app.use("/component", route)
+  app.use("/components", route)
 
   route.post("/", middlewares.wrap(require("./create-component").default))
   

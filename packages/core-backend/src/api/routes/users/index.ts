@@ -1,5 +1,5 @@
 import { Router } from "express"
-import middlewares from "../../../middlewares"
+import middlewares from "../../middlewares"
 
 export const unauthenticatedUserRoutes = (app) => {
   const route = Router()

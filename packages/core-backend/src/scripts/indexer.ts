@@ -1,4 +1,4 @@
-import {BatchSearchEngineIndexer} from "../interfaces";
+import {BatchSearchEngineIndexer} from "../types/interfaces";
 import { IndexableDocument, indexFields } from '../types/search';
 import { Readable } from 'stream';
 import { ConfigModule } from "../types/config-module";

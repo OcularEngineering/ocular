@@ -1,5 +1,5 @@
 import { EntityManager } from "typeorm";
-import { TransactionBaseService } from "../interfaces";
+import { TransactionBaseService } from "../types/interfaces";
 import { CreateComponentInput, FilterableComponentProps } from "../types/component";
 import { Component, User } from "../models";
 import ComponentRepository from "../repositories/component";
