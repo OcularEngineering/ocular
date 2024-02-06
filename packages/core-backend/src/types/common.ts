@@ -1,6 +1,6 @@
 import "reflect-metadata"
 import {   FindOperator,FindManyOptions, FindOneOptions, FindOptionsOrder, FindOptionsRelations, FindOptionsSelect, FindOptionsWhere } from "typeorm"
-import { BaseEntity } from "../interfaces/models/base-entity"
+import { BaseEntity } from "./interfaces/models/base-entity"
 import {
   IsDate,
   IsNumber,

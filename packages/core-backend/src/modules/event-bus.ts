@@ -1,5 +1,5 @@
 import {  Logger } from "../types"
-import { AbstractEventBusModuleService } from "../interfaces/event-bus"
+import { AbstractEventBusModuleService } from "../types/interfaces/event-bus"
 import { BulkJobOptions, JobsOptions, Queue, Worker } from "bullmq"
 import { Redis } from "ioredis"
 import { BullJob, EmitData, EmitOptions, EventBusRedisModuleOptions } from "../types/event-bus"

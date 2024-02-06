@@ -1,6 +1,6 @@
 import {  Logger } from "../types"
 import { DatabaseErrorCode } from "../utils/handle-postgres-database-error"
-import { TransactionBaseService } from "../interfaces"
+import { TransactionBaseService } from "../types/interfaces"
 import { StagedJob } from "../models"
 import { ConfigModule } from  "../types"
 import { isString } from "../utils"

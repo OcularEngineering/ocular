@@ -1,6 +1,6 @@
 import { Router } from "express"
 import authRoutes from "./auth"
-import {unauthenticatedUserRoutes} from "./auth/users"
+import {unauthenticatedUserRoutes} from "./users"
 import middlewares from "../middlewares"
 import invites, { unauthenticatedInviteRoutes } from "./invites"
 import search from "./search"

@@ -14,7 +14,7 @@ import {
   formatRegistrationName,
 } from "../utils/format-registration-name"
 import { asValue, asFunction , Lifetime } from "awilix"
-import { OauthService } from "../interfaces"
+import { OauthService } from "../types/interfaces"
 import { AppService } from "../services";
 
 type Options = {

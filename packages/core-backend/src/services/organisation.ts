@@ -1,5 +1,5 @@
 import { EntityManager} from "typeorm"
-import { TransactionBaseService } from "../interfaces"
+import { TransactionBaseService } from "../types/interfaces"
 import {Organisation} from "../models"
 import { OrganisationRepository } from "../repositories/organisation"
 import { FindConfig } from "../types/common"

@@ -1,7 +1,7 @@
 import Scrypt from "scrypt-kdf"
 import { AuthenticateResult } from "../types/auth"
 import { User } from "../models"
-import { TransactionBaseService } from "../interfaces"
+import { TransactionBaseService } from "../types/interfaces"
 import UserService from "./user"
 import { EntityManager } from "typeorm"
 

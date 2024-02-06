@@ -1,7 +1,7 @@
 import { IndexSettings } from "../types/search"
 import {indexTypes}  from "../utils/search"
 import Algolia, { SearchClient } from "algoliasearch"
-import { AbstractSearchService } from "../interfaces"
+import { AbstractSearchService } from "../types/interfaces"
 import { SearchEngineOptions, SearchOptions } from "../types/search/options"
 import { ConfigModule, Logger } from "../types"
 import { RegisterOcularParameters } from "../types/ocular/ocular"
