@@ -1,6 +1,6 @@
 import { BeforeInsert, Column, Entity, PrimaryColumn } from "typeorm"
 
-import { DbAwareColumn } from "../utils/db-aware-column"
+import { DbAwareColumn } from "../../../utils/src/db-aware-column"
 import { generateEntityId } from "../utils/generate-entity-id"
 
 @Entity()

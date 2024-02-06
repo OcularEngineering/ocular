@@ -4,8 +4,8 @@ import {
   Entity,
   OneToMany
 } from "typeorm"
-import { BaseEntity } from "../types/interfaces/models/base-entity"
-import { DbAwareColumn } from "../utils/db-aware-column"
+import { BaseEntity } from "@ocular-ai/types"
+import { DbAwareColumn } from "../../../utils/src/db-aware-column"
 import { generateEntityId } from "../utils/generate-entity-id"
 import { User } from "./user";
 import { Invite } from "./invite";

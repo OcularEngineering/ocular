@@ -17,7 +17,6 @@
     "nx"
   ],
   "author": "Louis Luxa Murerwa",
-  "license": "MIT",
   "dependencies": {
     "@azure/search-documents": "^12.0.0",
     "@ocular-ai/modules-sdk": "file:../modules-sdk",

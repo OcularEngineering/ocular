@@ -14,7 +14,7 @@ import {
   formatRegistrationName,
 } from "../utils/format-registration-name"
 import { asValue, asFunction , Lifetime } from "awilix"
-import { OauthService } from "../types/interfaces"
+import { OauthService } from "@ocular-ai/types"
 import { AppService } from "../services";
 
 type Options = {

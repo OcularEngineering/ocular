@@ -2,7 +2,7 @@ import { pick } from "lodash"
 import { FindConfig, QueryConfig, RequestQueryFields } from "../types/common"
 import { isDefined,} from "./is-defined"
 import { AutoflowAiError } from "@ocular-ai/utils"
-import { BaseEntity } from "../types/interfaces/models/base-entity"
+import { BaseEntity } from "@ocular-ai/types/src/interfaces/models/base-entity"
 
 export function pickByConfig<TModel extends BaseEntity>(
   obj: TModel | TModel[],

@@ -56,7 +56,7 @@ export default (rootDirectory: string): ConfigModule => {
       cookie_secret: cookie_secret ?? "supersecret",
       ...configModule?.projectConfig,
     },
-    modules: configModule?.modules ?? {},
+    // modules: configModule?.modules ?? {},
     apps: configModule?.apps ?? []
   }
 }

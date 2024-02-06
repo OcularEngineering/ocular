@@ -28,7 +28,7 @@ export default async (req, res) => {
   const user = await manager.transaction(async (transactionManager) => {
     return await userService
       .withTransaction(transactionManager)
-      .create(data, validated.password)
+      .createOrganisationAdmin(data, validated.password)
   })
 
   res.status(200).json({ user: _.omit(user, ["password_hash"]) })
@@ -50,10 +50,7 @@ export class UserCreateUserReq{
   @IsOptional()
   @IsString()
   last_name?: string
-
-  @IsEnum(UserRoles)
-  role: UserRoles
-
+  
   @IsString()
   password: string
 
