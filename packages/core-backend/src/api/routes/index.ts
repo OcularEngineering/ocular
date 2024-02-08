@@ -3,9 +3,10 @@ import authRoutes from "./auth"
 import {unauthenticatedUserRoutes} from "./users"
 import middlewares from "../middlewares"
 import invites, { unauthenticatedInviteRoutes } from "./invites"
-import search from "./search"
-import components from "./components"
 import apps from "./apps"
+import components from "./components"
+import search from "./search"
+import teams from "./teams"
 
 export default (app, container, config) => {
   const route = Router()
@@ -33,9 +34,8 @@ export default (app, container, config) => {
   components(route)
   invites(route)
   search(route)
-  
+  teams(route)
 
-  
   // users(route)
   return app
 }

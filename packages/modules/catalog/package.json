@@ -1,0 +1,26 @@
+{
+  "name": "@ocular-ai/catalog",
+  "version": "0.0.0",
+  "description": "Catalog Module for Ocular",
+  "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OcularEngineering/OcularAI",
+    "directory": "packages/modules/catalog"
+  },
+  "files": [
+    "dist"
+  ],
+  "author": "Louis Luxa Murerwa",
+  "license": "MIT",
+  "devDependencies": {
+  },
+  "dependencies": {
+  },
+  "scripts": {
+    "watch": "tsc --build --watch",
+    "prepare": "cross-env NODE_ENV=production yarn run build",
+    "build": "tsc --build",
+    "test": "jest --passWithNoTests"
+  }
+}

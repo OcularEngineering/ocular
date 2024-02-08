@@ -1,6 +1,6 @@
 import { EntityManager} from "typeorm"
 import { TransactionBaseService } from "@ocular-ai/types"
-import {Organisation} from "../models"
+import {Organisation, User} from "../models"
 import { OrganisationRepository } from "../repositories/organisation"
 import { FindConfig } from "../types/common"
 import { buildQuery} from "../utils/build-query"
@@ -65,6 +65,7 @@ class OrganisationService extends TransactionBaseService {
 
     return organisations[0]
   }
+
 
   async list(selector: FilterableOrganisationProps, config = {}): Promise<Organisation[]> {
     const organisationRepo = this.activeManager_.withRepository(this.organisationRepository_)

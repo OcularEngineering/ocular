@@ -72,9 +72,6 @@ export default async ({
 
 
   // resolved.forEach((plugin) => trackInstallation(plugin.name, "plugin"))
-  
-
-  console.log("resolved", resolved)
 
 }
 
@@ -84,8 +81,6 @@ function getResolvedApps(
   extensionDirectoryPath = "dist"
 ): undefined | AppDetails[] {
   const { apps } = configModule
-
-  console.log("apps", apps)
 
   const resolved = apps.map((app) => {
     if (_.isString(app)) {
@@ -98,15 +93,15 @@ function getResolvedApps(
     return details
   })
 
-  const extensionDirectory = path.join(rootDirectory, extensionDirectoryPath)
-  // Resolve user's project as a app for loading purposes
-  resolved.push({
-    resolve: extensionDirectory,
-    name: OCULAR_PROJECT_NAME,
-    id: createAppId(OCULAR_PROJECT_NAME),
-    options: configModule,
-    version: createFileContentHash(process.cwd(), `**`),
-  })
+  // const extensionDirectory = path.join(rootDirectory, extensionDirectoryPath)
+  // // Resolve user's project as a app for loading purposes
+  // resolved.push({
+  //   resolve: extensionDirectory,
+  //   name: OCULAR_PROJECT_NAME,
+  //   id: createAppId(OCULAR_PROJECT_NAME),
+  //   options: configModule,
+  //   version: createFileContentHash(process.cwd(), `**`),
+  // })
 
   return resolved
 }

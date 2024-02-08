@@ -148,11 +148,13 @@ class InviteService extends TransactionBaseService {
 
       invite = await inviteRepository.save(invite)
 
+      const inviteLink = `${this.configModule_.projectConfig.ui_cors}/invite/accept/token=${invite.token}`
+
       await this.eventBus_
         .withTransaction(manager)
         .emit(InviteService.Events.CREATED, {
           id: invite.id,
-          token: invite.token,
+          invite_link: inviteLink,
           organisation_name: this.loggedInUser_.organisation.name,
           user_email: invite.user_email,
         })

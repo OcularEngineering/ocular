@@ -13,12 +13,14 @@ import { FindConfig } from "../types/common"
 import OrganisationService from "./organisation"
 import { CreateOrganisationInput } from "../types/organisation"
 import { isDefined } from "../utils/is-defined"
+import EventBusService from "./event-bus"
 
 
 
 type UserServiceProps = {
   userRepository: typeof UserRepository
   organisationService: OrganisationService
+  eventBusService: EventBusService
   manager: EntityManager
 }
 
@@ -35,17 +37,20 @@ class UserService extends TransactionBaseService {
 
   protected readonly userRepository_: typeof UserRepository
   protected readonly organisationService_: OrganisationService
+  protected readonly eventBus_: EventBusService
 
   static readonly IndexName = `users`
 
   constructor({
     userRepository,
-    organisationService
+    organisationService,
+    eventBusService
   }: UserServiceProps) {
     // eslint-disable-next-line prefer-rest-params
     super(arguments[0])
     this.userRepository_ = userRepository
     this.organisationService_ = organisationService
+    this.eventBus_ = eventBusService
   }
 
     /**
@@ -143,6 +148,7 @@ class UserService extends TransactionBaseService {
    */
   async createOrganisationAdmin(createUser: CreateUserInput, password: string): Promise<User> {
     return await this.atomicPhase_(async (manager: EntityManager) => {
+      
       const userRepo = manager.withRepository(this.userRepository_)
 
       const createUserData = { ...createUser } as CreateUserInput & {
@@ -167,16 +173,23 @@ class UserService extends TransactionBaseService {
         createUserData.password_hash = hashedPassword
       }
 
+
       // Create a new organisation for User
       createUserData.email = validatedEmail
       createUserData.role = UserRoles.ADMIN;
-
       const user = userRepo.create({...createUserData})
       const createOrganisatonData = { ...user.organisation} as CreateOrganisationInput
       const organisationService = this.organisationService_.withTransaction(manager)
       const organisation = await organisationService.create(createOrganisatonData)
       user.organisation = organisation
-      return await userRepo.save(user)
+
+      const newUser = await userRepo.save(user)
+
+      // Genererate verify token for user
+      await this.eventBus_
+      .withTransaction(manager)
+      .emit(UserService.Events.CREATED, { user: newUser})
+      return newUser
     })
   }
 
