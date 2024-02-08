@@ -21,7 +21,7 @@ try {
   dotenv.config({ path: process.cwd() + "/" + ENV_FILE_NAME });
 } catch (e) { }
 
-// CORS when consuming Medusa from admin
+// UI_CORS is the URL of the UI that is allowed to access the API
 const UI_CORS = process.env.ADMIN_CORS || "http://localhost:3000";
 
 

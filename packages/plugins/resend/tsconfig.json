@@ -2,8 +2,7 @@
   "compilerOptions": {
      "lib": ["es2020"],
      "target": "es2020",
-     "outDir": "./",
-     "rootDir": "./src",
+     "outDir": "./dist",
      "esModuleInterop": true,
      "declaration": false,
      "module": "commonjs",
@@ -17,9 +16,10 @@
      "noImplicitThis": false,
      "allowJs": true,
      "skipLibCheck": true,
-     "downlevelIteration": true
+     "downlevelIteration": true,
+     "jsx": "react"
   },
-  "include": ["src"],
+  "include": ["src", "src/templates"],src/templates
   "exclude": [
      "dist",
      "src/**/__tests__",
