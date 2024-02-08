@@ -7,6 +7,7 @@ import apps from "./apps"
 import components from "./components"
 import search from "./search"
 import teams from "./teams"
+import organisation from "./organisation"
 
 export default (app, container, config) => {
   const route = Router()
@@ -35,6 +36,7 @@ export default (app, container, config) => {
   invites(route)
   search(route)
   teams(route)
+  organisation(route)
 
   // users(route)
   return app
