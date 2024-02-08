@@ -17,7 +17,7 @@ export class Team extends BaseEntity {
   @Column({ type: "varchar", nullable: true })
   organisation_id: string;
 
-  @ManyToOne(() => Organisation, (organisation) => organisation.members)
+  @ManyToOne(() => Organisation, (organisation) => organisation.teams)
   @JoinColumn({ name: 'organisation_id', referencedColumnName: 'id' },)
   organisation: Organisation;
 

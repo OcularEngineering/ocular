@@ -11,6 +11,7 @@ import { User } from "./user";
 import { Invite } from "./invite";
 import { Component, } from "./component";
 import { OAuth } from "./oauth";
+import { Team } from "./team";
 
 @Entity()
 export class Organisation extends BaseEntity {
@@ -19,6 +20,9 @@ export class Organisation extends BaseEntity {
 
   @OneToMany(() => User, (user) => user?.organisation)
   members?: User[];
+
+  @OneToMany(() => Team, (team) => team?.organisation)
+  teams?: Team[];
 
   @OneToMany(() => Invite, invite => invite?.organisation)
   invites?: Invite[];
