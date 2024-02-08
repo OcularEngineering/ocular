@@ -1,6 +1,6 @@
 import { BeforeInsert, Column, Entity, Index, OneToMany} from "typeorm"
 import { generateEntityId } from "../utils/generate-entity-id"
-import { BaseEntity } from "../interfaces/models/base-entity"
+import { BaseEntity } from "@ocular-ai/types"
 import { OAuth } from "./oauth"
 
 

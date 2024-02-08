@@ -1,11 +1,11 @@
 import { AutoflowAiError } from "@ocular-ai/utils"
 import Scrypt from "scrypt-kdf"
 import { EntityManager } from "typeorm"
-import { TransactionBaseService } from "../interfaces"
-import { User } from "../models"
+import { TransactionBaseService } from "@ocular-ai/types"
+import { User, UserRoles } from "../models"
 import { UserRepository } from "../repositories/user"
 import {
-    CreateUserInput, FilterableUserProps,
+    CreateUserInput, FilterableUserProps, UserRole,
 } from "../types/user"
 import { validateEmail } from "../utils/is-email"
 import {buildQuery} from "../utils/build-query"
@@ -13,12 +13,14 @@ import { FindConfig } from "../types/common"
 import OrganisationService from "./organisation"
 import { CreateOrganisationInput } from "../types/organisation"
 import { isDefined } from "../utils/is-defined"
+import EventBusService from "./event-bus"
 
 
 
 type UserServiceProps = {
   userRepository: typeof UserRepository
   organisationService: OrganisationService
+  eventBusService: EventBusService
   manager: EntityManager
 }
 
@@ -35,17 +37,20 @@ class UserService extends TransactionBaseService {
 
   protected readonly userRepository_: typeof UserRepository
   protected readonly organisationService_: OrganisationService
+  protected readonly eventBus_: EventBusService
 
   static readonly IndexName = `users`
 
   constructor({
     userRepository,
-    organisationService
+    organisationService,
+    eventBusService
   }: UserServiceProps) {
     // eslint-disable-next-line prefer-rest-params
     super(arguments[0])
     this.userRepository_ = userRepository
     this.organisationService_ = organisationService
+    this.eventBus_ = eventBusService
   }
 
     /**
@@ -141,19 +146,16 @@ class UserService extends TransactionBaseService {
    * @param {string} password - user's password to hash
    * @return {Promise} the result of create
    */
-  // Notes
-  // User is the admin
-  // User has organisation associated with them.
-  // Information passed should have organisation info.
-  async create(user: CreateUserInput, password: string, invite:boolean = false ): Promise<User> {
+  async createOrganisationAdmin(createUser: CreateUserInput, password: string): Promise<User> {
     return await this.atomicPhase_(async (manager: EntityManager) => {
+      
       const userRepo = manager.withRepository(this.userRepository_)
 
-      const createUserData = { ...user } as CreateUserInput & {
+      const createUserData = { ...createUser } as CreateUserInput & {
         password_hash: string
       }
 
-      const validatedEmail = validateEmail(user.email)
+      const validatedEmail = validateEmail(createUserData.email)
 
       const userEntity = await userRepo.findOne({
         where: { email: validatedEmail },
@@ -172,30 +174,77 @@ class UserService extends TransactionBaseService {
       }
 
 
+      // Create a new organisation for User
       createUserData.email = validatedEmail
-      const created = userRepo.create(createUserData)
+      createUserData.role = UserRoles.ADMIN;
+      const user = userRepo.create({...createUserData})
+      const createOrganisatonData = { ...user.organisation} as CreateOrganisationInput
+      const organisationService = this.organisationService_.withTransaction(manager)
+      const organisation = await organisationService.create(createOrganisatonData)
+      user.organisation = organisation
 
-      // If invite is true, then we are inviting a user to an existing organisation else we are creating a new organisation.
-      if(invite) {
-        const organisation = await this.organisationService_.retrieve(user.organisation_id)
-        if(!organisation) {
-          throw new AutoflowAiError(
-            AutoflowAiError.Types.INVALID_DATA,
-            "A user has invited to an existing organisation."
-          )
-        }
-        created.organisation = organisation
-      }else{
-        const createOrganisatonData = { ...user.organisation} as CreateOrganisationInput
-        const organisationService = this.organisationService_.withTransaction(manager)
-        const organisation = await organisationService.create(createOrganisatonData)
-        created.organisation = organisation 
-      }
-  
-      const newUser = await userRepo.save(created)
-      return created
+      const newUser = await userRepo.save(user)
+
+      // Genererate verify token for user
+      await this.eventBus_
+      .withTransaction(manager)
+      .emit(UserService.Events.CREATED, { user: newUser})
+      return newUser
     })
   }
+
+    /**
+   * Creates a user with username being validated. User will have an organisation associated to them and will be the admin.
+   * Fails if email is not a valid format.
+   * @param {object} user - the user to create
+   * @param {string} password - user's password to hash
+   * @return {Promise} the result of create
+   */
+    async createInvitedUser(createUser: CreateUserInput, password: string): Promise<User> {
+      return await this.atomicPhase_(async (manager: EntityManager) => {
+        const userRepo = manager.withRepository(this.userRepository_)
+  
+        const createUserData = { ...createUser } as CreateUserInput & {
+          password_hash: string
+        }
+  
+        const validatedEmail = validateEmail(createUserData.email)
+  
+        const userEntity = await userRepo.findOne({
+          where: { email: validatedEmail },
+        })
+  
+        if (userEntity) {
+          throw new AutoflowAiError(
+            AutoflowAiError.Types.INVALID_DATA,
+            "A user with the same email already exists."
+          )
+        }
+  
+        if (password) {
+          const hashedPassword = await this.hashPassword_(password)
+          createUserData.password_hash = hashedPassword
+        }
+  
+        // Create a new organisation for User
+        createUserData.email = validatedEmail
+        createUserData.role = UserRoles.ADMIN;
+  
+        return userRepo.create({...createUserData})
+      })
+    }
+
+  // // If invite is true, then we are inviting a user to an existing organisation else we are creating a new organisation.
+  // if(invite) {
+  //   const organisation = await this.organisationService_.retrieve(user.organisation_id)
+  //   if(!organisation) {
+  //     throw new AutoflowAiError(
+  //       AutoflowAiError.Types.INVALID_DATA,
+  //       "A user has invited to an existing organisation."
+  //     )
+  //   }
+  //   created.organisation = organisation
+  // }else{
 
   // /**
   //  * Updates a user.

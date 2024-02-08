@@ -1,8 +1,9 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne, BeforeInsert } from "typeorm"
+import { Column, Entity, Index, JoinColumn, ManyToOne, BeforeInsert, JoinTable, ManyToMany } from "typeorm"
 import { Organisation } from "./organisation";
-import { BaseEntity } from "../interfaces/models/base-entity";
-import { DbAwareColumn } from "../utils/db-aware-column";
+import { BaseEntity } from "@ocular-ai/types";
+import { DbAwareColumn } from "../../../utils/src/db-aware-column";
 import { generateEntityId } from "../utils/generate-entity-id";
+import { Team } from "./team";
 
 /**
  * @enum
@@ -56,6 +57,22 @@ export class User extends BaseEntity {
   @ManyToOne(() => Organisation, (organisation) => organisation.members)
   @JoinColumn({ name: 'organisation_id', referencedColumnName: 'id' })
   organisation?: Organisation;
+
+  @JoinTable({
+    name: "team_members",
+    joinColumn: {
+      name: "team_id",
+      referencedColumnName: "id",
+    },
+    inverseJoinColumn: {
+      name: "user_id",
+      referencedColumnName: "id",
+    },
+  })
+  @ManyToMany(() => Team, (team) => team.members,{
+    onDelete: "CASCADE"
+  })
+  teams: Team[];
 
   /**
   * @apiIgnore

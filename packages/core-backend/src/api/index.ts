@@ -1,8 +1,8 @@
 // import cors from "cors"
 import { Router } from "express"
 // import errorHandler from "./middlewares/error-handler"
-// import { parseCorsOrigins } from "medusa-core-utils"
 import routes from "./routes"
+import cors from "cors"
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default (container, config) => {
@@ -18,6 +18,13 @@ export default (container, config) => {
   //   )
   // }
   // app.use("/v1")
+ const uiCors = config.ui_cors || ""
+  app.use(
+    cors({
+      origin: uiCors,
+      credentials: true,
+    })
+  )
   routes(app,container,config)
 
   // app.use(errorHandler())

@@ -51,6 +51,8 @@ export default async ({
     "user-session",
     new CustomStrategy(async (req:AutoflowRequest, done) => {
       // @ts-ignore
+      console.log(req.session)
+      // @ts-ignore
       if (req.session?.user_id) {
         // @ts-ignore
         return done(null, { userId: req.session.user_id })
