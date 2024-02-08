@@ -9,11 +9,9 @@ coverage
 !src/**
 ./tsconfig.tsbuildinfo
 package-lock.json
-medusa-db.sql
 /build
-/api
-/migrations
-/models
-/repositories
-/services
-/subscribers
+/templates/.next
+/templates/.vscode
+/templates/node_modules
+/templates/react-email
+/templates/package-lock.json

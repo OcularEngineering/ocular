@@ -2,10 +2,11 @@ import { Resend } from 'resend'
 import Handlebars from 'handlebars'
 import path from 'path'
 import fs from 'fs'
-import { humanizeAmount, zeroDecimalCurrencies } from 'medusa-core-utils'
-import { NotificationService } from 'ocular-ai/types'
-// import { MedusaError } from "@medusajs/utils"
+import  { AbstractNotificationService } from '@ocular-ai/types'
 import {AutoflowAiError, AutoflowAiErrorTypes} from "@ocular-ai/utils"
+import {UserService} from '@ocular-ai/core-backend'
+import { Sign } from 'crypto'
+import SignUpEmail from '../templates/emails/signup'
 
 
 type InjectedDependencies = {
@@ -15,9 +16,9 @@ type InjectedDependencies = {
 type SendOptions = {
    to: string
    from: string
-   subject?: string
+   subject: string
    html?: string
-   text?: string
+   text: string
    react?: string
    attachments?: Array<{
       content: string
@@ -27,7 +28,7 @@ type SendOptions = {
 
 
 
-class ResendService extends NotificationService {
+class ResendService extends AbstractNotificationService {
    static identifier = "resend"
 
    /**
@@ -57,7 +58,7 @@ class ResendService extends NotificationService {
          userService
       }: InjectedDependencies, options) {
 
-      super({},options)
+      super(arguments[0],options)
 
       this.apiKey_ = options.api_key
       this.from_ = options.from
@@ -65,49 +66,54 @@ class ResendService extends NotificationService {
       this.subjectTemplateType_ = options.subject_template_type
       this.bodyTemplateType_ = options.body_template_type
       this.userVerificationTemplate_ = options.user_verification_template
-
-      this.templatePath_ = (options.template_path.startsWith('/')) ?
-      path.resolve(options.template_path) : // The path given in options is absolute
-      path.join(__dirname, '../../..', options.template_path) // The path given in options is relative
-
       this.userService_ = userService
       this.resendClient_ = new Resend(this.apiKey_)
    }
 
-   async sendNotification(event, eventData, attachmentGenerator) {
-      let templateId = this.getTemplateId(event)
-      if (!templateId) { 
-         throw new AutoflowAiError(AutoflowAiErrorTypes.INVALID_DATA, "Resend service: No template was set for this event")
-      }
-
-      const data = await this.fetchData(event, eventData, attachmentGenerator)
-      if (!data) {
-         throw new AutoflowAiError(AutoflowAiErrorTypes.INVALID_DATA, "Resend service: Invalid event data was received")
-      }
-
+   async sendNotification(event:string , eventData: any, attachmentGenerator:unknown):Promise<{
+      to: string;
+      status: string;
+      data: Record<string, unknown>;
+    }>  {
+      // let template = this.getTemplateId(event)
+      // if (!template) { 
+      //    throw new AutoflowAiError(AutoflowAiErrorTypes.INVALID_DATA, "Resend service: No template was set for this event")
+      // }
+      
       const sendOptions: SendOptions = {
-         to: data.email,
-         from: this.from_
+         to: "louis@useocular.com",
+         from: this.from_,
+         subject: "Thank You for Signing Up",
+         text: 'it works!',
       }
 
-      if (this.subjectTemplateType_ === 'text') {
-         sendOptions.subject = fs.existsSync(path.join(this.templatePath_, templateId, 'subject.txt'))?
-            fs.readFileSync(path.join(this.templatePath_, templateId, 'subject.txt'), "utf8") : null
-      } else {
-         sendOptions.subject = await this.compileSubjectTemplate(templateId, data)
+      if(event == "invite.created") {
+         sendOptions.to="michael@useocular.com"
+         sendOptions.subject = "You have been invited to join Ocular"
+         sendOptions.text = `You have been invited to join Ocular. Please click the link below to create your account. ${eventData.invite_link}`
       }
+      
 
-      if (this.bodyTemplateType_=== 'react') {
-         const react = await this.compileReactTemplate(templateId, data)
-         if (react) sendOptions.react = react
-      } else {
-         const { html, text } = await this.compileBodyTemplate(templateId, data)
-         if (html) sendOptions.html = html
-         if (text) sendOptions.text = text
-      }
+      // if (!sendOptions.subject || (!sendOptions.html && !sendOptions.text && !sendOptions.react)) { 
+      //    throw new AutoflowAiError(AutoflowAiErrorTypes.INVALID_DATA, "Resend service: The requested templates were not found. Check template path in config.") 	
+      // }
 
-      if (!sendOptions.subject || (!sendOptions.html && !sendOptions.text && !sendOptions.react)) { 
-         throw new AutoflowAiError(AutoflowAiErrorTypes.INVALID_DATA, "Resend service: The requested templates were not found. Check template path in config.") 	
+      let status;
+      await this.resendClient_.emails.send(sendOptions)
+      .then(() => { status: "sent"})
+      .catch((error) => { status = "failed"; })
+
+      return { to: eventData.email, status, data: sendOptions }
+   }
+
+   async resendNotification(notification:any, config: any, attachmentGenerator:unknown):Promise<{
+      to: string;
+      status: string;
+      data: Record<string, unknown>;
+    }>  {
+      const sendOptions = {
+         ...notification.data,
+         to: config.to || notification.to,
       }
 
       let status
@@ -115,81 +121,64 @@ class ResendService extends NotificationService {
       .then(() => { status = "sent" })
       .catch((error) => { status = "failed"; console.log(error) })
 
-      // We don't want heavy docs stored in DB
-      delete sendOptions.attachments
-
-      return { to: data.email, status, data: sendOptions }
-   }
-
-   async resendNotification(notification, config, attachmentGenerator) {
-      const sendOptions = {
-         ...notification.data,
-         to: config.to || notification.to,
-      }
-
-      let status
-      await this.resendClient_.sendMail(sendOptions)
-      .then(() => { status = "sent" })
-      .catch((error) => { status = "failed"; console.log(error) })
-
       return { to: sendOptions.to, status, data: sendOptions }
    }
 
-   /**
-      * Sends an email using Resend.
-      * @param {string} template_id - id of template to use
-      * @param {string} from - sender of email
-      * @param {string} to - receiver of email
-      * @param {Object} data - data to send in mail (match with template)
-      * @return {Promise} result of the send operation
-      */
-   async sendEmail(templateId , from, to, data) {
-      // This function is used by the /resend/send API endpoint included in this plugin.
-      // It is disabled by default.
-      // This endpoint may be useful for testing purposes and for use by related applications.
-      // There is NO SECURITY on the endpoint by default.
-      // Most people will NOT need to enable it.
-      // If you are certain that you want to enable it and that you know what you are doing,
-      // set the environment variable RESEND_ENABLE_ENDPOINT to "42" (a string, not an int).
-      // The unsual setting is meant to prevent enabling by accident or without thought.
-      if (this.resendClient_.enable_endpoint !== '42') { return false }
+   // /**
+   //    * Sends an email using Resend.
+   //    * @param {string} template_id - id of template to use
+   //    * @param {string} from - sender of email
+   //    * @param {string} to - receiver of email
+   //    * @param {Object} data - data to send in mail (match with template)
+   //    * @return {Promise} result of the send operation
+   //    */
+   // async sendEmail(templateId , from, to, data) {
+   //    // This function is used by the /resend/send API endpoint included in this plugin.
+   //    // It is disabled by default.
+   //    // This endpoint may be useful for testing purposes and for use by related applications.
+   //    // There is NO SECURITY on the endpoint by default.
+   //    // Most people will NOT need to enable it.
+   //    // If you are certain that you want to enable it and that you know what you are doing,
+   //    // set the environment variable RESEND_ENABLE_ENDPOINT to "42" (a string, not an int).
+   //    // The unsual setting is meant to prevent enabling by accident or without thought.
+   //    if (this.resendClient_.enable_endpoint !== '42') { return false }
 
-      try {
-         const sendOptions: SendOptions = {
-            to: to,
-            from: from
-         }
+   //    try {
+   //       const sendOptions: SendOptions = {
+   //          to: to,
+   //          from: from
+   //       }
 
-         if (this.subjectTemplateType_ === 'text') {
-            sendOptions.subject = fs.existsSync(path.join(this.templatePath_, templateId, 'subject.txt'))?
-               fs.readFileSync(path.join(this.templatePath_, templateId, 'subject.txt'), "utf8") : null
-         } else {
-            sendOptions.subject = await this.compileSubjectTemplate(templateId, data)
-         }
+   //       if (this.subjectTemplateType_ === 'text') {
+   //          sendOptions.subject = fs.existsSync(path.join(this.templatePath_, templateId, 'subject.txt'))?
+   //             fs.readFileSync(path.join(this.templatePath_, templateId, 'subject.txt'), "utf8") : null
+   //       } else {
+   //          sendOptions.subject = await this.compileSubjectTemplate(templateId, data)
+   //       }
    
-         if (this.bodyTemplateType_=== 'react') {
-            const react = await this.compileReactTemplate(templateId, data)
-            if (react) sendOptions.react = react
-         } else {
-            const { html, text } = await this.compileBodyTemplate(templateId, data)
-            if (html) sendOptions.html = html
-            if (text) sendOptions.text = text
-         }
+   //       if (this.bodyTemplateType_=== 'react') {
+   //          const react = await this.compileReactTemplate(templateId, data)
+   //          if (react) sendOptions.react = react
+   //       } else {
+   //          const { html, text } = await this.compileBodyTemplate(templateId, data)
+   //          if (html) sendOptions.html = html
+   //          if (text) sendOptions.text = text
+   //       }
    
-         if (!sendOptions.subject || (!sendOptions.html && !sendOptions.text && !sendOptions.react)) {
-            return { 
-               message: "Message not sent. Templates were not found or a compile error was encountered.",
-               results: {
-                  sendOptions
-               }
-            }
-         }
-         //return sendOptions.react
-         return this.resendClient_.sendEmail(sendOptions)
-      } catch (error) {
-         throw error
-      }
-   }
+   //       if (!sendOptions.subject || (!sendOptions.html && !sendOptions.text && !sendOptions.react)) {
+   //          return { 
+   //             message: "Message not sent. Templates were not found or a compile error was encountered.",
+   //             results: {
+   //                sendOptions
+   //             }
+   //          }
+   //       }
+   //       //return sendOptions.react
+   //       return this.resendClient_.sendEmail(sendOptions)
+   //    } catch (error) {
+   //       throw error
+   //    }
+   // }
 
    async compileSubjectTemplate(templateId, data) {
       const subjectTemplate = fs.existsSync(path.join(this.templatePath_, templateId, 'subject.hbs')) ?
@@ -222,22 +211,11 @@ class ResendService extends NotificationService {
    getTemplateId(event) {
       switch (event) {
          case "user.sign_up":
-            return this.userVerificationTemplate_
+            return SignUpEmail
          default:
             return null
       }
    }
-
-
-   async fetchData(event, eventData, attachmentGenerator) {
-      switch (event) {
-         case "user.sign_up":
-            return eventData
-         default:
-            return {}
-      }
-   }
-
    
 }
 
