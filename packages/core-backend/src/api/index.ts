@@ -18,7 +18,7 @@ export default (container, config) => {
   //   )
   // }
   // app.use("/v1")
-  const uiCors = config.ui_cors || ""
+ const uiCors = config.ui_cors || ""
   app.use(
     cors({
       origin: uiCors,

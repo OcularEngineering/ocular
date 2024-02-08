@@ -86,6 +86,13 @@ export type ConfigModule = {
       }
     | string
   )[],
+  plugins?: (
+    | {
+        resolve: string
+        options: Record<string, unknown>
+      }
+    | string
+  )[],
 }
 
 export type PartialPick<T, K extends keyof T> = {

@@ -70,5 +70,14 @@ module.exports = {
     {
       resolve: `github`,
     }
+  ],
+  plugins: [
+    {
+      resolve: `resend`,
+      options: {
+        api_key: "re_YVvG7TjY_4Z3Tfpb9YvXdQMUn915bniyk",
+        from: "onboarding@useocular.com",
+      }
+    }
   ]
 };

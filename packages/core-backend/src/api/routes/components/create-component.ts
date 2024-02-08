@@ -11,11 +11,11 @@ export default async (req, res) => {
   const entityService: ComponentService = req.scope.resolve("componentService")
 
   const manager: EntityManager = req.scope.resolve("manager")
-  await manager.transaction(async (transactionManager) => {
-    return await entityService
-      .withTransaction(transactionManager)
-      .create(validated)
-  })
+  // await manager.transaction(async (transactionManager) => {
+  //   return await entityService
+  //     .withTransaction(transactionManager)
+  //     .create(validated)
+  // })
 
   res.sendStatus(200)
 }
