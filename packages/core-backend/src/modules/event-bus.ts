@@ -1,8 +1,8 @@
 import {  Logger } from "../types"
-import { AbstractEventBusModuleService } from "../interfaces/event-bus"
+import { AbstractEventBusModuleService } from "@ocular-ai/types"
 import { BulkJobOptions, JobsOptions, Queue, Worker } from "bullmq"
 import { Redis } from "ioredis"
-import { BullJob, EmitData, EmitOptions, EventBusRedisModuleOptions } from "../types/event-bus"
+import { BullJob, EmitData, EmitOptions, EventBusRedisModuleOptions } from "@ocular-ai/types/src/event-bus"
 
 type InjectedDependencies = {
   logger: Logger

@@ -1,6 +1,6 @@
 import {  Logger } from "../types"
 import { DatabaseErrorCode } from "../utils/handle-postgres-database-error"
-import { TransactionBaseService } from "../interfaces"
+import { TransactionBaseService } from "@ocular-ai/types"
 import { StagedJob } from "../models"
 import { ConfigModule } from  "../types"
 import { isString } from "../utils"
@@ -8,7 +8,7 @@ import { sleep } from "../utils"
 import StagedJobService from "./staged-job"
 import { FindConfig } from "../types/common"
 import { EOL } from "os"
-import { EmitData, IEventBusService as EventBusServiceInterface, IEventBusModule, Subscriber, SubscriberContext } from "../types/event-bus"
+import { EmitData, IEventBusService as EventBusServiceInterface, IEventBusModule, Subscriber, SubscriberContext } from "@ocular-ai/types"
 
 type InjectedDependencies = {
   stagedJobService: StagedJobService

@@ -2,10 +2,6 @@ import { RedisOptions } from "ioredis"
 import { LoggerOptions } from "typeorm"
 import { SearchEngineOptions } from "./search/options"
 import { PineConePluginOptions } from "./search/pinecone"
-import {
-  ExternalModuleDeclaration,
-  InternalModuleDeclaration,
-} from "@ocular-ai/types"
 
 type SessionOptions = {
   name?: string
@@ -46,8 +42,7 @@ export type ProjectConfigOptions = {
   database_extra?: Record<string, unknown> & {
     ssl: { rejectUnauthorized: false }
   }
-  store_cors?: string
-  admin_cors?: string
+  ui_cors?: string
   search_engine_options?:SearchEngineOptions
   vector_search_options?: PineConePluginOptions
 }
@@ -91,12 +86,13 @@ export type ConfigModule = {
       }
     | string
   )[],
-  modules?: Record<
-  string,
-  | false
-  | string
-  | Partial<InternalModuleDeclaration | ExternalModuleDeclaration>
-  >
+  plugins?: (
+    | {
+        resolve: string
+        options: Record<string, unknown>
+      }
+    | string
+  )[],
 }
 
 export type PartialPick<T, K extends keyof T> = {

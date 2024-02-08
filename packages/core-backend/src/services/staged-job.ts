@@ -4,9 +4,9 @@ import { FindConfig } from "../types/common"
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { StagedJob } from "../models"
 import { StagedJobRepository } from "../repositories/staged-job"
-import { TransactionBaseService } from "../interfaces"
+import { TransactionBaseService } from "@ocular-ai/types"
 import { isString } from "../utils"
-import { EmitData } from "../types/event-bus"
+import { EmitData } from "@ocular-ai/types/src/event-bus"
 
 type StagedJobServiceProps = {
   manager: EntityManager

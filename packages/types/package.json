@@ -1,7 +1,7 @@
 {
   "name": "@ocular-ai/types",
-  "version": "0.0.0",
-  "description": "Ocualar Types definition",
+  "version": "0.0.1",
+  "description": "Ocular Types definition",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
@@ -31,5 +31,8 @@
     "build": "rimraf dist && tsc --build",
     "watch": "tsc --build --watch",
     "test": "exit 0"
+  },
+  "dependencies": {
+    "@ocular-ai/utils": "file:../utils"
   }
 }

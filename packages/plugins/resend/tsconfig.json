@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+     "lib": ["es2020"],
+     "target": "es2020",
+     "outDir": "./dist",
+     "esModuleInterop": true,
+     "declaration": false,
+     "module": "commonjs",
+     "moduleResolution": "node",
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "sourceMap": true,
+     "noImplicitReturns": false,
+     "strictNullChecks": false,
+     "strictFunctionTypes": false,
+     "noImplicitThis": false,
+     "allowJs": true,
+     "skipLibCheck": true,
+     "downlevelIteration": true,
+     "jsx": "react"
+  },
+  "include": ["src", "src/templates"],src/templates
+  "exclude": [
+     "dist",
+     "src/**/__tests__",
+     "src/**/__mocks__",
+     "src/**/__fixtures__",
+     "node_modules"
+  ]
+}

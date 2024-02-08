@@ -21,11 +21,9 @@ try {
   dotenv.config({ path: process.cwd() + "/" + ENV_FILE_NAME });
 } catch (e) { }
 
-// CORS when consuming Medusa from admin
-const ADMIN_CORS = process.env.ADMIN_CORS || "http://localhost:7001";
+// UI_CORS is the URL of the UI that is allowed to access the API
+const UI_CORS = process.env.ADMIN_CORS || "http://localhost:3000";
 
-// CORS to avoid issues when consuming Medusa from a client
-const STORE_CORS = process.env.STORE_CORS || "http://localhost:8000";
 
 /** @type {import('./src/types/config-module').ConfigModule} */
 module.exports = {
@@ -36,8 +34,7 @@ module.exports = {
     database_database: process.env.DATABASE_NAME,
     database_type: "postgres",
     redis_url: process.env.REDIS_URL,
-    store_cors: STORE_CORS,
-    admin_cors: ADMIN_CORS,
+    ui_cors: UI_CORS,
     search_engine_options: {
       apiKey: process.env.AZURE_SEARCH_API_KEY,
       endpoint: process.env.AZURE_SEARCH_ENDPOINT,
@@ -72,6 +69,15 @@ module.exports = {
   apps: [
     {
       resolve: `github`,
+    }
+  ],
+  plugins: [
+    {
+      resolve: `resend`,
+      options: {
+        api_key: "re_YVvG7TjY_4Z3Tfpb9YvXdQMUn915bniyk",
+        from: "onboarding@useocular.com",
+      }
     }
   ]
 };

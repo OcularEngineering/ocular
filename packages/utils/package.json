@@ -19,13 +19,12 @@
     "dist"
   ],
   "author": "Louis Luxa Murerwa",
-  "license": "MIT",
   "devDependencies": {},
   "dependencies": {
-    "@ocular-ai/types": "file:../types",
     "knew": "0.0.0",
     "knex": "^3.1.0",
     "tsc": "^2.0.4",
+    "typeorm": "^0.3.20",
     "typescript": "^5.3.3"
   },
   "scripts": {

@@ -23,6 +23,7 @@ import expressLoader from "./express"
 import modelsLoader from "./models.js"
 import modulesLoader from "./module"
 import passportLoader from "./passport"
+import pluginsLoader from "./plugins"
 import repositoriesLoader from "./repositories"
 import searchEngineLoader from "./search"
 import servicesLoader from "./services.js"
@@ -110,7 +111,7 @@ export default async ({
     next()
   })
 
-  const appsActivity = Logger.activity(`Initializing plugins${EOL}`)
+  const appsActivity = Logger.activity(`Initializing apps${EOL}`)
   await appsLoader({
     container,
     rootDirectory,
@@ -119,6 +120,16 @@ export default async ({
     activityId: appsActivity,
   })
   const aAct = Logger.success(appsActivity, "Apps intialized") || {}
+
+  const pluginsActivity = Logger.activity(`Initializing plugins${EOL}`)
+  await pluginsLoader({
+    container,
+    rootDirectory,
+    configModule,
+    app: expressApp,
+    activityId: pluginsActivity,
+  })
+  const pAct = Logger.success(pluginsActivity, "Plugins intialized") || {}
 
 
   const subActivity = Logger.activity(`Initializing subscribers${EOL}`)
