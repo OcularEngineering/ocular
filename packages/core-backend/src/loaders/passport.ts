@@ -48,38 +48,69 @@ export default async ({
   // calls will be authenticated based on the JWT
   const { jwt_secret } = configModule.projectConfig
   passport.use(
-    "user-session",
+    "admin-session",
     new CustomStrategy(async (req:AutoflowRequest, done) => {
       // @ts-ignore
-      console.log(req.session)
-      // @ts-ignore
-      if (req.session?.user_id) {
+      if (req.session?.user.user_id && req.session?.user.user_role === "admin") {
         // @ts-ignore
-        return done(null, { userId: req.session.user_id })
+        return done(null, { userId: req.session.user.user_id , userRole: req.session.user.user_role})
       }
 
       return done(null, false)
     })
   )
 
-  // Bearer JWT token authentication strategy, best suited for web SPAs or mobile apps
-  passport.use(
-    "bearer-token",
-    new JWTStrategy(
-      {
-        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-        secretOrKey: jwt_secret,
-      },
-      (token, done) => {
-        if (!token.user_id) {
-          done(null, false)
-          return
-        }
+  // // Bearer JWT token authentication strategy, best suited for web SPAs or mobile apps
+  // passport.use(
+  //   "bearer-token",
+  //   new JWTStrategy(
+  //     {
+  //       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  //       secretOrKey: jwt_secret,
+  //     },
+  //     (token, done) => {
+  //       if (!token.user_id) {
+  //         done(null, false)
+  //         return
+  //       }
 
-        done(null, { userId: token.user_id })
+  //       done(null, { userId: token.user_id, userRole: token.user_role})
+  //     }
+  //   )
+  // )
+
+
+  passport.use(
+    "member-session",
+    new CustomStrategy(async (req:AutoflowRequest, done) => {
+      // @ts-ignore
+      if (req.session?.user?.user_id ) {
+        // @ts-ignore
+        return done(null, { userId: req.session.user.user_id , userRole: req.session.user.user_role})
       }
-    )
+
+      return done(null, false)
+    })
   )
+
+  // // Bearer JWT token authentication strategy, best suited for web SPAs or mobile apps
+  // passport.use(
+  //   "bearer-token",
+  //   new JWTStrategy(
+  //     {
+  //       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  //       secretOrKey: jwt_secret,
+  //     },
+  //     (token, done) => {
+  //       if (!token.user_id) {
+  //         done(null, false)
+  //         return
+  //       }
+
+  //       done(null, { userId: token.user_id })
+  //     }
+  //   )
+  // )
 
   app.use(passport.initialize())
   app.use(passport.session())
