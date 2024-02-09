@@ -225,12 +225,9 @@ class UserService extends TransactionBaseService {
           const hashedPassword = await this.hashPassword_(password)
           createUserData.password_hash = hashedPassword
         }
-  
-        // Create a new organisation for User
-        createUserData.email = validatedEmail
-        createUserData.role = UserRoles.ADMIN;
-  
-        return userRepo.create({...createUserData})
+
+         const user = userRepo.create({...createUserData})
+         return await userRepo.save(user)
       })
     }
 

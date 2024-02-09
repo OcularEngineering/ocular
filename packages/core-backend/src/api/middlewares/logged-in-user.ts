@@ -4,6 +4,8 @@ import { User } from "../../models/user"
 export  default async (req, res, next) =>  {
   let loggedInUser: User | null = null
 
+  console.log("req.user", req.user)
+
   if (req.user && req.user.userId) {
 
     const userRepo: typeof UserRepository =
