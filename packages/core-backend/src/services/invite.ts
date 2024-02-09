@@ -10,19 +10,11 @@ import { ConfigModule } from "../types/config-module"
 import { ListInvite } from "../types/invite"
 import { buildQuery } from "../utils/build-query"
 import {IEventBusService} from "../types"
-import { AutoflowAiError , AutoflowAiErrorTypes } from "@ocular-ai/utils"
+import { AutoflowAiError , AutoflowAiErrorTypes, AutoflowContainer } from "@ocular-ai/utils"
 
 // 7 days
 const DEFAULT_VALID_DURATION = 1000 * 60 * 60 * 24 * 7
 
-type InviteServiceProps = {
-  manager: EntityManager
-  userService: UserService
-  userRepository: typeof UserRepository
-  inviteRepository: typeof InviteRepository
-  eventBusService: IEventBusService
-  loggedInUser: User
-}
 
 class InviteService extends TransactionBaseService {
   static Events = {
@@ -33,31 +25,22 @@ class InviteService extends TransactionBaseService {
   protected readonly userRepo_: typeof UserRepository
   protected readonly inviteRepository_: typeof InviteRepository
   protected readonly eventBus_:  IEventBusService
-  protected readonly loggedInUser_: User
+  protected readonly loggedInUser_: User | null
 
   protected readonly configModule_: ConfigModule
 
-  constructor(
-    {
-      userService,
-      userRepository,
-      inviteRepository,
-      eventBusService,
-      loggedInUser
-    }: InviteServiceProps,
-    configModule: ConfigModule
-  ) {
+  constructor(container,) {
     // @ts-ignore
     // eslint-disable-next-line prefer-rest-params
     super(...arguments)
 
-    this.configModule_ = configModule
-    this.userService_ = userService
-    this.userRepo_ = userRepository
-    this.inviteRepository_ = inviteRepository
-    this.eventBus_ = eventBusService
+    this.configModule_ = container.configModule
+    this.userService_ = container.userService
+    this.userRepo_ = container.userRepository
+    this.inviteRepository_ = container.inviteRepository
+    this.eventBus_ = container.eventBusService
     try {
-      this.loggedInUser_ = loggedInUser
+      this.loggedInUser_ = container.loggedInUser
     } catch (e) {
       // avoid errors when backend first runs
     }
