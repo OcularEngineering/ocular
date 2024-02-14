@@ -176,7 +176,7 @@ export async function registerServices(
   appDetails: AppDetails,
   container: AutoflowContainer
 ): Promise<void> {
-  const files = glob.sync(`${appDetails.resolve}/services/[!__]*.js`, {})
+  const files = glob.sync(`${appDetails.resolve}/dist/services/[!__]*.js`, {})
   await promiseAll(
     files.map(async (fn) => {
       const loaded = require(fn).default
@@ -189,15 +189,16 @@ export async function registerServices(
       }
 
       if (OauthService.isOauthService(loaded.prototype)) {
-        const registerAppDetails = loaded.getAppDetails(appDetails.options)
-
+        const configModule = container.resolve<ConfigModule>("configModule")
+        const createAppInput = loaded.getAppDetails(configModule.projectConfig,appDetails.options)
 
         // Self register the app on startup
         const appService =
            container.resolve("appService")
-        await appService.registerAppOnStartUp(registerAppDetails)
+        
+        await appService.register(createAppInput)
 
-        const name = registerAppDetails.name
+        const name = createAppInput.name
         container.register({
           [`${name}Oauth`]: asFunction(
             (cradle) => new loaded(cradle, appDetails.options),
@@ -297,7 +298,7 @@ function resolveApp(appName: string): {
         const packageJSON = JSON.parse(
           fs.readFileSync(`${resolvedPath}/package.json`, `utf-8`)
         )
-        const name = packageJSON.name || appName
+        const name = packageJSON.idenitifier || appName
         // warnOnIncompatiblePeerDependency(name, packageJSON)
 
         return {

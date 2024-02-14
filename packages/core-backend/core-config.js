@@ -35,6 +35,8 @@ module.exports = {
     database_type: "postgres",
     redis_url: process.env.REDIS_URL,
     ui_cors: UI_CORS,
+    client_id: process.env.CLIENT_ID,
+    github_client_secret: process.env.GITHUB_CLIENT_SECRET,
     search_engine_options: {
       apiKey: process.env.AZURE_SEARCH_API_KEY,
       endpoint: process.env.AZURE_SEARCH_ENDPOINT,
