@@ -1,4 +1,4 @@
-import { OAuthService } from "../../../services"
+import { OAuthService } from "../../../../services"
 
 export default async (req, res) => {
   const oauthService: OAuthService = req.scope.resolve("oauthService")

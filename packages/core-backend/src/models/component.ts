@@ -1,9 +1,10 @@
-import { BeforeInsert, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne } from "typeorm"
+import { BeforeInsert, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from "typeorm"
 import { BaseEntity } from "@ocular-ai/types"
 import { generateEntityId } from "../utils/generate-entity-id"
 import { Organisation } from "./organisation"
 import { DbAwareColumn } from "../../../utils/src/db-aware-column"
 import { Team } from "./team"
+import { Event } from "./event"
 
 /**
  * @enum
@@ -38,6 +39,8 @@ export class Component extends BaseEntity {
   @Column({ type: "varchar", nullable: true })
   organisation_id: string;
 
+  @OneToMany(() => Event, (event) => event?.component)
+  events?: Event[];
 
   @ManyToOne(() => Organisation, (organisation) => organisation.members)
   @JoinColumn({ name: 'organisation_id', referencedColumnName: 'id' })

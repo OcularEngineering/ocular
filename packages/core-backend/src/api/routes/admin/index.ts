@@ -2,7 +2,7 @@ import { Router } from "express"
 import invites from "./invites"
 import middlewares from "../../middlewares"
 import users from "./users/index"
-// import apps from "./apps"
+import apps from "./apps"
 // import components from "./member/components"
 // import search from "./member/search"
 import teams from "./teams"
@@ -19,7 +19,7 @@ export default (app, container, config) => {
   route.use(middlewares.authenticateAdmin())
   route.use(middlewares.registeredLoggedinUser)
 
-  // apps(route)
+  apps(route)
   // components(route)
   invites(route)
   // search(route)
