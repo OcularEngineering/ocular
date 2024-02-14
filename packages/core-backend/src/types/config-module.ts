@@ -43,6 +43,8 @@ export type ProjectConfigOptions = {
     ssl: { rejectUnauthorized: false }
   }
   ui_cors?: string
+  client_id?: string
+  github_client_secret?: string
   search_engine_options?:SearchEngineOptions
   vector_search_options?: PineConePluginOptions
 }

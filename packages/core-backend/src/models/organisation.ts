@@ -12,6 +12,7 @@ import { Invite } from "./invite";
 import { Component, } from "./component";
 import { OAuth } from "./oauth";
 import { Team } from "./team";
+import { Event } from "./event";
 
 @Entity()
 export class Organisation extends BaseEntity {
@@ -32,6 +33,9 @@ export class Organisation extends BaseEntity {
 
   @OneToMany(() => OAuth, oauth => oauth?.organisation)
   oauth?: OAuth[];
+
+  @OneToMany(() => Event, event => event?.organisation)
+  events?: Event[];
 
   @Column({ nullable: true, type: "text" })
   invite_link_template?: string | null

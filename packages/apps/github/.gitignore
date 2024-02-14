@@ -7,10 +7,3 @@ node_modules
 yarn.lock
 
 /dist
-
-/api
-/services
-/models
-/subscribers
-/loaders
-/utils
