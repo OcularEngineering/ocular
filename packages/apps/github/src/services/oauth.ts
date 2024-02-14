@@ -27,7 +27,7 @@ class GithubOauth extends OauthService {
   async refreshToken() {
     // const params = {
     //   refresh_token: refreshToken,
-    //   client_id: "medusa-dev",
+    //   client_id: "",
     //   client_secret: CLIENT_SECRET,
     // }
 
@@ -40,9 +40,9 @@ class GithubOauth extends OauthService {
   async generateToken() {
     console.log("refreshToken")
     // const params = {
-    //   client_id: "medusa-dev",
+    //   client_id: "",
     //   client_secret: CLIENT_SECRET,
-    //   redirect: "https://tekla.medusa-commerce.com/a/oauth/brightpearl",
+    //   redirect: "https://tekla.commerce.com/a/oauth/brightpearl",
     //   code,
     // }
 
