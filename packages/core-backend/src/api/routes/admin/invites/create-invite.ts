@@ -15,7 +15,7 @@ export default async (req, res) => {
   await manager.transaction(async (transactionManager) => {
     return await inviteService
       .withTransaction(transactionManager)
-      .create(validated.user, validated.role)
+      .create(validated.email, validated.role)
   })
 
   res.sendStatus(200)
@@ -39,7 +39,7 @@ export default async (req, res) => {
  */
 export class AdminPostInvitesReq {
   @IsEmail()
-  user: string
+  email: string
 
   @IsEnum(UserRoles)
   role: UserRoles

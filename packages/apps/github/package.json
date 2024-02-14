@@ -1,21 +1,29 @@
 {
   "name": "github",
-  "description": "GitHub application for Ocular",
-  "main": "index.js",
+  "description": "GitHub Application for Ocular",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "engines": {
     "node": ">=16"
   },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
   "author": "Louis Luxa Murerwa",
-  "devDependencies": {
+  "devDependencies": {},
+  "dependencies": {
+    "@ocular-ai/types": "file:../../types",
+    "tsc": "^2.0.4",
+    "typeorm": "^0.3.20",
+    "typescript": "^5.3.3"
   },
   "scripts": {
-    "prepare": "cross-env NODE_ENV=production yarn run build",
-    "test": "jest --passWithNoTests src",
-    "build": "babel src --out-dir . --ignore '**/__tests__','**/__mocks__'",
-    "watch": "babel -w src --out-dir . --ignore '**/__tests__','**/__mocks__'"
-  },
-  "peerDependencies": {
-  },
-  "dependencies": {
+    "prepublishOnly": "cross-env NODE_ENV=production tsc --build",
+    "build": "rimraf dist && tsc --build",
+    "watch": "tsc --build --watch",
+    "test": "jest --runInBand --bail --forceExit"
   }
 }

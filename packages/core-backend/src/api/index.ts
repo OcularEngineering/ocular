@@ -10,8 +10,7 @@ const app = Router()
 export default (container, config) => {
   const adminRouter = Router()
   const memberRouter = Router()
-  app.use("/v1", adminRouter)
-  app.use("/v1", memberRouter)
+
   // const httpCompressionOptions = compressionOptions(config)
 
   // if (httpCompressionOptions.enabled) {
@@ -31,6 +30,8 @@ export default (container, config) => {
       credentials: true,
     })
   )
+  app.use("/v1", adminRouter)
+  app.use("/v1", memberRouter)
 
   // Admin Routes
   admin(adminRouter,container,config)

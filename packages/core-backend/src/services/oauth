@@ -70,7 +70,7 @@ class OAuthService extends TransactionBaseService {
     if(!this.loggedInUser_ || !this.loggedInUser_.organisation){
       throw new AutoflowAiError(
         AutoflowAiErrorTypes.NOT_FOUND,
-        `User must belong to an "organisation" must be defined so as to add a component`
+        `User must belong to an "organisation" must be defined to create an OAuth`
       )
     }
     const oauthRepo = this.activeManager_.withRepository(this.oauthRepository_)
@@ -79,24 +79,25 @@ class OAuthService extends TransactionBaseService {
   }
 
   async generateToken(
-    appName: string,
-    code: string
+    identifier: string,
+    code: string,
+    state: string
   ): Promise<OAuth> {
 
-    // Check If User Generating the Token Belongs To An Organisation
+    // Check If The User Generating the Token Belongs To An Organisation
     if(!this.loggedInUser_ || !this.loggedInUser_.organisation){
       throw new AutoflowAiError(
         AutoflowAiErrorTypes.NOT_FOUND,
-        `User must belong to an "organisation" so as to get components`
+        `User must belong to an "organisation" so as to add OAuth`
       )
     }
 
-    const app:App = await this.appService_.retrieveByName(appName)
+    const app:App = await this.appService_.retrieveIdentfier(identifier)
     
     if(!app){
       throw new AutoflowAiError(
         AutoflowAiErrorTypes.NOT_FOUND,
-        `Application ${appName} not found`
+        `Application ${identifier} not found`
       )
     }
     const service = this.container_[`${app.name}Oauth`]
@@ -118,11 +119,11 @@ class OAuthService extends TransactionBaseService {
 
     // Create An OAuth For This App And Organisation
     return await this.create({
-      data: data, organisation: this.loggedInUser_.organisation, app: app
+      data: data, organisation: this.loggedInUser_.organisation, app_id: app.id
     })
     .then(async (result) => {
       await this.eventBus_.emit(
-        `${OAuthService.Events.TOKEN_GENERATED}.${appName}`,
+        `${OAuthService.Events.TOKEN_GENERATED}.${app.name}`,
         data
       )
       return result
