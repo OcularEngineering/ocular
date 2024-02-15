@@ -20,11 +20,11 @@ export default (app) => {
   //   middlewares.wrap(require("./get-app").default)
   //   )
   
-  // route.get("/",middlewares.wrap(require("./list-apps").default))
-  // route.post(
-  //   "/authorizations",
-  //   middlewares.wrap(require("./authorize-app").default)
-  // )
+  route.get("/",middlewares.wrap(require("./list-apps").default))
+  route.post(
+    "/authorize",
+    middlewares.wrap(require("./authorize-app").default)
+  )
   
 
   // route.post(
@@ -35,5 +35,6 @@ export default (app) => {
   return app
 }
 
+export * from "./authorize-app"
 // export * from "./create-app"
-// export * from "./list-apps"
+export * from "./list-apps"

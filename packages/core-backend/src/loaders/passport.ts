@@ -51,7 +51,7 @@ export default async ({
     "admin-session",
     new CustomStrategy(async (req:AutoflowRequest, done) => {
       // @ts-ignore
-      if (req.session?.user.user_id && req.session?.user.user_role === "admin") {
+      if (req.session?.user?.user_id && req.session?.user?.user_role === "admin") {
         // @ts-ignore
         return done(null, { userId: req.session.user.user_id , userRole: req.session.user.user_role})
       }

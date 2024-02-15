@@ -4,11 +4,12 @@ import {
   IsString,
   ValidateNested,
 } from "class-validator"
-
+import _ from "lodash"
 import InviteService from "../../../../services/invite"
 import { Type } from "class-transformer"
 import { validator } from "../../../../utils/validator"
 import { EntityManager } from "typeorm"
+import { AuthService } from "../../../../services"
 
 /**
  * @oas [post] /admin/invites/accept
@@ -21,15 +22,31 @@ export default async (req, res) => {
   const validated = await validator(InviteAcceptReq, req.body)
 
   const inviteService: InviteService = req.scope.resolve("inviteService")
+  const authService: AuthService = req.scope.resolve("authService")
 
   const manager: EntityManager = req.scope.resolve("manager")
   await manager.transaction(async (transactionManager) => {
-    return await inviteService
+   await inviteService
       .withTransaction(transactionManager)
       .accept(validated.token, validated.user)
+      .then((user) => {
+        authService
+        .withTransaction(transactionManager)
+        .authenticate(user.email, validated.user.password)
+        .then((result) => {
+          if (result.success && result.user) {
+            req.session.user = { user_id: result.user.id, user_role: result.user.role }
+            const cleanRes = _.omit(result.user, ["password_hash"])
+            res.json({ user: result.user })
+          }else{
+            res.sendStatus(401)
+          }
+        })
+      }).catch((error) => {
+        console.log("error ->", error)
+        res.sendStatus(401)
+      })
   })
-
-  res.sendStatus(200)
 }
 
 /**
