@@ -4,20 +4,21 @@ import { OAuthService } from "../../../../services"
 import { validator } from "../../../../utils/validator"
 
 export default async (req, res) => {
+  console.log("req.body  code ->", req.body)
   const validated = await validator(PostAppsReq, req.body)
   const oauthService: OAuthService = req.scope.resolve("oauthService")
   const data = await oauthService.generateToken(
-    validated.identifer,
+    validated.name,
     validated.code,
     validated.state
   )
-  res.status(200).json({ apps: data })
+  res.status(200).json({ apps: null })
 }
 
 export class PostAppsReq {
   @IsString()
   @IsNotEmpty()
-  identifer: string
+  name: string
 
   @IsString()
   @IsNotEmpty()

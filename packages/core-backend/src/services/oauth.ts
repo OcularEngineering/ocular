@@ -79,7 +79,7 @@ class OAuthService extends TransactionBaseService {
   }
 
   async generateToken(
-    identifier: string,
+    name: string,
     code: string,
     state: string
   ): Promise<OAuth> {
@@ -92,14 +92,17 @@ class OAuthService extends TransactionBaseService {
       )
     }
 
-    const app:App = await this.appService_.retrieveIdentfier(identifier)
+    const app:App = await this.appService_.retrieveByName(name)
     
     if(!app){
       throw new AutoflowAiError(
         AutoflowAiErrorTypes.NOT_FOUND,
-        `Application ${identifier} not found`
+        `Application ${name} not found`
       )
     }
+
+ 
+
     const service = this.container_[`${app.name}Oauth`]
     if (!service) {
       throw new AutoflowAiError(
@@ -108,18 +111,18 @@ class OAuthService extends TransactionBaseService {
       )
     }
 
-    // if (!(app.data.state === state)) {
-    //   throw new AutoflowAiError(
-    //     AutoflowAiErrorTypes.NOT_ALLOWED,
-    //     `${app.display_name} could not match state`
-    //   )
-    // }
+   if (!(app.state === state)) {
+      throw new AutoflowAiError(
+        AutoflowAiErrorTypes.NOT_ALLOWED,
+        `${app.name} could not match state`
+      )
+    }
 
     const data = await service.generateToken(code)
 
     // Create An OAuth For This App And Organisation
     return await this.create({
-      data: data, organisation: this.loggedInUser_.organisation, app_id: app.id
+      code: data, organisation: this.loggedInUser_.organisation, app_name: app.name
     })
     .then(async (result) => {
       await this.eventBus_.emit(
@@ -128,6 +131,7 @@ class OAuthService extends TransactionBaseService {
       )
       return result
     })
+    return null
   }
 }
 
