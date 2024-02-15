@@ -32,6 +32,9 @@ export class App extends BaseEntity {
   @Column({ type: "varchar", nullable: true})
   website: string
 
+  @Column({ type: "varchar", nullable: true})
+  oauth_url: string
+
   @Column({ nullable: true,  type: "varchar" })
   install_url: string
 

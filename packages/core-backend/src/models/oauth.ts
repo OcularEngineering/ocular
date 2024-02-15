@@ -1,8 +1,8 @@
-import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, OneToMany} from "typeorm"
+import { BeforeInsert, Column, Entity, Index, JoinColumn, ManyToOne, OneToMany} from "typeorm"
 import { DbAwareColumn } from "../../../utils/src/db-aware-column"
 import { generateEntityId } from "../utils/generate-entity-id"
 import { Organisation } from "./organisation"
-import { BaseEntity } from "@ocular-ai/types"
+import { AppNameDefinitions, BaseEntity } from "@ocular-ai/types"
 import { App } from "./app"
 import { Event } from "./event"
 
@@ -10,12 +10,17 @@ import { Event } from "./event"
 @Entity()
 export class OAuth extends BaseEntity {
 
-  @DbAwareColumn({ type: "jsonb", nullable: true })
-  data: Record<string, unknown>
+  @Index("OAuthAppName")
+  @DbAwareColumn({
+    type: "enum",
+    enum: AppNameDefinitions,
+    nullable: false,
+    unique: true
+  })
+  app_name: AppNameDefinitions
 
   @Column({ type: "varchar", nullable: false })
-  app_id: string;
-
+  code: string
 
   @Column({ type: "varchar", nullable: true })
   organisation_id: string;
