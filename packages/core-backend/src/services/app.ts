@@ -61,29 +61,29 @@ class AppService extends TransactionBaseService {
     })
   }
 
-  // async retrieveByName(appName: string): Promise<App> {
+  async retrieveByName(appName: string): Promise<App> {
 
-  //   if (!isDefined(appName)) {
-  //     throw new AutoflowAiError(
-  //       AutoflowAiError.Types.NOT_FOUND,
-  //       `"AppName" must be defined`
-  //     )
-  //   }
+    if (!isDefined(appName)) {
+      throw new AutoflowAiError(
+        AutoflowAiError.Types.NOT_FOUND,
+        `"AppName" must be defined`
+      )
+    }
 
-  //   const appRepo = this.activeManager_.withRepository(this.appRepository_)
-  //   const query = buildQuery({  application_name: appName} )
+    const appRepo = this.activeManager_.withRepository(this.appRepository_)
+    const query = buildQuery({  name: appName} )
 
-  //   const app = await appRepo.findOne(query)
+    const app = await appRepo.findOne(query)
 
-  //   if (!app) {
-  //     throw new AutoflowAiError(
-  //       AutoflowAiError.Types.NOT_FOUND,
-  //       `Application ${appName} not found`
-  //     )
-  //   }
+    if (!app) {
+      throw new AutoflowAiError(
+        AutoflowAiError.Types.NOT_FOUND,
+        `Application ${appName} not found`
+      )
+    }
 
-  //   return app
-  // }
+    return app
+  }
 
   // async retrieve(appId: string, config: FindConfig<App> = {}): Promise<App> {
   //   if (!isDefined(appId)) {
@@ -109,11 +109,11 @@ class AppService extends TransactionBaseService {
   //   return app
   // }
 
-  // async list(selector: Selector<App>): Promise<App[]> {
-  //   const appRepo = this.activeManager_.withRepository(this.appRepository_)
-  //   const query = buildQuery(selector, {})
-  //   return await appRepo.find(query)
-  // }
+  async list(selector: Selector<App>): Promise<App[]> {
+    const appRepo = this.activeManager_.withRepository(this.appRepository_)
+    const query = buildQuery(selector, {})
+    return await appRepo.find(query)
+  }
 
  
 }
