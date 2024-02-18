@@ -1,0 +1,4 @@
+class GitHubService extends TransactionBaseService {
+  constructor(container) {}
+  // Register App
+}

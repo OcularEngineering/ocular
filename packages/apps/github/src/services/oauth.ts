@@ -1,6 +1,6 @@
 import axios from "axios"
 import randomize from "randomatic"
-import { OauthService, AppNameDefinitions } from "@ocular-ai/types"
+import { OauthService, AppNameDefinitions, AppCategoryDefinitions  } from "@ocular-ai/types"
 import { config } from "process"
 
 class GithubOauth extends OauthService {
@@ -17,17 +17,20 @@ class GithubOauth extends OauthService {
   static getAppDetails(projectConfig,options) {
     const client_id = options.client_id
     const client_secret = options.client_secret
-    const state = randomize("A0", 16)
     const redirect = `${projectConfig.ui_cors}oauth/github`
     return {
       name: AppNameDefinitions.GITHUB,
-      identifier: AppNameDefinitions.GITHUB,
-      logo: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+      logo: "/Github.png",
       description: "GitHub is a web code hosting platform for version control and collaboration. It lets you and others work together on projects from anywhere.",
-      website: "https://github.com",
       install_url: `https://github.com/apps/ocular-ai/installations/new`,
-      oauth_url: `https://github.com/login/oauth/authorize?client_id=${client_id}&state=${state}`,
-      state,
+      oauth_url: `https://github.com/login/oauth/authorize?client_id=${client_id}`,
+      slug:AppNameDefinitions.GITHUB,
+      category:AppCategoryDefinitions.SOTWARE_DEVELOPMENT,
+      developer:"Ocular AI",
+      images:["/Github.png"],
+      overview: "GitHub is a web-based platform used for version control. Git simplifies the process of working with other people and makes it easy to collaborate on projects. Team members can work on files and easily merge their changes in with the master branch of the project.",
+      docs: "https://docs.github.com/en",
+      website: "https://github.com"
     }
   }
 

@@ -9,3 +9,11 @@ export enum AppNameDefinitions {
    */
   GITHUB = "github",
 }
+
+export enum AppCategoryDefinitions {
+  /**
+   * GitHub
+   */
+  SOTWARE_DEVELOPMENT = "Software Development",
+}
+
