@@ -4,6 +4,7 @@ import { Router } from "express"
 import cors from "cors"
 import admin from "./routes/admin"
 import member from "./routes/member"
+import {parseCorsOrigins}   from "@ocular-ai/utils"
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const app = Router()
@@ -26,7 +27,7 @@ export default (container, config) => {
  const uiCors = config.ui_cors || ""
   app.use(
     cors({
-      origin: uiCors,
+      origin: parseCorsOrigins(uiCors),
       credentials: true,
     })
   )

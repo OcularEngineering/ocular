@@ -7,9 +7,13 @@ import { buildQuery} from "../utils/build-query"
 import {CreateOrganisationInput, FilterableOrganisationProps} from "../types/organisation"
 import { isDefined} from "../utils/is-defined"
 import {AutoflowAiError} from "@ocular-ai/utils"
+import { AppNameDefinitions } from "@ocular-ai/types"
+import { AppRepository } from "../repositories"
 
 type InjectedDependencies = {
   manager: EntityManager
+  appRepository: typeof AppRepository
+  loggedInUser: User
   organisationRepository: typeof OrganisationRepository
 }
 
@@ -17,15 +21,22 @@ type InjectedDependencies = {
  * Provides layer to manipulate store settings.
  */
 class OrganisationService extends TransactionBaseService {
+  protected readonly appRepository_: typeof AppRepository
+  protected readonly loggedInUser_: User | null
   protected readonly organisationRepository_: typeof OrganisationRepository
 
-  constructor({
-    organisationRepository,
-  }: InjectedDependencies) {
+  constructor(container: InjectedDependencies) {
     // eslint-disable-next-line prefer-rest-params
     super(arguments[0])
+    this.appRepository_ =  container.appRepository
+    this.organisationRepository_ = container.organisationRepository
 
-    this.organisationRepository_ = organisationRepository
+    try {
+      this.loggedInUser_ = container.loggedInUser
+    } catch (e) {
+      // avoid errors when backend first runs
+    }
+
   }
 
 
@@ -71,5 +82,48 @@ class OrganisationService extends TransactionBaseService {
     const organisationRepo = this.activeManager_.withRepository(this.organisationRepository_)
     return await organisationRepo.find(buildQuery(selector, config))
   }
+
+
+  async installApp(name: AppNameDefinitions): Promise<Organisation> {
+    return await this.atomicPhase_(
+      async (transactionManager: EntityManager) => {
+        const appRepository = transactionManager.withRepository(
+          this.appRepository_
+        )
+
+        const app = await appRepository.findOne({where: {name: name}})
+
+        if (!isDefined(app)) {
+          throw new AutoflowAiError(
+            AutoflowAiError.Types.NOT_FOUND,
+            `${app} must be defined to be installed`
+          )
+        }
+      const organisation = await this.organisationRepository_.findOne({where: { id: "org_01HKQP19S8C74S1HGP9AK07PBZ"}} );
+      if(!organisation){
+        throw new AutoflowAiError(
+          AutoflowAiError.Types.NOT_FOUND,
+          `Org with not not found`
+        )
+      }
+
+      organisation.addApp({id: app.id, name: app.name})
+      return await this.organisationRepository_.save(organisation)
+      }
+    )
+  }
+
+  async listInstalledApps(): Promise<Organisation> {
+
+    // if(!this.loggedInUser_ || !this.loggedInUser_.organisation){
+    //   throw new AutoflowAiError(
+    //     AutoflowAiError.Types.NOT_FOUND,
+    //     `User must belong to an "organisation" so as to get components`
+    //   )
+    // }
+    return  await this.organisationRepository_.findOne({where: { id:  "org_01HKQP19S8C74S1HGP9AK07PBZ"}} );
+  }
+
+
 }
 export default OrganisationService;

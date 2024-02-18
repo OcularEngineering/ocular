@@ -43,7 +43,7 @@ class AppService extends TransactionBaseService {
       const appRepo = this.activeManager_.withRepository(this.appRepository_)
       
       // Try to find the existing application
-      let application = await appRepo.findOne({ where: { name: app.name, identifier: app.identifier } });
+      let application = await appRepo.findOne({ where: { name: app.name} });
 
       if (application) {
         // If application exists, update all fields except name and identifier

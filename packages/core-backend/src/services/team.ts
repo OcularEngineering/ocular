@@ -67,8 +67,8 @@ class TeamService extends TransactionBaseService {
         const teamRepo: typeof TeamRepository = manager.withRepository(
           this.teamRepository_
         )
-        const created = teamRepo.create({name: team.name, organisation:this.loggedInUser_.organisation})
-        
+        const created = await teamRepo.create({name: team.name, organisation:this.loggedInUser_.organisation})
+        created.members = []
         for(const email of team.member_emails){
           await this.userService_.retrieveByEmail(email)
           .then((user)=>{
@@ -76,8 +76,8 @@ class TeamService extends TransactionBaseService {
               created.members.push(user)
             }
           })
-          .catch(() => { 
-            this.logger_.error(`User with email: ${email} was not found for ${this.loggedInUser_.organisation.id} team.`)
+          .catch((err) => { 
+            this.logger_.error(`User with email: ${email} was not found for ${this.loggedInUser_.organisation.id} team with ${err}.`)
           })
         }
         const createdTeam = await teamRepo.save(created)
