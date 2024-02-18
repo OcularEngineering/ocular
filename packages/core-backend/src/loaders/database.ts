@@ -44,7 +44,7 @@ export default async ({
       (configModule.projectConfig.database_logging || false),
   } as DataSourceOptions)
 
-  await dataSource.initialize().catch(handlePostgresDatabaseError)
+   await dataSource.initialize().catch(handlePostgresDatabaseError)
 
   // If migrations are not included in the config, we assume you are attempting to start the server
   // Therefore, throw if the database is not migrated

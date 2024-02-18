@@ -2,6 +2,8 @@ import {
   BeforeInsert,
   Column,
   Entity,
+  JoinTable,
+  ManyToMany,
   OneToMany
 } from "typeorm"
 import { BaseEntity } from "@ocular-ai/types"
@@ -14,10 +16,18 @@ import { OAuth } from "./oauth";
 import { Team } from "./team";
 import { Event } from "./event";
 
+type App = {
+  id: string;
+  name: string;
+}
+
 @Entity()
 export class Organisation extends BaseEntity {
   @Column({ default: "Org", type: "varchar" })
   name: string
+
+  @Column({ type: 'json', nullable: true })
+  installed_apps: App[];
 
   @OneToMany(() => User, (user) => user?.organisation)
   members?: User[];
@@ -42,6 +52,16 @@ export class Organisation extends BaseEntity {
 
   @DbAwareColumn({ type: "jsonb", nullable: true })
   metadata: Record<string, unknown> | null
+
+  addApp(app: App) {
+    if (!this.installed_apps) {
+      this.installed_apps = [];
+    }
+    if (!this.installed_apps.some(existingApp => existingApp.id === app.id)) {
+      const { id ,name } = app;
+      this.installed_apps.push({ id, name });
+    }
+  }
 
   /**
    * @apiIgnore

@@ -9,7 +9,7 @@ import { UserRepository } from "../repositories/user"
 import { ConfigModule } from "../types/config-module"
 import { ListInvite } from "../types/invite"
 import { buildQuery } from "../utils/build-query"
-import {IEventBusService} from "../types"
+import {IEventBusService} from "@ocular-ai/types"
 import { AutoflowAiError , AutoflowAiErrorTypes, AutoflowContainer } from "@ocular-ai/utils"
 
 // 7 days

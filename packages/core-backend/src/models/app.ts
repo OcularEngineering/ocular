@@ -1,8 +1,10 @@
-import { BeforeInsert, Column, Entity, Index, OneToMany} from "typeorm"
+// Table designed by Michael Moyo
+import { BeforeInsert, Column, Entity, Generated, Index, ManyToMany, OneToMany} from "typeorm"
 import { generateEntityId } from "../utils/generate-entity-id"
-import { BaseEntity, AppNameDefinitions } from "@ocular-ai/types"
+import { BaseEntity, AppNameDefinitions, AppCategoryDefinitions } from "@ocular-ai/types"
 import { OAuth } from "./oauth"
 import { DbAwareColumn } from "@ocular-ai/utils"
+import { Organisation } from "./organisation"
 
 
 @Entity()
@@ -17,21 +19,6 @@ export class App extends BaseEntity {
   })
   name: AppNameDefinitions
 
-  @Column({  unique:true, type: "varchar", nullable: false  })
-  identifier: string
-
-  @Column({ type: "varchar", nullable: true  })
-  state: string
-
-  @Column({ type: "varchar", nullable: true})
-  logo: string
-
-  @Column({ type: "varchar", nullable: true })
-  description: string
-
-  @Column({ type: "varchar", nullable: true})
-  website: string
-
   @Column({ type: "varchar", nullable: true})
   oauth_url: string
 
@@ -41,11 +28,51 @@ export class App extends BaseEntity {
   @Column({ type: "varchar", nullable: true})
   uninstall_url: string
 
+  @Column({ type: "varchar", nullable: false, unique: true  })
+  slug: string
+
+  @DbAwareColumn({
+    type: "enum",
+    enum: AppCategoryDefinitions,
+    nullable: false,
+  })
+  category: AppCategoryDefinitions
+
+  @Column({ type: "varchar", nullable: false })
+  developer: string
+
+  @Column({ type: "varchar", nullable: false})
+  logo: string
+
+  @Column({ type: "varchar", nullable: true, array: true, default: [] })
+  images: string[]
+
+  @Column({ type: "varchar", nullable: false })
+  overview: string
+
+  @Column({ type: "varchar", nullable: false })
+  description: string
+
+  @Column({ type: "varchar", nullable: false})
+  website: string
+
+  @Column({ type: "varchar", nullable: true})
+  docs: string
+
+  @Column({ type: "tsvector", nullable: false })
+  tsv: string;
+
   /**
    * @apiIgnore
    */
   @BeforeInsert()
   private beforeInsert(): void {
     this.id = generateEntityId(this.id, "app")
+    this.generateTsv();
+  }
+
+  // Function to generate tsv value based on specified columns
+  private generateTsv(): void {
+    this.tsv = `setweight(to_tsvector('english', ${this.name}), 'A') || setweight(to_tsvector('english', ${this.description}), 'B') || setweight(to_tsvector('english', ${this.overview}), 'C') || setweight(to_tsvector('english', ${this.category}), 'D') || setweight(to_tsvector('english', ${this.slug}), 'D')`;
   }
 }
