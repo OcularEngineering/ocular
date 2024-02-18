@@ -7,9 +7,7 @@ import { App } from "../../../../models"
 
 const route = Router()
 export default (app) => {
-
   app.use("/apps", route)
-
   // route.get(
   //   "/:id", 
   //   transformQuery(GetAppParams, {
@@ -20,21 +18,19 @@ export default (app) => {
   //   middlewares.wrap(require("./get-app").default)
   //   )
   
-  route.get("/",middlewares.wrap(require("./list-apps").default))
-  route.post(
-    "/authorize",
-    middlewares.wrap(require("./authorize-app").default)
-  )
-  
 
   // route.post(
-  //   "/",
-  //   middlewares.wrap(require("./create-app").default)
+  //   "/authorize",
+  //   middlewares.wrap(require("./authorize-app").default)
   // )
-
+  route.get("/",middlewares.wrap(require("./list-apps").default))
+  //   route.post(
+  //   "/install",
+  //   middlewares.wrap(require("./install-app").default)
+  // )
   return app
 }
 
-export * from "./authorize-app"
-// export * from "./create-app"
+// export * from "../oauth/authorize-app"
+// export * from "../organisation/install-app"
 export * from "./list-apps"

@@ -20,13 +20,29 @@ export default (app) => {
       isList: false,
     }),
     middlewares.wrap(require("./get-organisation").default)
-    )
-  
+  )
 
+  route.post(
+    "/:id/install-app",
+    middlewares.wrap(require("./install-app").default)
+  )
+
+  route.get(
+    "/:id/apps",
+    middlewares.wrap(require("./list-installed-apps").default)
+  )
+
+  route.post(
+    "/:id/apps/authorize",
+    middlewares.wrap(require("./authorize-app").default)
+  )
+  
   return app
 }
 
 export * from "./get-organisation"
+export * from "./install-app"
+export * from "./list-installed-apps"
 
 export const defaultOrganisationRelations = [
 ]

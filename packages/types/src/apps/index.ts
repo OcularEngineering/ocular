@@ -1,1 +1,1 @@
-export * from "./app-definition"
+export * from "./definition"

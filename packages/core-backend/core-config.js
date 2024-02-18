@@ -22,7 +22,7 @@ try {
 } catch (e) { }
 
 // UI_CORS is the URL of the UI that is allowed to access the API
-const UI_CORS = process.env.ADMIN_CORS || "http://localhost:3000";
+const UI_CORS = process.env.ADMIN_CORS || "http://localhost:3000,http://localhost:3001,http://localhost:3002";
 
 
 /** @type {import('./src/types/config-module').ConfigModule} */
