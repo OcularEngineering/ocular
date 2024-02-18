@@ -80,8 +80,7 @@ class OAuthService extends TransactionBaseService {
 
   async generateToken(
     name: string,
-    code: string,
-    state: string
+    code: string
   ): Promise<OAuth> {
 
     // Check If The User Generating the Token Belongs To An Organisation
@@ -108,13 +107,6 @@ class OAuthService extends TransactionBaseService {
       throw new AutoflowAiError(
         AutoflowAiErrorTypes.INVALID_DATA,
         `An OAuth handler for ${app.name} could not be found make sure the app is registered in the Ocular Core.`
-      )
-    }
-
-   if (!(app.state === state)) {
-      throw new AutoflowAiError(
-        AutoflowAiErrorTypes.NOT_ALLOWED,
-        `${app.name} could not match state`
       )
     }
 
