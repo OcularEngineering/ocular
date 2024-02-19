@@ -1,10 +1,12 @@
-import { BeforeInsert, Column, Entity, Index, JoinColumn, ManyToOne, OneToMany} from "typeorm"
+import { CreateDateColumn, BeforeInsert, Column, Entity, Index, JoinColumn, ManyToOne, OneToMany} from "typeorm"
 import { DbAwareColumn } from "../../../utils/src/db-aware-column"
 import { generateEntityId } from "../utils/generate-entity-id"
 import { Organisation } from "./organisation"
 import { AppNameDefinitions, BaseEntity } from "@ocular-ai/types"
+import { resolveDbType } from "@ocular-ai/utils"
 import { App } from "./app"
 import { Event } from "./event"
+import { type } from "os"
 
 
 @Entity()
@@ -20,8 +22,20 @@ export class OAuth extends BaseEntity {
   app_name: AppNameDefinitions
 
   @Column({ type: "varchar", nullable: false })
-  code: string
+  type: string
 
+  @Column({ type: "varchar", nullable: false })
+  token: string
+
+  @CreateDateColumn({ type: resolveDbType("timestamptz") })
+  token_expires_at: Date
+
+  @Column({ type: "varchar", nullable: false })
+  refresh_token: string
+
+  @CreateDateColumn({ type: resolveDbType("timestamptz") })
+  refresh_token_expires_at: Date
+ 
   @Column({ type: "varchar", nullable: true })
   organisation_id: string;
 

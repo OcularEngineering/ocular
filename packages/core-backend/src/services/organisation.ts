@@ -4,7 +4,7 @@ import {Organisation, User} from "../models"
 import { OrganisationRepository } from "../repositories/organisation"
 import { FindConfig } from "../types/common"
 import { buildQuery} from "../utils/build-query"
-import {CreateOrganisationInput, FilterableOrganisationProps} from "../types/organisation"
+import {CreateOrganisationInput, FilterableOrganisationProps, UpdateOrganisationInput} from "../types/organisation"
 import { isDefined} from "../utils/is-defined"
 import {AutoflowAiError} from "@ocular-ai/utils"
 import { AppNameDefinitions } from "@ocular-ai/types"
@@ -122,6 +122,44 @@ class OrganisationService extends TransactionBaseService {
     //   )
     // }
     return  await this.organisationRepository_.findOne({where: { id:  "org_01HKQP19S8C74S1HGP9AK07PBZ"}} );
+  }
+
+  async update(org_id: string , data: UpdateOrganisationInput): Promise<Organisation> {
+    return await this.atomicPhase_(
+      async (transactionManager: EntityManager) => {
+        const organisationRepo = this.activeManager_.withRepository(this.organisationRepository_)
+
+        const {
+          installed_apps
+        } = data
+
+        const organisation = await this.retrieve(org_id)
+        if (!organisation) {
+          throw new AutoflowAiError(
+            AutoflowAiError.Types.NOT_FOUND,
+            `Organisation with id ${org_id} was not found`
+          )
+        }
+
+        if (installed_apps) {
+          organisation.installed_apps = organisation.installed_apps.map(app => {
+            // Find the installed app update for this app
+            const installedAppUpdate = installed_apps.find(installedApp => installedApp.name === app.name);
+            console.log("UPDATED_APP",installedAppUpdate)
+            app.installation_id = installedAppUpdate?.installation_id;
+
+            app.permissions = installedAppUpdate?.permissions;
+            
+            // If an update is found, return the updated app, otherwise return the original app
+            return app
+          });
+        }
+
+        console.log("UPDATED_ORG", organisation)
+
+        return await  organisationRepo.save(organisation)
+      }
+    )
   }
 
 
