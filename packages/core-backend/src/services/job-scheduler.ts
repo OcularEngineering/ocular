@@ -54,7 +54,7 @@ export default class JobSchedulerService {
         connection,
         prefix,
       })
-      this.queue_.obliterate()
+      // this.queue_.obliterate()
     }
   }
 

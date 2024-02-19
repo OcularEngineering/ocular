@@ -234,7 +234,7 @@ function registerSubscribers(
   appDetails: AppDetails,
   container: AutoflowContainer
 ): void {
-  const files = glob.sync(`${appDetails.resolve}/subscribers/*.js`, {})
+  const files = glob.sync(`${appDetails.resolve}/dist/subscribers/*.js`, {})
   files.forEach((fn) => {
     const loaded = require(fn).default
 

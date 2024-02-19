@@ -17,3 +17,10 @@ export enum AppCategoryDefinitions {
   SOTWARE_DEVELOPMENT = "Software Development",
 }
 
+
+export type InstalledApp = {
+  id?: string;
+  name?: string;
+  installation_id?: string;
+  permissions?: Record<string, string>;
+}

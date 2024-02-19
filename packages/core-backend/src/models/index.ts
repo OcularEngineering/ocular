@@ -1,4 +1,5 @@
 export * from "./app"
+export * from "./batch-job"
 export * from "./component"
 export * from "./invite"
 export * from "./oauth"
