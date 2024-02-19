@@ -1,7 +1,8 @@
 import axios from "axios"
 import randomize from "randomatic"
-import { OauthService, AppNameDefinitions, AppCategoryDefinitions  } from "@ocular-ai/types"
+import { OauthService, AppNameDefinitions, AppCategoryDefinitions, OAuthToken  } from "@ocular-ai/types"
 import { config } from "process"
+import { Octokit } from "@octokit/rest"
 
 class GithubOauth extends OauthService {
 
@@ -18,6 +19,7 @@ class GithubOauth extends OauthService {
     const client_id = options.client_id
     const client_secret = options.client_secret
     const redirect = `${projectConfig.ui_cors}oauth/github`
+    console.log("GitHub Oauth", client_id, client_secret, redirect)
     return {
       name: AppNameDefinitions.GITHUB,
       logo: "/Github.png",
@@ -47,7 +49,7 @@ class GithubOauth extends OauthService {
     return "refreshToken"
   }
 
-  async generateToken(code: string) {
+  async generateToken(code: string): Promise<OAuthToken> {
     try {
       const response = await axios.post('https://github.com/login/oauth/access_token', {
         client_id: this.client_id_,
@@ -62,8 +64,14 @@ class GithubOauth extends OauthService {
       if (response.data.error) {
         throw new Error(`Failed to get access token: ${response.data.error_description}`);
       }
-  
-      return response.data.access_token;
+
+      return {
+        type: response.data.token_type,
+        token : response.data.access_token,
+        token_expires_at : new Date(Date.now() + response.data.expires_in * 1000),
+        refresh_token: response.data.refresh_token,
+        refresh_token_expires_at: new Date(Date.now() + response.data.refresh_token_expires_in * 1000),
+      }
     } catch (error) {
       console.error(error);
       throw error;

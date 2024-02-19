@@ -6,7 +6,7 @@ import {
   ManyToMany,
   OneToMany
 } from "typeorm"
-import { BaseEntity } from "@ocular-ai/types"
+import { BaseEntity, InstalledApp } from "@ocular-ai/types"
 import { DbAwareColumn } from "../../../utils/src/db-aware-column"
 import { generateEntityId } from "../utils/generate-entity-id"
 import { User } from "./user";
@@ -16,18 +16,13 @@ import { OAuth } from "./oauth";
 import { Team } from "./team";
 import { Event } from "./event";
 
-type App = {
-  id: string;
-  name: string;
-}
-
 @Entity()
 export class Organisation extends BaseEntity {
   @Column({ default: "Org", type: "varchar" })
   name: string
 
   @Column({ type: 'json', nullable: true })
-  installed_apps: App[];
+  installed_apps: InstalledApp[];
 
   @OneToMany(() => User, (user) => user?.organisation)
   members?: User[];
@@ -53,7 +48,7 @@ export class Organisation extends BaseEntity {
   @DbAwareColumn({ type: "jsonb", nullable: true })
   metadata: Record<string, unknown> | null
 
-  addApp(app: App) {
+  addApp(app: InstalledApp) {
     if (!this.installed_apps) {
       this.installed_apps = [];
     }
