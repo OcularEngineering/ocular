@@ -1,15 +1,16 @@
 import { EntityManager } from "typeorm"
-import { TransactionBaseService } from "@ocular-ai/types"
+import { AppNameDefinitions, TransactionBaseService } from "@ocular-ai/types"
 import EventBusService from "./event-bus"
 import { AutoflowContainer } from "@ocular-ai/types"
 import { AutoflowAiError,AutoflowAiErrorTypes } from "@ocular-ai/utils"
 import { App, User } from "../models"
 import { buildQuery } from "../utils/build-query"
-import { CreateOAuthInput } from "../types/oauth"
+import { CreateOAuthInput, RetrieveOAuthConfig } from "../types/oauth"
 import  {OAuth} from "../models"
 import AppService from "./app"
 import OAuthRepository from "../repositories/oauth"
 import { Selector } from "../types/common"
+import { OAuthToken } from "@ocular-ai/types"
 
 
 type InjectedDependencies = AutoflowContainer & {
@@ -48,6 +49,16 @@ class OAuthService extends TransactionBaseService {
     } catch (e) {
       // avoid errors when backend first runs
     }
+  }
+
+  // Expose this to Internal Services Only
+  // Hack To Expose This Credientals To Indexing Apps
+  async retrieve(retrieveConfig: RetrieveOAuthConfig): Promise<OAuth> {
+    const oauthRepo = this.activeManager_.withRepository(this.oauthRepository_)
+    const oauth = await oauthRepo.findOne({
+      where: { organisation_id:retrieveConfig.id, app_name: retrieveConfig.app_name }
+    })
+    return oauth
   }
 
   // List Apps Owned BY The Logged In User
@@ -110,16 +121,39 @@ class OAuthService extends TransactionBaseService {
       )
     }
 
-    const data = await service.generateToken(code)
+    const token: OAuthToken = await service.generateToken(code)
+
+    console.log("TOKEN GENERATED", token)
+
+    const oauth = this.oauthRepository_.find({
+      where: {
+        organisation_id: this.loggedInUser_.organisation_id,
+        app_name: app.name
+      }
+    });
+
+    if(oauth){
+      await this.oauthRepository_.delete({
+        organisation_id: this.loggedInUser_.organisation_id,
+        app_name: app.name
+      })
+    }
 
     // Create An OAuth For This App And Organisation
     return await this.create({
-      code: data, organisation: this.loggedInUser_.organisation, app_name: app.name
+      type: token.type, 
+      token: token.token, 
+      token_expires_at: token.token_expires_at, 
+      refresh_token: token.refresh_token, 
+      refresh_token_expires_at: token.refresh_token_expires_at,  
+      organisation: this.loggedInUser_.organisation, app_name: app.name
     })
     .then(async (result) => {
       await this.eventBus_.emit(
-        `${OAuthService.Events.TOKEN_GENERATED}.${app.name}`,
-        data
+        `${OAuthService.Events.TOKEN_GENERATED}.${app.name}`,{
+          organisation: this.loggedInUser_.organisation,
+          token: token
+        }
       )
       return result
     })

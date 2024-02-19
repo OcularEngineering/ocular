@@ -216,72 +216,15 @@ class SearchService extends AbstractSearchService {
   }
 
 
+  // Schedules jobs that build a search index for each organisation
   async build() {
-    console.log("Index Builder Build")
-    // For each Org
-    // Iterate though all apps installed in an org
-    // For each app find an ocular and schedule an indexing job that takes in the Org, Oauth, Index name for indexing.
-
     const orgs: Organisation[] =  await this.organisationService_.list({})
     orgs.forEach((org) => {
-
-      //  const occularType = "core-backend"
-      //  const occular = await this.oculars[occularType].factory.getOcular(orgs[i]);
-
-      //  console.log(`Collating documents for ${occularType} organisation ${orgs[i].name} via ${this.oculars[occularType].factory.constructor.name}`,);
-      
-    
-    //   this.jobSchedulerService_.create( "Sync Apps Data",
-    //     {occularType}, 
-    //     "* * * * *", 
-    //     async () => {
-    //     pipeline(
-    //       [occular, indexer],
-    //       (error: NodeJS.ErrnoException | null) => {
-    //         if (error) {
-    //           console.error(
-    //             `Collating documents for ${occularType} failed: ${error}`,
-    //           );
-    //           // reject(error);
-    //         } else {
-    //           // Signal index pipeline completion!
-    //           console.log(`Collating documents for ${occularType} succeeded`);
-    //           // resolve();
-    //         }
-    //       },
-    //     );
-    //     }
-    //   )
-    // }
-  //   this.jobSchedulerService_.create(`SyncAppsData for ${org.name}`, {org: org}, "* * * * *", async () => {
-  //   //Get OAUTH Apps Installed on The Organisation
-  //   // const oauthApps = await this.oauthService_.list({organisation_id: org.id})
-  //   // const indexer = new IndexerScript({searchIndexClient:this.searchIndexClient_, configModule: this.config_, organisation: org, logger: this.logger_ })
-  //   // oauthApps.forEach((oauthApp) => {
-  //   //  const service = this.container_[`${oauth.name}AppService`]
-  //   //       pipeline(
-  //   //         [service.occular(oauth), indexer],
-  //   //         (error: NodeJS.ErrnoException | null) => {
-  //   //           if (error) {
-  //   //             console.error(
-  //   //               `Collating documents for ${occularType} failed: ${error}`,
-  //   //             );
-  //   //             // reject(error);
-  //   //           } else {
-  //   //             // Signal index pipeline completion!
-  //   //             console.log(`Collating documents for ${occularType} succeeded`);
-  //   //             // resolve();
-  //   //           }
-  //   //         },
-  //   //       );
-  //   //       }
-  //   //   )
-  //   //  const occularType = oauthApp.type
-  //   // }
-  //   console.log("Indexing for", org)
-  // })
-  }) 
+      console.log("org", org)
+      // this.jobSchedulerService_.create(`Sync Apps Data for ${org.name}`, {org: org}, "* * * * *", async () => {
+      //   // Schedule A Batch Job To Index All The Aps In An Organisation
+      // })
+    })
+  } 
 }
-}
-
 export default SearchService

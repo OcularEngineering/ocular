@@ -1,23 +1,24 @@
 {
   "compilerOptions": {
-    "lib": ["es5", "es6", "es2019"],
+       "lib": ["es5", "es6", "es2019"],
     "target": "es5",
     "rootDir": "src",
     "outDir": "./dist",
     "esModuleInterop": true,
-    "declaration": true,
+    // "declaration": true,
     "module": "commonjs",
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "sourceMap": true,
-    "noImplicitReturns": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "noImplicitThis": true,
-    "allowJs": true,
+    // "sourceMap": true,
+    // "noImplicitReturns": true,
+    // "strictNullChecks": true,
+    // "strictFunctionTypes": true,
+    // "noImplicitThis": true,
+    // "allowJs": true,
     "skipLibCheck": true,
-    "downlevelIteration": true
+    // "downlevelIteration": true, // to use ES5 specific tooling
+    // "resolveJsonModule": true
   },
   "include": ["./src/**/*"],
   "exclude": [
