@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Marketing",
+    "members": 3
+  },
+  {
+    "name": "Engineering",
+    "members": 10
+  },
+  {
+    "name": "Customer Success Engineering",
+    "members": 7
+  }
+]
