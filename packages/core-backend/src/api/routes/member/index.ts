@@ -5,7 +5,7 @@ import invites  from "./invites"
 import middlewares from "../../middlewares"
 // import apps from "./apps"
 // import components from "./member/components"
-// import search from "./member/search"
+import search from "./search"
 // import teams from "./member/teams"
 // import organisation from "./member/organisation"
 
@@ -28,7 +28,7 @@ export default (app, container, config) => {
   // apps(route)
   // components(route)
   // invites(route)
-  // search(route)
+  search(route)
   // teams(route)
   // organisation(route)
 

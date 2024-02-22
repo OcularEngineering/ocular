@@ -4,10 +4,12 @@ import { EntityManager } from "typeorm"
 import { Octokit } from "@octokit/rest"
 import {  AppNameDefinitions , IEventBusService } from "@ocular-ai/types"
 import { App, OrganisationService } from "@ocular-ai/core-backend"
+import  GitHubService  from "../services/github"
 
 type InjectedDependencies = {
   eventBusService: IEventBusService
   organisationService: OrganisationService
+  githubService: GitHubService
   manager: EntityManager
 }
 
@@ -15,10 +17,12 @@ class GitHubOauthSubscriber {
   protected readonly manager_: EntityManager
   protected readonly eventBus_: IEventBusService
   protected readonly organisationService_: OrganisationService
+  protected readonly githubService_: GitHubService
 
-  constructor({ manager, organisationService, eventBusService }: InjectedDependencies) {
+  constructor({ manager, githubService, organisationService, eventBusService }: InjectedDependencies) {
     this.eventBus_ = eventBusService
     this.organisationService_ = organisationService
+    this.githubService_ = githubService
     this.manager_ = manager
 
     this.eventBus_.subscribe(
@@ -52,8 +56,6 @@ class GitHubOauthSubscriber {
           installation_id: installation.id.toString(),
           permissions: installation.permissions
         }))
-
-        console.log("INSTALLATIONS", installations)
 
         await this.organisationService_.update(data.organisation.id,{installed_apps:installations});
       }
