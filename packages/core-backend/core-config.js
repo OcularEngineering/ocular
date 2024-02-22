@@ -72,6 +72,7 @@ module.exports = {
       options: {
         client_id: process.env.GITHUB_CLIENT_ID,
         client_secret: process.env.GITHUB_CLIENT_SECRET,
+        app_id: process.env.GITHUB_APP_ID,
       }
     }
   ],

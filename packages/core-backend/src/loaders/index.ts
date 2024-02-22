@@ -25,11 +25,10 @@ import modulesLoader from "./module"
 import passportLoader from "./passport"
 import pluginsLoader from "./plugins"
 import repositoriesLoader from "./repositories"
-import searchEngineLoader from "./search"
+import searchIndexLoader from "./search"
 import servicesLoader from "./services.js"
 import redisLoader from './redis';
 import subscribersLoader from "./subscribers"
-import scheduleSeachIndexJobs from "./search-indexing-jobs"
 
 import { moduleLoader, registerModules } from "@ocular-ai/modules-sdk"
 
@@ -137,12 +136,8 @@ export default async ({
   const subAct = Logger.success(subActivity, "Subscribers initialized") || {}
 
   const searActivity = Logger.activity(`Initializing Search Engine${EOL}`)
-  await searchEngineLoader({container, configModule, logger: Logger})
+  await searchIndexLoader({container, configModule, logger: Logger})
   const searAct = Logger.success(searActivity, "Search Engine initialized") || {}
-
-  const searchIndexJobsActivity = Logger.activity(`Scheduling Search Index Jobs${EOL}`)
-  await scheduleSeachIndexJobs({container, configModule, logger: Logger})
-  const searchJobsIndexAct = Logger.success(searchIndexJobsActivity, "Scheduling Search Index Jobs initialized") || {}
 
   const apiActivity = Logger.activity(`Initializing API${EOL}`)
   await apiLoader({ container, app: expressApp, configModule })
