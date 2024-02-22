@@ -71,5 +71,5 @@ export class FilterableBatchJobProps {
 
 export type BatchJobCreateProps = Pick<
   BatchJob,
-  "context" | "type" | "created_by" | "dry_run"
+  "context" | "type" | "dry_run"
 >

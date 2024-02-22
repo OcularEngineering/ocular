@@ -13,6 +13,8 @@ import JobSchedulerService from "./job-scheduler"
 import { Organisation } from "../models"
 import { OauthService } from "@ocular-ai/types/src/interfaces"
 
+
+
 type InjectedDependencies = {
   organisationService: OrganisationService
   searchIndexClient: SearchIndexClient
@@ -168,8 +170,10 @@ class SearchService extends AbstractSearchService {
   ) {
     const searchClient = this.searchIndexClient_.getSearchClient(indexName);
     const searchResults = await searchClient.search(query, {
-      select: ["id", "title", "source", "content", "updated_at", "location"],
+      select: ["id", "title", "source", "updated_at", "location"],
     })
+
+    // "content"
     // Convert the PagedAsyncIterableIterator to an array
     const resultsArray = [];
     for await (const result of searchResults.results) {
@@ -214,17 +218,5 @@ class SearchService extends AbstractSearchService {
         return documents
     }
   }
-
-
-  // Schedules jobs that build a search index for each organisation
-  async build() {
-    const orgs: Organisation[] =  await this.organisationService_.list({})
-    orgs.forEach((org) => {
-      console.log("org", org)
-      // this.jobSchedulerService_.create(`Sync Apps Data for ${org.name}`, {org: org}, "* * * * *", async () => {
-      //   // Schedule A Batch Job To Index All The Aps In An Organisation
-      // })
-    })
-  } 
 }
 export default SearchService

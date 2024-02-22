@@ -4,6 +4,7 @@ import {
   EventBusService,
   StrategyResolverService,
 } from "../services"
+import { AbstractBatchJobStrategy } from "../interfaces"
 
 type InjectedDependencies = {
   eventBusService: EventBusService
@@ -50,10 +51,10 @@ class BatchJobSubscriber {
           batchJob.type
         )
 
-        // await batchJobStrategy
-        //   .withTransaction(manager)
-        //   .preProcessBatchJob(batchJob.id)
-        // await batchJobServiceTx.setPreProcessingDone(batchJob.id)
+        await batchJobStrategy
+          .withTransaction(manager)
+          .preProcessBatchJob(batchJob.id)
+        await batchJobServiceTx.setPreProcessingDone(batchJob.id)
       })
     } catch (e) {
       await this.batchJobService_.setFailed(data.id, e.message)
@@ -72,7 +73,7 @@ class BatchJobSubscriber {
         )
 
         await batchJobServiceTx.setProcessing(batchJob.id)
-        // await batchJobStrategy.withTransaction(manager).processJob(batchJob.id)
+        await batchJobStrategy.withTransaction(manager).processJob(batchJob.id)
         await batchJobServiceTx.complete(batchJob.id)
       })
     } catch (e) {

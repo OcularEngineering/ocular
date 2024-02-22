@@ -2,10 +2,13 @@ import { asValue } from "awilix"
 import Redis from "ioredis"
 import FakeRedis from "ioredis-mock"
 import { EOL } from "os"
-import { Logger, AutoflowContainer } from "@ocular-ai/types"
+import { Logger, AutoflowContainer, AbstractSearchService } from "@ocular-ai/types"
 import { ConfigModule }  from "../types/config-module"
 import { SearchEngineOptions } from "../types/search/options"
 import { SearchIndexClient, AzureKeyCredential } from "@azure/search-documents";
+import { EventBusService } from "../services"
+
+export const SEARCH_INDEX_EVENT = "SEARCH_INDEX_EVENT"
 
 type Options = {
   container: AutoflowContainer
@@ -14,7 +17,7 @@ type Options = {
 }
 
 // Loads a search client into the container for use by the indexer and the search engine.
-async function searchLoader({
+async function searchIndexLoader({
   container,
   configModule,
   logger,
@@ -36,12 +39,30 @@ async function searchLoader({
     await searchIndexClient.getServiceStatistics()
     logger?.info(`Connection to Search Client established`)
   } catch (err) {
-    logger?.error(`An error occurred while connecting to Search Client:${EOL} ${err}`)
+    logger?.error(`An error occurred while connecting to Search Client: ${err}`)
+    console.log(err)
   }
 
   container.register({
     searchIndexClient: asValue(searchIndexClient),
   })
+
+  // Check if there is a SearchService registered in the container before we emit the 
+  // event to trigger the Search Service Index build.
+  const searchService = container.resolve<AbstractSearchService>("searchService")
+  if (searchService.isDefault) {
+    logger.warn(
+      "No search engine provider was found: make sure to include a search plugin to enable searching"
+    )
+    return
+  }
+
+  const eventBusService: EventBusService = container.resolve("eventBusService")
+  void eventBusService.emit(SEARCH_INDEX_EVENT, {}).catch((err) => {
+    logger.error(
+      `Something went wrong while emitting the search indexing event ${err}`
+    )
+  })
 }
 
-export default searchLoader
+export default searchIndexLoader

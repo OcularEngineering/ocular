@@ -1,4 +1,7 @@
+import { AppCategoryDefinitions } from "../apps";
+import { AppNameDefinitions } from "../apps";
 
+export const INDEX_DOCUMENT_EVENT = "INDEX_DOCUMENT_EVENT"
 
 
 // List Of Apps That Can Be Installed and Indexed In The Core Backend
@@ -35,7 +38,7 @@ export type IndexableDocument = {
   /**
     * The source app of the the document (e.g. "core-backend", "gmail" etc).
   */
- source: AppType 
+ source: AppNameDefinitions;
 
  /**
   * Free-form text of the document (e.g. description, content, etc).

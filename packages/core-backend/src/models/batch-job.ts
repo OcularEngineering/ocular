@@ -25,9 +25,9 @@ export class BatchJob extends SoftDeletableEntity {
   @Column({ nullable: true })
   created_by: string | null
 
-  @ManyToOne(() => User)
-  @JoinColumn({ name: "created_by" })
-  created_by_user: User
+  // @ManyToOne(() => User)
+  // @JoinColumn({ name: "created_by" })
+  // created_by_user: User 
 
   @DbAwareColumn({ type: "jsonb", nullable: true })
   context: Record<string, unknown>

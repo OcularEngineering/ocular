@@ -1,10 +1,10 @@
 const glob = require("glob");
-import { Express } from "express"
+import e, { Express } from "express"
 import fs from "fs"
 import { sync as existsSync } from "fs-exists-cached"
 import _ from "lodash"
 import createRequireFromPath from "../utils/create-require-from-path"
-
+import { aliasTo } from "awilix"
 import { EOL } from "os"
 import path from "path"
 import { AutoflowContainer } from "@ocular-ai/utils"
@@ -16,6 +16,7 @@ import {
 import { asValue, asFunction , Lifetime } from "awilix"
 import { OauthService } from "@ocular-ai/types"
 import { AppService } from "../services";
+import { error } from "console";
 
 type Options = {
   rootDirectory: string
@@ -62,6 +63,7 @@ export default async ({
       // await registerMedusaApi(appDetails, container)
       // registerApi(appDetails, app, rootDirectory, container, activityId)
       // registerCoreRouters(pluginDetails, container)
+      registerStrategies(appDetails, container)
       registerSubscribers(appDetails, container)
     })
   )
@@ -241,8 +243,38 @@ function registerSubscribers(
     container.build(
       asFunction(
         (cradle) => new loaded(cradle, appDetails.options)
-      ).singleton()
+      ).scoped()
     )
+  })
+}
+
+/**
+ * Registers a app's strategies at the right location in our container.
+ * Strategies are registered directly in the container.
+ * @param {object} appDetails - the app details including app options,
+ *    version, id, resolved path, etc. See resolveApp
+ * @param {object} container - the container where the services will be
+ *    registered
+ * @return {void}
+ */
+function registerStrategies(
+  appDetails: AppDetails,
+  container: AutoflowContainer): void {
+
+
+const files = glob.sync(`${appDetails.resolve}/dist/strategies/*.js`, {})
+  files.forEach((fn) => {
+    const loaded = require(fn).default
+    const name = formatRegistrationName(fn)
+    const batchType = loaded.batchType
+    container.register({
+      [`${batchType}Strategy`]: asFunction(
+        (cradle) => new loaded(cradle),
+        {
+          lifetime: Lifetime.SCOPED,
+        }
+      ),
+   })
   })
 }
 
