@@ -5,7 +5,7 @@ import HeaderFilterToolbar from "./header-filter-toolbar";
 
 export default function Header() {
   const router = useRouter();
-  const [searchInput, setSearchInput] = useState(router.query.term);
+  const [searchInput, setSearchInput] = useState(router.query.q);
   const [showHeaderFilterToolbar, setShowHeaderFilterToolbar] = useState(true);
 
   useEffect(() => {
@@ -23,7 +23,7 @@ export default function Header() {
   const search = (e) => {
     e.preventDefault();
     if (!searchInput) return;
-    router.push(`/dashboard/search/results?term=${searchInput}`);
+    router.push(`/dashboard/search/results?q=${searchInput}`);
   }
 
   const handleInputChange = (e) => {

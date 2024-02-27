@@ -181,16 +181,6 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 
 /***/ }),
 
-/***/ "./node_modules/lucide-react/dist/esm/icons/trash-2.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/lucide-react/dist/esm/icons/trash-2.js ***!
-  \*************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ Trash2)\n/* harmony export */ });\n/* harmony import */ var _createLucideIcon_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../createLucideIcon.js */ \"./node_modules/lucide-react/dist/esm/createLucideIcon.js\");\n/**\n * lucide-react v0.105.0 - ISC\n */\n\n\n\nconst Trash2 = (0,_createLucideIcon_js__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(\"Trash2\", [\n  [\"path\", { d: \"M3 6h18\", key: \"d0wm0j\" }],\n  [\"path\", { d: \"M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6\", key: \"4alrt4\" }],\n  [\"path\", { d: \"M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2\", key: \"v07s0e\" }],\n  [\"line\", { x1: \"10\", y1: \"11\", x2: \"10\", y2: \"17\", key: \"m9v7hp\" }],\n  [\"line\", { x1: \"14\", y1: \"11\", x2: \"14\", y2: \"17\", key: \"23cpt9\" }]\n]);\n\n\n//# sourceMappingURL=trash-2.js.map\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiLi9ub2RlX21vZHVsZXMvbHVjaWRlLXJlYWN0L2Rpc3QvZXNtL2ljb25zL3RyYXNoLTIuanMiLCJtYXBwaW5ncyI6Ijs7Ozs7QUFBQTtBQUNBO0FBQ0E7O0FBRXNEOztBQUV0RCxlQUFlLGdFQUFnQjtBQUMvQixhQUFhLDZCQUE2QjtBQUMxQyxhQUFhLDJEQUEyRDtBQUN4RSxhQUFhLHdEQUF3RDtBQUNyRSxhQUFhLHVEQUF1RDtBQUNwRSxhQUFhLHVEQUF1RDtBQUNwRTs7QUFFNkI7QUFDN0IiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly9vY3VsYXItY29yZS11aS8uL25vZGVfbW9kdWxlcy9sdWNpZGUtcmVhY3QvZGlzdC9lc20vaWNvbnMvdHJhc2gtMi5qcz8yNjQ2Il0sInNvdXJjZXNDb250ZW50IjpbIi8qKlxuICogbHVjaWRlLXJlYWN0IHYwLjEwNS4wIC0gSVNDXG4gKi9cblxuaW1wb3J0IGNyZWF0ZUx1Y2lkZUljb24gZnJvbSAnLi4vY3JlYXRlTHVjaWRlSWNvbi5qcyc7XG5cbmNvbnN0IFRyYXNoMiA9IGNyZWF0ZUx1Y2lkZUljb24oXCJUcmFzaDJcIiwgW1xuICBbXCJwYXRoXCIsIHsgZDogXCJNMyA2aDE4XCIsIGtleTogXCJkMHdtMGpcIiB9XSxcbiAgW1wicGF0aFwiLCB7IGQ6IFwiTTE5IDZ2MTRjMCAxLTEgMi0yIDJIN2MtMSAwLTItMS0yLTJWNlwiLCBrZXk6IFwiNGFscnQ0XCIgfV0sXG4gIFtcInBhdGhcIiwgeyBkOiBcIk04IDZWNGMwLTEgMS0yIDItMmg0YzEgMCAyIDEgMiAydjJcIiwga2V5OiBcInYwN3MwZVwiIH1dLFxuICBbXCJsaW5lXCIsIHsgeDE6IFwiMTBcIiwgeTE6IFwiMTFcIiwgeDI6IFwiMTBcIiwgeTI6IFwiMTdcIiwga2V5OiBcIm05djdocFwiIH1dLFxuICBbXCJsaW5lXCIsIHsgeDE6IFwiMTRcIiwgeTE6IFwiMTFcIiwgeDI6IFwiMTRcIiwgeTI6IFwiMTdcIiwga2V5OiBcIjIzY3B0OVwiIH1dXG5dKTtcblxuZXhwb3J0IHsgVHJhc2gyIGFzIGRlZmF1bHQgfTtcbi8vIyBzb3VyY2VNYXBwaW5nVVJMPXRyYXNoLTIuanMubWFwXG4iXSwibmFtZXMiOltdLCJzb3VyY2VSb290IjoiIn0=\n//# sourceURL=webpack-internal:///./node_modules/lucide-react/dist/esm/icons/trash-2.js\n");
-
-/***/ }),
-
 /***/ "./node_modules/lucide-react/dist/esm/icons/users.js":
 /*!***********************************************************!*\
   !*** ./node_modules/lucide-react/dist/esm/icons/users.js ***!

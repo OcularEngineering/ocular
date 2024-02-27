@@ -16,10 +16,10 @@ export function Search() {
   function search(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (searchInputRef.current) {
-      const term = searchInputRef.current.value;
-      if (!term) return;
+      const q = searchInputRef.current.value;
+      if (!q) return;
 
-      router.push(`/dashboard/search/results?term=${term}`);
+      router.push(`/dashboard/search/results?q=${q}`);
     }
   }
   return (

@@ -1,5 +1,5 @@
-# AutoFlow AI UI
+# Ocular AI UI
 
-Code Base for the AutoFlow AI Core UI.
+Code Base for the Ocular AI Core UI.
 
 

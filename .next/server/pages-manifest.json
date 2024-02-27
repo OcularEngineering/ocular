@@ -2,12 +2,7 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/admin/members": "pages/admin/members.js",
-  "/admin/marketplace": "pages/admin/marketplace.js",
-  "/dashboard/search": "pages/dashboard/search.js",
-  "/admin/teams": "pages/admin/teams.js",
-  "/dashboard/copilot": "pages/dashboard/copilot.js",
-  "/dashboard/team": "pages/dashboard/team.js",
   "/dashboard/search/results": "pages/dashboard/search/results.js",
-  "/dashboard/marketplace": "pages/dashboard/marketplace.js"
+  "/admin/members": "pages/admin/members.js",
+  "/dashboard/search": "pages/dashboard/search.js"
 }

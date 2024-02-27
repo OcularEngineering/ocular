@@ -62,9 +62,12 @@ export default {
     },
   },
   search: {
-    query(data) {
-      const path = `/search`
-      return  ocularRequest("POST", path)
+    query(q?: string) {
+      const path = `/search`;
+      const body = {
+        q: q
+      };
+      return ocularRequest("POST", path, body);
     }
   },
   users:{
