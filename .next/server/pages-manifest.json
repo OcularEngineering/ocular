@@ -4,5 +4,10 @@
   "/_document": "pages/_document.js",
   "/dashboard/search/results": "pages/dashboard/search/results.js",
   "/admin/members": "pages/admin/members.js",
-  "/dashboard/search": "pages/dashboard/search.js"
+  "/admin/marketplace": "pages/admin/marketplace.js",
+  "/admin/insights": "pages/admin/insights.js",
+  "/admin/teams": "pages/admin/teams.js",
+  "/admin/components": "pages/admin/components.js",
+  "/dashboard/search": "pages/dashboard/search.js",
+  "/dashboard/marketplace": "pages/dashboard/marketplace.js"
 }
