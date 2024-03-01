@@ -26,7 +26,7 @@ export function Search() {
   }
   return (
     <>
-      <div className="dark:bg-primary-dark group flex min-h-screen flex-col items-center dark:text-white">
+      <div className="dark:bg-primary-dark group flex min-h-screen flex-col items-center dark:text-white" style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.01) 10%, transparent)'}}>
 
         <Head>
             <meta charSet="utf-8" />
@@ -51,7 +51,7 @@ export function Search() {
                 alt=""
               />
 
-            <div className="dark:bg-gray-700md:dark:hover:border-gray-100 mt-5 flex w-full max-w-md  items-center rounded-full border px-5 py-2 focus-within:shadow hover:shadow sm:max-w-xl sm:py-3 md:hover:border-white lg:max-w-4xl">
+            <div className="dark:bg-gray-700md:dark:hover:border-gray-100 mt-5 flex w-full max-w-md bg-background items-center rounded-full border px-5 py-2 focus-within:shadow hover:shadow sm:max-w-xl sm:py-3 md:hover:border-white lg:max-w-4xl">
                 <SearchIcon className="mr-3 h-5 text-gray-500 " />
                 <input
                   ref={searchInputRef}

@@ -109,7 +109,7 @@ function SearchChart() {
   let count = 0;
   return (
     
-    <div className="card flex flex-col gap-5 border p-5 rounded-xl hover:shadow-lg">
+    <div className="card flex flex-col gap-5 border p-5 rounded-xl hover:shadow-lg bg-background">
         <div className='flex flex-col gap-2'>
             <h1 className="card-title font-semibold text-xl">Searches</h1>
             <p className="text-sm text-gray-500">Day-over-day</p>

@@ -69,9 +69,6 @@ const Results = ({ results }) => (
 const ResultsFilter = ({ results }) => (
   <div className="mt-5 flex w-2/5 flex-col items-start justify-start">
     <div className="flex flex-col items-center">
-      <p className="mt-5 text-sm text-gray-600 dark:text-gray-400">
-        Found 3k results
-      </p>
       <AppFilterOptions results={results.searchInformation?.formattedTotalResults} />
     </div>
   </div>

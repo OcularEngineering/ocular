@@ -20,7 +20,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             />
         </Head>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <div className="flex h-screen justify-center">
+            <div className="flex h-screen justify-center" style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.01) 10%, transparent)'}}>
                 <div className="border-default flex w-[240px] flex-col justify-between overflow-y-auto border-r bg-gray-100 dark:bg-transparent p-2">
                     <AdminNav />
                 </div>

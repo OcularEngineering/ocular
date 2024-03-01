@@ -67,7 +67,7 @@ function IntegrationsBreakdown() {
 
   let count = 0;
   return (
-    <div className="card flex flex-col gap-5 border p-5 rounded-xl hover:shadow-lg flex-grow">
+    <div className="card flex flex-col gap-5 border p-5 rounded-xl hover:shadow-lg flex-grow bg-background">
       <div className='flex flex-col gap-2 items-start'>
         <h1 className="card-title font-semibold text-xl">Integrations Breakdown</h1>
         <p className="text-sm text-gray-500">Search distribution by integrations</p>

@@ -95,7 +95,7 @@ function IntegrationsPage() {
   }, {});
 
   return (
-    <>
+    <div style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.01) 10%, transparent)'}}>
       <Head>
         <title>{metadata.title.default} | Ocular Integrations Marketplace</title>
         <meta name="description" content={metadata.description}></meta>
@@ -150,7 +150,7 @@ function IntegrationsPage() {
           </div>
         </div>
       </SectionContainer>
-    </>
+    </div>
   )
 }
 

@@ -32,10 +32,20 @@
       "static/chunks/main.js",
       "static/chunks/pages/admin/marketplace.js"
     ],
+    "/admin/members": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/admin/members.js"
+    ],
     "/admin/settings": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
       "static/chunks/pages/admin/settings.js"
+    ],
+    "/admin/teams": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/admin/teams.js"
     ],
     "/dashboard/copilot": [
       "static/chunks/webpack.js",
