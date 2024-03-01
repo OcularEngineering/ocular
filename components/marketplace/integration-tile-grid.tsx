@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Integration } from '@/types/types'
+import { Badge } from "@/components/ui/badge"
 
 export default function IntegrationTileGrid({
   integrationsByCategory,
@@ -13,7 +14,7 @@ export default function IntegrationTileGrid({
     <>
       {Object.keys(integrationsByCategory).map((category) => (
         <div key={category} id={category.toLowerCase()} className="space-y-8">
-          {!hideCategories && <h2 className="font-heading sm:text-2xl md:text-3xl lg:text-2xl">{category}</h2>}
+          {!hideCategories && <h2 className="font-semibold sm:text-lg md:text-lg lg:text-lg">{category}</h2>}
           <div className="grid grid-cols-1 gap-5  lg:max-w-none lg:grid-cols-2 xl:grid-cols-3">
             {integrationsByCategory[category].map((p) => (
               <Link key={p.slug} href={`/integrations/${p.slug}`} legacyBehavior>
@@ -21,26 +22,34 @@ export default function IntegrationTileGrid({
                   <div
                     className="
                     group flex
-                    size-full flex-col rounded-md border-0 bg-white p-6 shadow transition-all hover:bg-gray-100 hover:shadow-lg 
+                    size-full flex-col rounded-xl bg-custom-gray p-6 transition-all hover:shadow-lg 
                     dark:border dark:bg-transparent 
                     dark:hover:border-white dark:hover:bg-transparent"
                   >
-                    <div className="flex w-full space-x-6">
-                      <div className="scale-100 transition-all group-hover:scale-110">
+                    <div className="flex flex-col w-full space-x-6 items-center justify-center gap-8">
+                      <div className="transition-all group-hover:scale-110">
                         <Image
                           layout="fixed"
-                          width={350}
-                          height={350}
+                          width={80}
+                          height={80}
                           className=""
                           src={p.logo}
                           alt={p.name}
                         />
                       </div>
                       <div>
-                        <h3 className="text-scale-1100 group-hover:text-scale-1200 font-heading mb-2 text-xl transition-colors">
-                          {p.name}
+                        <h3 className="text-scale-1100 group-hover:text-scale-1200 font-semibold mb-2 text-lg transition-colors items-center justify-center">
+                          {
+                            p.name
+                              .split('-')
+                              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                              .join(' ')
+                          }
                         </h3>
-                        <p className="text-scale-900 text-sm">{p.description}</p>
+                        <p className="text-scale-900 text-sm" style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: '3', overflow: 'hidden' }}>
+                          {p.description}
+                        </p>
+                        
                       </div>
                     </div>
                   </div>

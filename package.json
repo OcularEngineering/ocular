@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Ocular AI core ui",
     "scripts": {
-        "dev": "next dev",
+        "dev": "next dev -p 3001",
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
@@ -12,7 +12,7 @@
         "typecheck": "tsc --noEmit",
         "format:write": "prettier --write \"**/*.{ts,tsx,mdx}\" --cache",
         "format:check": "prettier --check \"**/*.{ts,tsx,mdx}\" --cache"
-      },
+    },
     "private": true,
     "keywords": [
         "nextjs",
@@ -48,6 +48,7 @@
         "@tanstack/react-table": "^8.11.3",
         "@tremor/react": "^3.12.2",
         "@types/axios": "^0.14.0",
+        "apexcharts": "^3.46.0",
         "axios": "^1.6.7",
         "class-variance-authority": "^0.4.0",
         "classnames": "^2.5.1",

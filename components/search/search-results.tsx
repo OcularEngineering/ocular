@@ -17,7 +17,7 @@ const Results = ({ results }) => (
         key={index}
         className="dark:shadow-3xl group mb-4 flex max-w-4xl rounded-lg px-3 py-4 text-xs shadow ring-2 ring-gray-200 sm:text-base sm:shadow-none sm:ring-0 dark:ring-1 dark:ring-[#303134]"
       >
-        <Image src={result.document && result.document.source ? `/${result.document.source}.svg` : '/default.png'} alt={result.document.title} className="mr-4 size-[40px]" width={10} height={10} />
+        <Image src={result.document && result.document.source === 'pagerduty' ? '/PagerDuty.png' : result.document && result.document.source ? `/${result.document.source}.svg` : '/default.png'} alt={result.document.title} className="mr-4 size-[40px]" width={10} height={10} />
         <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
           <div className='space-y-1'>
             <a href={result.document.location} target="_blank" rel="noopener noreferrer">
@@ -30,10 +30,10 @@ const Results = ({ results }) => (
                 new Date(result.document.updated_at).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })
               }
             </p>
-            <p className="font-regular line-clamp-3 text-sm" dangerouslySetInnerHTML={{ __html: result.document.location }}></p>
+            <p className="font-regular line-clamp-3 text-sm" dangerouslySetInnerHTML={{ __html: result.document.content }}></p>
           </div>
           <div className='flex flex-row gap-1'>
-            <Button 
+            {/* <Button 
               id="headerOption"
               variant={"outline"}
               // eslint-disable-next-line tailwindcss/no-contradicting-classname
@@ -44,11 +44,12 @@ const Results = ({ results }) => (
                 <SparklesIcon className="size-4" />
                 Summarize
               </div>
-            </Button>
+            </Button> */}
             {/* <CopilotSideDialog showSideSheet={showSideSheet} setShowSideSheet={setShowSideSheet} /> */}
             <Button 
               id="linkIcon"
               variant={"outline"}
+              
               // eslint-disable-next-line tailwindcss/no-contradicting-classname
               className="dark:bg-secondary-dark hover:dark:bg-secondary-dark box-border flex hidden h-10 min-w-10 cursor-pointer items-center justify-start rounded-full bg-gray-100 px-3 text-sm hover:bg-blue-100 group-hover:block"
             >
@@ -69,7 +70,7 @@ const ResultsFilter = ({ results }) => (
   <div className="mt-5 flex w-2/5 flex-col items-start justify-start">
     <div className="flex flex-col items-center">
       <p className="mt-5 text-sm text-gray-600 dark:text-gray-400">
-        Found {results.searchInformation?.formattedTotalResults} results
+        Found 3k results
       </p>
       <AppFilterOptions results={results.searchInformation?.formattedTotalResults} />
     </div>

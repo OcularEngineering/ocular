@@ -42,9 +42,9 @@ export function Search() {
           {/* Body */}
           <form className="flex h-96 w-[80%] grow space-y-10 flex-col items-center justify-center sm:w-[90%]">
             <Image
-                src="/Ocular-logo-light.svg"
+                src="/Ocular-full-light.svg"
                 className="w-225 md:w-300 md:h-100"
-                width={225}
+                width={300}
                 height={75}
                 alt=""
               />

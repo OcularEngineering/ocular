@@ -64,18 +64,6 @@ export const links: LinkProps[] =[
     link: "/dashboard/marketplace"
   },
   {
-    title: "Teams",
-    label: "",
-    icon: "Users",
-    variant: "ghost",
-    link: "/dashboard/team"
-  },
-]
-
-export type Link = (typeof links)[number]
-
-export const BottomLinks: LinkProps[] =[
-  {
     title: "Settings",
     label: "",
     icon: "Settings",
@@ -83,12 +71,18 @@ export const BottomLinks: LinkProps[] =[
     link: "/dashboard/settings"
   },
   {
-    title: "Help",
+    title: "Support",
     label: "",
     icon: "HelpCircle",
     variant: "ghost",
     link: "/dashboard/help"
   },
+]
+
+export type Link = (typeof links)[number]
+
+export const BottomLinks: LinkProps[] =[
+
 
 ]
 

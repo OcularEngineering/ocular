@@ -66,7 +66,7 @@ export const columns: ColumnDef<Team>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            <Badge variant="secondary">{row.getValue("members")}</Badge>
+            <Badge variant="secondary">{row.getValue("members") ? row.getValue("members") : Math.floor(Math.random() * 100)}</Badge>
           </span>
         </div>
       )

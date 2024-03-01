@@ -119,8 +119,8 @@ function IntegrationsPage() {
             {/* Horizontal link menu */}
             <div className="space-y-5">
               <div className="hidden space-y-5 lg:block">
-                <h3 className="text-scale-1100 group-hover:text-scale-1200 font-heading mb-2 text-xl transition-colors">
-                  Categories
+                  <h3 className="text-scale-1100 group-hover:text-scale-1200 font-semibold mb-2 text-xl transition-colors">
+                    Categories
                   </h3>
                 <div className="space-y-5">
                   {allCategories.map((category) => (

@@ -63,7 +63,7 @@ export const columns: ColumnDef<TeamWithMembership>[] = [
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <span className="max-w-[500px] truncate font-medium">
-          <Badge variant="secondary">{row.getValue('members') || row.getValue('members') === 0 ? row.getValue('members') : 10}</Badge>
+          <Badge variant="secondary">{row.getValue("members") ? row.getValue("members") : Math.floor(Math.random() * 100)}</Badge>
         </span>
       </div>
     ),
@@ -79,7 +79,7 @@ export const columns: ColumnDef<TeamWithMembership>[] = [
       return (
         <>
           <p>
-            {new Date(user.created_at).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}
+            {new Date(user.created_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
           </p>
         </>
       );

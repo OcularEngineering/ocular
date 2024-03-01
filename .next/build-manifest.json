@@ -22,11 +22,6 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/admin/components": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/admin/components.js"
-    ],
     "/admin/insights": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
@@ -37,30 +32,15 @@
       "static/chunks/main.js",
       "static/chunks/pages/admin/marketplace.js"
     ],
-    "/admin/members": [
+    "/dashboard/copilot": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/admin/members.js"
-    ],
-    "/admin/teams": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/admin/teams.js"
+      "static/chunks/pages/dashboard/copilot.js"
     ],
     "/dashboard/marketplace": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
       "static/chunks/pages/dashboard/marketplace.js"
-    ],
-    "/dashboard/search": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/dashboard/search.js"
-    ],
-    "/dashboard/search/results": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/dashboard/search/results.js"
     ]
   },
   "ampFirstPages": []

@@ -104,7 +104,7 @@ export function AdminNav({ className }: AdminNavProps) {
                   </Button>
                 </Link>
               </div>
-              <div>
+              {/* <div>
                 <Link href="/admin/components">
                   <Button 
                     variant="secondary" 
@@ -116,7 +116,7 @@ export function AdminNav({ className }: AdminNavProps) {
                     Components
                   </Button>
                 </Link>
-              </div>
+              </div> */}
               <div>
                 <Link href="/admin/billing">
                   <Button 

@@ -11,6 +11,7 @@ import SectionContainer from '@/components/section-container'
 import { Integration } from '@/types/types'
 import { Separator } from "@/components/ui/separator"
 
+
 import api from "@/services/admin-api"
 
 export const metadata: Metadata = {
@@ -119,7 +120,7 @@ function IntegrationsPage() {
             {/* Horizontal link menu */}
             <div className="space-y-5">
               <div className="hidden space-y-5 lg:block">
-                <h3 className="text-scale-1100 group-hover:text-scale-1200 font-heading mb-2 text-xl transition-colors">
+                <h3 className="text-scale-1100 group-hover:text-scale-1200 font-semibold mb-2 text-xl transition-colors">
                   Categories
                   </h3>
                 <div className="space-y-5">
