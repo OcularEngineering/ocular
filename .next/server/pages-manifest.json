@@ -2,8 +2,11 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/admin/insights": "pages/admin/insights.js",
-  "/admin/marketplace": "pages/admin/marketplace.js",
   "/dashboard/marketplace": "pages/dashboard/marketplace.js",
+  "/dashboard/search": "pages/dashboard/search.js",
+  "/admin/settings": "pages/admin/settings.js",
+  "/dashboard/search/results": "pages/dashboard/search/results.js",
+  "/admin/marketplace": "pages/admin/marketplace.js",
+  "/admin/insights": "pages/admin/insights.js",
   "/dashboard/copilot": "pages/dashboard/copilot.js"
 }

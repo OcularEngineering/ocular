@@ -1,6 +1,6 @@
 import AppFilterOption from "./app-filter-option";
 
-const iconsArray = ['Jira.svg', 'Github.png', 'PagerDuty.png', 'GoogleDrive.png', 'stackoverflow.svg' ];
+const iconsArray = ['Jira.svg', 'Github.png', 'PagerDuty.png', 'GoogleDrive.png', 'stackoverflow.svg', 'Notion.png' ];
 
 type AppFilterOptionsProps = {
     results: any; 

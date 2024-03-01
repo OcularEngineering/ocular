@@ -9,6 +9,8 @@ import {
 import { useRef } from "react";
 import { useRouter } from "next/router";
 
+const iconsArray = ['asana.svg', 'Jira.svg', 'Github.png', 'Notion.png', 'google-drive.png', 'stackoverflow.svg', 'plus.png' ];
+
 export function Search() {
   const router = useRouter();
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -24,7 +26,7 @@ export function Search() {
   }
   return (
     <>
-      <div className="dark:bg-primary-dark group flex min-h-screen flex-col items-center justify-between dark:text-white">
+      <div className="dark:bg-primary-dark group flex min-h-screen flex-col items-center dark:text-white">
 
         <Head>
             <meta charSet="utf-8" />
@@ -63,7 +65,21 @@ export function Search() {
                 Submit Querry Button
               </button>
             </div>
+            <div className="flex flex-wrap items-center gap-5">
+              {iconsArray.map((iconName) => (
+                <div className="w-full sm:w-auto bg-custom-gray dark:bg-muted p-6 rounded-2xl hover:opacity-80 hover:cursor-pointer transition-all hover:scale-110 hover:shadow-lg">
+                  <Image
+                    src={`/${iconName}`}
+                    className="w-12 h-12"
+                    width={70}
+                    height={70}
+                    alt=""
+                  />
+                </div>
+              ))}
+          </div>
           </form>
+
       </div>
       <div id="portal"></div>
     </>

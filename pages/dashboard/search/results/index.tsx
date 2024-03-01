@@ -5,6 +5,7 @@ import Head from "next/head";
 import Header from "@/components/search/header";
 import { useRouter } from "next/router";
 import SearchResults from "@/components/search/search-results";
+import Image from 'next/image'
 
 // Importing API End Points
 import api from "@/services/api"
@@ -27,8 +28,28 @@ export default function Search() {
       });
   }, [router.query.q]); 
 
-  if (isLoading) return <p>Loading...</p>;
-  if (!results) return <p>Loading...</p>;
+  if (isLoading) return (      
+    <div className="flex items-center justify-center min-h-screen min-w-full">
+      <Image 
+          src={"/AI.svg"} 
+          alt="Loading..." 
+          width={600} 
+          height={600} 
+          className="animate-pulse duration-5000"
+      />
+    </div>
+  );
+  if (!results) return (      
+    <div className="flex items-center justify-center min-h-screen min-w-full">
+      <Image 
+          src={"/AI.svg"} 
+          alt="Loading..." 
+          width={600} 
+          height={600} 
+          className="animate-pulse duration-5000"
+      />
+    </div>
+  );
 
   return (
     <div className="dark:bg-primary-dark w-full bg-white text-black">
