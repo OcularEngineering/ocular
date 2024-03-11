@@ -19,7 +19,7 @@
      "downlevelIteration": true,
      "jsx": "react"
   },
-  "include": ["src", "src/templates"],src/templates
+  "include": ["src", "src/templates"],
   "exclude": [
      "dist",
      "src/**/__tests__",

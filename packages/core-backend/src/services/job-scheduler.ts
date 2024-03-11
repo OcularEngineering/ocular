@@ -5,6 +5,7 @@ import { promiseAll } from "../utils/promise-all"
 
 type InjectedDependencies = {
   logger: Logger
+  redisClient: Redis
 }
 
 type ScheduledJobHandler<T = unknown> = (
@@ -19,12 +20,13 @@ export type CreateJobOptions = {
 export default class JobSchedulerService {
   protected readonly config_: ConfigModule
   protected readonly logger_: Logger
+  protected readonly redisClient_: Redis
   protected readonly handlers_: Map<string | symbol, ScheduledJobHandler[]> =
     new Map()
   protected readonly queue_: Queue
 
   constructor(
-    { logger }: InjectedDependencies,
+    { logger, redisClient }: InjectedDependencies,
     config: ConfigModule,
     singleton = true
   ) {
@@ -38,22 +40,26 @@ export default class JobSchedulerService {
     if (singleton && config?.projectConfig?.redis_url) {
       // Required config
       // See: https://github.com/OptimalBits/bull/blob/develop/CHANGELOG.md#breaking-changes
-      const connection = new Redis(config.projectConfig.redis_url, {
-        maxRetriesPerRequest: null,
-        enableReadyCheck: false,
-        ...(config.projectConfig.redis_options ?? {}),
-      })
+      // const connection = new Redis(config.projectConfig.redis_url, {
+      //   maxRetriesPerRequest: null,
+      //   enableReadyCheck: false,
+      //   ...(config.projectConfig.redis_options ?? {}),
+      // })
+
 
       this.queue_ = new Queue(`scheduled-jobs:queue`, {
-        connection,
+        connection: redisClient,
         prefix,
       })
 
       // Register scheduled job worker
       new Worker("scheduled-jobs:queue", this.scheduledJobsWorker, {
-        connection,
+        connection: redisClient,
         prefix,
       })
+
+      // this.queue_.pause()
+      // this.queue_.obliterate({ force: true })
     }
   }
 

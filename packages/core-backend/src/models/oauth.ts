@@ -35,6 +35,9 @@ export class OAuth extends BaseEntity {
 
   @CreateDateColumn({ type: resolveDbType("timestamptz") })
   refresh_token_expires_at: Date
+
+  @Column({ type: "timestamptz", nullable: true, default: () => 'NULL'})
+  last_sync: Date;
  
   @Column({ type: "varchar", nullable: true })
   organisation_id: string;

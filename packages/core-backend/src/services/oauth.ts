@@ -5,7 +5,7 @@ import { AutoflowContainer } from "@ocular-ai/types"
 import { AutoflowAiError,AutoflowAiErrorTypes } from "@ocular-ai/utils"
 import { App, User } from "../models"
 import { buildQuery } from "../utils/build-query"
-import { CreateOAuthInput, RetrieveOAuthConfig } from "../types/oauth"
+import { CreateOAuthInput, RetrieveOAuthConfig, UpdateOAuthInput } from "../types/oauth"
 import  {OAuth} from "../models"
 import AppService from "./app"
 import OAuthRepository from "../repositories/oauth"
@@ -158,6 +158,36 @@ class OAuthService extends TransactionBaseService {
       return result
     })
     return null
+  }
+
+  async update(id: string, update: UpdateOAuthInput): Promise<OAuth> {
+    const repo = this.activeManager_.withRepository(this.oauthRepository_)
+
+    const oauth = await this.oauthRepository_.findOne({
+      where: {
+        id: id
+      }
+    });
+
+    const { last_sync, token, token_expires_at, refresh_token, refresh_token_expires_at  } = update
+
+    if (last_sync) {
+      oauth.last_sync =  last_sync
+    }
+    if (token) {
+      oauth.token = token
+    }
+    if (token_expires_at) {
+      oauth.token_expires_at = token_expires_at
+    }
+    if (refresh_token) {
+      oauth.refresh_token = refresh_token
+    }
+    if (refresh_token_expires_at) {
+      oauth.refresh_token_expires_at = refresh_token_expires_at
+    }
+
+    return await repo.save(oauth)
   }
 }
 

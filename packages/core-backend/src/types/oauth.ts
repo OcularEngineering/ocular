@@ -2,10 +2,14 @@ import { AppNameDefinitions } from "@ocular-ai/types";
 import { App, OAuth} from "../models";
 
 
-export type CreateOAuthInput = Omit<OAuth, "id" | "organisation_id" | "app_id" | "created_at" | "updated_at" | "deleted_at">
+export type CreateOAuthInput = Omit<OAuth, "id" | "last_sync" | "organisation_id" | "app_id" | "created_at" | "updated_at" | "deleted_at">
 
 export type UpdateOAuthInput = {
-  data: Record<string, unknown>
+  token?: string,
+  token_expires_at?: Date,
+  refresh_token?: string,
+  refresh_token_expires_at?: Date,
+  last_sync?: Date
 }
 
 export type RetrieveOAuthConfig ={

@@ -57,3 +57,18 @@ export default async ({
   // }
   return dataSource
 }
+
+// Start Project
+// npm run start
+
+
+// Generate Migrations
+// npm run typeorm migration:generate  src/migrations/adduserandorganisation
+
+// Build Source Migratio
+
+// Run Migration
+// npm run typeorm migration:run
+
+// Revert 
+// npm run typeorm migration:revert

@@ -36,63 +36,7 @@ class SearchIndexingSubscriber {
   }
 
   indexOrganisationUsers = async (): Promise<void> => {
-    const users = await this.userService_.list({})
-
-    // SearchService Indexing
-    if(users) {
-      await this.searchService_.addDocuments(
-        UserService.IndexName,
-        users,
-        indexTypes.USERS
-      )
-    }
-
-    // Vector Search Indexing
-    if(users) {
-      await this.vectorSearchService_.addDocuments(
-        UserService.IndexName,
-        users,
-        indexTypes.USERS
-      )
-    }
-    
-    // const TAKE = (this.searchService_?.options?.batch_size as number) ?? 1000
-    // let hasMore = true
-
-    // let lastSeenId = ""
-
-    // while (hasMore) {
-    //   const users = await this.retrieveNextUsers(lastSeenId, TAKE)
-
-    //   if (users.length > 0) {
-    //     await this.searchService_.addDocuments(
-    //       UserService.IndexName,
-    //       users,
-    //       indexTypes.users
-    //     )
-    //     lastSeenId = users[users.length - 1].id
-    //   } else {
-    //     hasMore = false
-    //   }
-    // }
-  }
-
-  protected async retrieveNextUsers(
-    lastSeenId: string,
-    take: number
-  ): Promise<User[]> {
-    const relations = [...defaultSearchIndexingProductRelations]
-
-    return await this.userService_.list({})
-
-    // return await this.userService_.list(
-    //   { id: { gt: lastSeenId } },
-    //   {
-    //     relations,
-    //     take: take,
-    //     order: { id: "ASC" },
-    //   }
-    // )
+ 
   }
 }
 

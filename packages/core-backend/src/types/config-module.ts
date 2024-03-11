@@ -1,7 +1,6 @@
 import { RedisOptions } from "ioredis"
 import { LoggerOptions } from "typeorm"
-import { SearchEngineOptions } from "./search/options"
-import { PineConePluginOptions } from "./search/pinecone"
+import { SearchEngineOptions,AzureOpenAIOptions  } from "./search/options"
 
 type SessionOptions = {
   name?: string
@@ -46,7 +45,7 @@ export type ProjectConfigOptions = {
   client_id?: string
   github_client_secret?: string
   search_engine_options?:SearchEngineOptions
-  vector_search_options?: PineConePluginOptions
+  azure_open_ai_options?: AzureOpenAIOptions 
 }
 
 export type ConfigModule = {

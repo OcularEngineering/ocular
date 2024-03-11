@@ -17,7 +17,9 @@ export default async (req, res) => {
     forbidNonWhitelisted: false,
   })
 
-  const { q, offset, limit, filter, ...options } = validated
+  const { q, offset, limit, categoryFilter, ...options } = validated
+
+  console.log(q, offset, limit, categoryFilter, options)
 
   const paginationOptions = { offset, limit }
 
@@ -28,7 +30,7 @@ export default async (req, res) => {
 
   const results = await searchService.search(loggedInUser.organisation_id.toLowerCase().substring(4), q, {
     paginationOptions,
-    filter,
+    categoryFilter:categoryFilter,
     additionalOptions: options,
   })
  
@@ -67,5 +69,5 @@ export class PostSearchReq {
   limit?: number
 
   @IsOptional()
-  filter?: string
+  categoryFilter?: string
 }

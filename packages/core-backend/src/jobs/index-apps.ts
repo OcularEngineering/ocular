@@ -53,6 +53,13 @@
 
     // Schedule Indexing Batch Jobs For An Organisation
     const syncOrganisationDataFromApps = async () => {
-      // Sync Core Ocular Data
+      // Create A Shared Indexer.
+      // indeconst indexer = new IndexerScript({searchIndexClient:this.searchIndexClient_, configModule: this.config_, organisation: org, logger: this.logger_ })
+      // Schedule Job To Index The Core Ocular Data
+
       // Schedule Indexing Batch Jobs For Each App in An Organisation
+      // For Each App Installed In An Organisation
+      // Get The Oauth Of the App
+      // Resolve The Ocular For The App From The Container
+      // Schedule A Batch Job To Index The Data From The Ocular and Pass in the Indexer and Oauth.
     };
