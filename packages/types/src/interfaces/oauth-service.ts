@@ -15,7 +15,7 @@ class BaseOauthService extends TransactionBaseService {
     throw Error("generateToken must be overridden by the child class")
   }
 
-  refreshToken() {
+  refreshToken(refresh_token: string) {
     throw Error("refreshToken must be overridden by the child class")
   }
 

@@ -30,21 +30,18 @@ class GithubStrategy extends AbstractBatchJobStrategy {
   async processJob(batchJobId: string): Promise<void> {
     console.log("Processing Github Indexing Job", batchJobId)
 
-    const batchJob = await this.batchJobService_.retrieve(batchJobId)
+    // const batchJob = await this.batchJobService_.retrieve(batchJobId)
 
-    const stream = await this.githubService_.getRepositoriesOcular(batchJob.context?.org as Organisation)
+    // const stream = await this.githubService_.getRepositoriesOcular(batchJob.context?.org as Organisation)
 
-    stream.on('data', (chunk) => {
-      console.log(chunk);
-      this.eventBusService_.emit(INDEX_DOCUMENT_EVENT, chunk)
-     
-    });
+    // stream.on('data', (documents) => {
+    //   this.eventBusService_.emit(INDEX_DOCUMENT_EVENT, documents)
+    // });
 
 
-  stream.on('end', () => {
-    console.log('No more data');
-  });
-    // )
+    // stream.on('end', () => {
+    //   console.log('No more data');
+    // });
   }
 
   buildTemplate(): Promise<string> {

@@ -22,7 +22,7 @@ try {
 } catch (e) { }
 
 // UI_CORS is the URL of the UI that is allowed to access the API
-const UI_CORS = process.env.ADMIN_CORS || "http://localhost:3000,http://localhost:3001,http://localhost:3002";
+const UI_CORS = process.env.ADMIN_CORS || "http://localhost:3001";
 
 
 /** @type {import('./src/types/config-module').ConfigModule} */
@@ -62,11 +62,28 @@ module.exports = {
         },
       },
     },
-    vector_search_options: {
-      apiKey: process.env.PINECONE_API_KEY,
+    azure_open_ai_options: {
+      apiKey: process.env.AZURE_OPENAI_API_KEY,
+      serviceName: process.env.AZURE_OPEN_AI_SERVICE_NAME,
+      apiVersion: process.env.AZURE_OPENAI_API_VERSION,
+      deploymentName: process.env.AZURE_OPENAI_DEPLOYMENT_NAME,
+      openAIModel: "gpt-4"
     },
   },
   apps: [
+    {
+      resolve: `asana`,
+      options:{
+        client_id: process.env.ASANA_CLIENT_ID,
+        client_secret: process.env.ASANA_CLIENT_SECRET,
+        scope: "openid email profile"
+      }
+    },
+    {
+      resolve: `confluence`,
+      options: {
+      }
+    },
     {
       resolve: `github`,
       options: {
@@ -74,7 +91,30 @@ module.exports = {
         client_secret: process.env.GITHUB_CLIENT_SECRET,
         app_id: process.env.GITHUB_APP_ID,
       }
-    }
+    },
+    {
+      resolve: `google-drive`,
+      options: {
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: "https://oauth.pstmn.io/v1/callback",
+      }
+    },
+    {
+      resolve: `gmail`,
+      options: {
+      }
+    },
+    {
+      resolve: `jira`,
+      options: {
+      }
+    },
+    {
+      resolve: `notion`,
+      options: {
+      }
+    },
   ],
   plugins: [
     {

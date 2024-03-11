@@ -7,6 +7,7 @@ import { ConfigModule }  from "../types/config-module"
 import { SearchEngineOptions } from "../types/search/options"
 import { SearchIndexClient, AzureKeyCredential } from "@azure/search-documents";
 import { EventBusService } from "../services"
+import { AutoflowAiError } from "@ocular-ai/utils"
 
 export const SEARCH_INDEX_EVENT = "SEARCH_INDEX_EVENT"
 
@@ -40,6 +41,7 @@ async function searchIndexLoader({
     logger?.info(`Connection to Search Client established`)
   } catch (err) {
     logger?.error(`An error occurred while connecting to Search Client: ${err}`)
+    throw AutoflowAiError
     console.log(err)
   }
 

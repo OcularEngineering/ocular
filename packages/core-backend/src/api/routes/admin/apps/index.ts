@@ -24,10 +24,6 @@ export default (app) => {
   //   middlewares.wrap(require("./authorize-app").default)
   // )
   route.get("/",middlewares.wrap(require("./list-apps").default))
-  //   route.post(
-  //   "/install",
-  //   middlewares.wrap(require("./install-app").default)
-  // )
   return app
 }
 
