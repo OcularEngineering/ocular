@@ -33,6 +33,7 @@
     "test": "exit 0"
   },
   "dependencies": {
+    "@azure/search-documents": "^12.0.0",
     "@ocular-ai/utils": "file:../utils"
   }
 }

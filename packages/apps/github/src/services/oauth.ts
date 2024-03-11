@@ -22,14 +22,14 @@ class GithubOauth extends OauthService {
     console.log("GitHub Oauth", client_id, client_secret, redirect)
     return {
       name: AppNameDefinitions.GITHUB,
-      logo: "/Github.png",
+      logo: "/github.svg",
       description: "GitHub is a web code hosting platform for version control and collaboration. It lets you and others work together on projects from anywhere.",
       install_url: `https://github.com/apps/ocular-ai/installations/new`,
       oauth_url: `https://github.com/login/oauth/authorize?client_id=${client_id}`,
       slug:AppNameDefinitions.GITHUB,
       category:AppCategoryDefinitions.SOTWARE_DEVELOPMENT,
       developer:"Ocular AI",
-      images:["/Github.png"],
+      images:["/github.svg"],
       overview: "GitHub is a web-based platform used for version control. Git simplifies the process of working with other people and makes it easy to collaborate on projects. Team members can work on files and easily merge their changes in with the master branch of the project.",
       docs: "https://docs.github.com/en",
       website: "https://github.com"
