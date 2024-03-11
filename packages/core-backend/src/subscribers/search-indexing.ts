@@ -10,9 +10,10 @@ import { BatchJobCreateProps } from "../types/batch-job"
 import { INDEX_DOCUMENT_EVENT } from "@ocular-ai/types"
 import { AzureKeyCredential, SearchClient, SearchIndex, SearchIndexClient} from "@azure/search-documents"
 import { IndexableDocument } from "@ocular-ai/types/src/common"
-import { ConfigModule } from "../types"
+import { ConfigModule, Logger } from "../types"
 import { SearchEngineOptions } from "../types/search/options"
 import api from "../api"
+import IndexerScript from "../scripts/indexer"
 
 
 type InjectedDependencies = {
@@ -21,6 +22,7 @@ type InjectedDependencies = {
   organisationService: OrganisationService
   jobSchedulerService: JobSchedulerService
   configModule: ConfigModule
+  logger: Logger
 }
 
 class SearchIndexingSubscriber {
@@ -30,19 +32,22 @@ class SearchIndexingSubscriber {
   private readonly jobSchedulerService_: JobSchedulerService
   private readonly searchIndexClient_: SearchIndexClient;
   private readonly configModule_: ConfigModule;
+  private readonly logger_: Logger
 
   constructor({
     eventBusService,
     batchJobService,
     organisationService,
     jobSchedulerService,
-    configModule
+    configModule,
+    logger,
   }: InjectedDependencies) {
     this.batchJobService_ = batchJobService
     this.organisationService_ = organisationService
     this.eventBusService_ = eventBusService
     this.jobSchedulerService_ = jobSchedulerService
     this.configModule_ = configModule
+    this.logger_ = logger
     this.searchIndexClient_ = new SearchIndexClient(configModule.projectConfig.search_engine_options.endpoint, new AzureKeyCredential(configModule.projectConfig.search_engine_options.apiKey))
     this.eventBusService_.subscribe(SEARCH_INDEX_EVENT, this.buildSearchIndex)
     this.eventBusService_.subscribe(INDEX_DOCUMENT_EVENT, this.registerIndexDocumentJobHandler )
@@ -56,10 +61,37 @@ class SearchIndexingSubscriber {
         if (!org.installed_apps) return;
         this.jobSchedulerService_.create(`Sync Apps Data for ${org.name}`, {org: org}, "* * * * *", async () => {
           org.installed_apps.forEach((app) => {
+            console.log(app.name)
             switch (app.name) {
-                case AppNameDefinitions.GITHUB: {
+              //   case AppNameDefinitions.GITHUB: {
+              //   const jobProps: BatchJobCreateProps = {
+              //       type: "github",
+              //       context: {
+              //           org: org
+              //       },
+              //       // created_by: "system",
+              //       dry_run: false,
+              //   }
+              //   this.batchJobService_.create(jobProps)
+              //   break;
+              // }
+              // case AppNameDefinitions.ASANA: {
+              //   const jobProps: BatchJobCreateProps = {
+              //       type: "asana",
+              //       context: {
+              //           org: org
+              //       },
+              //       // created_by: "system",
+              //       dry_run: false,
+              //   }
+              //   this.batchJobService_.create(jobProps)
+              //   break;
+              // }
+             
+              case AppNameDefinitions.GOOGLEDRIVE: {
+                console.log("Creating Google Drive Job")
                 const jobProps: BatchJobCreateProps = {
-                    type: "github",
+                    type: "google-drive",
                     context: {
                         org: org
                     },
@@ -78,70 +110,12 @@ class SearchIndexingSubscriber {
     })
   }
 
-  registerIndexDocumentJobHandler = async (data:IndexableDocument): Promise<void> => {
+  registerIndexDocumentJobHandler = async (data:IndexableDocument[]): Promise<void> => {
     try{
-
-      const indexName =  data.organisation_id.toLowerCase().substring(4);
-      console.error(`Indexing Document in JOBSERVICE ${data.title}`)
-      const searchIndex: SearchIndex = {
-        name: indexName,
-        fields: [
-          {
-            name: "id",
-            type: "Edm.String",
-            key: true,
-            searchable: false,
-          },
-          {
-            name: "organisation_id",
-            type: "Edm.String",
-            filterable: true,
-          },
-          { 
-            name: "title",
-            type: "Edm.String",
-            searchable: true,
-            sortable: true
-           },
-          { 
-            name: "source", 
-            type: "Edm.String", 
-            searchable: true,
-            sortable: true , 
-            filterable: true
-          },
-          // {
-          //   name: "content", 
-          //   type: "Collection(Edm.ComplexType)", 
-          //   fields: [
-          //     { name: "text", type: "Edm.String", searchable: true },
-          //     { name: "link", type: "Edm.String", searchable: false }
-          //   ]
-          // },
-          { 
-            name: "updated_at", 
-            type: "Edm.DateTimeOffset", 
-            sortable: true, 
-            facetable: true,
-            searchable: false,
-          },
-          {
-            name: "location",
-            type: "Edm.String",
-            searchable: false,
-          },
-        ],
-      }
-
-
-      await this.searchIndexClient_.createOrUpdateIndex(searchIndex) ;
-      // const { batchSize, settings,endpoint,apiKey } = this.configModule_.projectConfig.search_engine_options as SearchEngineOptions
-      const searchClient: SearchClient<IndexableDocument> = new SearchClient<IndexableDocument>(
-        this.configModule_.projectConfig.search_engine_options.endpoint,
-        indexName,
-        new AzureKeyCredential(this.configModule_.projectConfig.search_engine_options.apiKey)
-      );
-      await searchClient.uploadDocuments([data]);
+    if(data.length == 0) return;
+    const org = await this.organisationService_.retrieve(data[0].organisation_id)
+    const indexer = await new IndexerScript({searchIndexClient:this.searchIndexClient_, configModule: this.configModule_, organisation:org, logger: this.logger_ })
+    await indexer.index(data)
     }catch(e){
       console.error(e)
     }

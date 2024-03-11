@@ -1,11 +1,10 @@
-import {BatchSearchEngineIndexer} from "@ocular-ai/types/src/interfaces";
-import { IndexableDocument, indexFields } from '@ocular-ai/types';
+import { IndexableDocument, IndexFields, semanticSearchProfile ,vectorSearchProfile } from '@ocular-ai/types';
 import { Readable } from 'stream';
 import { ConfigModule } from "../types/config-module";
 import { SearchEngineOptions } from "../types/search/options";
 import { SearchIndexClient, AzureKeyCredential,SearchIndex,SearchClient, SearchIndexingBufferedSender} from "@azure/search-documents";
 import { Lifetime } from "awilix"
-import { Logger } from "@ocular-ai/types";
+import { Logger, BatchSearchEngineIndexer } from "@ocular-ai/types";
 import e from "express";
 import { Organisation } from "../models";
 
@@ -71,68 +70,37 @@ class IndexerScript extends BatchSearchEngineIndexer{
     this.indexName = this.organisation_.id.toLowerCase().substring(4);
     console.log(this.indexName);
 
+    const searchIndex: SearchIndex = {
+      name: this.indexName,
+      fields: IndexFields,
+      vectorSearch: vectorSearchProfile,
+      semanticSearch:semanticSearchProfile,
+    }
+    this.searchIndexClient_.createOrUpdateIndex(
+      searchIndex
+    );
   }
 
 
   async initialize(): Promise<void> {
     this.logger_.info(`Initializing Search Index ${this.organisation_.id} belonging to ${this.organisation_.name}...`);
     // Migrate The Index Fields To Their Own File For Cleaner Code
-    const searchIndex: SearchIndex = {
-      name: this.indexName,
-      fields: [
-        {
-          name: "id",
-          type: "Edm.String",
-          key: true,
-          searchable: false,
-        },
-        {
-          name: "organisation_id",
-          type: "Edm.String",
-          filterable: true,
-        },
-        { 
-          name: "title",
-          type: "Edm.String",
-          searchable: true,
-          sortable: true
-         },
-        { 
-          name: "source", 
-          type: "Edm.String", 
-          searchable: true,
-          sortable: true , 
-          filterable: true
-        },
-        {
-          name: "content", 
-          type: "Collection(Edm.ComplexType)", 
-          fields: [
-            { name: "text", type: "Edm.String", searchable: true },
-            { name: "link", type: "Edm.String", searchable: false }
-          ]
-        },
-        { 
-          name: "updated_at", 
-          type: "Edm.DateTimeOffset", 
-          sortable: true, 
-          facetable: true,
-          searchable: false,
-        },
-        {
-          name: "location",
-          type: "Edm.String",
-          searchable: false,
-        },
-      ],
-    }
-    await this.searchIndexClient_.createOrUpdateIndex(searchIndex);
+    // const searchIndex: SearchIndex = {
+    //   name: this.indexName,
+    //   fields: IndexFields,
+    //   vectorSearch: vectorSearchProfile,
+    //   semanticSearch:semanticSearchProfile,
+    // }
+    // await this.searchIndexClient_.createOrUpdateIndex(
+    //   searchIndex
+    // );
   }
 
   async index(documents: IndexableDocument[]): Promise<void> {
-    this.logger_.info(`Indexing ${documents[0]} documents...`);
+    this.logger_.info(`Indexing ${documents[0]} documents in index ${this.indexName}...`);
     console.log(documents[0]);
 
+    // Optimize Here And Avoid Creating A New Client For Each Batch
     const searchClient: SearchClient<IndexableDocument> = new SearchClient<IndexableDocument>(
       this.endpoint_,
       this.indexName,

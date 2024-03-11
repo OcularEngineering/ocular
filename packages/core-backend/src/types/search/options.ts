@@ -2,7 +2,7 @@ import { IndexSettings } from "./settings"
 
 export type SearchOptions = {
   paginationOptions: Record<string, unknown>
-  filter: string
+  categoryFilter: string
   additionalOptions: Record<string, unknown>
 }
 
@@ -16,4 +16,12 @@ export type SearchEngineOptions = {
   settings?: {
     [key: string]: IndexSettings
   }
+}
+
+export type AzureOpenAIOptions = {
+  serviceName: string
+  deploymentName: string
+  apiKey: string
+  apiVersion: string
+  openAIModel: string
 }

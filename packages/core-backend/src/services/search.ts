@@ -2,7 +2,7 @@ import { IndexSettings } from "../types/search"
 import {indexTypes}  from "../utils/search"
 import Algolia, { SearchClient } from "algoliasearch"
 import { AbstractSearchService } from "@ocular-ai/types"
-import { SearchEngineOptions, SearchOptions } from "../types/search/options"
+import { AzureOpenAIOptions, SearchEngineOptions, SearchOptions } from "../types/search/options"
 import { ConfigModule, Logger } from "../types"
 import { RegisterOcularParameters } from "../types/ocular/ocular"
 import OrganisationService from "./organisation"
@@ -12,6 +12,8 @@ import { SearchIndexClient } from "@azure/search-documents"
 import JobSchedulerService from "./job-scheduler"
 import { Organisation } from "../models"
 import { OauthService } from "@ocular-ai/types/src/interfaces"
+import axios from "axios"
+import fs from "fs"
 
 
 
@@ -30,6 +32,9 @@ class SearchService extends AbstractSearchService {
   protected readonly searchIndexClient_: SearchIndexClient
   protected readonly logger_: Logger
   protected readonly jobSchedulerService_: JobSchedulerService
+
+  // Azure Open AI 
+  protected readonly openAIOptions_: AzureOpenAIOptions
 
   private oculars: Record<string, RegisterOcularParameters>;
   constructor(container, config) {
@@ -52,6 +57,9 @@ class SearchService extends AbstractSearchService {
     this.searchIndexClient_ = container.searchIndexClient
     this.logger_ = container.logger
     this.jobSchedulerService_ = container.jobSchedulerService
+
+    // Azure Open AI Keys
+    this.openAIOptions_ = this.config_.projectConfig.azure_open_ai_options as AzureOpenAIOptions
   }
 
   /**
@@ -168,18 +176,105 @@ class SearchService extends AbstractSearchService {
     query: string,
     options: SearchOptions & Record<string, unknown>
   ) {
-    const searchClient = this.searchIndexClient_.getSearchClient(indexName);
-    const searchResults = await searchClient.search(query, {
-      select: ["id", "title", "source", "updated_at", "location"],
-    })
+    console.log("Query", query)
+  //   // Hybrid Vector Search
+  // // 1. Cross Field Vector Search
+  // // 2. Hybrid Vector Search -> Text + Vector Query
+  // // 3. Vector Search with Filter (Filter With Source(Github, Gitlab, etc))
+  // // 4. Semantic Search
+  // // TODO: Abstract This Into A Query Service That Does Query Translation.
+  let filter = ''
+  if (options.hybridVectorSearch) {
+    filter = `source eq ${options.categoryFilter}`
+  }
 
-    // "content"
-    // Convert the PagedAsyncIterableIterator to an array
+  const searchClient = this.searchIndexClient_.getSearchClient(indexName);
+  const searchResults = await searchClient.search(query, {
+    // vectorSearchOptions: {
+    //   queries: [
+    //     {
+    //       kind: 'vector',
+    //       vector: await this.generateEmbeddings(query),
+    //       fields: ["titleVector", "contentVector"],
+    //       kNearestNeighborsCount: 5,
+    //     }
+    //   ],
+    // },
+    filter: filter,
+    select: ["title","source","content","updated_at","location"],
+    top: 3,
+    // queryType: "semantic",
+    // semanticSearchOptions: {
+    //   answers: {
+    //     answerType: "extractive",
+    //     count: 3
+    //   },
+    //   captions:{
+    //     captionType: "extractive",
+    //   },
+    //   configurationName: "my-semantic-config",
+    // },
+    });
+
+    // for await (const answer of searchResults.answers) {
+    //   if (answer.highlights) {
+    //     console.log(`Semantic answer: ${answer.highlights}`);
+    //   } else {
+    //     console.log(`Semantic answer: ${answer.text}`);
+    //   }
+    //   console.log(`Semantic answer score: ${answer.score}\n`);
+    // }
+
+    // for await (const result of searchResults.results) {
+    //   // console.log(`Title: ${result.document.title}`);
+    //   // console.log(`Reranker Score: ${result.rerankerScore}`); // Reranker score is the semantic score
+    //   // console.log(`Content: ${result.document.content}`);
+    //   // console.log(`Category: ${result.document.category}`);
+  
+    //   if (result.captions) {
+    //     const caption = result.captions[0];
+    //     if (caption.highlights) {
+    //       console.log(`Caption: ${caption.highlights}`);
+    //     } else {
+    //       console.log(`Caption: ${caption.text}`);
+    //     }
+    //   }
+  
+    //   console.log(`\n`);
+    // }
     const resultsArray = [];
     for await (const result of searchResults.results) {
       resultsArray.push(result);
     }
     return resultsArray;
+  
+    // const inputData = JSON.parse(
+    //   fs.readFileSync("/Users/louismurerwa/Desktop/LuxaInvestmentsProjects/autoflow-ai/packages/core-backend/src/data/mock-data.json", "utf-8")
+    // );
+
+    // return inputData;
+  }
+
+  async generateEmbeddings(text: string): Promise<number[]> {
+   // Set Azure OpenAI API parameters from environment variables
+    const apiBase = `https://${this.openAIOptions_.deploymentName}.openai.azure.com`;
+
+    const response = await axios.post(
+      `${apiBase}/openai/deployments/${this.openAIOptions_.deploymentName}/embeddings?api-version=${this.openAIOptions_.apiVersion}`,
+      {
+        input: text,
+        engine: this.openAIOptions_.openAIModel,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": this.openAIOptions_.apiKey,
+        },
+      }
+    );
+
+    const embeddings = response.data.data[0].embedding;
+    return embeddings;
   }
 
   /**

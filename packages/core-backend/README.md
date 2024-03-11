@@ -5,6 +5,8 @@ Start Project
 npm run start
 
 
+
+# Add or Modify DataBase Models
 Generate Migrations
 npm run typeorm migration:generate  src/migrations/adduserandorganisation
 

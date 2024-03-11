@@ -189,7 +189,7 @@ export async function registerServices(
           `Cannot register ${name}. Make sure to default export a service class in ${fn}`
         )
       }
-
+ 
       if (OauthService.isOauthService(loaded.prototype)) {
         const configModule = container.resolve<ConfigModule>("configModule")
         const createAppInput = loaded.getAppDetails(configModule.projectConfig,appDetails.options)
