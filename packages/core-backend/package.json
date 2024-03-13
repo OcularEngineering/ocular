@@ -19,6 +19,7 @@
   "author": "Louis Luxa Murerwa",
   "dependencies": {
     "@azure/search-documents": "^12.0.0",
+    "@infisical/sdk": "^2.1.8",
     "@ocular-ai/modules-sdk": "file:../modules-sdk",
     "@ocular-ai/types": "file:../types",
     "@ocular-ai/utils": "file:../utils",

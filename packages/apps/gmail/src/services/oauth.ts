@@ -1,92 +1,94 @@
-
+const {google} = require('googleapis');
 import randomize from "randomatic"
-import axios from "axios"
 import { OauthService, AppNameDefinitions, AppCategoryDefinitions, OAuthToken  } from "@ocular-ai/types"
-import { ConfigModule } from '@ocular-ai/core-backend/src/types';
+import {OAuth2Client} from 'google-auth-library';
 
 class GmailOauth extends OauthService {
+
   protected client_id_: string
   protected client_secret_: string
-  protected configModule_: ConfigModule
+  protected oauth2Client_: OAuth2Client
 
   constructor(container, options) {
     super(arguments[0])
     this.client_id_ = options.client_id
     this.client_secret_ = options.client_secret
-    this.configModule_ = container.configModule
+    this.oauth2Client_ = new google.auth.OAuth2(
+      options.client_id,
+      options.client_secret,
+      options.redirect_uri
+    );
   }
 
   static getAppDetails(projectConfig,options) {
+    const scopes = [
+      'https://www.googleapis.com/auth/gmail.readonly',
+    ];
+    const oauth2Client = new google.auth.OAuth2(
+      options.client_id,
+      options.client_secret,
+      options.redirect_uri
+    );
+    const authorizeUrl = oauth2Client.generateAuthUrl({
+      access_type: 'offline',
+      prompt: 'consent',
+      scope: scopes.join(' '),
+    });
     const client_id = options.client_id
     const client_secret = options.client_secret
-    const redirect = `${projectConfig.ui_cors}/oauth/confluence`
+    const redirect = `${projectConfig.ui_cors}oauth/gmail`
     return {
       name: AppNameDefinitions.GMAIL,
-      logo: "/gmail.svg",
-      description: "Gmail is an email service provided by Google. As of 2019, it had 1.5 billion active users worldwide, making it the largest email service in the world. It also provides a webmail interface, accessible through a web browser, and is also accessible through the official mobile application",
-      oauth_url: `xxx`,
+      logo: "/gmail.png",
+      description: "Gmail keeps your account & emails encrypted, private and under your control with the largest secure email service in the world.",
+      install_url: null,
+      oauth_url: authorizeUrl,
       slug:AppNameDefinitions.GMAIL,
-      category:AppCategoryDefinitions.MESSAGING,
+      category:AppCategoryDefinitions.FILE_STORAGE,
       developer:"Ocular AI",
-      images:["/gmail.svg"],
-      overview:"Gmail is an email service provided by Google. As of 2019, it had 1.5 billion active users worldwide, making it the largest email service in the world. It also provides a webmail interface, accessible through a web browser, and is also accessible through the official mobile application.",
-      docs: "https://support.google.com/a/users/answer/9282664",
-      website: "https://www.google.com/gmail/about"
+      images:["/google-drive.png"],
+      overview: "Gmail uses industry-leading encryption for all messages you receive and send. We never use your Gmail content to personalize ads.",
+      docs: "https://docs.google.com/document/u/0/?ec=asw-docs-globalnav-goto",
+      website: "https://www.google.com/docs/about/"
     }
   }
 
-  async refreshToken() {
-    // const params = {
-    //   refresh_token: refreshToken,
-    //   client_id: "",
-    //   client_secret: CLIENT_SECRET,
-    // }
-
-    console.log("refreshToken")
-
-    // const data = await Brightpearl.refreshToken(this.account_, params)
-    return "refreshToken"
+  async refreshToken(refresh_token: string): Promise<OAuthToken> {
+    try {
+      
+      await this.oauth2Client_.setCredentials({ refresh_token: refresh_token });
+      const newToken = await this.oauth2Client_.refreshAccessToken();
+      const accessToken = newToken.credentials.access_token;
+      return {
+        token : accessToken,
+      }
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 
   async generateToken(code: string): Promise<OAuthToken> {
-
-    console.log("***** Generating token from the code:\n");
-    console.log(code);
-    
-    const body = {
-      grant_type: "authorization_code",
-      client_id: this.client_id_,
-      client_secret: this.client_secret_,
-      redirect_uri: `https://oauth.pstmn.io/v1/callback`,
-      code: code,
-    };
-  
-    const config = {
-      headers: {
-        "content-type": "application/x-www-form-urlencoded",
-      },
-    };
-
-   return axios
-    .post("https://app.asana.com/-/oauth_token", 
-      Object.keys(body)
-    .map((key) => `${key}=${encodeURIComponent(body[key])}`)
-    .join('&'), 
-      config)
-    .then((res) => {
+    try {
+      const {tokens} = await this.oauth2Client_.getToken(code);
+      console.log(tokens)                 
       return {
-        type: res.data.token_type,
-        token : res.data.access_token,
-        token_expires_at : new Date(Date.now() + res.data.expires_in * 1000),
-        refresh_token: res.data.refresh_token,
-        refresh_token_expires_at: new Date(Date.now() + 172800 * 1000),
-      } as OAuthToken
-    })
-    .catch((err) => {
-      console.error(err);
-      throw err;
-    });
+        type: tokens.token_type,
+        token : tokens.access_token,
+        token_expires_at :  new Date(tokens.expiry_date),
+        refresh_token: tokens.refresh_token,
+        refresh_token_expires_at: new Date(Date.now() + 172800000),
+      }
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
+
+  async getOauthCLient(): Promise<OAuth2Client>{
+    return this.oauth2Client_
+  }
+
 }
 
 export default GmailOauth;
