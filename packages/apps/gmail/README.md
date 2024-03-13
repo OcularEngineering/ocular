@@ -1,6 +1,6 @@
 # Brightpearl
 
-Intergrate with an Organisations GitHub.
+Intergrate With Gmail.
 
 
 ## Features

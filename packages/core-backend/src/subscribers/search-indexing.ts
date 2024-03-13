@@ -88,10 +88,23 @@ class SearchIndexingSubscriber {
               //   break;
               // }
              
-              case AppNameDefinitions.GOOGLEDRIVE: {
-                console.log("Creating Google Drive Job")
+              // case AppNameDefinitions.GOOGLEDRIVE: {
+              //   console.log("Creating Google Drive Job")
+              //   const jobProps: BatchJobCreateProps = {
+              //       type: "google-drive",
+              //       context: {
+              //           org: org
+              //       },
+              //       // created_by: "system",
+              //       dry_run: false,
+              //   }
+              //   this.batchJobService_.create(jobProps)
+              //   break;
+              // }
+               case AppNameDefinitions.GMAIL: {
+                console.log("Creating GMAIL Job")
                 const jobProps: BatchJobCreateProps = {
-                    type: "google-drive",
+                    type: "gmail",
                     context: {
                         org: org
                     },

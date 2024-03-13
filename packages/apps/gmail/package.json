@@ -1,6 +1,6 @@
 {
-  "name": "asanaa",
-  "description": "Jira Application for Ocular",
+  "name": "gmail",
+  "description": "Gmail Application for Ocular",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "engines": {
@@ -20,6 +20,7 @@
     "@ocular-ai/types": "file:../../types",
     "asana": "^3.0.2",
     "axios": "^1.6.7",
+    "googleapis": "^133.0.0",
     "octokit": "^3.1.2",
     "tsc": "^2.0.4",
     "typeorm": "^0.3.20",

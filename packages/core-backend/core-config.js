@@ -20,7 +20,7 @@ switch (process.env.NODE_ENV) {
 try {
   dotenv.config({ path: process.cwd() + "/" + ENV_FILE_NAME });
 } catch (e) { }
-
+ 
 // UI_CORS is the URL of the UI that is allowed to access the API
 const UI_CORS = process.env.ADMIN_CORS || "http://localhost:3001";
 
@@ -38,29 +38,6 @@ module.exports = {
     search_engine_options: {
       apiKey: process.env.AZURE_SEARCH_API_KEY,
       endpoint: process.env.AZURE_SEARCH_ENDPOINT,
-      batchSize: 1,
-      settings: {
-        users: {
-          indexSettings: {
-            searchableAttributes: [
-              "first_name",
-              "last_name",
-            ],
-            attributesToRetrieve: [
-              "objectID",
-              "first_name",
-              "last_name",
-            ],
-          },
-          primaryKey: "id",
-          transformer: (user) => ({
-            objectID : user.id, 
-            first_name: user.first_name,
-            last_name: user.last_name,
-            // other attributes...
-          }),
-        },
-      },
     },
     azure_open_ai_options: {
       apiKey: process.env.AZURE_OPENAI_API_KEY,
@@ -77,11 +54,6 @@ module.exports = {
         client_id: process.env.ASANA_CLIENT_ID,
         client_secret: process.env.ASANA_CLIENT_SECRET,
         scope: "openid email profile"
-      }
-    },
-    {
-      resolve: `confluence`,
-      options: {
       }
     },
     {
@@ -103,20 +75,22 @@ module.exports = {
     {
       resolve: `gmail`,
       options: {
-      }
-    },
-    {
-      resolve: `jira`,
-      options: {
-      }
-    },
-    {
-      resolve: `notion`,
-      options: {
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: "https://oauth.pstmn.io/v1/callback",
       }
     },
   ],
   plugins: [
+    // Add Azure Search Index As A Plugin
+      // Type Of Plugin: Search Index
+      // Backend Cant Start Without A Search Index Plugin
+    // Add Azure Vector Search As A Plugin
+      // Type Of Plugin: Vector Search
+      // -> Backend Cant Start Without A Vector Search Plugin
+    // LLM Model 
+      // Type Of Plugin: LLM Model
+      // -> Backend Cant Start Without A LLM Model Plugin
     {
       resolve: `resend`,
       options: {
