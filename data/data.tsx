@@ -50,62 +50,17 @@ export const links: LinkProps[] =[
     link: "/dashboard/search"
   },
   {
-    title: "Copilot",
-    label: "",
-    icon: "Bot",
-    variant: "ghost",
-    link: "/dashboard/copilot"
-  },
-  {
     title: "Marketplace",
     label: "",
     icon: "LayoutGrid",
     variant: "ghost",
     link: "/dashboard/marketplace"
   },
-  {
-    title: "Settings",
-    label: "",
-    icon: "Settings",
-    variant: "ghost",
-    link: "/dashboard/settings"
-  },
-  {
-    title: "Support",
-    label: "",
-    icon: "HelpCircle",
-    variant: "ghost",
-    link: "/dashboard/help"
-  },
 ]
 
 export type Link = (typeof links)[number]
 
-export const BottomLinks: LinkProps[] =[
-
-
-]
-
 export type BottomLinks = (typeof links)[number]
-
-export const types = [
-  {
-    value: "admin",
-    label: "Admin",
-  },
-  {
-    value: "member",
-    label: "Member",
-  },
-]
-
-import {
-  CheckCircledIcon,
-  CircleIcon,
-  CrossCircledIcon,
-  QuestionMarkCircledIcon,
-  StopwatchIcon,
-} from "@radix-ui/react-icons"
 
 export const apps = [
 {

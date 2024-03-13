@@ -37,7 +37,7 @@ export function CreateAccountForm({ className, ...props }: CreateAccountFormProp
 
     try {
       await api.users.create(formData)
-      router.push(`/admin/members`)
+      router.push(`/dashboard/search`)
     } catch (error) {
       console.error(error)
     }

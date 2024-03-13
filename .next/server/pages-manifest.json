@@ -2,12 +2,8 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/dashboard/copilot": "pages/dashboard/copilot.js",
+  "/sign-in": "pages/sign-in.js",
+  "/create-account": "pages/create-account.js",
   "/dashboard/search": "pages/dashboard/search.js",
-  "/dashboard/search/results": "pages/dashboard/search/results.js",
-  "/dashboard/marketplace": "pages/dashboard/marketplace.js",
-  "/dashboard/settings": "pages/dashboard/settings.js",
-  "/admin/insights": "pages/admin/insights.js",
-  "/dashboard/settings/notifications": "pages/dashboard/settings/notifications.js",
-  "/dashboard/settings/security": "pages/dashboard/settings/security.js"
+  "/dashboard/marketplace": "pages/dashboard/marketplace.js"
 }

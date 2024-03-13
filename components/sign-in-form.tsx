@@ -30,7 +30,7 @@ export function SignInForm({ className, ...props }: SignInFormProps) {
 
     try {
       await api.auth.authenticate(formData)
-      router.push(`/admin/members`)
+      router.push(`/dashboard/search`)
     } catch (error) {
       console.error(error)
     }

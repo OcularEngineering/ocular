@@ -6,7 +6,7 @@ export const siteConfig = {
     "Ocular AI",
   mainNav: [
     {
-      title: "Home",
+      title: "Dashboard",
       href: "/",
     },
   ],

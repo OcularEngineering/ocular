@@ -15,7 +15,6 @@ NProgress.configure({
 
 {/* Layouts */}
 import DashboardLayout from '@/components/dashboard-layout';
-import AdminLayout from '@/components/admin-layout';
 import AuthLayout from '@/components/auth-layout';
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -48,9 +47,6 @@ function MyApp({ Component, pageProps }: AppProps) {
 
       return (page: ReactNode) => <AuthLayout>{page}</AuthLayout>;
 
-    } else if (router.pathname.startsWith('/admin')) {
-
-      return (page: ReactNode) => <AdminLayout>{page}</AdminLayout>;
     } else if (router.pathname.startsWith('/dashboard/search')){
 
       return (page: ReactNode) => <Layout>{page}</Layout>;

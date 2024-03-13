@@ -17,11 +17,8 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
@@ -64,32 +61,12 @@ export function UserNav()  {
     }
   }
 
-  async function navigateToSettingsPage(event: React.SyntheticEvent) {
-    event.preventDefault()
-
-    try {
-      router.push(`/dashboard/settings`)
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  async function navigateToAdminConsole(event: React.SyntheticEvent) {
-    event.preventDefault()
-
-    try {
-      router.push(`/admin/insights`)
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
             <Avatar className="h-9 w-9">
-              <AvatarImage src="/michael.png" alt="User" />
+              <AvatarImage src="" alt="User" />
               <AvatarFallback>
                 {firstName[0]}{lastName[0]}
               </AvatarFallback>
@@ -105,22 +82,6 @@ export function UserNav()  {
           </p>
         </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          {role === 'admin' && (
-            <DropdownMenuItem onClick={navigateToAdminConsole}>
-              Admin Console
-            </DropdownMenuItem>
-          )}
-          <DropdownMenuItem onClick={navigateToSettingsPage}>
-            Profile
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={navigateToSettingsPage}>
-            Settings
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuItem>Support</DropdownMenuItem>
-        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={logOut}>
           Log out
         </DropdownMenuItem>

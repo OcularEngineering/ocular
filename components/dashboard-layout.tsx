@@ -1,6 +1,5 @@
 import { SideNav } from "@/components/side-nav";
 import { links } from "@/data/data";
-import { BottomLinks } from "@/data/data";
 import Head from 'next/head';
 import { cn } from "@/lib/utils"
 import { siteConfig } from "@/config/site"
@@ -26,7 +25,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <div className="border-default flex w-14 flex-col justify-between overflow-y-auto border-r bg-background p-2">
                     <SideNav
                         links={links}
-                        BottomLinks={BottomLinks}
                     />
                 </div>
                 <div className="grow justify-center overflow-auto">

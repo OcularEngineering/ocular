@@ -15,8 +15,7 @@
     },
     "private": true,
     "keywords": [
-        "nextjs",
-        "module-federation"
+        "nextjs"
     ],
     "author": "Ocular AI",
     "license": "",

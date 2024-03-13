@@ -22,15 +22,10 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/admin/insights": [
+    "/create-account": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/admin/insights.js"
-    ],
-    "/dashboard/copilot": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/dashboard/copilot.js"
+      "static/chunks/pages/create-account.js"
     ],
     "/dashboard/marketplace": [
       "static/chunks/webpack.js",
@@ -42,25 +37,10 @@
       "static/chunks/main.js",
       "static/chunks/pages/dashboard/search.js"
     ],
-    "/dashboard/search/results": [
+    "/sign-in": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/dashboard/search/results.js"
-    ],
-    "/dashboard/settings": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/dashboard/settings.js"
-    ],
-    "/dashboard/settings/notifications": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/dashboard/settings/notifications.js"
-    ],
-    "/dashboard/settings/security": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/dashboard/settings/security.js"
+      "static/chunks/pages/sign-in.js"
     ]
   },
   "ampFirstPages": []

@@ -1,15 +1,5 @@
 import { z } from "zod"
 
-export const teamSchema = z.lazy(() => z.object({
-  id: z.string(),
-  name: z.string(),
-  created_at: z.string(),
-  updated_at: z.string(),
-  organisation_id: z.string(),
-  description: z.string().optional(),
-  members: z.array(userSchema),
-}));
-
 export const userSchema = z.object({
   id: z.string(),
   email: z.string(),
@@ -25,8 +15,6 @@ export const userSchema = z.object({
   avatar: z.string(),
   metadata: z.unknown().optional(),
   bio: z.string().optional(),
-  teams: z.array(teamSchema).optional(),
 });
 
 export type User = z.infer<typeof userSchema>
-export type Team = z.infer<typeof teamSchema>
