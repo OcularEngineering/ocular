@@ -69,7 +69,7 @@ function SearchesByRole() {
   return (
     <div className="card flex flex-col gap-5 border p-5 rounded-xl hover:shadow-lg flex-grow bg-background">
       <div className='flex flex-col gap-2 items-start'>
-        <h1 className="card-title font-semibold text-xl">Searches by role</h1>
+        <h1 className="card-title font-semibold text-xl">Searches by Role</h1>
         <p className="text-sm text-gray-500">Search distribution by roles</p>
       </div>
       <div className="card-body">
