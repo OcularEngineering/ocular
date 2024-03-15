@@ -1,4 +1,5 @@
-import { AutoflowContainer, Constructor } from "../common"
+import { AutoflowContainer } from "../common"
+import { Constructor } from "@ocular/utils"
 import { Logger } from "../logger"
 
 import {
