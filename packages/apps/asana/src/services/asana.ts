@@ -3,9 +3,9 @@ import axios from 'axios';
 import { Readable } from 'stream';
 import { EntityManager } from "typeorm";
 import { Octokit } from "@octokit/rest";
-import { OAuthService, Organisation } from "@ocular-ai/core-backend";
-import { IndexableDocument, TransactionBaseService, Logger, AppNameDefinitions  } from "@ocular-ai/types";
-import { ConfigModule } from '@ocular-ai/core-backend/src/types';
+import { OAuthService, Organisation } from "@ocular/ocular";
+import { IndexableDocument, TransactionBaseService, Logger, AppNameDefinitions  } from "@ocular/types";
+import { ConfigModule } from "@ocular/ocular/src/types";
 import { App } from "octokit";
 
 

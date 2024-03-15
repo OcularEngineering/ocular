@@ -1,12 +1,10 @@
-import {AbstractBatchJobStrategy } from "@ocular-ai/core-backend/dist/core-backend/src/interfaces"
-import { BatchJobService, Organisation, EventBusService } from "@ocular-ai/core-backend"
-import { EntityManager } from "typeorm"
-import AsanaService from "../services/asana"
-import JobSchedulerService from "@ocular-ai/core-backend"
-import e from "express"
-import { INDEX_DOCUMENT_EVENT } from "@ocular-ai/types"
 
-class AsanaStrategy extends AbstractBatchJobStrategy {
+import { BatchJobService, Organisation, EventBusService } from "@ocular/ocular"
+import AsanaService from "../services/asana"
+import { INDEX_DOCUMENT_EVENT } from "@ocular/types"
+import { AbstractBatchJobStrategy } from "@ocular/types"
+
+export default class AsanaStrategy extends AbstractBatchJobStrategy {
   static identifier = "asana-indexing-strategy"
   static batchType = "asana"
   protected batchJobService_: BatchJobService
@@ -35,5 +33,3 @@ class AsanaStrategy extends AbstractBatchJobStrategy {
     throw new Error("Method not implemented.")
   }
 }
-
-export default AsanaStrategy
