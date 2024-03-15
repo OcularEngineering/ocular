@@ -1,7 +1,8 @@
 const {google} = require('googleapis');
 import randomize from "randomatic"
-import { OauthService, AppNameDefinitions, AppCategoryDefinitions, OAuthToken  } from "@ocular-ai/types"
 import {OAuth2Client} from 'google-auth-library';
+import { OauthService, AppNameDefinitions, AppCategoryDefinitions, OAuthToken  } from "@ocular-ai/types"
+
 
 class GmailOauth extends OauthService {
 
