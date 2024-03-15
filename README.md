@@ -1,21 +1,17 @@
-# AutoflowAi
+<h1 align="center">
+  Ocular AI
+</h1>
 
-Run Apps-Server and CoreUi
-```
-nx run-many --target=serve --projects=apps-server,core-ui
-```
+<h4 align="center">
+  <a href="https://www.useocular.com/">Website</a>
+</h4>
 
-Generate a New App To AppStore 
-```
-nx g @nx/react:remote example-app --directory=packages/apps/example-app
-```
+<p align="center">
+  Building Blocks for Search Platforms.
+</p>
+<p align="center">
+</p>
 
-Publish New App
-```
-cd packages/apps/example-app
-nx publish
-```
+## What is Medusa
 
-Refresh your browser , you should see your new plugin :)
-
-
+Ocular is a set of modules and tools that allow you to build rich, reliable, and performant Generative AI-Powered Search platforms without the need to reinvent Search Architecture.

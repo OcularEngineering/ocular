@@ -1,6 +1,6 @@
 import { IndexableDocument } from '../common';
 import { Writable } from 'stream';
-import { AutoflowAiError} from "@ocular-ai/utils"
+import { AutoflowAiError} from "@ocular/utils"
 
 export type BatchSearchEngineOptions = {
   batchSize: number;

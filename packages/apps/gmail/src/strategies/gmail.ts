@@ -1,10 +1,10 @@
-import {AbstractBatchJobStrategy } from "@ocular-ai/core-backend/dist/core-backend/src/interfaces"
-import { BatchJobService, Organisation, EventBusService } from "@ocular-ai/core-backend"
+
 import { EntityManager } from "typeorm"
+import { BatchJobService, Organisation, EventBusService } from "@ocular/ocular"
 import GmailService from "../services/gmail"
-import JobSchedulerService from "@ocular-ai/core-backend"
+import JobSchedulerService from "@ocular/ocular"
 import e from "express"
-import { INDEX_DOCUMENT_EVENT } from "@ocular-ai/types"
+import { INDEX_DOCUMENT_EVENT, AbstractBatchJobStrategy  } from "@ocular-ai/types"
 
 class GmailStrategy extends AbstractBatchJobStrategy {
   static identifier = "gmail-indexing-strategy"

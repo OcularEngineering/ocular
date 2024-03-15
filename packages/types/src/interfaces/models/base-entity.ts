@@ -3,7 +3,7 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from "typeorm"
-import { resolveDbType } from "@ocular-ai/utils"
+import { resolveDbType } from "@ocular/utils"
 
 /**
  * Base abstract entity for all entities
