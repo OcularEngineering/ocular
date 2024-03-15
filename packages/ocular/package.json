@@ -1,0 +1,34 @@
+{
+  "name": "@ocular/ocular",
+  "version": "1.0.0",
+  "description": "Ocular Core Backend",
+  "packageManager": "npm@6.14.15",
+  "main": "dist/ocular/src/main.js",
+  "keywords": [
+    "core",
+    "backend",
+    "nx"
+  ],
+  "author": "Louis Luxa Murerwa",
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3"
+  },
+  "scripts": {
+    "watch": "tsc --build --watch",
+    "prepublishOnly": "cross-env NODE_ENV=production tsc --build",
+    "build": "rimraf dist && tsc --build",
+    "start": "npm run build && nodemon dist/core-backend/src/main.js",
+    "test": "jest --runInBand --bail --detectOpenHandles --forceExit",
+    "typeorm": "npm run build && typeorm-ts-node-esm -d dist/core-backend/src/data-source.js"
+  },
+  "dependencies": {
+    "@azure/search-documents": "^12.0.0",
+    "@ocular/types": "file:../types",
+    "@ocular/utils": "file:../utils",
+    "algoliasearch": "^4.22.1",
+    "passport-custom": "^1.1.1",
+    "typeorm": "^0.3.20"
+  }
+}

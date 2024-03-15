@@ -1,5 +1,5 @@
 {
-  "name": "@ocular-ai/utils",
+  "name": "@ocular/utils",
   "version": "0.0.0",
   "description": "Ocular utilities functions shared by Ocular CoreBackend and Modules",
   "main": "dist/index.js",
@@ -19,18 +19,18 @@
     "dist"
   ],
   "author": "Louis Luxa Murerwa",
-  "devDependencies": {},
   "dependencies": {
     "knew": "0.0.0",
     "knex": "^3.1.0",
-    "tsc": "^2.0.4",
-    "typeorm": "^0.3.20",
-    "typescript": "^5.3.3"
+    "typeorm": "^0.3.20"
   },
   "scripts": {
     "prepublishOnly": "cross-env NODE_ENV=production tsc --build",
     "build": "rimraf dist && tsc --build",
     "watch": "tsc --build --watch",
     "test": "jest --runInBand --bail --forceExit"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.2"
   }
 }

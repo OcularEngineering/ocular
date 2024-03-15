@@ -1,8 +1,8 @@
 
 import randomize from "randomatic"
 import axios from "axios"
-import { OauthService, AppNameDefinitions, AppCategoryDefinitions, OAuthToken  } from "@ocular-ai/types"
-import { ConfigModule } from '@ocular-ai/core-backend/src/types';
+import { OauthService, AppNameDefinitions, AppCategoryDefinitions, OAuthToken  } from "@ocular/types"
+import { ConfigModule } from "@ocular/ocular/src/types";
 
 class AsanaOauth extends OauthService {
   protected client_id_: string

@@ -4,6 +4,7 @@
     "target": "es5",
     "rootDir": "src",
     "outDir": "./dist",
+    //"strict":true,
     "esModuleInterop": true,
     // "declaration": true,
     "module": "commonjs",
@@ -20,7 +21,7 @@
     // "downlevelIteration": true, // to use ES5 specific tooling
     // "resolveJsonModule": true
   },
-  "include": ["./src/**/*"],
+  "include": ["src"],
   "exclude": [
     "dist",
     "./src/**/__tests__",
