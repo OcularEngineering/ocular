@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "lib": ["es5", "es6", "es2020"],
+    "target": "es5",
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "strictNullChecks": false,
+    // "declaration": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    // "sourceMap": true,
+    // "noImplicitReturns": true,
+    // "strictNullChecks": true,
+    // "strictFunctionTypes": true,
+    // "noImplicitThis": true,
+    // "allowJs": true,
+    "skipLibCheck": true,
+    // "downlevelIteration": true, // to use ES5 specific tooling
+    // "resolveJsonModule": true
+  },
+  "include": ["./src/**/*", "../utils/src/common/is-type.ts", "../utils/src/common/validator.ts"],
+  "exclude": [
+    "./dist/**/*",
+    "./src/**/__tests__",
+    "./src/**/__mocks__",
+    "./src/**/__fixtures__",
+    "node_modules"
+  ]
+}
