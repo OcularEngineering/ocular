@@ -23,6 +23,7 @@
   "dependencies": {
     "@octokit/app": "^14.0.2",
     "@octokit/auth-app": "^6.0.4",
+    "@octokit/rest": "^20.0.2",
     "@ocular/ocular": "*",
     "@ocular/types": "*",
     "@ocular/utils": "*",
