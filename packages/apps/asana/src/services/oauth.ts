@@ -8,23 +8,25 @@ class AsanaOauth extends OauthService {
   protected client_id_: string
   protected client_secret_: string
   protected configModule_: ConfigModule
+  protected redirect_uri_: string
 
   constructor(container, options) {
     super(arguments[0])
     this.client_id_ = options.client_id
     this.client_secret_ = options.client_secret
+    this.redirect_uri_ = options.redirect_uri
     this.configModule_ = container.configModule
   }
 
   static getAppDetails(projectConfig,options) {
     const client_id = options.client_id
     const client_secret = options.client_secret
-    const redirect = `${projectConfig.ui_cors}/oauth/asana`
+    const redirect = options.redirect_uri
     return {
       name: AppNameDefinitions.ASANA,
       logo: "/asana.svg",
       description: "Asana is a web and mobile application designed to help teams organize, track, and manage their work. It's a popular project management tool that enables teams to collaborate more effectively.",
-      oauth_url: `https://app.asana.com/-/oauth_authorize?response_type=code&client_id=${client_id}&state=${randomize('Aa0', 32)}&redirect_uri=https://oauth.pstmn.io/v1/callback`,
+      oauth_url: `https://app.asana.com/-/oauth_authorize?response_type=code&client_id=${client_id}&redirect_uri=${redirect}`,
       slug:AppNameDefinitions.ASANA,
       category:AppCategoryDefinitions.PRODUCTIVITY,
       developer:"Ocular AI",
@@ -76,7 +78,7 @@ class AsanaOauth extends OauthService {
       grant_type: "authorization_code",
       client_id: this.client_id_,
       client_secret: this.client_secret_,
-      redirect_uri: `https://oauth.pstmn.io/v1/callback`,
+      redirect_uri: this.redirect_uri_,
       code: code,
     };
   

@@ -11,7 +11,7 @@ import {
   Min,
   ValidateNested,} from "class-validator"
   import { Type } from "class-transformer"
-import { UserRoles } from "../../../../models/user"
+import { UserRoles } from "@ocular/types"
 import UserService from "../../../../services/user"
 import _ from "lodash"
 import { validator } from "@ocular/utils"

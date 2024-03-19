@@ -7,7 +7,7 @@ import {OAuth2Client} from 'google-auth-library';
 import { ConfigModule } from '@ocular/ocular/src/types';
 import { App } from "octokit";
 import fs from 'fs';
-import { google } from 'googleapis';
+import { google, drive_v3 } from 'googleapis';
 
 export default class GoogleDriveService extends TransactionBaseService {
   protected oauthService_: OAuthService;
@@ -28,70 +28,72 @@ export default class GoogleDriveService extends TransactionBaseService {
 
   async *getGoogleDriveFiles(org: Organisation): AsyncGenerator<IndexableDocument[]> {
       this.logger_.info(`Starting oculation of Google Drive for ${org.id} organisation`);
+     
+      // Check if the OAuth record exists for this App in this Organisation.
       const oauth = await this.oauthService_.retrieve({id: org.id, app_name: AppNameDefinitions.GOOGLEDRIVE});
-      let documents: IndexableDocument[] = [];
-
       if (!oauth) {
         this.logger_.error(`No Google Drive OAuth Cred found for ${org.id} organisation`);
         return;
       }
+
+      // Get the last sync date - this is the time the latest document that was synced from Google Drive.
       let last_sync = ''
-      if(oauth.last_sync!==null){
+      if(oauth.last_sync !== null){
         last_sync =  oauth.last_sync.toISOString();
       }
 
+      // Get the OAuth2Client for the Google Drive App and set the credentials.
       const oauth2Client:OAuth2Client = await this.container_[`${AppNameDefinitions.GOOGLEDRIVE}Oauth`].getOauthCLient();
       oauth2Client.setCredentials({ access_token: oauth.token, refresh_token: oauth.refresh_token});
+      const drive: drive_v3.Drive = await google.drive({ version: 'v3', auth: oauth2Client });
 
-      const drive = await google.drive({ version: 'v3', auth: oauth2Client });
-  
-      // Currently Gets Docs Only But Needs To Be Extended To Get All Files Like Videos, Slides Etc
+      
+      // Array storing the processed documents
+      let documents: IndexableDocument[] = [];
+
       try {
-
-        // Only Sync Files Modified After Last Sync
+        // Only Sync Files Modified After Last Sync.
         let query = "mimeType='application/vnd.google-apps.document'";
         if (last_sync !== '') {
           query += ` and modifiedTime > '${last_sync}'`;
         }
-        const {data} = await drive.files.list({
-          q: query,
-          fields: 'files(id,name,modifiedTime,webViewLink)'
-        });
 
-        // Export Each File As Plain Text
-        for (const file of data.files) {
-          // Export the Google Docs file as plain text
-          let content = await new Promise<string>((resolve, reject) => {
-            let data = '';
-            drive.files.export({
-              fileId: file.id,
-              mimeType: 'text/plain'
-            }, {responseType: 'stream'})
-            .then(response => {
-              response.data
-                .on('data', chunk => data += chunk)
-                .on('end', () => resolve(data))
-                .on('error', reject);
-            })
-            .catch(reject);
+        // Paginate To Get All Files From Google Drive
+        let pageToken = null;
+        do {
+          const { data } = await drive.files.list({
+            q: query,
+            fields: 'files(id,name,modifiedTime,webViewLink)',
+            pageToken: pageToken
           });
-
-          const doc: IndexableDocument = {
-            id: file.id,
-            organisation_id: org.id,
-            title: file.name,
-            source: AppNameDefinitions.GOOGLEDRIVE,
-            content:  content,
-            updated_at: new Date(file.modifiedTime),
-            location: file.webViewLink,
-          };
-          console.log(doc)
-          documents.push(doc);
-        }
-        await this.oauthService_.update(oauth.id, {last_sync: new Date()});
+          // Get the content of each file
+          for(const file of data.files){
+            // Get Each Files Content As Plain Text
+            const content = await this.getGoogleDriveFileContent(file.id, drive);
+            const doc: IndexableDocument = {
+              id: file.id,
+              organisation_id: org.id,
+              title: file.name,
+              source: AppNameDefinitions.GOOGLEDRIVE,
+              content:  content,
+              updated_at: new Date(file.modifiedTime),
+              location: file.webViewLink,
+            };
+            // Batch Documents To Be Yielded To Max 100 At A Time
+            if(documents.length == 100){
+              yield documents;
+              documents = [];
+            }
+            documents.push(doc);
+          }
+          pageToken = data.nextPageToken;
+        } while (pageToken);
+        // Yield The Remaining Documents
         yield documents;
+        // Update the last sync date  for the connector
+        await this.oauthService_.update(oauth.id, {last_sync: new Date()});
       } catch (error) {
-
+        // If the error is an unauthorized error, refresh the token and retry the request
         if (error.response && error.response.status === 401) { // Check if it's an unauthorized error
           this.logger_.info(`Refreshing Asana token for ${org.id} organisation`);
 
@@ -112,5 +114,23 @@ export default class GoogleDriveService extends TransactionBaseService {
         return null;
       }
       this.logger_.info(`Finished oculation of Github for ${org.id} organisation`);
+  }
+
+  // Get The Content Of A Google Drive File
+  async getGoogleDriveFileContent(fileId: string, drive: drive_v3.Drive) {
+    return await new Promise<string>((resolve, reject) => {
+      let data = '';
+      drive.files.export({
+        fileId: fileId,
+        mimeType: 'text/plain'
+      }, {responseType: 'stream'})
+      .then(response => {
+        response.data
+          .on('data', chunk => data += chunk)
+          .on('end', () => resolve(data))
+          .on('error', reject);
+      })
+      .catch(reject);
+    });
   }
 }

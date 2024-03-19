@@ -1,8 +1,7 @@
 import { BeforeInsert, Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne } from "typeorm"
 import { DbAwareColumn, resolveDbType } from "../../../utils/src/db-aware-column"
 
-import { SoftDeletableEntity } from "@ocular/types"
-import { UserRoles } from "./user"
+import { SoftDeletableEntity, UserRoles } from "@ocular/types"
 import { generateEntityId } from "../utils/generate-entity-id"
 import { Organisation } from "./organisation"
 
@@ -16,7 +15,7 @@ export class Invite extends SoftDeletableEntity {
     type: "enum",
     enum: UserRoles,
     nullable: true,
-    enumName: 'UserRoles',
+    default: UserRoles.MEMBER,
   })
   role: UserRoles
 
@@ -38,7 +37,7 @@ export class Invite extends SoftDeletableEntity {
   expires_at: Date
 
   @DbAwareColumn({ type: "jsonb", nullable: true })
-  metadata: Record<string, unknown>
+  metadata?: Record<string, unknown>
 
   /**
    * @apiIgnore

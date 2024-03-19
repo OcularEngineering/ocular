@@ -13,15 +13,16 @@
   "devDependencies": {
     "nodemon": "^3.0.2",
     "rimraf": "^5.0.5",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },
   "scripts": {
     "watch": "tsc --build --watch",
     "prepublishOnly": "cross-env NODE_ENV=production tsc --build",
     "build": "rimraf dist && tsc --build",
-    "start": "npm run build && nodemon dist/core-backend/src/main.js",
+    "start": "npm run build && nodemon dist/ocular/src/main.js",
     "test": "jest --runInBand --bail --detectOpenHandles --forceExit",
-    "typeorm": "npm run build && typeorm-ts-node-esm -d dist/core-backend/src/data-source.js"
+    "typeorm": "npm run build && typeorm-ts-node-esm -d dist/ocular/src/data-source.js"
   },
   "dependencies": {
     "@azure/search-documents": "^12.0.0",

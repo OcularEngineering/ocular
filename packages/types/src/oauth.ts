@@ -4,4 +4,5 @@ export type OAuthToken = {
   token_expires_at?: Date
   refresh_token?: string
   refresh_token_expires_at?: Date
+  metadata?: Record<string, unknown>
 }

@@ -53,7 +53,8 @@ module.exports = {
       options:{
         client_id: process.env.ASANA_CLIENT_ID,
         client_secret: process.env.ASANA_CLIENT_SECRET,
-        scope: "openid email profile"
+        scope: "openid email profile",
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/asana`
       }
     },
     {
@@ -61,7 +62,10 @@ module.exports = {
       options: {
         client_id: process.env.GITHUB_CLIENT_ID,
         client_secret: process.env.GITHUB_CLIENT_SECRET,
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/github`,
         app_id: process.env.GITHUB_APP_ID,
+        private_key: process.env.GITHUB_PRIVATE_KEY_PATH,
+        scope: "repo"
       }
     },
     {
@@ -69,7 +73,7 @@ module.exports = {
       options: {
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: "https://oauth.pstmn.io/v1/callback",
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/google-drive`,
       }
     },
     {
@@ -77,7 +81,7 @@ module.exports = {
       options: {
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: "https://oauth.pstmn.io/v1/callback",
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/gmail`,
       }
     },
   ],

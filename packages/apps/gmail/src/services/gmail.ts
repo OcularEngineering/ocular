@@ -28,130 +28,79 @@ export default class GmailService extends TransactionBaseService {
 
   async *getGmailFiles(org: Organisation): AsyncGenerator<IndexableDocument[]> {
       this.logger_.info(`Starting oculation of Gmail for ${org.id} organisation`);
-      const oauth = await this.oauthService_.retrieve({id: org.id, app_name: AppNameDefinitions.GMAIL});
-      let documents: IndexableDocument[] = [];
 
+      // Check if the OAuth record exists for this App in this Organisation.
+      const oauth = await this.oauthService_.retrieve({id: org.id, app_name: AppNameDefinitions.GMAIL});
       if (!oauth) {
         this.logger_.error(`No Gmail OAuth Cred found for ${org.id} organisation`);
         return;
       }
+
+      // Get the last sync date - this is the time the latest document that was synced from Gmail.
       let last_sync = ''
-      if(oauth.last_sync!==null){
+      if( oauth.last_sync !==null ){
         last_sync =  oauth.last_sync.toISOString();
       }
 
+      // Get the OAuth2Client for the Gmail App and set the credentials.
       const oauth2Client:OAuth2Client = await this.container_[`${AppNameDefinitions.GMAIL}Oauth`].getOauthCLient();
       oauth2Client.setCredentials({ access_token: oauth.token, refresh_token: oauth.refresh_token});
-
       const gmail = google.gmail({version: 'v1', auth: oauth2Client});
-  
-      // Currently Gets Docs Only But Needs To Be Extended To Get All Files Like Videos, Slides Etc
+
+      let documents: IndexableDocument[] = [];
       try {
+       // Only Sync Files Modified After Last Sync.
+        let query = "";
+        if (last_sync !== '') {
+          query += ` and modifiedTime > '${last_sync}'`;
+        }
 
-        const {data} = await gmail.users.messages.list({
-          userId: 'me',
-          labelIds: ['INBOX'],
-        })
+        let nextPageToken = "";
+        do {
+          const {data} = await gmail.users.messages.list({
+            userId: 'me',
+            pageToken: nextPageToken,
+            q: query, 
+          })
 
-        console.log("Gmail Data")
-        console.log(data)
+          for (const message of data.messages) {
+            const {data} = await gmail.users.messages.get({
+              userId: 'me',
+              id: message.id,
+              format: 'full'
+            });
+            const emailData = data;
 
-        // for (const message of data.messages) {
-        //   const {data} = await gmail.users.messages.get({
-        //     userId: 'me',
-        //     id: message.id,
-        //   });
-        //   const emailData = data;
-        //   const headers = emailData.payload.headers;
-        //   const subjectHeader = headers.find(header => header.name === 'Subject');
+            const headers = emailData.payload.headers;
+            const subjectHeader = headers.find(header => header.name === 'Subject');
 
-        //   if (emailData.payload && emailData.payload.parts && emailData.payload.parts.length > 0) {
-        //     const emailBody = emailData.payload.parts[0].body.data;
-        //     if (emailBody) {
-        //       const emailContent = Buffer.from(emailBody, 'base64').toString('utf8');
-        //       const doc: IndexableDocument = {
-        //         id: emailData.id,
-        //         organisation_id: org.id,
-        //         title: subjectHeader.value,
-        //         source: AppNameDefinitions.GMAIL,
-        //         content:  emailContent,
-        //         updated_at: new Date(parseInt(emailData.internalDate)),
-        //         location: `https://mail.google.com/mail/u/0/#inbox/${message.id}`,
-        //       };
-        //        documents.push(doc);
-        //     }
-        //   } 
-
-        //   if(documents.length == 50){
-        //     yield documents;
-        //     documents = [];
-        //   }
-
-        // await this.oauthService_.update(oauth.id, {last_sync: new Date()});
-        // yield documents;
-        // }
-        // await this.oauthService_.update(oauth.id, {last_sync: new Date()});
-      
-        
-    
-        //   const messages = data.messages;
-        //   if (messages) {
-        //     messages.forEach((message) => {
-        //       // documents.push(doc);
-        //       gmail.users.messages.get({
-        //         userId: 'me',
-        //         id: message.id,
-        //       }, (err, res) => {
-        //         if (err) return console.log('The API returned an error: ' + err);
-        //         const emailData = res.data;
-             
-                
-        //         const headers = emailData.payload.headers;
-        //         const subjectHeader = headers.find(header => header.name === 'Subject');
-
-        //         if (emailData.payload && emailData.payload.parts && emailData.payload.parts.length > 0) {
-        //           const emailBody = emailData.payload.parts[0].body.data;
-        //           if (emailBody) {
-        //             const emailContent = Buffer.from(emailBody, 'base64').toString('utf8');
-        //             console.log(`Email ID: ${emailData.id}`);
-        //             console.log(`Email Subject: ${subjectHeader.value}`);
-        //             console.log(`Email Content: ${emailContent}`);
-
-
-
-        //           const doc: IndexableDocument = {
-        //           id: emailData.id,
-        //           organisation_id: org.id,
-        //           title: subjectHeader.value,
-        //           source: AppNameDefinitions.GMAIL,
-        //           content:  emailContent,
-        //           updated_at: new Date(parseInt(emailData.internalDate)),
-        //           location: `https://mail.google.com/mail/u/0/#inbox/${message.id}`,
-        //         };
-        //          documents.push(doc);
-
-              
-
-        //         } else {
-        //           console.log('No email body found.');
-        //         }
-              
-        //         } else {
-        //           console.log('No email body found.');
-        //         }
-        //     });
-
-
-       
-
-        //     });
+            if (emailData.payload && emailData.payload.parts && emailData.payload.parts.length > 0) {
+              const emailBody = emailData.payload.parts[0].body.data;
+              if (emailBody) {
+                const emailContent = Buffer.from(emailBody, 'base64').toString('utf8');
+                const doc: IndexableDocument = {
+                  id: emailData.id,
+                  organisation_id: org.id,
+                  title: subjectHeader.value,
+                  source: AppNameDefinitions.GMAIL,
+                  content:  emailContent,
+                  updated_at: new Date(parseInt(emailData.internalDate)),
+                  location: `https://mail.google.com/mail/u/0/#inbox/${message.id}`,
+                };
+                 documents.push(doc);
+                 if (documents.length >= 100) {
+                   yield documents;
+                   documents = [];
+                 }
+              }
+            } 
+          }
           
-        //   } else {
-        //     console.log('No messages found.');
-        //   }
-        // });
-        // await this.oauthService_.update(oauth.id, {last_sync: new Date()});
-        // yield documents;
+          nextPageToken = data.nextPageToken;
+        } while(nextPageToken);
+        yield documents;
+        // Update the last sync date  for the connector
+        await this.oauthService_.update(oauth.id, {last_sync: new Date()});
       } catch (error) {
 
         if (error.response && error.response.status === 401) { // Check if it's an unauthorized error

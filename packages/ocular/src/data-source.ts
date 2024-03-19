@@ -52,6 +52,7 @@ const getDataSource = async (directory) => {
     customOptions: {
       migrations: coreMigrations,
       logging: "all",
+      generateMigration: true,
     },
   })
 }

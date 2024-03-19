@@ -8,23 +8,23 @@ After following the above instructions to log in to Infiscal.
 
 Start The Core Backend With Infisical As The Secrets Manager. It automatically injects the secrets into the BackEnd Process.
 
-infisical run -- npm run start
+infisical run --env=dev turbo start
 
 # CoreBackend Configuration
 
 
 # Add or Modify DataBase Models
 Generate Migrations
-npm run typeorm migration:generate  src/migrations/adduserandorganisation
+ infisical run --env=dev npm run typeorm migration:generate  src/migrations/adduserandorganisation
 
 Build Source Migration
-npm run build
+ npm run build
 
 Run Migration
-npm run typeorm migration:run
+ infisical run --env=dev npm run typeorm migration:run
 
 Revert 
-npm run typeorm migration:revert
+ infisical run --env=dev npm run typeorm migration:revert
 
 
 ## Development

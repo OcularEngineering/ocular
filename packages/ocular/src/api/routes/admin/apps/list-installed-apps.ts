@@ -8,10 +8,10 @@ export default async (req, res) => {
   const organisationService: OrganisationService = req.scope.resolve("organisationService")
   const org = await organisationService.listInstalledApps()
   if (!org) {
-    res.status(404).json({ message: "No organisation found" })
+    return res.status(404).json({ message: "No organisation found" })
   }
   if (!org.installed_apps) {
-    res.status(200).json({ apps: []})
+    return res.status(200).json({ apps: []})
   }
-  res.status(200).json({ apps: org.installed_apps })
+  return res.status(200).json({ apps: org.installed_apps })
 }
