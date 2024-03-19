@@ -1,26 +1,9 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, BeforeInsert, JoinTable, ManyToMany } from "typeorm"
 import { Organisation } from "./organisation";
-import { BaseEntity } from "@ocular/types";
+import { BaseEntity, UserRoles  } from "@ocular/types";
 import { DbAwareColumn } from "../../../utils/src/db-aware-column";
 import { generateEntityId } from "../utils/generate-entity-id";
 import { Team } from "./team";
-
-/**
- * @enum
- * 
- * The user's role.
- */
-export enum UserRoles {
-  /**
-   * The user is an admin.
-   */
-  ADMIN = "admin",
-  /**
-   * The user is a team member.
-   */
-  MEMBER = "member",
-}
-
 @Entity()
 export class User extends BaseEntity {
   @DbAwareColumn({

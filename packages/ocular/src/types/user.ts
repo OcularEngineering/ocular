@@ -1,4 +1,5 @@
-import { User, UserRoles } from "../models/user"
+import { User } from "../models/user"
+import { UserRoles } from "@ocular/types"
 import { PartialPick } from "../types/common"
 import { CreateOrganisationInput } from "./organisation"
 

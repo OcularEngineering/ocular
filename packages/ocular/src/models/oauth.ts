@@ -17,7 +17,7 @@ export class OAuth extends BaseEntity {
     type: "enum",
     enum: AppNameDefinitions,
     nullable: false,
-    unique: true
+    unique: false
   })
   app_name: AppNameDefinitions
 
@@ -41,6 +41,9 @@ export class OAuth extends BaseEntity {
  
   @Column({ type: "varchar", nullable: true })
   organisation_id: string;
+
+  @DbAwareColumn({ type: "jsonb", nullable: true })
+  metadata?: Record<string, unknown> | null
 
   @ManyToOne(() => Organisation, (organisation) => organisation.members)
   @JoinColumn({ name: 'organisation_id', referencedColumnName: 'id' })

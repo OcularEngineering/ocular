@@ -6,7 +6,7 @@ import { FindConfig } from "../types/common"
 import { buildQuery} from "../utils/build-query"
 import {CreateOrganisationInput, FilterableOrganisationProps, UpdateOrganisationInput} from "../types/organisation"
 import { isDefined} from "../utils/is-defined"
-import {AutoflowAiError} from "@ocular/utils"
+import {AutoflowAiError, AutoflowAiErrorTypes} from "@ocular/utils"
 import { AppNameDefinitions } from "@ocular/types"
 import { AppRepository } from "../repositories"
 
@@ -36,7 +36,6 @@ class OrganisationService extends TransactionBaseService {
     } catch (e) {
       // avoid errors when backend first runs
     }
-
   }
 
 
@@ -87,6 +86,14 @@ class OrganisationService extends TransactionBaseService {
   async installApp(name: AppNameDefinitions): Promise<Organisation> {
     return await this.atomicPhase_(
       async (transactionManager: EntityManager) => {
+           // Check If The User Generating the Token Belongs To An Organisation
+        if(!this.loggedInUser_ || !this.loggedInUser_.organisation){
+          throw new AutoflowAiError(
+            AutoflowAiErrorTypes.NOT_FOUND,
+            `User must belong to an "organisation" so as to add OAuth`
+          )
+        }
+
         const appRepository = transactionManager.withRepository(
           this.appRepository_
         )
@@ -99,7 +106,7 @@ class OrganisationService extends TransactionBaseService {
             `${app} must be defined to be installed`
           )
         }
-      const organisation = await this.organisationRepository_.findOne({where: { id: "org_01HKQP19S8C74S1HGP9AK07PBZ"}} );
+      const organisation = await this.organisationRepository_.findOne({where: { id: this.loggedInUser_.organisation_id }} );
       if(!organisation){
         throw new AutoflowAiError(
           AutoflowAiError.Types.NOT_FOUND,
@@ -115,13 +122,13 @@ class OrganisationService extends TransactionBaseService {
 
   async listInstalledApps(): Promise<Organisation> {
 
-    // if(!this.loggedInUser_ || !this.loggedInUser_.organisation){
-    //   throw new AutoflowAiError(
-    //     AutoflowAiError.Types.NOT_FOUND,
-    //     `User must belong to an "organisation" so as to get components`
-    //   )
-    // }
-    return  await this.organisationRepository_.findOne({where: { id:  "org_01HKQP19S8C74S1HGP9AK07PBZ"}} );
+    if(!this.loggedInUser_ || !this.loggedInUser_.organisation){
+      throw new AutoflowAiError(
+        AutoflowAiError.Types.NOT_FOUND,
+        `User must belong to an "organisation" so as to get components`
+      )
+    }
+    return  await this.organisationRepository_.findOne({where: { id: this.loggedInUser_.organisation_id}} );
   }
 
   async update(org_id: string , data: UpdateOrganisationInput): Promise<Organisation> {

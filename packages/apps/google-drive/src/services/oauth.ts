@@ -57,7 +57,6 @@ class GoogleDriveOauth extends OauthService {
 
   async refreshToken(refresh_token: string): Promise<OAuthToken> {
     try {
-      
       await this.oauth2Client_.setCredentials({ refresh_token: refresh_token });
       const newToken = await this.oauth2Client_.refreshAccessToken();
       const accessToken = newToken.credentials.access_token;

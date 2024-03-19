@@ -2,7 +2,7 @@ import { IsEmail, IsEnum } from "class-validator"
 
 import { InviteService }from "../../../../services"
 import { EntityManager } from "typeorm"
-import { UserRoles } from "../../../../models/user"
+import { UserRoles } from "@ocular/types"
 import { validator } from "@ocular/utils"
 
 
