@@ -14,13 +14,12 @@ export default (app, container, config) => {
   
   // Create User Routes Admin Routes
   users(route)
-  apps(route)
 
   // Authenticated routes
   route.use(middlewares.authenticateAdmin())
   route.use(middlewares.registeredLoggedinUser)
 
-
+  apps(route)
   // components(route)
   invites(route)
   // search(route)

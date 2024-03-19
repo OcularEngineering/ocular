@@ -91,7 +91,8 @@ class OAuthService extends TransactionBaseService {
 
   async generateToken(
     name: string,
-    code: string
+    code: string,
+    installationId?: string
   ): Promise<OAuth> {
 
     // Check If The User Generating the Token Belongs To An Organisation
@@ -111,8 +112,6 @@ class OAuthService extends TransactionBaseService {
       )
     }
 
- 
-
     const service = this.container_[`${app.name}Oauth`]
     if (!service) {
       throw new AutoflowAiError(
@@ -121,9 +120,7 @@ class OAuthService extends TransactionBaseService {
       )
     }
 
-    const token: OAuthToken = await service.generateToken(code)
-
-    console.log("TOKEN GENERATED", token)
+    const token: OAuthToken = await service.generateToken(code, installationId)
 
     const oauth = this.oauthRepository_.find({
       where: {
@@ -146,13 +143,14 @@ class OAuthService extends TransactionBaseService {
       token_expires_at: token.token_expires_at, 
       refresh_token: token.refresh_token, 
       refresh_token_expires_at: token.refresh_token_expires_at,  
-      organisation: this.loggedInUser_.organisation, app_name: app.name
+      organisation: this.loggedInUser_.organisation, app_name: app.name,
+      metadata: token.metadata
     })
     .then(async (result) => {
       await this.eventBus_.emit(
-        `${OAuthService.Events.TOKEN_GENERATED}.${app.name}`,{
+        OAuthService.Events.TOKEN_GENERATED,{
           organisation: this.loggedInUser_.organisation,
-          token: token
+          app_name: app.name,
         }
       )
       return result

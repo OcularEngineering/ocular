@@ -13,6 +13,7 @@ import { SearchEngineOptions } from "../types/search/options"
 import api from "../api"
 import IndexerScript from "../scripts/indexer"
 import { SEARCH_INDEX_EVENT } from "../loaders/search"
+import  OAuthService  from "../services/oauth"
 
 
 type InjectedDependencies = {
@@ -49,7 +50,8 @@ class SearchIndexingSubscriber {
     this.logger_ = logger
     this.searchIndexClient_ = new SearchIndexClient(configModule.projectConfig.search_engine_options.endpoint, new AzureKeyCredential(configModule.projectConfig.search_engine_options.apiKey))
     this.eventBusService_.subscribe(SEARCH_INDEX_EVENT, this.buildSearchIndex)
-    this.eventBusService_.subscribe(INDEX_DOCUMENT_EVENT, this.registerIndexDocumentJobHandler )
+    this.eventBusService_.subscribe(INDEX_DOCUMENT_EVENT, this.registerIndexDocumentJobHandler)
+    this.eventBusService_.subscribe(OAuthService.Events.TOKEN_GENERATED, this.addSearchIndexingJob)
   }
 
   // Schedules Jobs That Build The Search Indexes For The Organisations in Ocular
@@ -58,7 +60,7 @@ class SearchIndexingSubscriber {
       const orgs: Organisation[] =  await this.organisationService_.list({})
       orgs.forEach((org) => {
         if (!org.installed_apps) return;
-        this.jobSchedulerService_.create(`Sync Apps Data for ${org.name}`, {org: org}, "* * * * *", async () => {
+        this.jobSchedulerService_.create(`Sync Apps Data for ${org.name}`, {org: org}, "*/10 * * * *", async () => {
           org.installed_apps.forEach((app) => {
             console.log(app.name)
             switch (app.name) {
@@ -100,22 +102,22 @@ class SearchIndexingSubscriber {
               //   this.batchJobService_.create(jobProps)
               //   break;
               // }
-               case AppNameDefinitions.GMAIL: {
-                console.log("Creating GMAIL Job")
-                const jobProps: BatchJobCreateProps = {
-                    type: "gmail",
-                    context: {
-                        org: org
-                    },
-                    // created_by: "system",
-                    dry_run: false,
-                }
-                this.batchJobService_.create(jobProps)
-                break;
-              }
-              default: {
-                //this.logger_.error(`App ${app.name} not supported for indexing`)
-              }
+              //  case AppNameDefinitions.GMAIL: {
+              //   console.log("Creating GMAIL Job")
+              //   const jobProps: BatchJobCreateProps = {
+              //       type: "gmail",
+              //       context: {
+              //           org: org
+              //       },
+              //       // created_by: "system",
+              //       dry_run: false,
+              //   }
+              //   this.batchJobService_.create(jobProps)
+              //   break;
+              // }
+              // default: {
+              //   //this.logger_.error(`App ${app.name} not supported for indexing`)
+              // }
           }
           })
       })
@@ -125,12 +127,29 @@ class SearchIndexingSubscriber {
   registerIndexDocumentJobHandler = async (data:IndexableDocument[]): Promise<void> => {
     try{
     if(data.length == 0) return;
-    const org = await this.organisationService_.retrieve(data[0].organisation_id)
-    const indexer = await new IndexerScript({searchIndexClient:this.searchIndexClient_, configModule: this.configModule_, organisation:org, logger: this.logger_ })
-    await indexer.index(data)
+      console.log("Indexing Data", data.length)
+      console.log(data[0])
+      const org = await this.organisationService_.retrieve(data[0].organisation_id)
+      const indexer = await new IndexerScript({searchIndexClient:this.searchIndexClient_, configModule: this.configModule_, organisation:org, logger: this.logger_ })
+      await indexer.index(data)
     }catch(e){
       console.error(e)
     }
+  }
+
+  addSearchIndexingJob = async (data): Promise<void> => {
+    const {organisation,app_name} = data
+    this.jobSchedulerService_.create(`Sync Apps Data for ${organisation.name}`, {org: organisation}, "* * * * *", async () => {
+        const jobProps: BatchJobCreateProps = {
+            type: app_name,
+            context: {
+                org: organisation
+            },
+            // created_by: "system",
+            dry_run: false,
+        }
+        this.batchJobService_.create(jobProps)
+      })
   }
 }
 

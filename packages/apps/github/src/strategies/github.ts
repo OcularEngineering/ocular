@@ -1,17 +1,10 @@
-import {AbstractBatchJobStrategy } from "@ocular/ocular"
-import { BatchJobService, Organisation, EventBusService } from "../../../../ocular-backend"
+import {AbstractBatchJobStrategy } from "@ocular/types"
+import { BatchJobService, Organisation, EventBusService } from "@ocular/ocular"
 import { EntityManager } from "typeorm"
 import GitHubService from "../services/github"
 import JobSchedulerService from "@ocular/ocular"
 import e from "express"
 import { INDEX_DOCUMENT_EVENT } from "@ocular-ai/types"
-
-// async scheduleJob<T>(
-//   eventName: string,
-//   data: T,
-//   schedule: string,
-//   options?: CreateJobOptions
-// ): Promise<Job> {
 
 class GithubStrategy extends AbstractBatchJobStrategy {
   static identifier = "github-indexing-strategy"
@@ -30,26 +23,23 @@ class GithubStrategy extends AbstractBatchJobStrategy {
   async processJob(batchJobId: string): Promise<void> {
     console.log("Processing Github Indexing Job", batchJobId)
 
-    // const batchJob = await this.batchJobService_.retrieve(batchJobId)
+    const batchJob = await this.batchJobService_.retrieve(batchJobId)
 
-    // const stream = await this.githubService_.getRepositoriesOcular(batchJob.context?.org as Organisation)
+    const stream = await this.githubService_.getRepositoriesOcular(batchJob.context?.org as Organisation)
 
-    // stream.on('data', (documents) => {
-    //   this.eventBusService_.emit(INDEX_DOCUMENT_EVENT, documents)
-    // });
+    stream.on('data', (documents) => {
+      this.eventBusService_.emit(INDEX_DOCUMENT_EVENT, documents)
+    });
 
 
-    // stream.on('end', () => {
-    //   console.log('No more data');
-    // });
+    stream.on('end', () => {
+      console.log('No more data');
+    });
   }
 
   buildTemplate(): Promise<string> {
     throw new Error("Method not implemented.")
   }
-
-  protected manager_: EntityManager
-  protected transactionManager_: EntityManager
 
 }
 

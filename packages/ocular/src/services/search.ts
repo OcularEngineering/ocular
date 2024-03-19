@@ -202,7 +202,7 @@ class SearchService extends AbstractSearchService {
     // },
     filter: filter,
     select: ["title","source","content","updated_at","location"],
-    top: 3,
+    top: 10,
     // queryType: "semantic",
     // semanticSearchOptions: {
     //   answers: {

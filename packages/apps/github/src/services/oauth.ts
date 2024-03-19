@@ -2,30 +2,35 @@ import axios from "axios"
 import randomize from "randomatic"
 import { OauthService, AppNameDefinitions, AppCategoryDefinitions, OAuthToken  } from "@ocular-ai/types"
 import { config } from "process"
-import { Octokit } from "@octokit/rest"
+const { createAppAuth } = require("@octokit/auth-app");
+import fs from 'fs';
 
 class GithubOauth extends OauthService {
 
   protected client_id_: string
   protected client_secret_: string
+  protected redirect_uri_: string
+  protected app_id_: string
+  protected private_key_: string
 
   constructor(container, options) {
     super(arguments[0])
     this.client_id_ = options.client_id
     this.client_secret_ = options.client_secret
-  }
+    this.redirect_uri_ = options.redirect_uri
+    this.app_id_ = options.app_id
+    this.private_key_ = options.private_key
+   }
 
-  static getAppDetails(projectConfig,options) {
+   static getAppDetails(projectConfig,options) {
     const client_id = options.client_id
     const client_secret = options.client_secret
-    const redirect = `${projectConfig.ui_cors}oauth/github`
-    console.log("GitHub Oauth", client_id, client_secret, redirect)
+    const redirect = options.redirect_uri
     return {
       name: AppNameDefinitions.GITHUB,
       logo: "/github.svg",
       description: "GitHub is a web code hosting platform for version control and collaboration. It lets you and others work together on projects from anywhere.",
-      install_url: `https://github.com/apps/ocular-ai/installations/new`,
-      oauth_url: `https://github.com/login/oauth/authorize?client_id=${client_id}`,
+      oauth_url: `https://github.com/apps/ocular-ai/installations/new`,
       slug:AppNameDefinitions.GITHUB,
       category:AppCategoryDefinitions.SOTWARE_DEVELOPMENT,
       developer:"Ocular AI",
@@ -36,41 +41,52 @@ class GithubOauth extends OauthService {
     }
   }
 
-  async refreshToken() {
-    // const params = {
-    //   refresh_token: refreshToken,
-    //   client_id: "",
-    //   client_secret: CLIENT_SECRET,
-    // }
 
-    console.log("refreshToken")
+  // async refreshToken(refresh_token: string): Promise<OAuthToken> {
+  //   try {
+  //     await this.oauth2Client_.setCredentials({ refresh_token: refresh_token });
+  //     const newToken = await this.oauth2Client_.refreshAccessToken();
+  //     const accessToken = newToken.credentials.access_token;
+  //     return {
+  //       token : accessToken,
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //     throw error;
+  //   }
+  // }
 
-    // const data = await Brightpearl.refreshToken(this.account_, params)
-    return "refreshToken"
-  }
-
-  async generateToken(code: string): Promise<OAuthToken> {
+  async generateToken(code: string, installation_id?:string): Promise<OAuthToken> {
     try {
-      const response = await axios.post('https://github.com/login/oauth/access_token', {
-        client_id: this.client_id_,
-        client_secret: this.client_secret_,
-        code: code
-      }, {
-        headers: {
-          accept: 'application/json'
+      const auth = new createAppAuth({
+        appId: this.app_id_,
+        installationId: installation_id,
+        privateKey: fs.readFileSync(this.private_key_, "utf-8"),
+        oauth:{
+          clientId: this.client_id_,
+          clientSecret: this.client_secret_,
         }
       });
-  
-      if (response.data.error) {
-        throw new Error(`Failed to get access token: ${response.data.error_description}`);
-      }
 
+      // Check With Server That The Installaion ID is Valid.
+      const appAuthentication = await auth({ type: "app" });
+      const response = await axios.post(`https://api.github.com/app/installations/${installation_id}/access_tokens`, {}, {
+          headers: {
+            'Accept': 'application/vnd.github+json',
+            'Authorization': `Bearer ${appAuthentication.token}`,
+            'X-GitHub-Api-Version': '2022-11-28'
+          }
+        });
+    
       return {
-        type: response.data.token_type,
-        token : response.data.access_token,
-        token_expires_at : new Date(Date.now() + response.data.expires_in * 1000),
-        refresh_token: response.data.refresh_token,
-        refresh_token_expires_at: new Date(Date.now() + response.data.refresh_token_expires_in * 1000),
+        type: "Bearer",
+        token : response.data.token,
+        token_expires_at : new Date(response.data.expires_at),
+        refresh_token: "",
+        refresh_token_expires_at: new Date(response.data.expires_at),
+        metadata: {
+          installation_id: installation_id
+        }
       }
     } catch (error) {
       console.error(error);
