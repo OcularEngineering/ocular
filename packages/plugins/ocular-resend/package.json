@@ -18,7 +18,7 @@
       "react-email": "^2.0.0"
    },
    "scripts": {
-      "prepare": "cross-env NODE_ENV=production yarn run build",
+      "prepare": "cross-env NODE_ENV=production npm run build",
       "test": "jest --passWithNoTests src",
       "build": "tsc",
       "watch": "tsc --watch"
