@@ -2,7 +2,7 @@
 
 import { EntityManager } from "typeorm"
 import { Octokit } from "@octokit/rest"
-import {  AppNameDefinitions , IEventBusService } from "@ocular-ai/types"
+import {  AppNameDefinitions , IEventBusService } from "@ocular/types"
 import { App, OrganisationService } from "@ocular/ocular"
 import  GitHubService  from "../services/github"
 

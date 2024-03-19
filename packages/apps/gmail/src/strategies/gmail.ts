@@ -4,7 +4,7 @@ import { BatchJobService, Organisation, EventBusService } from "@ocular/ocular"
 import GmailService from "../services/gmail"
 import JobSchedulerService from "@ocular/ocular"
 import e from "express"
-import { INDEX_DOCUMENT_EVENT, AbstractBatchJobStrategy  } from "@ocular-ai/types"
+import { INDEX_DOCUMENT_EVENT, AbstractBatchJobStrategy  } from "@ocular/types"
 
 class GmailStrategy extends AbstractBatchJobStrategy {
   static identifier = "gmail-indexing-strategy"

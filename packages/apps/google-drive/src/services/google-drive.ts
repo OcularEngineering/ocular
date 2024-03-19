@@ -2,7 +2,7 @@ import { Readable } from 'stream';
 import { EntityManager } from "typeorm";
 import { Octokit } from "@octokit/rest";
 import { OAuthService, Organisation } from "@ocular/ocular";
-import { IndexableDocument, TransactionBaseService, Logger, AppNameDefinitions  } from "@ocular-ai/types";
+import { IndexableDocument, TransactionBaseService, Logger, AppNameDefinitions  } from "@ocular/types";
 import {OAuth2Client} from 'google-auth-library';
 import { ConfigModule } from '@ocular/ocular/src/types';
 import { App } from "octokit";

@@ -2,8 +2,8 @@ import { Resend } from 'resend'
 import Handlebars from 'handlebars'
 import path from 'path'
 import fs from 'fs'
-import  { AbstractNotificationService } from '@ocular-ai/types'
-import {AutoflowAiError, AutoflowAiErrorTypes} from "@ocular-ai/utils"
+import  { AbstractNotificationService } from '@ocular/types'
+import {AutoflowAiError, AutoflowAiErrorTypes} from "@ocular/utils"
 import {UserService} from '@ocular/ocular'
 import { Sign } from 'crypto'
 import SignUpEmail from '../templates/emails/signup'
