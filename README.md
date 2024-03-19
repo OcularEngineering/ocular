@@ -12,6 +12,6 @@
 <p align="center">
 </p>
 
-## What is Medusa
+## What is Ocular
 
 Ocular is a set of modules and tools that allow you to build rich, reliable, and performant Generative AI-Powered Search platforms without the need to reinvent Search Architecture.
