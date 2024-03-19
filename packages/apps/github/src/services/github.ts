@@ -2,7 +2,7 @@ import { Readable } from 'stream';
 import { EntityManager } from "typeorm";
 import { App } from "octokit";
 import { OAuthService, Organisation } from "@ocular/ocular";
-import { IndexableDocument, TransactionBaseService, Logger, AppNameDefinitions  } from "@ocular-ai/types";
+import { IndexableDocument, TransactionBaseService, Logger, AppNameDefinitions  } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";;
 import fs from 'fs';
 import e from 'express';

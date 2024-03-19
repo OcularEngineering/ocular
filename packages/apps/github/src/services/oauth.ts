@@ -1,6 +1,6 @@
 import axios from "axios"
 import randomize from "randomatic"
-import { OauthService, AppNameDefinitions, AppCategoryDefinitions, OAuthToken  } from "@ocular-ai/types"
+import { OauthService, AppNameDefinitions, AppCategoryDefinitions, OAuthToken  } from "@ocular/types"
 import { config } from "process"
 const { createAppAuth } = require("@octokit/auth-app");
 import fs from 'fs';

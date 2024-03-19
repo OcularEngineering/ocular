@@ -4,7 +4,7 @@ import { EntityManager } from "typeorm"
 import GitHubService from "../services/github"
 import JobSchedulerService from "@ocular/ocular"
 import e from "express"
-import { INDEX_DOCUMENT_EVENT } from "@ocular-ai/types"
+import { INDEX_DOCUMENT_EVENT } from "@ocular/types"
 
 class GithubStrategy extends AbstractBatchJobStrategy {
   static identifier = "github-indexing-strategy"
