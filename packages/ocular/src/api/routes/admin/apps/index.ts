@@ -24,9 +24,17 @@ export default (app) => {
   //   middlewares.wrap(require("./authorize-app").default)
   // )
   route.get("/",middlewares.wrap(require("./list-apps").default))
+  route.post(
+    "/authorize",
+    middlewares.wrap(require("./authorize-app").default)
+  )
+  route.get(
+    "/installed",
+    middlewares.wrap(require("./list-installed-apps").default)
+  )
   return app
 }
 
-// export * from "../oauth/authorize-app"
+export * from "./authorize-app"
 // export * from "../organisation/install-app"
 export * from "./list-apps"

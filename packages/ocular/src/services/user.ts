@@ -1,8 +1,8 @@
 import { AutoflowAiError } from "@ocular/utils"
 import Scrypt from "scrypt-kdf"
 import { EntityManager } from "typeorm"
-import { TransactionBaseService } from "@ocular/types"
-import { User, UserRoles } from "../models"
+import { TransactionBaseService, UserRoles } from "@ocular/types"
+import { User } from "../models"
 import { UserRepository } from "../repositories/user"
 import {
     CreateUserInput, FilterableUserProps, UserRole,
