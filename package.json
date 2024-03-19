@@ -6,7 +6,8 @@
     "packages/utils",
     "packages/types",
     "packages/ocular",
-    "packages/*/*/*"
+    "packages/apps/*",
+    "packages/plugins/*"
   ],
   "scripts": {
     "build": "turbo run build",
