@@ -1,22 +1,20 @@
-import { IEventBusService } from "@ocular/types"
+import { IndexableDocument,AppNameDefinitions, IEventBusService, INDEX_DOCUMENT_EVENT, BatchJobCreateProps  } from "@ocular/types"
 import { defaultSearchIndexingProductRelations, indexTypes } from "../utils/search"
 import OrganisationService from "../services/organisation"
 import { BatchJobService, UserService } from "../services"
 import { Organisation, User } from "../models"
 import JobSchedulerService from "../services/job-scheduler"
-import { AppNameDefinitions } from "@ocular/types"
-import { INDEX_DOCUMENT_EVENT, BatchJobCreateProps } from "@ocular/types"
-import { AzureKeyCredential, SearchClient, SearchIndex, SearchIndexClient} from "@azure/search-documents"
-import { IndexableDocument } from "@ocular/types"
 import { ConfigModule, Logger } from "../types"
 import { SearchEngineOptions } from "../types/search/options"
 import api from "../api"
-import IndexerScript from "../scripts/indexer"
+import IndexerService from "../services/indexer"
 import { SEARCH_INDEX_EVENT } from "../loaders/search"
 import  OAuthService  from "../services/oauth"
+import { orgIdToIndexName } from "@ocular/utils"
 
 
 type InjectedDependencies = {
+  indexerService: IndexerService
   eventBusService: IEventBusService
   batchJobService: BatchJobService
   organisationService: OrganisationService
@@ -26,15 +24,16 @@ type InjectedDependencies = {
 }
 
 class SearchIndexingSubscriber {
+  private readonly indexerService_: IndexerService
   private readonly eventBusService_: IEventBusService
   private readonly batchJobService_: BatchJobService
   private readonly organisationService_: OrganisationService
   private readonly jobSchedulerService_: JobSchedulerService
-  private readonly searchIndexClient_: SearchIndexClient;
   private readonly configModule_: ConfigModule;
   private readonly logger_: Logger
 
   constructor({
+    indexerService,
     eventBusService,
     batchJobService,
     organisationService,
@@ -42,13 +41,12 @@ class SearchIndexingSubscriber {
     configModule,
     logger,
   }: InjectedDependencies) {
+    this.indexerService_ = indexerService
     this.batchJobService_ = batchJobService
     this.organisationService_ = organisationService
     this.eventBusService_ = eventBusService
     this.jobSchedulerService_ = jobSchedulerService
-    this.configModule_ = configModule
     this.logger_ = logger
-    this.searchIndexClient_ = new SearchIndexClient(configModule.projectConfig.search_engine_options.endpoint, new AzureKeyCredential(configModule.projectConfig.search_engine_options.apiKey))
     this.eventBusService_.subscribe(SEARCH_INDEX_EVENT, this.buildSearchIndex)
     this.eventBusService_.subscribe(INDEX_DOCUMENT_EVENT, this.registerIndexDocumentJobHandler)
     this.eventBusService_.subscribe(OAuthService.Events.TOKEN_GENERATED, this.addSearchIndexingJob)
@@ -130,8 +128,9 @@ class SearchIndexingSubscriber {
       console.log("Indexing Data", data.length)
       console.log(data[0])
       const org = await this.organisationService_.retrieve(data[0].organisation_id)
-      const indexer = await new IndexerScript({searchIndexClient:this.searchIndexClient_, configModule: this.configModule_, organisation:org, logger: this.logger_ })
-      await indexer.index(data)
+      // Azure Hybrid Search Indexing
+      await this.indexerService_.createIndex(orgIdToIndexName(org.id))
+      await this.indexerService_.indexDocuments(orgIdToIndexName(org.id), data)
     }catch(e){
       console.error(e)
     }

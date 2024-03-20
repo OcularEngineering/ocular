@@ -6,7 +6,7 @@ import { AzureOpenAIOptions, SearchEngineOptions, SearchOptions } from "../types
 import { ConfigModule, Logger } from "../types"
 import { RegisterOcularParameters } from "../types/ocular/ocular"
 import OrganisationService from "./organisation"
-import IndexerScript from "../scripts/indexer"
+// import IndexerScript from "../scripts/indexer"
 import { pipeline } from "stream"
 import { SearchIndexClient } from "@azure/search-documents"
 import JobSchedulerService from "./job-scheduler"

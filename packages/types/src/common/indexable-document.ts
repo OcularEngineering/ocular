@@ -17,56 +17,15 @@ type Content = {
 
 // Note: Adding a field here requires updating the index definition below.
 export type IndexableDocument = {
-  /*
-  * Unique identifier for the document.
-  */
   id: string;
-
-  /**
-   * The organisation id that owns this doc. 
-   * Note: All docs belonging to a particular organisation are indexed in a single index, so this id shouldnt matter.
-   * However we need this as a last case defense against docs showing the wrong organisation the wrong docs. 
-   * This is a last line of defence.
-   */
   organisation_id: string;
-
- 
-  /**
-    * The primary name of the document (e.g. name, title, identifier, etc).
-    */
   title?: string;
-
   titleVector?: number[]|null;
-
-  /**
-    * The source app of the the document (e.g. "core-backend", "gmail" etc).
-  */
   source?: AppNameDefinitions;
-
- /**
-  * Free-form text of the document (e.g.content, etc).
-  */
- content?: string;
-
- contentVector?: number[] | null;
-
-
- metadata?: string;
-
-  /**
-   * Document Embedding
-   */
-
-  // contentVector?: number[]|null;
- 
-  /**
-    * The date the document was last updated.
-  */
+  content?: string;
+  contentVector?: number[] | null;
+  metadata?: string;
   updated_at?: Date;
-  /**
-    * The relative or absolute URL of the document (target when a search result
-    * is clicked).
-    */
   location?: string;
 };
 
@@ -76,7 +35,6 @@ export type IndexableDocument = {
       name: "id",
       type: "Edm.String" as SearchFieldDataType,
       key: true,
-      searchable: false,
     },
     {
       name: "organisation_id",
@@ -92,15 +50,18 @@ export type IndexableDocument = {
      {
       name: "titleVector",
       type: "Collection(Edm.Single)" as SearchFieldDataType,
+      hidden: false,
       searchable: true,
+      filterable: false,
+      sortable: false,
+      facetable: false,
       vectorSearchDimensions: 1536,
       vectorSearchProfileName: "myHnswProfile",
     },
     { 
       name: "source", 
       type: "Edm.String" as SearchFieldDataType, 
-      searchable: true,
-      sortable: true , 
+      sortable: true, 
       filterable: true
     },
     {
@@ -111,7 +72,11 @@ export type IndexableDocument = {
     {
       name: "contentVector",
       type: "Collection(Edm.Single)" as SearchFieldDataType,
+      hidden: false,
       searchable: true,
+      filterable: false,
+      sortable: false,
+      facetable: false,
       vectorSearchDimensions: 1536,
       vectorSearchProfileName: "myHnswProfile",
     },
