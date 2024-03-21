@@ -257,9 +257,7 @@ function registerStrategies(
   appDetails: AppDetails,
   container: AutoflowContainer): void {
 
-console.log("appDetails.resolve", appDetails.resolve)
 const files = glob.sync(`${appDetails.resolve}/dist/strategies/*.js`, {})
-console.log("files", files)
   files.forEach((fn) => {
     const loaded = require(fn).default
     const name = formatRegistrationName(fn)

@@ -47,11 +47,11 @@ export default class AsanaService extends TransactionBaseService {
           for (const task of tasks) {
             const doc: IndexableDocument = {
               id: task.gid,
-              organisation_id: org.id,
+              organisationId: org.id,
               title: task.name,
               source: AppNameDefinitions.ASANA,
               content: task.notes,
-              updated_at: new Date(task.modified_at),
+              updatedAt: new Date(task.modified_at),
               location: `https://app.asana.com/0/${project.gid}/${task.gid}`,
               metadata: JSON.stringify({ completed: task.completed }) 
             };
@@ -65,11 +65,11 @@ export default class AsanaService extends TransactionBaseService {
           // Add Project To Documents
           const projectDoc:IndexableDocument = {
           id: project.gid,
-          organisation_id: org.id,
+          organisationId: org.id,
           title: project.name,
           source: AppNameDefinitions.ASANA,
           content: project.notes,
-          updated_at: new Date(project.modified_at),
+          updatedAt: new Date(project.modified_at),
           location: `https://app.asana.com/0/${project.gid}`,
           metadata: JSON.stringify({ completed: project.completed }) 
         }

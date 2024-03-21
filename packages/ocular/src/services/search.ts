@@ -6,7 +6,7 @@ import { AzureOpenAIOptions, SearchEngineOptions, SearchOptions } from "../types
 import { ConfigModule, Logger } from "../types"
 import { RegisterOcularParameters } from "../types/ocular/ocular"
 import OrganisationService from "./organisation"
-import IndexerScript from "../scripts/indexer"
+// import IndexerScript from "../scripts/indexer"
 import { pipeline } from "stream"
 import { SearchIndexClient } from "@azure/search-documents"
 import JobSchedulerService from "./job-scheduler"
@@ -201,7 +201,7 @@ class SearchService extends AbstractSearchService {
     //   ],
     // },
     filter: filter,
-    select: ["title","source","content","updated_at","location"],
+    select: ["title","source","content","updatedAt","location"],
     top: 10,
     // queryType: "semantic",
     // semanticSearchOptions: {

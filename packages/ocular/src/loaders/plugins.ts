@@ -15,6 +15,7 @@ import {
 } from "../utils/format-registration-name"
 import {  aliasTo, asValue, asFunction , Lifetime } from "awilix"
 import { AbstractNotificationService, OauthService } from "@ocular/types"
+import { AbstractDocumentProcesserService } from "@ocular/types";
 
 type Options = {
   rootDirectory: string
@@ -176,13 +177,11 @@ export async function registerServices(
   pluginDetails: PluginDetails,
   container: AutoflowContainer
 ): Promise<void> {
-
   const files = glob.sync(`${pluginDetails.resolve}/dist/services/[!__]*.js`, {})
   await promiseAll(
     files.map(async (fn) => {
       const loaded = require(fn).default
       const name = formatRegistrationName(fn)
-
       if (typeof loaded !== "function") {
         throw new Error(
           `Cannot register ${name}. Make sure to default export a service class in ${fn}`
@@ -217,8 +216,6 @@ export async function registerServices(
           })
         )
 
-   
-
         // Add the service directly to the container in order to make simple
         // resolution if we already know which notification provider we need to use
         container.register({
@@ -230,7 +227,16 @@ export async function registerServices(
           ),
           [`noti_${loaded.identifier}`]: aliasTo(name),
         })
-      }else {
+      } else if (AbstractDocumentProcesserService.isDocumentProcessorService(loaded.prototype)) {
+        container.register({
+          [name]: asFunction(
+            (cradle) => new loaded(cradle, pluginDetails.options),
+            {
+              lifetime: loaded.LIFE_TIME || Lifetime.SINGLETON,
+            }
+          ),
+        })
+      } else {
         container.register({
           [name]: asFunction(
             (cradle) => new loaded(cradle, pluginDetails.options),

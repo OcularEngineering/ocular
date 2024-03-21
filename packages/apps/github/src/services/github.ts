@@ -66,11 +66,11 @@ export default class GitHubService extends TransactionBaseService {
           for(const pr of prs.data) {
             const doc: IndexableDocument = {
               id: String(pr.id),
-              organisation_id: org.id,
+              organisationId: org.id,
               title: pr.title,
               source: AppNameDefinitions.GITHUB,
               content: pr.body,
-              updated_at: new Date(pr.updated_at),
+              updatedAt: new Date(pr.updated_at),
               location: pr.html_url,
               metadata: JSON.stringify({ state: pr.state }) 
             };
@@ -93,11 +93,11 @@ export default class GitHubService extends TransactionBaseService {
           for(const issue of issues.data) {
             const doc: IndexableDocument = {
               id: String(issue.id),
-              organisation_id: org.id,
+              organisationId: org.id,
               title: issue.title,
               source: AppNameDefinitions.GITHUB,
               content: issue.body,
-              updated_at: new Date(issue.updated_at),
+              updatedAt: new Date(issue.updated_at),
               location: issue.html_url,
               metadata: JSON.stringify({ state: issue.state }) 
             };
@@ -110,11 +110,11 @@ export default class GitHubService extends TransactionBaseService {
         // Add Repository To Documents
         const repoDoc:IndexableDocument = {
           id: String(repo.id),
-          organisation_id: org.id,
+          organisationId: org.id,
           title: repo.name,
           content: repo.description,
           source: AppNameDefinitions.GITHUB,
-          updated_at: new Date(repo.updated_at),
+          updatedAt: new Date(repo.updated_at),
           location: repo.html_url
         }
         documents.push(repoDoc); 
