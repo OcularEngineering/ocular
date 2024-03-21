@@ -177,7 +177,7 @@ export default class EventBusModule extends AbstractEventBusModuleService {
 
       job.data.completedSubscriberIds = updatedCompletedSubscribers
 
-      await job.update(job.data)
+      await job.updateData(job.data)
 
       const errorMessage = `One or more subscribers of ${eventName} failed. Retrying...`
 

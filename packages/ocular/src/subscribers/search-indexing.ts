@@ -127,8 +127,7 @@ class SearchIndexingSubscriber {
     if(data.length == 0) return;
       console.log("Indexing Data", data.length)
       console.log(data[0])
-      const org = await this.organisationService_.retrieve(data[0].organisation_id)
-      // Azure Hybrid Search Indexing
+      const org = await this.organisationService_.retrieve(data[0].organisationId)
       await this.indexerService_.createIndex(orgIdToIndexName(org.id))
       await this.indexerService_.indexDocuments(orgIdToIndexName(org.id), data)
     }catch(e){

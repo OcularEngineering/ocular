@@ -101,6 +101,9 @@ module.exports = {
         api_key: "",
         from: "onboarding@useocular.com",
       }
-    }
+    },
+    {
+      resolve: `ocular-document-processor`,
+    },
   ]
 };
