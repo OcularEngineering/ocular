@@ -7,8 +7,12 @@ export default {
       const path = `/admin/oauth`
       return ocularRequest("POST", path, data)
     },
+    authorizeApp(data) {
+      const path = `/admin/apps/authorize`
+      return ocularRequest("POST", path, data)
+    },
     listInstalled() {
-      const path = `/admin/oauth`
+      const path = `/admin/apps/installed`
       return ocularRequest("GET", path)
     },
     list() {

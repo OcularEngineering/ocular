@@ -68,4 +68,6 @@ export interface Integration {
   overview: string
   website: string
   docs: string
+  oauth_url: string
+  install_url: string
 }

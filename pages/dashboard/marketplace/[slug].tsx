@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { marked } from 'marked';
 import Head from 'next/head';
@@ -16,8 +16,9 @@ import { IconChevronLeft, IconExternalLink } from '@supabase/ui';
 function Integration() {
 
   const [integration, setIntegration] = useState<Integration | null>(null);
+  const [authorized, setAuthorized] = useState(false);
   const router = useRouter();
-  const { slug } = router.query;
+  let { slug, code, installation_id } = router.query;
 
   useEffect(() => {
 
@@ -27,7 +28,7 @@ function Integration() {
       try {
         const response = await api.apps.list(); // Adjust this to match your actual API call
 
-        const fetchedIntegration = response.data.apps.find(app => app.slug === slug);
+        const fetchedIntegration = response.data.apps.find(app => app.name === slug);
         if (fetchedIntegration) {
           fetchedIntegration.overview = marked.parse(fetchedIntegration.overview); // Parse markdown content
           setIntegration(fetchedIntegration);
@@ -39,6 +40,42 @@ function Integration() {
 
     fetchIntegration();
   }, [slug]);
+
+    useEffect(() => {
+      const listInstalled = async () => {
+        try {
+          const response = await api.apps.listInstalled(); // Adjust this to match your actual API call
+          if (response) {
+           
+            const installed = response.data.apps.some(app => app.name === slug);
+            setAuthorized(installed);
+          }
+        } catch (error) {
+          console.error("Failed to get installe apps", error);
+        }
+      }
+      listInstalled()
+    }, [slug]);
+
+  useEffect(() => {
+    const authorizeApp = async () => {
+      if (code == null ) return; // If OAuth code is not present, return
+      try {
+        const response = await api.apps.authorizeApp({
+          code: code as string,
+          name: slug as string,
+          installationId: installation_id
+        }); // Adjust this to match your actual API call
+        if (response) {
+          setAuthorized(true);
+          router.push(`/dashboard/marketplace/${slug}`); // Redirect to the integration page
+        }
+      } catch (error) {
+        console.error("Failed to authorize integration", error);
+      }
+    }
+    authorizeApp()
+  }, [code,installation_id]);
 
   if (!integration) return <div>Loading...</div>;
 
@@ -54,7 +91,7 @@ function Integration() {
         <SectionContainer>
           {/* Integration details and UI components */}
           <div className="col-span-12 mx-auto mb-2 max-w-5xl space-y-12 lg:col-span-2">
-            <Link href="/marketplace" legacyBehavior>
+            <Link href="/dashboard/marketplace" legacyBehavior>
               <a className="text-scale-1200 hover:text-scale-1000 flex cursor-pointer items-center transition-colors">
                 <IconChevronLeft style={{ padding: 0 }} />
                 Back to Integrations Marketplace
@@ -73,9 +110,16 @@ function Integration() {
                 />
                 <h1 className="font-heading sm:text-2xl md:text-3xl">{integration.name}</h1>
               </div>
-              <Button>Add {integration.name} for Ocular</Button>
+            
+              {authorized? (
+                <Button disabled>Installed</Button>
+              ) : (
+                <Link href={integration.oauth_url}>
+                  <Button>Add {integration.name} for Ocular</Button>
+                </Link>
+              )
+              }
             </div>
-
             {/* Swiper for images */}
             <Swiper
               initialSlide={0}
@@ -176,7 +220,14 @@ function Integration() {
                   </div>
                   
                 </div>
-                <Button>Add {integration.name} for Ocular </Button>
+                 {authorized? (
+                  <Button disabled>Installed</Button>
+                  ) : (
+                  <Link href={integration.oauth_url}>
+                   <Button>Add {integration.name} for Ocular</Button>
+                  </Link>
+              )
+              }
               </div>
             </div>
           </div>
@@ -185,5 +236,6 @@ function Integration() {
     </>
   )
 }
+
 
 export default Integration

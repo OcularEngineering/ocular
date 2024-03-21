@@ -2,8 +2,9 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
+  "/dashboard/search/results": "pages/dashboard/search/results.js",
   "/sign-in": "pages/sign-in.js",
-  "/create-account": "pages/create-account.js",
   "/dashboard/search": "pages/dashboard/search.js",
-  "/dashboard/marketplace": "pages/dashboard/marketplace.js"
+  "/dashboard/marketplace": "pages/dashboard/marketplace.js",
+  "/dashboard/marketplace/[slug]": "pages/dashboard/marketplace/[slug].js"
 }
