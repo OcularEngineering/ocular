@@ -72,11 +72,11 @@ export default class GoogleDriveService extends TransactionBaseService {
             const content = await this.getGoogleDriveFileContent(file.id, drive);
             const doc: IndexableDocument = {
               id: file.id,
-              organisation_id: org.id,
+              organisationId: org.id,
               title: file.name,
               source: AppNameDefinitions.GOOGLEDRIVE,
               content:  content,
-              updated_at: new Date(file.modifiedTime),
+              updatedAt: new Date(file.modifiedTime),
               location: file.webViewLink,
             };
             // Batch Documents To Be Yielded To Max 100 At A Time
