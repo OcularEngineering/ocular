@@ -1,5 +1,5 @@
 {
-   "name": "ocular-resend",
+   "name": "ocular-plugin-openai",
    "version": "0.0.0",
    "description": "Resend PlugIn for Ocular",
    "main": "dist/index.js",

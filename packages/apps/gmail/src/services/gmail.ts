@@ -78,11 +78,11 @@ export default class GmailService extends TransactionBaseService {
                 const emailContent = Buffer.from(emailBody, 'base64').toString('utf8');
                 const doc: IndexableDocument = {
                   id: emailData.id,
-                  organisation_id: org.id,
+                  organisationId: org.id,
                   title: subjectHeader.value,
                   source: AppNameDefinitions.GMAIL,
                   content:  emailContent,
-                  updated_at: new Date(parseInt(emailData.internalDate)),
+                  updatedAt: new Date(parseInt(emailData.internalDate)),
                   location: `https://mail.google.com/mail/u/0/#inbox/${message.id}`,
                 };
                  documents.push(doc);
