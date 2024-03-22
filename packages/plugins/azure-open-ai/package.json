@@ -1,7 +1,7 @@
 {
-   "name": "ocular-plugin-openai",
+   "name": "azure-open-ai",
    "version": "0.0.0",
-   "description": "Resend PlugIn for Ocular",
+   "description": "Ocular Open AI",
    "main": "dist/index.js",
    "types": "dist/index.d.ts",
    "author": "Louis Murerwa",
@@ -19,7 +19,7 @@
    },
    "scripts": {
       "prepare": "cross-env NODE_ENV=production npm run build",
-      "test": "jest --passWithNoTests src",
+      "test": "jest src",
       "build": "tsc",
       "watch": "tsc --watch"
    },

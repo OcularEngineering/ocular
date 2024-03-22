@@ -1,16 +1,34 @@
+import { AutoflowContainer } from '../common';
+import { IndexableDocument,IndexableDocChunk } from '../common/indexable-document';
+import { TransactionBaseService } from './transaction-base-service';
 
+export interface ILLMInterface extends TransactionBaseService {
+  createEmbeddings(text:string): Promise<number[]> ;
+}
 
+/**
+ * @parentIgnore activeManager_,atomicPhase_,shouldRetryTransaction_,withTransaction
+ */
+export abstract class AbstractLLMService
+  extends TransactionBaseService
+  implements ILLMInterface
+{
+  static _isLLM = true
+  static identifier: string
 
-// createEmbeddings
-// createEmbeddingsBatch
-// 
+  static isLLMService(object): boolean {
+    return object?.constructor?._isLLM
+  }
 
-// export type OpenAiService = {
-//   getChat(): Promise<Chat>;
-//   getEmbeddings(): Promise<Embeddings>;
-//   getApiToken(): Promise<string>;
-//   config: {
-//     apiVersion: string;
-//     apiUrl: string;
-//   };
-// };
+  getIdentifier(): string {
+    return (this.constructor as any).identifier
+  }
+
+  protected constructor(
+    protected readonly container: AutoflowContainer,
+    protected readonly config?: Record<string, unknown> // eslint-disable-next-line @typescript-eslint/no-empty-function
+  ) {
+    super(container, config)
+  }
+  abstract createEmbeddings(text:string): Promise<number[]> ;
+}

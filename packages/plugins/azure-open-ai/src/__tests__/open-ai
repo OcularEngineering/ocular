@@ -1,0 +1,37 @@
+import { OpenAI } from 'openai';
+import OpenAIService from '../services/open-ai';
+describe('OpenAIService', () => {
+  let service;
+
+  beforeEach(() => {
+    service = new OpenAIService({}, {
+      open_ai_version: "2023-05-15",
+      endpoint: process.env.AZURE_OPEN_AI_ENDPOINT,
+      embedding_deployment_name: process.env.AZURE_OPEN_AI_EMBEDDER_DEPLOYMENT_NAME,
+      model: process.env.AZURE_OPEN_AI_EMBEDDING_MODEL,
+      open_ai_key: process.env.AZURE_OPEN_AI_KEY
+    });
+  });
+
+  it('should create embeddings', async () => {
+    const doc = { content: 't' };
+    const embeddings = await service.createEmbeddings(doc);
+    expect(embeddings).toEqual([1, 2, 3]);
+    expect(OpenAI).toHaveBeenCalledWith({
+      apiKey: 'test-key',
+      defaultQuery: { 'api-version': 'test-version' },
+      defaultHeaders: { 'api-key': 'test-key' },
+      baseURL: 'test-endpoint/openai/deployments/test-deployment'
+    });
+    expect(service.openai_.embeddings.create).toHaveBeenCalledWith({
+      input: 'test content',
+      model: 'test-model'
+    });
+  });
+
+  it('should return empty array if doc content is not provided', async () => {
+    const doc = {};
+    const embeddings = await service.createEmbeddings(doc);
+    expect(embeddings).toEqual([]);
+  });
+});

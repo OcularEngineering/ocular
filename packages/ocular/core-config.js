@@ -95,15 +95,25 @@ module.exports = {
     // LLM Model 
       // Type Of Plugin: LLM Model
       // -> Backend Cant Start Without A LLM Model Plugin
+    // {
+    //   resolve: `resend`,
+    //   options: {
+    //     api_key: "",
+    //     from: "onboarding@useocular.com",
+    //   }
+    // },
     {
-      resolve: `resend`,
-      options: {
-        api_key: "",
-        from: "onboarding@useocular.com",
-      }
+      resolve: `document-processor`,
     },
     {
-      resolve: `ocular-document-processor`,
+      resolve: `azure-open-ai`,
+      options: {
+        open_ai_key: process.env.AZURE_OPEN_AI_KEY,
+        open_ai_version: "2023-05-15",
+        endpoint: process.env.AZURE_OPEN_AI_ENDPOINT,
+        embedding_deployment_name: process.env.AZURE_OPEN_AI_EMBEDDER_DEPLOYMENT_NAME,
+        embedding_model: process.env.AZURE_OPEN_AI_EMBEDDING_MODEL,
+      }
     },
   ]
 };
