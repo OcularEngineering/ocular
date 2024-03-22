@@ -1,5 +1,5 @@
 {
-  "name": "ocular-document-processor",
+  "name": "document-processor",
   "version": "0.0.0",
   "description": "Document Processor PlugIn for Ocular",
   "main": "dist/index.js",

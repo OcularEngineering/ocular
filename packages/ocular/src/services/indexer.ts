@@ -1,19 +1,22 @@
-import { IndexableDocument, AutoflowContainer,IIndexerInterface,  IDocumentProcessorInterface ,IndexFields, semanticSearchProfile ,vectorSearchProfile  } from "@ocular/types"
+import { IndexableDocument, AutoflowContainer,IIndexerInterface,  IDocumentProcessorInterface ,IndexFields, semanticSearchProfile ,vectorSearchProfile, ILLMInterface  } from "@ocular/types"
 import { SearchIndexClient, SearchIndex} from "@azure/search-documents";
 import { ConfigModule } from "../types/config-module"
 import { Logger } from "@ocular/types";
+import { IndexableDocChunk } from "@ocular/types";
 
 export default class IndexerService implements IIndexerInterface {
   private config_: ConfigModule
   protected readonly searchIndexClient_: SearchIndexClient
   protected readonly logger_: Logger
   protected readonly documentProcessorService_:  IDocumentProcessorInterface
+  protected readonly openAiService_:  ILLMInterface
 
   constructor(container, config: ConfigModule) {
     this.config_ = config
     this.logger_ = container.logger
     this.searchIndexClient_ = container.searchIndexClient
     this.documentProcessorService_ = container.documentProcessorService
+    this.openAiService_ = container.openAiService
    
 
     // // const { applicationId, adminApiKey, settings } = this.config_.projectConfig.search_engine_options as SearchEngineOptions
@@ -39,46 +42,55 @@ export default class IndexerService implements IIndexerInterface {
   async createIndex(indexName: string, options?: unknown){
     this.logger_.info(`Creating index ${indexName}`)
 
-    // Store Existing Indexes In Memory To Avoid Unnecessary Calls To The Azure API
-    const names: string[] = [];
-    const indexNames = await this.searchIndexClient_.listIndexes();
-    for await (const index of indexNames) {
-      names.push(index.name);
-    }
-
-    // Check if Index exists in the Search Service
-    if (!names.includes(indexName)) {
-      this.logger_.info(` Create Search "${indexName}" Index`);
-      const searchIndex: SearchIndex = {
-        name: indexName,
-        fields: IndexFields,
-        vectorSearch: vectorSearchProfile,
-        semanticSearch:semanticSearchProfile,
+    try{
+      // Store Existing Indexes In Memory To Avoid Unnecessary Calls To The Azure API
+      const names: string[] = [];
+      const indexNames = await this.searchIndexClient_.listIndexes();
+      for await (const index of indexNames) {
+        names.push(index.name);
       }
-      await this.searchIndexClient_.createIndex(searchIndex, options);
+
+      // Check if Index exists in the Search Service
+      if (!names.includes(indexName)) {
+        this.logger_.info(` Create Search "${indexName}" Index`);
+        const searchIndex: SearchIndex = {
+          name: indexName,
+          fields: IndexFields,
+          vectorSearch: vectorSearchProfile,
+          semanticSearch:semanticSearchProfile,
+        }
+        await this.searchIndexClient_.createIndex(searchIndex, options);
+      }
+    } catch(error){
+    this.logger_.error(`Error Creating Index ${indexName}, error ${error.message}`)
     }
   }
 
-  indexDocuments(indexName: string, documents: IndexableDocument[]) {
-    // Add Indexable Document to the Content Storage
-    // Optionally Add Indexable Document to a Blob Storage.
-
-    // Batch Chunk Indexable Documents
-    const chunks = this.documentProcessorService_.chunkIndexableDocumentsBatch(documents)
-    
-    // Embed Documents Using an Embedder
-
-    // Index Document Chunks into A Vector Database
-    // chunkIndexableDocument
-
-    // Index Document Chunks To The Azure Vector + DB Search Index
-    this.logger_.info(`Indexing ${documents.length} documents to index ${indexName}`)
+  async indexDocuments(indexName: string, documents: IndexableDocument[]): Promise<void> {
     try {
+      this.logger_.info(`Indexing ${documents.length} documents to index ${indexName}`)
+      // Optionally Add Indexable Document to a Blob Storage.
+      const chunks = this.documentProcessorService_.chunkIndexableDocumentsBatch(documents)
+      for (const chunk of chunks) {
+         await this.embedChunk(chunk)
+      }
+      chunks.map((chunk) => this.embedChunk(chunk))
+      // Index Document Chunks To The Azure Vector + DB Search Index
       const searchClient = this.searchIndexClient_.getSearchClient(indexName)
-      searchClient.uploadDocuments(documents)
+      searchClient.uploadDocuments(chunks)
     } catch (error) {
-      this.logger_.error(error)
-      throw error
+      this.logger_.error(`Error Indexing ${indexName}, error ${error.message}`)
     }
+  }
+
+  private async embedChunk(chunk: IndexableDocChunk) {
+    if(chunk?.title){
+      chunk.titleVector = await this.openAiService_.createEmbeddings(chunk.title)
+    }
+
+    if(chunk?.content){
+      chunk.contentVector = await this.openAiService_.createEmbeddings(chunk.content)
+    }
+    return chunk
   }
 }

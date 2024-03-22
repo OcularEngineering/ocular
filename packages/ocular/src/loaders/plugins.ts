@@ -15,7 +15,7 @@ import {
 } from "../utils/format-registration-name"
 import {  aliasTo, asValue, asFunction , Lifetime } from "awilix"
 import { AbstractNotificationService, OauthService } from "@ocular/types"
-import { AbstractDocumentProcesserService } from "@ocular/types";
+import { AbstractDocumentProcesserService, AbstractLLMService } from "@ocular/types";
 
 type Options = {
   rootDirectory: string
@@ -178,6 +178,7 @@ export async function registerServices(
   container: AutoflowContainer
 ): Promise<void> {
   const files = glob.sync(`${pluginDetails.resolve}/dist/services/[!__]*.js`, {})
+  
   await promiseAll(
     files.map(async (fn) => {
       const loaded = require(fn).default
@@ -228,6 +229,15 @@ export async function registerServices(
           [`noti_${loaded.identifier}`]: aliasTo(name),
         })
       } else if (AbstractDocumentProcesserService.isDocumentProcessorService(loaded.prototype)) {
+        container.register({
+          [name]: asFunction(
+            (cradle) => new loaded(cradle, pluginDetails.options),
+            {
+              lifetime: loaded.LIFE_TIME || Lifetime.SINGLETON,
+            }
+          ),
+        })
+      } else if (AbstractLLMService.isLLMService(loaded.prototype)){
         container.register({
           [name]: asFunction(
             (cradle) => new loaded(cradle, pluginDetails.options),
