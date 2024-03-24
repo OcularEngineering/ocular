@@ -28,11 +28,20 @@ export default async (req, res) => {
 
   
 
-  const results = await searchService.search(loggedInUser.organisation_id.toLowerCase().substring(4), q, {
-    paginationOptions,
-    categoryFilter:categoryFilter,
-    additionalOptions: options,
-  })
+  // const results = await searchService.search(loggedInUser.organisation_id.toLowerCase().substring(4), q, {
+  //   paginationOptions,
+  //   categoryFilter:categoryFilter,
+  //   additionalOptions: options,
+  // })
+  const results = await searchService.search(
+      loggedInUser.organisation_id.toLowerCase().substring(4), 
+      q, 
+      {
+        retrieval_mode: "hybrid",
+        semantic_ranker: true,
+        semantic_captions: true,
+      }
+    )
  
   res.status(200).send(results)
 }

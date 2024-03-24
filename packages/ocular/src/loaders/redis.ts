@@ -16,31 +16,7 @@ async function redisLoader({
   configModule,
   logger,
 }: Options): Promise<void> {
-  if (configModule.projectConfig.redis_url) {
-    const redisClient = new Redis(configModule.projectConfig.redis_url, {
-      // Lazy connect to properly handle connection errors
-      lazyConnect: true,
-      maxRetriesPerRequest: null, // Add this line
-      ...(configModule.projectConfig.redis_options ?? {}),
-    })
-
-    try {
-      await redisClient.connect()
-      logger?.info(`Connection to Redis established`)
-    } catch (err) {
-      logger?.error(`An error occurred while connecting to Redis:${EOL} ${err}`)
-    }
-
-    container.register({
-      redisClient: asValue(redisClient),
-    })
-  } else {
-    if (process.env.NODE_ENV === "production") {
-      logger.warn(
-        `No Redis url was provided - using Autoflow in production without a proper Redis instance is not recommended`
-      )
-    }
-
+  if(process.env.NODE_ENV === "development") {
     logger.info("Using fake Redis")
 
     // Economical way of dealing with redis clients
@@ -49,7 +25,35 @@ async function redisLoader({
     container.register({
       redisClient: asValue(client),
     })
+   } else {
+    if (configModule.projectConfig.redis_url) {
+      const redisClient = new Redis(configModule.projectConfig.redis_url, {
+        // Lazy connect to properly handle connection errors
+        lazyConnect: true,
+        maxRetriesPerRequest: null, // Add this line
+        ...(configModule.projectConfig.redis_options ?? {}),
+      })
+  
+      try {
+        await redisClient.connect()
+        logger?.info(`Connection to Redis established`)
+      } catch (err) {
+        logger?.error(`An error occurred while connecting to Redis:${EOL} ${err}`)
+      }
+  
+      container.register({
+        redisClient: asValue(redisClient),
+      })
+      } else {
+        if (process.env.NODE_ENV === "production") {
+          logger.warn(
+            `No Redis url was provided - using Autoflow in production without a proper Redis instance is not recommended`
+          )
+      }
+  
+    }
   }
+  
 }
 
 export default redisLoader

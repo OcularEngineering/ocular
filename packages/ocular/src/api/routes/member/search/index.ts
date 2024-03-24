@@ -12,4 +12,11 @@ export default (app) => {
   return app
 }
 
+export function ask(app) {
+  const route = Router()
+  app.use("/ask", route)
+  route.post("/", middlewares.wrap(require("./ask").default))
+  return app
+}
+
 export * from "./search"
