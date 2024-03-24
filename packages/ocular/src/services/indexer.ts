@@ -17,26 +17,6 @@ export default class IndexerService implements IIndexerInterface {
     this.searchIndexClient_ = container.searchIndexClient
     this.documentProcessorService_ = container.documentProcessorService
     this.openAiService_ = container.openAiService
-   
-
-    // // const { applicationId, adminApiKey, settings } = this.config_.projectConfig.search_engine_options as SearchEngineOptions
-
-    // // if (!applicationId) {
-    // //   throw new Error("Please provide a valid Application ID")
-    // // }
-
-    // // if (!adminApiKey) {
-    // //   throw new Error("Please provide a valid Admin Api Key")
-    // // }
-
-    // // this.client_ = Algolia(applicationId, adminApiKey)
-    // this.organisationService_ = container.organisationService
-    // this.searchIndexClient_ = container.searchIndexClient
-    // this.logger_ = container.logger
-    // this.jobSchedulerService_ = container.jobSchedulerService
-
-    // // Azure Open AI Keys
-    // this.openAIOptions_ = this.config_.projectConfig.azure_open_ai_options as AzureOpenAIOptions
   }
 
   async createIndex(indexName: string, options?: unknown){
@@ -69,7 +49,7 @@ export default class IndexerService implements IIndexerInterface {
   async indexDocuments(indexName: string, documents: IndexableDocument[]): Promise<void> {
     try {
       this.logger_.info(`Indexing ${documents.length} documents to index ${indexName}`)
-      // Optionally Add Indexable Document to a Blob Storage.
+      // Optionally Add Indexable Document to a Blob Storage. Implement this in the future.
       const chunks = this.documentProcessorService_.chunkIndexableDocumentsBatch(documents)
       for (const chunk of chunks) {
          await this.embedChunk(chunk)
@@ -77,7 +57,7 @@ export default class IndexerService implements IIndexerInterface {
       chunks.map((chunk) => this.embedChunk(chunk))
       // Index Document Chunks To The Azure Vector + DB Search Index
       const searchClient = this.searchIndexClient_.getSearchClient(indexName)
-      searchClient.uploadDocuments(chunks)
+      await searchClient.uploadDocuments(chunks)
     } catch (error) {
       this.logger_.error(`Error Indexing ${indexName}, error ${error.message}`)
     }

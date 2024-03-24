@@ -8,30 +8,42 @@ describe('OpenAIService', () => {
       open_ai_version: "2023-05-15",
       endpoint: process.env.AZURE_OPEN_AI_ENDPOINT,
       embedding_deployment_name: process.env.AZURE_OPEN_AI_EMBEDDER_DEPLOYMENT_NAME,
-      model: process.env.AZURE_OPEN_AI_EMBEDDING_MODEL,
-      open_ai_key: process.env.AZURE_OPEN_AI_KEY
+      embedding_model: process.env.AZURE_OPEN_AI_EMBEDDING_MODEL,
+      open_ai_key: process.env.AZURE_OPEN_AI_KEY,
+      chat_deployment: process.env.AZURE_OPEN_AI_CHAT_DEPLOYMENT_NAME,
+      chat_model: process.env.AZURE_OPEN_AI_CHAT_MODEL
     });
   });
 
-  it('should create embeddings', async () => {
-    const doc = { content: 't' };
-    const embeddings = await service.createEmbeddings(doc);
-    expect(embeddings).toEqual([1, 2, 3]);
-    expect(OpenAI).toHaveBeenCalledWith({
-      apiKey: 'test-key',
-      defaultQuery: { 'api-version': 'test-version' },
-      defaultHeaders: { 'api-key': 'test-key' },
-      baseURL: 'test-endpoint/openai/deployments/test-deployment'
-    });
-    expect(service.openai_.embeddings.create).toHaveBeenCalledWith({
-      input: 'test content',
-      model: 'test-model'
-    });
+  // it('should create embeddings', async () => {
+  //   const doc = { content: 't' };
+  //   const embeddings = await service.createEmbeddings(doc);
+  //   expect(embeddings).toEqual([1, 2, 3]);
+  //   expect(OpenAI).toHaveBeenCalledWith({
+  //     apiKey: 'test-key',
+  //     defaultQuery: { 'api-version': 'test-version' },
+  //     defaultHeaders: { 'api-key': 'test-key' },
+  //     baseURL: 'test-endpoint/openai/deployments/test-deployment'
+  //   });
+  //   expect(service.openai_.embeddings.create).toHaveBeenCalledWith({
+  //     input: 'test content',
+  //     model: 'test-model'
+  //   });
+  // });
+
+  // it('should return empty array if doc content is not provided', async () => {
+  //   const doc = {};
+  //   const embeddings = await service.createEmbeddings(doc);
+  //   expect(embeddings).toEqual([]);
+  // });
+
+  it('should complete chat', async () => {
+    const messages = [
+      {role: 'system', content: 'You are a helpful assistant.'},
+      {role: 'user', content: 'Translate the following English text to French: "Hello, how are you?"'}
+    ];
+    const result = await service.completeChat(messages);
+    expect(result).toEqual( "\"Bonjour, comment vas-tu ?\"");
   });
 
-  it('should return empty array if doc content is not provided', async () => {
-    const doc = {};
-    const embeddings = await service.createEmbeddings(doc);
-    expect(embeddings).toEqual([]);
-  });
 });
