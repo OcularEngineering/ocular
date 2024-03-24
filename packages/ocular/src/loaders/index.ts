@@ -18,6 +18,7 @@ import Logger from "./logger"
 
 // import defaultsLoader from "./defaults"
 import appsLoader from "./apps"
+import approachesLoader from "./approaches"
 import expressLoader from "./express"
 // import loadOcularApp from "./ocular-app"
 import modelsLoader from "./models.js"
@@ -137,6 +138,9 @@ export default async ({
   await subscribersLoader({ container })
   const subAct = Logger.success(subActivity, "Subscribers initialized") || {}
 
+  const approachesActivity = Logger.activity(`Initializing approaches${EOL}`)
+  await approachesLoader({ container, configModule })
+  const apprAct = Logger.success(approachesActivity, "Approaches initialized") || {}
 
 
   const apiActivity = Logger.activity(`Initializing API${EOL}`)
