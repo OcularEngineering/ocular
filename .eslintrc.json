@@ -1,29 +1,16 @@
 {
-  "root": true,
-  "ignorePatterns": ["**/*"],
-  "plugins": ["@nx"],
+  "extends": [
+    "plugin:@nrwl/nx/react-typescript",
+    "next",
+    "next/core-web-vitals",
+    "../../.eslintrc.json"
+  ],
+  "ignorePatterns": ["!**/*", ".next/**/*"],
   "overrides": [
-    {
-      "files": "*.json",
-      "parser": "jsonc-eslint-parser",
-      "rules": {}
-    },
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
       "rules": {
-        "@nx/enforce-module-boundaries": [
-          "error",
-          {
-            "enforceBuildableLibDependency": true,
-            "allow": [],
-            "depConstraints": [
-              {
-                "sourceTag": "*",
-                "onlyDependOnLibsWithTags": ["*"]
-              }
-            ]
-          }
-        ]
+        "@next/next/no-html-link-for-pages": ["error", "apps/shell/pages"]
       }
     },
     {
@@ -42,6 +29,14 @@
         "jest": true
       },
       "rules": {}
+    },
+    {
+      "rules": {
+        "@next/next/no-html-link-for-pages": "off"
+      },
+      "env": {
+        "jest": true
+      }
     }
   ]
 }

@@ -24,3 +24,10 @@ build/**
 **/stats
 package-lock.json
 **/package-lock.json
+node_modules
+node_modules
+
+.env.development
+.env.production
+.env
+.next
