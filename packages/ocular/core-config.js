@@ -86,15 +86,6 @@ module.exports = {
     },
   ],
   plugins: [
-    // Add Azure Search Index As A Plugin
-      // Type Of Plugin: Search Index
-      // Backend Cant Start Without A Search Index Plugin
-    // Add Azure Vector Search As A Plugin
-      // Type Of Plugin: Vector Search
-      // -> Backend Cant Start Without A Vector Search Plugin
-    // LLM Model 
-      // Type Of Plugin: LLM Model
-      // -> Backend Cant Start Without A LLM Model Plugin
     // {
     //   resolve: `resend`,
     //   options: {

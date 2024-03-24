@@ -23,9 +23,10 @@ export default async (req, res) => {
   const loggedInUser = req.scope.resolve("loggedInUser")
 
     if (approach === ApproachDefinitions.ASK_RETRIEVE_READ) {
-      const { q, messages, context, stream } = req.body;
+      const { q, context, stream } = req.body;
       const searchApproach = req.scope.resolve("askRetrieveReadApproache")
       const results = await searchApproach.run(loggedInUser.organisation_id.toLowerCase().substring(4),q , (context as any) ?? {});
+      console.log(results)
       return res.status(200).send(results)
     }
   } catch (_error: unknown) {
@@ -64,10 +65,10 @@ export class PostAskReq {
   @IsEnum(ApproachDefinitions)
   approach: ApproachDefinitions
   
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => Message)
-  messages: Message[]
+  // @IsArray()
+  // @ValidateNested({ each: true })
+  // @Type(() => Message)
+  // messages: Message[]
 
   @ValidateNested()
   context?: PostApproachContext 

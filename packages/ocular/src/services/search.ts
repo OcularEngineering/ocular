@@ -4,6 +4,7 @@ import { ConfigModule, Logger } from "../types"
 import { SearchIndexClient } from "@azure/search-documents"
 import { parseBoolean, removeNewlines} from "@ocular/utils"
 import { ILLMInterface } from "@ocular/types"
+import { IndexableDocChunk } from "@ocular/types"
 
 type InjectedDependencies = {
   searchIndexClient: SearchIndexClient
@@ -99,17 +100,19 @@ class SearchService extends AbstractSearchService {
     //     results.push(`${document[this.sourcePageField]}: ${removeNewlines(document[this.contentField])}`);
     //   }
     // }
-
+    const indexableDocuments: IndexableDocChunk[] = []
     for await (const result of searchResults.results) {
-      const document = result.document as any;
+      const document = result.document as IndexableDocChunk;
       document.contentVector = null
       document.titleVector = null
       results.push(document.content);
-    }
+      indexableDocuments.push(document)
+    }               
     const content = results.join('\n');
+
     return {
       query: queryText ?? '',
-      results: results,
+      results: indexableDocuments,
       content: content,
     };
   }
