@@ -113,6 +113,8 @@ module.exports = {
         endpoint: process.env.AZURE_OPEN_AI_ENDPOINT,
         embedding_deployment_name: process.env.AZURE_OPEN_AI_EMBEDDER_DEPLOYMENT_NAME,
         embedding_model: process.env.AZURE_OPEN_AI_EMBEDDING_MODEL,
+        chat_deployment_name: process.env.AZURE_OPEN_AI_CHAT_DEPLOYMENT_NAME,
+        chat_model: process.env.AZURE_OPEN_AI_CHAT_MODEL,
       }
     },
   ]

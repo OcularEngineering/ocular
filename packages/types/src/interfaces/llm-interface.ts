@@ -1,9 +1,10 @@
-import { AutoflowContainer } from '../common';
+import { AutoflowContainer, Message } from '../common';
 import { IndexableDocument,IndexableDocChunk } from '../common/indexable-document';
 import { TransactionBaseService } from './transaction-base-service';
 
 export interface ILLMInterface extends TransactionBaseService {
   createEmbeddings(text:string): Promise<number[]> ;
+  completeChat(messages: Message[]): Promise<string>;
 }
 
 /**
@@ -31,4 +32,5 @@ export abstract class AbstractLLMService
     super(container, config)
   }
   abstract createEmbeddings(text:string): Promise<number[]> ;
+  abstract completeChat(messages: Message[]): Promise<string>;
 }
