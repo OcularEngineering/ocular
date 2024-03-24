@@ -63,8 +63,8 @@ export default function Search() {
       </Head>
       
       <Header />
-      <AIResults content={ai_content} />
-      <SearchResults search_results={search_results} />
+
+      <SearchResults search_results={search_results} ai_content={ai_content}  />
     </div>
   );
 }
