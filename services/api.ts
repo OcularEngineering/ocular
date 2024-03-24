@@ -62,13 +62,22 @@ export default {
     },
   },
   search: {
-    query(q?: string) {
-      const path = `/search`;
+    ask(q?: string) {
+      const path = `/ask`;
       const body = {
+        approach: "ask-retrieve-read",
+        stream: false,
         q: q
       };
       return ocularRequest("POST", path, body);
-    }
+    },
+    // search(q?: string) {
+    //   const path = `/search`;
+    //   const body = {
+    //     q: q
+    //   };
+    //   return ocularRequest("POST", path, body);
+    // }
   },
   users:{
     create(data) {

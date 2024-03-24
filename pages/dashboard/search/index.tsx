@@ -20,7 +20,6 @@ export function Search() {
     if (searchInputRef.current) {
       const q = searchInputRef.current.value;
       if (!q) return;
-
       router.push(`/dashboard/search/results?q=${q}`);
     }
   }

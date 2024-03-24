@@ -5,21 +5,25 @@ import Head from "next/head";
 import Header from "@/components/search/header";
 import { useRouter } from "next/router";
 import SearchResults from "@/components/search/search-results";
+import {AIResults} from "@/components/search/search-results";
 import Image from 'next/image'
 
 // Importing API End Points
 import api from "@/services/api"
 
 export default function Search() {
-  const [results, setResults] = useState(null);
+  const [ai_content, setAiResults] = useState(null);
+  const [search_results, setSearchResults] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     setIsLoading(true); 
-    api.search.query(router.query.q)
+    api.search.ask(router.query.q)
       .then(data => {
-        setResults(data.data); 
+        console.log(data);
+        setAiResults(data.data.choices[0].message.content);
+        setSearchResults(data.data.search_results); 
         setIsLoading(false); 
       })
       .catch(error => {
@@ -39,7 +43,7 @@ export default function Search() {
       />
     </div>
   );
-  if (!results) return (      
+  if (!search_results) return (      
     <div className="flex items-center justify-center min-h-screen min-w-full">
       <Image 
           src={"/AI.svg"} 
@@ -59,7 +63,8 @@ export default function Search() {
       </Head>
       
       <Header />
-      <SearchResults results={results} />
+      <AIResults content={ai_content} />
+      <SearchResults search_results={search_results} />
     </div>
   );
 }
