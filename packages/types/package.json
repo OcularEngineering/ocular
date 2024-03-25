@@ -34,6 +34,9 @@
   },
   "dependencies": {
     "@azure/search-documents": "^12.0.0",
-    "@ocular/utils": "file:../utils"
+    "@ocular/utils": "file:../utils",
+    "bullmq": "^5.4.3",
+    "express": "^4.18.3",
+    "ulid": "^2.3.0"
   }
 }

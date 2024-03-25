@@ -1,15 +1,15 @@
-import { asValue } from "awilix"
-import Redis from "ioredis"
-import FakeRedis from "ioredis-mock"
-import { EOL } from "os"
-import { Logger, AutoflowContainer } from "@ocular/types"
-import  {ConfigModule}  from "../types/config-module"
+import { asValue } from 'awilix';
+import Redis from 'ioredis';
+import FakeRedis from 'ioredis-mock';
+import { EOL } from 'os';
+import { Logger, AutoflowContainer } from '@ocular/types';
+import { ConfigModule } from '../types/config-module';
 
 type Options = {
-  container: AutoflowContainer
-  configModule: ConfigModule
-  logger: Logger
-}
+  container: AutoflowContainer;
+  configModule: ConfigModule;
+  logger: Logger;
+};
 
 async function redisLoader({
   container,
@@ -20,35 +20,39 @@ async function redisLoader({
     const redisClient = new Redis(configModule.projectConfig.redis_url, {
       // Lazy connect to properly handle connection errors
       lazyConnect: true,
-      ...(configModule.projectConfig.redis_options ?? {}),
-    })
+      ...(configModule.projectConfig.redis_options ?? {
+        maxRetriesPerRequest: null,
+      }),
+    });
 
     try {
-      await redisClient.connect()
-      logger?.info(`Connection to Redis established`)
+      await redisClient.connect();
+      logger?.info(`Connection to Redis established`);
     } catch (err) {
-      logger?.error(`An error occurred while connecting to Redis:${EOL} ${err}`)
+      logger?.error(
+        `An error occurred while connecting to Redis:${EOL} ${err}`
+      );
     }
 
     container.register({
       redisClient: asValue(redisClient),
-    })
+    });
   } else {
-    if (process.env.NODE_ENV === "production") {
+    if (process.env.NODE_ENV === 'production') {
       logger.warn(
         `No Redis url was provided - using Autoflow in production without a proper Redis instance is not recommended`
-      )
+      );
     }
 
-    logger.info("Using fake Redis")
+    logger.info('Using fake Redis');
 
     // Economical way of dealing with redis clients
-    const client = new FakeRedis()
+    const client = new FakeRedis();
 
     container.register({
       redisClient: asValue(client),
-    })
+    });
   }
 }
 
-export default redisLoader
+export default redisLoader;

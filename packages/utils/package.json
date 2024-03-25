@@ -20,8 +20,11 @@
   ],
   "author": "Louis Luxa Murerwa",
   "dependencies": {
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
     "knew": "0.0.0",
     "knex": "^3.1.0",
+    "rimraf": "^5.0.5",
     "typeorm": "^0.3.20"
   },
   "scripts": {

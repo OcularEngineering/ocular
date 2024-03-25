@@ -1,41 +1,39 @@
-const glob = require("glob");
-import e, { Express } from "express"
-import fs from "fs"
-import { sync as existsSync } from "fs-exists-cached"
-import _ from "lodash"
-import createRequireFromPath from "../utils/create-require-from-path"
-import { aliasTo } from "awilix"
-import { EOL } from "os"
-import path from "path"
-import { AutoflowContainer,promiseAll } from "@ocular/utils"
-import { ConfigModule, Logger } from "../types"
-import {
-  formatRegistrationName,
-} from "../utils/format-registration-name"
-import { asValue, asFunction , Lifetime } from "awilix"
-import { OauthService } from "@ocular/types"
-import { AppService } from "../services";
-import { error } from "console";
+const glob = require('glob');
+import e, { Express } from 'express';
+import fs from 'fs';
+import { sync as existsSync } from 'fs-exists-cached';
+import _ from 'lodash';
+import createRequireFromPath from '../utils/create-require-from-path';
+import { aliasTo } from 'awilix';
+import { EOL } from 'os';
+import path from 'path';
+import { AutoflowContainer, promiseAll } from '@ocular/utils';
+import { ConfigModule, Logger } from '../types';
+import { formatRegistrationName } from '../utils/format-registration-name';
+import { asValue, asFunction, Lifetime } from 'awilix';
+import { OauthService } from '@ocular/types';
+import { AppService } from '../services';
+import { error } from 'console';
 
 type Options = {
-  rootDirectory: string
-  container: AutoflowContainer
-  configModule: ConfigModule
-  app: Express
-  activityId: string
-}
+  rootDirectory: string;
+  container: AutoflowContainer;
+  configModule: ConfigModule;
+  app: Express;
+  activityId: string;
+};
 
 type AppDetails = {
-  resolve: string
-  name: string
-  id: string
-  options: Record<string, unknown>
-  version: string
-}
+  resolve: string;
+  name: string;
+  id: string;
+  options: Record<string, unknown>;
+  version: string;
+};
 
-export const isSearchEngineInstalledResolutionKey = "isSearchEngineInstalled"
+export const isSearchEngineInstalledResolutionKey = 'isSearchEngineInstalled';
 
-export const OCULAR_PROJECT_NAME = "ocular-core-app"
+export const OCULAR_PROJECT_NAME = 'ocular-core-app';
 
 /**
  * Registers all services in the services directory
@@ -47,49 +45,45 @@ export default async ({
   configModule,
   activityId,
 }: Options): Promise<void> => {
-  const resolved = getResolvedApps(rootDirectory, configModule) || []
-  
+  const resolved = getResolvedApps(rootDirectory, configModule) || [];
+
   await promiseAll(
-    resolved.map(
-      async (appDetails) => await runSetupFunctions(appDetails)
-    )
-  )
+    resolved.map(async (appDetails) => await runSetupFunctions(appDetails))
+  );
 
   await promiseAll(
     resolved.map(async (appDetails) => {
-      registerRepositories(appDetails, container)
-      await registerServices(appDetails, container)
-      registerStrategies(appDetails, container)
-      registerSubscribers(appDetails, container)
+      registerRepositories(appDetails, container);
+      await registerServices(appDetails, container);
+      registerStrategies(appDetails, container);
+      registerSubscribers(appDetails, container);
     })
-  )
+  );
 
   await Promise.all(
     resolved.map(async (appDetails) => runLoaders(appDetails, container))
-  )
-
+  );
 
   // resolved.forEach((plugin) => trackInstallation(plugin.name, "plugin"))
-
-}
+};
 
 function getResolvedApps(
   rootDirectory: string,
   configModule: ConfigModule,
-  extensionDirectoryPath = "dist"
+  extensionDirectoryPath = 'dist'
 ): undefined | AppDetails[] {
-  const { apps } = configModule
+  const { apps } = configModule;
 
-  const resolved = apps.map((app) => {
+  const resolved = apps.map((app: AppDetails) => {
     if (_.isString(app)) {
-      return resolveApp(app)
+      return resolveApp(app.resolve);
     }
 
-    const details = resolveApp(app.resolve)
-    details.options = app.options
+    const details = resolveApp(app.resolve);
+    details.options = app.options;
 
-    return details
-  })
+    return details;
+  });
 
   // const extensionDirectory = path.join(rootDirectory, extensionDirectoryPath)
   // // Resolve user's project as a app for loading purposes
@@ -101,36 +95,29 @@ function getResolvedApps(
   //   version: createFileContentHash(process.cwd(), `**`),
   // })
 
-  return resolved
+  return resolved;
 }
 
 async function runLoaders(
   appDetails: AppDetails,
   container: AutoflowContainer
 ): Promise<void> {
-  const loaderFiles = glob.sync(
-    `${appDetails.resolve}/loaders/[!__]*.js`,
-    {}
-  )
+  const loaderFiles = glob.sync(`${appDetails.resolve}/loaders/[!__]*.js`, {});
   await Promise.all(
     loaderFiles.map(async (loader) => {
       try {
-        const module = require(loader).default
-        if (typeof module === "function") {
-          await module(container, appDetails.options)
+        const module = require(loader).default;
+        if (typeof module === 'function') {
+          await module(container, appDetails.options);
         }
       } catch (err) {
-        const logger = container.resolve<Logger>("logger")
-        logger.warn(`Running loader failed: ${err.message}`)
-        return Promise.resolve()
+        const logger = container.resolve<Logger>('logger');
+        logger.warn(`Running loader failed: ${err.message}`);
+        return Promise.resolve();
       }
     })
-  )
+  );
 }
-
-
-
-
 
 /**
  * Registers an apps's repositories at the right location in our container.
@@ -145,19 +132,19 @@ function registerRepositories(
   appDetails: AppDetails,
   container: AutoflowContainer
 ): void {
-  const files = glob.sync(`${appDetails.resolve}/repositories/*.js`, {})
+  const files = glob.sync(`${appDetails.resolve}/repositories/*.js`, {});
   files.forEach((fn) => {
-    const loaded = require(fn)
+    const loaded = require(fn);
 
     Object.entries(loaded).map(([, val]: [string, any]) => {
-      if (typeof loaded === "object") {
-        const name = formatRegistrationName(fn)
+      if (typeof loaded === 'object') {
+        const name = formatRegistrationName(fn);
         container.register({
           [name]: asValue(val),
-        })
+        });
       }
-    })
-  })
+    });
+  });
 }
 
 /**
@@ -174,29 +161,31 @@ export async function registerServices(
   appDetails: AppDetails,
   container: AutoflowContainer
 ): Promise<void> {
-  const files = glob.sync(`${appDetails.resolve}/dist/services/[!__]*.js`, {})
+  const files = glob.sync(`${appDetails.resolve}/dist/services/[!__]*.js`, {});
   await promiseAll(
     files.map(async (fn) => {
-      const loaded = require(fn).default
-      const name = formatRegistrationName(fn)
+      const loaded = require(fn).default;
+      const name = formatRegistrationName(fn);
 
-      if (typeof loaded !== "function") {
+      if (typeof loaded !== 'function') {
         throw new Error(
           `Cannot register ${name}. Make sure to default export a service class in ${fn}`
-        )
+        );
       }
- 
+
       if (OauthService.isOauthService(loaded.prototype)) {
-        const configModule = container.resolve<ConfigModule>("configModule")
-        const createAppInput = loaded.getAppDetails(configModule.projectConfig,appDetails.options)
+        const configModule = container.resolve<ConfigModule>('configModule');
+        const createAppInput = loaded.getAppDetails(
+          configModule.projectConfig,
+          appDetails.options
+        );
 
         // Self register the app on startup
-        const appService =
-           container.resolve("appService")
-        
-        await appService.register(createAppInput)
+        const appService = container.resolve('appService');
 
-        const name = createAppInput.name
+        await appService.register(createAppInput);
+
+        const name = createAppInput.name;
         container.register({
           [`${name}Oauth`]: asFunction(
             (cradle) => new loaded(cradle, appDetails.options),
@@ -204,8 +193,8 @@ export async function registerServices(
               lifetime: Lifetime.SCOPED,
             }
           ),
-        })
-      }  else {
+        });
+      } else {
         container.register({
           [name]: asFunction(
             (cradle) => new loaded(cradle, appDetails.options),
@@ -213,10 +202,10 @@ export async function registerServices(
               lifetime: loaded.LIFE_TIME || Lifetime.SCOPED,
             }
           ),
-        })
+        });
       }
     })
-  )
+  );
 }
 
 /**
@@ -232,16 +221,14 @@ function registerSubscribers(
   appDetails: AppDetails,
   container: AutoflowContainer
 ): void {
-  const files = glob.sync(`${appDetails.resolve}/dist/subscribers/*.js`, {})
+  const files = glob.sync(`${appDetails.resolve}/dist/subscribers/*.js`, {});
   files.forEach((fn) => {
-    const loaded = require(fn).default
+    const loaded = require(fn).default;
 
     container.build(
-      asFunction(
-        (cradle) => new loaded(cradle, appDetails.options)
-      ).scoped()
-    )
-  })
+      asFunction((cradle) => new loaded(cradle, appDetails.options)).scoped()
+    );
+  });
 }
 
 /**
@@ -255,24 +242,21 @@ function registerSubscribers(
  */
 function registerStrategies(
   appDetails: AppDetails,
-  container: AutoflowContainer): void {
-
-console.log("appDetails.resolve", appDetails.resolve)
-const files = glob.sync(`${appDetails.resolve}/dist/strategies/*.js`, {})
-console.log("files", files)
+  container: AutoflowContainer
+): void {
+  console.log('appDetails.resolve', appDetails.resolve);
+  const files = glob.sync(`${appDetails.resolve}/dist/strategies/*.js`, {});
+  console.log('files', files);
   files.forEach((fn) => {
-    const loaded = require(fn).default
-    const name = formatRegistrationName(fn)
-    const batchType = loaded.batchType
+    const loaded = require(fn).default;
+    const name = formatRegistrationName(fn);
+    const batchType = loaded.batchType;
     container.register({
-      [`${batchType}Strategy`]: asFunction(
-        (cradle) => new loaded(cradle),
-        {
-          lifetime: Lifetime.SCOPED,
-        }
-      ),
-   })
-  })
+      [`${batchType}Strategy`]: asFunction((cradle) => new loaded(cradle), {
+        lifetime: Lifetime.SCOPED,
+      }),
+    });
+  });
 }
 
 /**
@@ -282,24 +266,24 @@ console.log("files", files)
  * @param appDetails The app details including app options, version, id, resolved path, etc.
  */
 async function runSetupFunctions(appDetails: AppDetails): Promise<void> {
-  const files = glob.sync(`${appDetails.resolve}/setup/*.js`, {})
+  const files = glob.sync(`${appDetails.resolve}/setup/*.js`, {});
   await promiseAll(
     files.map(async (fn) => {
-      const loaded = require(fn).default
+      const loaded = require(fn).default;
       try {
-        await loaded()
+        await loaded();
       } catch (err) {
         throw new Error(
           `A setup function from ${appDetails.name} failed. ${err}`
-        )
+        );
       }
     })
-  )
+  );
 }
 
 // TODO: Create unique id for each app
 function createAppId(name: string): string {
-  return name
+  return name;
 }
 
 /**
@@ -311,23 +295,23 @@ function createAppId(name: string): string {
  * @return {object} the app details
  */
 function resolveApp(appName: string): {
-  resolve: string
-  id: string
-  name: string
-  options: Record<string, unknown>
-  version: string
+  resolve: string;
+  id: string;
+  name: string;
+  options: Record<string, unknown>;
+  version: string;
 } {
   // Only find apps when we're not given an absolute path
   if (!existsSync(appName)) {
     // Find the app in the local apps folder
-    const resolvedPath = path.resolve(`../apps/${appName}`)
+    const resolvedPath = path.resolve(`../apps/${appName}`);
 
     if (existsSync(resolvedPath)) {
       if (existsSync(`${resolvedPath}/package.json`)) {
         const packageJSON = JSON.parse(
           fs.readFileSync(`${resolvedPath}/package.json`, `utf-8`)
-        )
-        const name = packageJSON.idenitifier || appName
+        );
+        const name = packageJSON.idenitifier || appName;
         // warnOnIncompatiblePeerDependency(name, packageJSON)
 
         return {
@@ -337,15 +321,15 @@ function resolveApp(appName: string): {
           options: {},
           version:
             packageJSON.version || createFileContentHash(resolvedPath, `**`),
-        }
+        };
       } else {
         // Make package.json a requirement for local apps too
-        throw new Error(`App ${appName} requires a package.json file`)
+        throw new Error(`App ${appName} requires a package.json file`);
       }
     }
   }
 
-  const rootDir = path.resolve(".")
+  const rootDir = path.resolve('.');
 
   /**
    *  Here we have an absolute path to an internal app, or a name of a module
@@ -355,30 +339,28 @@ function resolveApp(appName: string): {
     const requireSource =
       rootDir !== null
         ? createRequireFromPath(`${rootDir}/:internal:`)
-        : require
-        // console.error("resolvedPath", re)
+        : require;
+    // console.error("resolvedPath", re)
     // If the path is absolute, resolve the directory of the internal app,
     // otherwise resolve the directory containing the package.json
     const resolvedPath = path.dirname(
       requireSource.resolve(`${appName}/package.json`)
-    )
-
-   
+    );
 
     const packageJSON = JSON.parse(
       fs.readFileSync(`${resolvedPath}/package.json`, `utf-8`)
-    )
+    );
     // warnOnIncompatiblePeerDependency(packageJSON.name, packageJSON)
 
     const computedResolvedPath =
-      resolvedPath + (process.env.DEV_MODE ? "/src" : "")
+      resolvedPath + (process.env.DEV_MODE ? '/src' : '');
 
     // Add support for a app to output the build into a dist directory
-    const resolvedPathToDist = resolvedPath + "/dist"
+    const resolvedPathToDist = resolvedPath + '/dist';
     const isDistExist =
       resolvedPathToDist &&
       !process.env.DEV_MODE &&
-      existsSync(resolvedPath + "/dist")
+      existsSync(resolvedPath + '/dist');
 
     return {
       resolve: isDistExist ? resolvedPathToDist : computedResolvedPath,
@@ -386,15 +368,15 @@ function resolveApp(appName: string): {
       name: packageJSON.name,
       options: {},
       version: packageJSON.version,
-    }
+    };
   } catch (err) {
-    console.log("err", err)
+    console.log('err', err);
     throw new Error(
       `Unable to find app "${appName}". Perhaps you need to install its package?`
-    )
+    );
   }
 }
 
 function createFileContentHash(path, files): string {
-  return path + files
+  return path + files;
 }
