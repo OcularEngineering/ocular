@@ -6,8 +6,7 @@
   "main": "dist/ocular/src/main.js",
   "keywords": [
     "core",
-    "backend",
-    "nx"
+    "backend"
   ],
   "author": "Louis Luxa Murerwa",
   "devDependencies": {
@@ -26,9 +25,8 @@
   },
   "dependencies": {
     "@azure/search-documents": "^12.0.0",
-    "@ocular/types": "file:../types",
-    "@ocular/utils": "file:../utils",
-    "algoliasearch": "^4.22.1",
+    "@ocular/types": "*",
+    "@ocular/utils": "*",
     "passport-custom": "^1.1.1",
     "typeorm": "^0.3.20"
   }

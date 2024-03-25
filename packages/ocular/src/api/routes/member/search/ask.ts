@@ -64,10 +64,10 @@ export class PostAskReq {
   @IsEnum(ApproachDefinitions)
   approach: ApproachDefinitions
   
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => Message)
-  messages: Message[]
+  // @IsArray()
+  // @ValidateNested({ each: true })
+  // @Type(() => Message)
+  // messages: Message[]
 
   @ValidateNested()
   context?: PostApproachContext 
