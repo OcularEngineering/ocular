@@ -1,42 +1,30 @@
-# Brightpearl
+# Asana
 
-Intergrate with an Organisations GitHub.
+Intergrate Ocular with Asana.
 
 
 ## Features
 
-- 
+- Get Asana Projects and Tasks into Ocular.
 
----
 
 ## How to Install
 
-1\. In `core-config.js` add the following at the end of the `plugins` array:
+1\. In `ocular/core-config.js` add the following at the end of the `appss` array:
 
   ```js
   const apps = [
     // ...
     {
-      resolve: `github`,
-      options: {
-      ...
-      },
+      resolve: `asana`,
+      options:{
+        client_id: process.env.ASANA_CLIENT_ID,
+        client_secret: process.env.ASANA_CLIENT_SECRET,
+        scope: "openid email profile",
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/asana`
+      }
     },
   ]
   ```
 
 ---
-
-## Test the Plugin
-
-1\. Run the following command in the directory of the Medusa backend to run the backend:
-
-  ```bash
-  npm run start
-  ```
-
-2\. xxxxx
-
----
-
-## Additional Information

@@ -62,6 +62,7 @@ The monorepo components are under `/packages`:
 
 - `/packages/apps`: Connectors To DataSources for Knowledge Indexing (Asana, Notion, GitHub etc)
 - `/packages/ocular-ui`: UI Dashboard for Ocular.
+- `/packages/ocular`: Backend for Ocular which Ingests Apps and Plugins.
 - `/packages/plugins`: Plugin's That Allow Ocular to access services such as VectorDBS, LLMModels etc
 - `/packages/types`: Shared data types shared across Ocular Modules
 - `/packages/utils`: Shared Utils aross Ocular Modules

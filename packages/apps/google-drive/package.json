@@ -1,29 +1,25 @@
-
 {
   "name": "google-drive",
   "version": "0.0.0",
-  "description": "Gmail Application for Ocular",
+  "description": "Google Drive Application for Ocular",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "author": "Louis Murerwa",
   "devDependencies": {
-     "@babel/cli": "^7.23.9",
-     "@babel/core": "^7.23.9",
-     "@babel/preset-env": "^7.23.9",
-     "@babel/preset-react": "^7.23.3",
-     "cross-env": "^5.2.1",
-     "typeorm": "^0.3.16",
-     "typescript": "^4.9.5"
+    "cross-env": "^5.2.1",
+    "typeorm": "^0.3.16",
+    "typescript": "^4.9.5"
   },
   "scripts": {
-     "prepare": "cross-env NODE_ENV=production npm run build",
-     "test": "jest --passWithNoTests src",
-     "build": "tsc",
-     "watch": "tsc --watch"
+    "prepare": "cross-env NODE_ENV=production npm run build",
+    "test": "jest --passWithNoTests src",
+    "build": "tsc",
+    "watch": "tsc --watch"
   },
   "dependencies": {
-     "@ocular/ocular": "*",
-     "@ocular/types": "*",
-     "@ocular/utils": "*"
+    "@ocular/ocular": "*",
+    "@ocular/types": "*",
+    "@ocular/utils": "*",
+    "googleapis": "^134.0.0"
   }
 }

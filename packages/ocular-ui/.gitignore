@@ -1,0 +1,4 @@
+package-lock.json
+.next
+.turbo
+node_modules

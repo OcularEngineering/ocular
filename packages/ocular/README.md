@@ -1,3 +1,6 @@
+# Ocular Backend
+
+
 # Secrets Management
 
 Ocular uses Infisical to manage secrets within the core backend. For a quick start on how to install Infisical ClI check this [link](https://infisical.com/docs/documentation/getting-started/cli). As a DEV at Ocular you should have your Infisical account set up with the credientals provided to start developing on Ocualar.
