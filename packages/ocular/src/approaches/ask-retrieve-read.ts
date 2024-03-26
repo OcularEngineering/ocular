@@ -67,13 +67,14 @@ export default class AskRetrieveThenRead implements IAskApproach {
             content: chatCompletion,
             context: {
               data_points: {
-                text: results,
+                // text: content.,
               },
               thoughts: `Question:<br>${query}<br><br>Prompt:<br>${messageToDisplay.replace('\n', '<br>')}`,
             },
           },
         },
       ],
+      results: results,
       object: 'chat.completion',
     };
   }

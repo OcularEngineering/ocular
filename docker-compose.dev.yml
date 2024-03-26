@@ -1,0 +1,34 @@
+version: "3"
+services:
+  ocular-db:
+    image: postgres:14-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: ocular
+      POSTGRES_USER: ocular
+      POSTGRES_DB: ocular
+  ocular-backend:
+    container_name: ocular-backend
+    build:
+      context: .
+      dockerfile: packages/ocular/Dockerfile
+    depends_on:
+      ocular-db:
+        condition: service_started
+    ports:
+      - 9000:9000
+    environment:
+      - DATABASE_URL=postgres://ocular:ocular@db/ocular
+      - NODE_ENV=development
+
+  # ocular-ui:
+  #   image: /pack/practice_docker
+  #   ports:
+  #     - 80:3000
+  #   command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; npm start'
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     - DATABASE_URL=postgres://postgres:password@db:5432/practicedocker
+  #     - PORT=3000

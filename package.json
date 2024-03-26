@@ -7,8 +7,7 @@
     "packages/types",
     "packages/ocular",
     "packages/apps/*",
-    "packages/plugins/*",
-    "packages/ocular-ui"
+    "packages/plugins/*"
   ],
   "scripts": {
     "build": "turbo run build  --concurrency=50% --no-daemon"
@@ -17,11 +16,8 @@
     "node": ">=14.0.0"
   },
   "dependencies": {
-    "@nrwl/eslint-plugin-nx": "^18.1.2",
     "@types/jest": "^29.5.12",
-    "bullmq": "^5.4.5",
-    "npm": "^10.5.0",
-    "passport-custom": "^1.1.1"
+    "npm": "^10.5.0"
   },
   "devDependencies": {
     "eslint-config-next": "^14.1.4"

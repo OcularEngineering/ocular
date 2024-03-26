@@ -1,4 +1,4 @@
-import { AbstractSearchService, ApproachContext, SearchDocumentsResult } from "@ocular/types"
+import { AbstractSearchService, ApproachContext, IndexableDocChunk, SearchDocumentsResult } from "@ocular/types"
 import { AzureOpenAIOptions, SearchEngineOptions, SearchOptions } from "../types/search/options"
 import { ConfigModule, Logger } from "../types"
 import { SearchIndexClient } from "@azure/search-documents"
@@ -99,17 +99,19 @@ class SearchService extends AbstractSearchService {
     //     results.push(`${document[this.sourcePageField]}: ${removeNewlines(document[this.contentField])}`);
     //   }
     // }
-
+    
+    const indexableDocResults: IndexableDocChunk[] = [] 
     for await (const result of searchResults.results) {
       const document = result.document as any;
       document.contentVector = null
       document.titleVector = null
       results.push(document.content);
+      indexableDocResults.push(document)
     }
     const content = results.join('\n');
     return {
       query: queryText ?? '',
-      results: results,
+      results: indexableDocResults,
       content: content,
     };
   }

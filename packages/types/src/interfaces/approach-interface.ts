@@ -1,4 +1,4 @@
-import { Message } from '../common';
+import { IndexableDocChunk, Message } from '../common';
 
 export enum ApproachDefinitions {
   ASK_RETRIEVE_READ="ask-retrieve-read",
@@ -11,6 +11,7 @@ export interface ApproachResponse {
     index: number;
     message: ApproachResponseMessage;
   }>;
+  results?: IndexableDocChunk[];
   object: 'chat.completion';
 }
 

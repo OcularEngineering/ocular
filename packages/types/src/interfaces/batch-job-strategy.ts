@@ -1,6 +1,7 @@
 
 import { TransactionBaseService } from "./transaction-base-service"
 import { CreateBatchJobInput } from "../batch-job"
+import { Express } from "express"
 
 
 export interface IBatchJobStrategy extends TransactionBaseService {

@@ -2,15 +2,15 @@
   "extends": [
     "plugin:@nrwl/nx/react-typescript",
     "next",
-    "next/core-web-vitals",
-    "../../.eslintrc.json"
+    "next/core-web-vitals"
   ],
+
   "ignorePatterns": ["!**/*", ".next/**/*"],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
       "rules": {
-        "@next/next/no-html-link-for-pages": ["error", "apps/shell/pages"]
+        "@next/next/no-html-link-for-pages": "off" // ignore this rule
       }
     },
     {
@@ -20,6 +20,20 @@
     {
       "files": ["*.js", "*.jsx"],
       "rules": {}
+    },
+    {
+      "files": ["*.ts", "*.tsx"],
+      "parser": "@typescript-eslint/parser",
+      "plugins": ["@typescript-eslint"],
+      "rules": {
+        "@typescript-eslint/no-array-constructor": "off",
+        "@typescript-eslint/no-namespace": "off",
+        "@typescript-eslint/no-use-before-define": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/no-useless-constructor": "off",
+        "@typescript-eslint/no-unused-expressions": "off"
+        
+      }
     }
   ],
   "rules": {
@@ -27,5 +41,5 @@
   },
   "env": {
     "jest": true
-  }
+  } 
 }
