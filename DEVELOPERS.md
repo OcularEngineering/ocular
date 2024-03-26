@@ -26,6 +26,7 @@ To contribute code to Ocular, you must fork the [Ocular repo](https://github.com
    ```
 
 2. Go to the Ocular directory:
+
    ```sh
    cd ocular
    ```
@@ -34,27 +35,55 @@ To contribute code to Ocular, you must fork the [Ocular repo](https://github.com
 
 1. Install the dependencies in the root of the repo.
 
+```sh
+   npm install # install dependencies
+```
+
+### Start Backend
+
+1. Build repo with turbo.
+
+```sh
+   turbo build  # install dependencies
+```
+
+2. Copy the example `.env.local.example` to `.env.local`
+
+```sh
+   cp packages/ocular/.env.local.example packages/ocular/.env
+```
+
+3. Navigate into core-backend "packages/ocular" and uncomment "apps" and "plugins" to activate apps and plugins in Ocular.
+
+4. Configure .env with app and plugin secrets of the apps added above.
+
+5. After that start the backend.
+
+```sh
+   npm run start # start all the applications
+```
+
+### Start UI
+
+1. Install the dependencies in the root of the repo.
+
    ```sh
    npm install # install dependencies
    ```
 
-2. Copy the example `.env.local.example` to `.env.local`
-
-   ```sh
-   cp packages/ocular/.env.local.example packages/ocular/.env.local
-   ```
+2. Navigate to Ocular UI in "packages/ocular-ui".
 
 3. After that you can run the apps simultaneously with the following.
-   ```sh
+
+```sh
    npm run dev # start all the applications
-   ```
+```
 
 Then visit the following sites:
 
 | Site                                                     | Directory      | Scope name | Description                                   | Local development server   |
 | -------------------------------------------------------- | -------------- | ---------- | --------------------------------------------- | -------------------------- |
-| [useocular.com/dashboard](https://useocular.com/dashboard) | `/packages/ocular-ui` | front-end    | Ocular UI (requires Docker, see below) | http://localhost:3001      |
-
+| [useocular.com/dashboard](https://useocular.com/dashboard) | `/packages/ocular-ui` | front-end    | Ocular UI (requires Docker, see below) | http://localhost:3001/create-account      |
 
 #### Shared components
 
@@ -75,7 +104,6 @@ The format is: `npm install <package name> -w=<workspace to install in>`.
 
 For example:
 
-- `npm install react -w plugins`: installs into `./packages/common`
 - `npm install react -w ocular-ui`: installs into `./packages/ocular-ui`
 - `npm install react -w ocular`: installs into `./packages/ocular`
 
@@ -89,24 +117,10 @@ To run Studio locally, you'll need to setup Docker in addition to your NextJS fr
 
 First, make sure you have the Docker installed on your device. You can download and install it from [here](https://docs.docker.com/get-docker/).
 
-#### Get Started
-
-1. Navigate to the `docker` directory in your forked repo
+1. In the home directory, run docker.
 
    ```sh
-   cd docker
-   ```
-
-2. Copy the example `env` file
-
-   ```sh
-   cp .env.example .env
-   ```
-
-3. Run docker
-
-   ```sh
-   docker compose up
+   docker compose -f docker-compose.dev.yml up
    ```
 
 This command initializes the containers specified in the `docker-compose.yml` file. It might take a few moments to complete, depending on your computer and internet connection.
@@ -130,7 +144,3 @@ We don't have a process for assigning issues to contributors yet.
 ## Community channels
 
 If you get stuck somewhere or have any questions, join our [Discord Community Server](https://slack.com)!
-
-
-Start Docker For Ocular
-"docker compose -f docker-compose.dev.yml up"
