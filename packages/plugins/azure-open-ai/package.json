@@ -19,6 +19,7 @@
    "dependencies": {
       "@ocular/ocular": "*",
       "@ocular/types": "*",
-      "@ocular/utils": "*"
+      "@ocular/utils": "*",
+      "openai": "^4.29.2"
    }
- }
+}

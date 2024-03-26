@@ -1,6 +1,8 @@
+import { IndexableDocChunk } from "../common";
+
 export interface SearchDocumentsResult {
   query: string;
-  results: string[];
+  results:  IndexableDocChunk[];
   content: string;
 }
 
