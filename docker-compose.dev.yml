@@ -8,6 +8,19 @@ services:
       POSTGRES_PASSWORD: ocular
       POSTGRES_USER: ocular
       POSTGRES_DB: ocular
+
+  ocular-db-migration:
+    container_name: ocular-db-migration
+    depends_on:
+      - ocular-db
+    build:
+      context: .
+      dockerfile: packages/ocular/Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://ocular:ocular@ocular-db:5432/ocular
+      - DATABASE_NAME=ocular
+    command: npm run typeorm migration:run
+
   ocular-backend:
     container_name: ocular-backend
     build:
@@ -16,19 +29,20 @@ services:
     depends_on:
       ocular-db:
         condition: service_started
+      ocular-db-migration:
+        condition: service_completed_successfully
     ports:
       - 9000:9000
     environment:
-      - DATABASE_URL=postgres://ocular:ocular@db/ocular
-      - NODE_ENV=development
+      - DATABASE_URL=postgresql://ocular:ocular@ocular-db:5432/ocular
+      - DATABASE_NAME=ocular
 
-  # ocular-ui:
-  #   image: /pack/practice_docker
-  #   ports:
-  #     - 80:3000
-  #   command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; npm start'
-  #   depends_on:
-  #     - db
-  #   environment:
-  #     - DATABASE_URL=postgres://postgres:password@db:5432/practicedocker
-  #     - PORT=3000
+  ocular-ui:
+    container_name: ocular-ui
+    build:
+      context: .
+      dockerfile: packages/ocular-ui/Dockerfile
+    ports:
+      - 3001:3001
+    depends_on:
+      - ocular-backend

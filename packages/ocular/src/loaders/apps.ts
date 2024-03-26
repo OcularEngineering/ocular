@@ -80,9 +80,9 @@ function getResolvedApps(
 ): undefined | AppDetails[] {
   const { apps } = configModule
 
-  const resolved = apps.map((app) => {
+  const resolved = apps.map((app:AppDetails) => {
     if (_.isString(app)) {
-      return resolveApp(app)
+      return resolveApp(app.resolve)
     }
 
     const details = resolveApp(app.resolve)

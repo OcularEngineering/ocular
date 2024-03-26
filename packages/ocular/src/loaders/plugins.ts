@@ -83,9 +83,9 @@ function getResolvedPlugins(
 ): undefined | PluginDetails[] {
   const { plugins } = configModule
 
-  const resolved = plugins.map((plugin) => {
+  const resolved = plugins.map((plugin:PluginDetails) => {
     if (_.isString(plugin)) {
-      return resolvePlugin(plugin)
+      return resolvePlugin(plugin.resolve)
     }
 
     const details = resolvePlugin(plugin.resolve)

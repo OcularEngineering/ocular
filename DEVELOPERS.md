@@ -130,3 +130,7 @@ We don't have a process for assigning issues to contributors yet.
 ## Community channels
 
 If you get stuck somewhere or have any questions, join our [Discord Community Server](https://slack.com)!
+
+
+Start Docker For Ocular
+"docker compose -f docker-compose.dev.yml up"
