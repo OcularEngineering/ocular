@@ -20,6 +20,7 @@
   ],
   "author": "Louis Luxa Murerwa",
   "dependencies": {
+    "@medusajs/utils": "^1.11.7",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "knew": "0.0.0",

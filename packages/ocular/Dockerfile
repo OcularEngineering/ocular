@@ -1,4 +1,6 @@
-FROM node:18-buster-slim
+
+FROM node:18-alpine
+
 
 
 WORKDIR /usr/src/app
@@ -22,7 +24,6 @@ COPY turbo.json ./
 # Copy app source
 COPY . .
 
-# RUN npm install @nx/nx-linux-arm64-gnu
 RUN npm install --verbose
 RUN turbo build
 
@@ -30,4 +31,4 @@ EXPOSE 8080
 
 WORKDIR /usr/src/app/packages/ocular
 
-CMD [ "npm", "run" "start" ]
+CMD ["npm", "run", "start"]

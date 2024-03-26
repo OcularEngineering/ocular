@@ -31,4 +31,5 @@ node_modules
 .env.production
 .env
 .next
-./docker-compose.yml
+./docker
+docker-compose.dev.yml 

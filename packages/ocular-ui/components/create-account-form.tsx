@@ -4,13 +4,13 @@ import * as React from "react"
 import { useRouter } from "next/navigation";
 
 // Importing API End Points
-import api from "@/src/services/admin-api"
+import api from "@/services/admin-api"
 
 // Importing Components
 import { cn } from "@/lib/utils"
-import { Icons } from "@/src/components/ui/icons"
-import { Button } from "@/src/components/ui/button"
-import { Input } from "@/src/components/ui/input"
+import { Icons } from "@/components/ui/icons"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
 interface CreateAccountFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 

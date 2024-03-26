@@ -6,19 +6,21 @@
   "types": "dist/index.d.ts",
   "author": "Louis Luxa ßßMurerwa",
   "devDependencies": {
-     "cross-env": "^5.2.1",
-     "typeorm": "^0.3.16",
-     "typescript": "^4.9.5"
+    "cross-env": "^5.2.1",
+    "typeorm": "^0.3.16",
+    "typescript": "^4.9.5"
   },
   "scripts": {
-     "prepare": "cross-env NODE_ENV=production npm run build",
-     "test": "jest --passWithNoTests src",
-     "build": "tsc",
-     "watch": "tsc --watch"
+    "prepare": "cross-env NODE_ENV=production npm run build",
+    "test": "jest --passWithNoTests src",
+    "build": "tsc",
+    "watch": "tsc --watch"
   },
   "dependencies": {
-     "@ocular/ocular": "*",
-     "@ocular/types": "*",
-     "@ocular/utils": "*"
+    "@ocular/ocular": "*",
+    "@ocular/types": "*",
+    "@ocular/utils": "*",
+    "axios": "^1.6.8",
+    "randomatic": "^3.1.1"
   }
 }

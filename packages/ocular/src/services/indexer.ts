@@ -69,7 +69,7 @@ export default class IndexerService implements IIndexerInterface {
     }
 
     if(chunk?.content){
-      chunk.contentVector = await this.openAiService_.createEmbeddings(chunk.content)
+     chunk.contentVector = await this.openAiService_.createEmbeddings(chunk.content)
     }
     return chunk
   }
