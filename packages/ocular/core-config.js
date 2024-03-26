@@ -13,7 +13,7 @@ switch (process.env.NODE_ENV) {
     break;
   case "development":
   default:
-    ENV_FILE_NAME = ".env";
+    ENV_FILE_NAME = ".env.local";
     break;
 }
 
