@@ -16,14 +16,14 @@
 
 [Ocular](https://useocular.com) is a set of modules and tools that allow you to build rich, reliable, and performant Generative AI-Powered Search Platforms without the need to reinvent Search Architecture.
 
-We're help you build you spin up customized internal search in days not months.
+We're help to you build you spin up customized internal search in days not months.
 
 <img src="/img/search.gif" width="100%" alt="Dashboard" />
 
 ## Features
 
 - ** Google Like Search Interface - Find what you need.
-- ** App MarketPlace - Connect to All of your favorite Apps.
+- ** App MarketPlace - Connect to all of your favorite Apps.
 - ** Custom Connectors - Build your own connectors to propeitary data sources.
 - ** Customizable Modular Infrastructure - Bring your own custom LLM's, Vector DB and more into Ocular.
 - ** Governance Engine - Role Based Access Control, Audit Logs etc.
@@ -32,7 +32,7 @@ We're help you build you spin up customized internal search in days not months.
 
 Repo is under [Apache License](https://github.com/OcularEngineering/ocular?tab=Apache-2.0-1-ov-file), with the exception of the `ee` directory which will contain premium enterprise features requiring an Ocular License.
 
-If you are interested in managed Ocular Cloud of self-hosted Enterprise Offerin [book a meeting with us](https://calendly.com/louis-murerwa):
+If you are interested in managed Ocular Cloud of self-hosted Enterprise Offering [book a meeting with us](https://calendly.com/louis-murerwa):
 
 <a href="[https://calendly.com/louis-murerwa](https://calendly.com/louis-murerwa)"><img alt="Schedule a meeting" src="https://cal.com/book-with-cal-dark.svg" /></a>
 
@@ -40,7 +40,7 @@ If you are interested in managed Ocular Cloud of self-hosted Enterprise Offerin 
 
 ## Running Ocular in Docker
 
-To run Studio locally, you'll need to setup Docker in addition to your NextJS frontend.
+To run Ocular locally, you'll need to setup Docker in addition to Ocular.
 
 ### Prerequsites
 
