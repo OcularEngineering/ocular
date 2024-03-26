@@ -12,11 +12,31 @@
 <p align="center">
 </p>
 
-## What is Ocular
+## Introduction
 
-Ocular is a set of modules and tools that allow you to build rich, reliable, and performant Generative AI-Powered Search Platforms without the need to reinvent Search Architecture.
+[Ocular](https://useocular.com) is a set of modules and tools that allow you to build rich, reliable, and performant Generative AI-Powered Search Platforms without the need to reinvent Search Architecture.
 
+We're help you build you spin up customized internal search in days not months.
 
+<img src="/img/search.gif" width="100%" alt="Dashboard" />
+
+## Features
+
+- ** Google Like Search Interface - Find what you need.
+- ** App MarketPlace - Connect to All of your favorite Apps.
+- ** Custom Connectors - Build your own connectors to propeitary data sources.
+- ** Customizable Modular Infrastructure - Bring your own custom LLM's, Vector DB and more into Ocular.
+- ** Governance Engine - Role Based Access Control, Audit Logs etc.
+
+## Open-source vs Paid
+
+Repo is under [Apache License](https://github.com/OcularEngineering/ocular?tab=Apache-2.0-1-ov-file), with the exception of the `ee` directory which will contain premium enterprise features requiring an Ocular License.
+
+If you are interested in managed Ocular Cloud of self-hosted Enterprise Offerin [book a meeting with us](https://calendly.com/louis-murerwa):
+
+<a href="[https://calendly.com/louis-murerwa](https://calendly.com/louis-murerwa)"><img alt="Schedule a meeting" src="https://cal.com/book-with-cal-dark.svg" /></a>
+
+## Getting started
 
 ## Running Ocular in Docker
 
@@ -37,3 +57,11 @@ This command initializes the containers specified in the `docker-compose.yml` fi
 Once the `docker compose up` process completes, you should have your local version of Ocular up and running within Docker containers. You can access it at `http://localhost:3001`.
 
 Remember to keep the Docker application open as long as you're working with your local Ocular instance.
+
+## Contributing
+
+We love contributions. Check out our guide to see how to [get started](https://github.com/OcularEngineering/ocular/blob/main/CONTRIBUTING.md).
+
+Not sure where to get started? You can:
+
+- Join our <a href="">Slack</a>, and ask us any questions there.
