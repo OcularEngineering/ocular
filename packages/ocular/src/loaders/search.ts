@@ -24,33 +24,6 @@ async function searchIndexLoader({
   logger,
 }: Options): Promise<void> {
 
-  const { apiKey, endpoint } = configModule.projectConfig.search_engine_options as SearchEngineOptions
-
-  if (!apiKey) {
-    throw new Error("Please provide a valid search apiKey")
-  }
-
-  if (!endpoint) {
-    throw new Error("Please provide a valid search Endpoint")
-  }
-
-  const searchIndexClient = new SearchIndexClient(endpoint, new AzureKeyCredential(apiKey));
-
-  try {
-    await searchIndexClient.getServiceStatistics()
-    logger?.info(`Connection to Search Client established`)
-  } catch (err) {
-    logger?.error(`An error occurred while connecting to Search Client: ${err}`)
-    throw AutoflowAiError
-    console.log(err)
-  }
-
-  container.register({
-    searchIndexClient: asValue(searchIndexClient),
-  })
-
-  // Check if there is a SearchService registered in the container before we emit the 
-  // event to trigger the Search Service Index build.
   const searchService = container.resolve<AbstractSearchService>("searchService")
   if (searchService.isDefault) {
     logger.warn(

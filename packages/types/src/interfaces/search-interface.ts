@@ -1,23 +1,29 @@
 import { IndexableDocChunk } from "../common";
 
-export interface SearchDocumentsResult {
+export type SearchContext = {
+  retrieval_mode?: 'hybrid' | 'text' | 'vectors';
+  semantic_ranker?: boolean;
+  semantic_captions?: boolean;
+  top?: number;
+  temperature?: number;
+  prompt_template?: string;
+  prompt_template_prefix?: string;
+  prompt_template_suffix?: string;
+  exclude_category?: string;
+};
+
+
+export interface SearchResult {
+  ai_content: string;
   query: string;
-  results:  IndexableDocChunk[];
-  content: string;
+  docs:  IndexableDocChunk[];
 }
 
 export interface ISearchService {
-    /**
-     * Used to search for a document in an index
-     * @param indexName the index name
-     * @param query the search query
-     * @param options
-     * - any options passed to the request object other than the query and indexName
-     * - additionalOptions contain any provider specific options
-     * @return returns response from search engine provider
-     */
-    search(indexName: string, query: string | null, options: unknown):  Promise<SearchDocumentsResult>
-}
+    // createIndex(indexName: string);
+    addDocuments(indexName: string, documents: IndexableDocChunk[]);
+    search(indexName: string, query: string, context?: SearchContext):  Promise<SearchResult>
+  }
 
 export abstract class AbstractSearchService
   implements ISearchService
@@ -38,10 +44,11 @@ export abstract class AbstractSearchService
   protected constructor(container, options) {
     this.options_ = options
   }
-
+  // abstract createIndex(indexName: string);
+  abstract addDocuments(indexName: string, documents: IndexableDocChunk[]);
   abstract search(
     indexName: string,
-    query: string | null,
-    options: unknown
-  ): Promise<SearchDocumentsResult>
+    query: string ,
+    context?: SearchContext
+  ): Promise<SearchResult>
 }

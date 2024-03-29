@@ -31,4 +31,8 @@ EXPOSE 8080
 
 WORKDIR /usr/src/app/packages/ocular
 
-CMD ["npm", "run", "start"]
+RUN apk add --no-cache bash curl && curl -1sLf \
+  'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.alpine.sh' | bash \
+  && apk add infisical
+
+CMD ["sh", "-c", "infisical run --env=dev -- npm run start"]

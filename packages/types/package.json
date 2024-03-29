@@ -34,6 +34,7 @@
   "dependencies": {
     "@azure/search-documents": "^12.0.0",
     "@ocular/utils": "file:../utils",
+    "@qdrant/js-client-rest": "^1.8.1",
     "bullmq": "^5.4.3",
     "express": "^4.18.3",
     "ulid": "^2.3.0"

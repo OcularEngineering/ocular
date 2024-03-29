@@ -33,3 +33,5 @@ node_modules
 .next
 ./docker
 docker-compose.dev.yml 
+ typesense-data/
+../typesense-data/

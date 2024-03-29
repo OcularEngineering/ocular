@@ -1,5 +1,5 @@
 import { IAskApproach, ISearchService, ILLMInterface, AutoflowContainer } from "@ocular/types";
-import { ApproachContext, ApproachResponse, ApproachResponseChunk } from "@ocular/types";
+import { SearchContext, ApproachResponse, ApproachResponseChunk } from "@ocular/types";
 import { MessageBuilder} from "../utils/message";
 import { EntityManager } from "typeorm";
 import { ApproachDefinitions } from "@ocular/types";
@@ -39,20 +39,27 @@ export default class AskRetrieveThenRead implements IAskApproach {
     this.searchService_ = container.searchService;
   }
 
-  async run(indexName: string, userQuery: string, context?: ApproachContext): Promise<ApproachResponse> {
-    const { query, results, content } = await this.searchService_.search(indexName, userQuery, context);
+  async run(indexName: string, userQuery: string, context?: SearchContext): Promise<ApproachResponse> {
+    let { query, docs, ai_content } = await this.searchService_.search(indexName, userQuery, context);
+
+    docs = docs.filter(doc => doc !== null);
+    console.log("Found Docs", docs)
+  
     const messageBuilder = new MessageBuilder(context?.prompt_template || SYSTEM_CHAT_TEMPLATE);
 
-    // const sources = content.map((c) => c.content).join(', ');
+    const sources = docs.map((c) => c.content).join(', ');
     // Add user question
-    const userContent = `${userQuery}\nSources:\n${content}`;
+    const userContent = `${userQuery}\nSources:\n${sources}`;
     messageBuilder.appendMessage('user', userContent);
 
-    // Add shots/samples. This helps model to mimic response and make sure they match rules laid out in system message.
+   
+    // // Add shots/samples. This helps model to mimic response and make sure they match rules laid out in system message.
     // messageBuilder.appendMessage('assistant', QUESTION);
     // messageBuilder.appendMessage('user', ANSWER);
 
     const messages = messageBuilder.messages;
+
+    console.log(messages)
 
     const chatCompletion = await this.openai_.completeChat(messages);
 
@@ -74,7 +81,7 @@ export default class AskRetrieveThenRead implements IAskApproach {
           },
         },
       ],
-      results: results,
+      docs: docs,
       object: 'chat.completion',
     };
   }

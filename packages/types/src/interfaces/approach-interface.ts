@@ -1,4 +1,5 @@
 import { IndexableDocChunk, Message } from '../common';
+import { SearchContext } from "./search-interface";
 
 export enum ApproachDefinitions {
   ASK_RETRIEVE_READ="ask-retrieve-read",
@@ -11,7 +12,7 @@ export interface ApproachResponse {
     index: number;
     message: ApproachResponseMessage;
   }>;
-  results?: IndexableDocChunk[];
+  docs?: IndexableDocChunk[];
   object: 'chat.completion';
 }
 
@@ -36,19 +37,8 @@ export type ApproachResponseMessage = Message & {
   session_state?: Record<string, any>;
 };
 
-export type ApproachContext = {
-  retrieval_mode?: 'hybrid' | 'text' | 'vectors';
-  semantic_ranker?: boolean;
-  semantic_captions?: boolean;
-  top?: number;
-  temperature?: number;
-  prompt_template?: string;
-  prompt_template_prefix?: string;
-  prompt_template_suffix?: string;
-  exclude_category?: string;
-};
 
-export type ChatApproachContext = ApproachContext & {
+export type ChatApproachContext = SearchContext & {
   suggest_followup_questions?: boolean;
 };
 
@@ -59,6 +49,6 @@ export interface IChatApproach {
 
 export interface IAskApproach {
   identifier: ApproachDefinitions;
-  run(indexName: string, query: string, context?: ApproachContext): Promise<ApproachResponse>;
+  run(indexName: string, query: string, context?: SearchContext): Promise<ApproachResponse>;
 }
 
