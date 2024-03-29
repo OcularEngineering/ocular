@@ -52,7 +52,7 @@ class SearchIndexingSubscriber {
     this.eventBusService_.subscribe(OAuthService.Events.TOKEN_GENERATED, this.addSearchIndexingJob)
   }
 
-  // Schedules Jobs That Build The Search Indexes For The Organisations in Ocular
+  // Schedules Jobs That Index Apps Connected To Ocualar.
   buildSearchIndex = async (): Promise<void> => {
       console.error("Building Search Indexes")
       const orgs: Organisation[] =  await this.organisationService_.list({})
@@ -122,6 +122,7 @@ class SearchIndexingSubscriber {
     })
   }
 
+  // Registers The Handler To Handle Docs Sent To Ocular By Apps.
   registerIndexDocumentJobHandler = async (data:IndexableDocument[]): Promise<void> => {
     try{
     if(data.length == 0) return;
@@ -135,6 +136,7 @@ class SearchIndexingSubscriber {
     }
   }
 
+  // Schedules An jndexing job when an app is installed by an organization.
   addSearchIndexingJob = async (data): Promise<void> => {
     const {organisation,app_name} = data
     this.jobSchedulerService_.create(`Sync Apps Data for ${organisation.name}`, {org: organisation}, "* * * * *", async () => {

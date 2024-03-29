@@ -18,3 +18,4 @@ node_modules
 
 .dockerignore
 ./docker
+ typesense-data/

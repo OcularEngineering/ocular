@@ -16,16 +16,6 @@ async function redisLoader({
   configModule,
   logger,
 }: Options): Promise<void> {
-  if(process.env.NODE_ENV === "development") {
-    logger.info("Using fake Redis")
-
-    // Economical way of dealing with redis clients
-    const client = new FakeRedis()
-
-    container.register({
-      redisClient: asValue(client),
-    })
-   } else {
     if (configModule.projectConfig.redis_url) {
       const redisClient = new Redis(configModule.projectConfig.redis_url, {
         // Lazy connect to properly handle connection errors
@@ -50,9 +40,8 @@ async function redisLoader({
             `No Redis url was provided - using Autoflow in production without a proper Redis instance is not recommended`
           )
       }
-  
     }
-  }
+  // }
   
 }
 

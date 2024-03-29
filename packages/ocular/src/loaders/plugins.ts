@@ -14,8 +14,9 @@ import {
   formatRegistrationName,
 } from "../utils/format-registration-name"
 import {  aliasTo, asValue, asFunction , Lifetime } from "awilix"
-import { AbstractNotificationService, OauthService } from "@ocular/types"
+import { AbstractNotificationService, AbstractSearchService, OauthService } from "@ocular/types"
 import { AbstractDocumentProcesserService, AbstractLLMService } from "@ocular/types";
+import { AbstractVectorDBService } from "@ocular/types";
 
 type Options = {
   rootDirectory: string
@@ -245,6 +246,33 @@ export async function registerServices(
               lifetime: loaded.LIFE_TIME || Lifetime.SINGLETON,
             }
           ),
+        })
+      } else if (AbstractVectorDBService.isVectorDBService(loaded.prototype)){
+        // Register A Vector DB Service To Our Backend As The Defacto VectorDB
+        // for Ocular
+        container.register({
+          [name]: asFunction(
+            (cradle) => new loaded(cradle, pluginDetails.options),
+            {
+              lifetime: loaded.LIFE_TIME || Lifetime.SINGLETON,
+            }
+          ),
+          // Register Service as vectorDBService for easy resolution.
+          [`vectorDBService`]: aliasTo(name),
+        })
+        container.register(isSearchEngineInstalledResolutionKey, asValue(true))
+      } else if (AbstractSearchService.isSearchService(loaded.prototype)) {
+        // Register A SeaService To Our Backend As The Defacto VectorDB
+        // for Ocular
+        container.register({
+          [name]: asFunction(
+            (cradle) => new loaded(cradle, pluginDetails.options),
+            {
+              lifetime: loaded.LIFE_TIME || Lifetime.SINGLETON,
+            }
+          ),
+          // Register Service as vectorDBService for easy resolution.
+          [`searchIndexService`]: aliasTo(name),
         })
       } else {
         container.register({

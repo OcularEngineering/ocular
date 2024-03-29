@@ -21,8 +21,9 @@ export default function Search() {
     setIsLoading(true); 
     api.search.ask(router.query.q)
       .then(data => {
+        console.log(data)
         setAiResults(data.data.choices[0].message.content);
-        setSearchResults(data.data.results); 
+        setSearchResults(data.data.docs); 
         setIsLoading(false); 
       })
       .catch(error => {

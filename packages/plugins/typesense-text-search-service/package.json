@@ -1,0 +1,19 @@
+{
+   "name": "typesense-search",
+   "version": "0.0.0",
+   "description": "TypeSearch PlugIn for Ocular",
+   "main": "dist/index.js",
+   "types": "dist/index.d.ts",
+   "author": "Louis Murerwa",
+   "scripts": {
+      "prepare": "cross-env NODE_ENV=production npm run build",
+      "test": "jest --passWithNoTests src",
+      "build": "tsc",
+      "watch": "tsc --watch"
+   },
+   "dependencies": {
+      "@babel/runtime": "^7.24.1",
+      "@ocular/types": "*",
+      "typesense": "^1.7.2"
+   }
+}

@@ -129,14 +129,13 @@ export default async ({
   })
   const pAct = Logger.success(pluginsActivity, "Plugins intialized") || {}
 
-  const searActivity = Logger.activity(`Initializing Search Engine${EOL}`)
-  await searchIndexLoader({container, configModule, logger: Logger})
-  const searAct = Logger.success(searActivity, "Search Engine initialized") || {}
-
-
   const subActivity = Logger.activity(`Initializing subscribers${EOL}`)
   await subscribersLoader({ container })
   const subAct = Logger.success(subActivity, "Subscribers initialized") || {}
+
+  const searActivity = Logger.activity(`Initializing Search Engine${EOL}`)
+  await searchIndexLoader({container, configModule, logger: Logger})
+  const searAct = Logger.success(searActivity, "Search Engine initialized") || {}
 
   const approachesActivity = Logger.activity(`Initializing approaches${EOL}`)
   await approachesLoader({ container, configModule })

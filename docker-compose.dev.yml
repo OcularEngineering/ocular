@@ -1,5 +1,39 @@
 version: "3"
 services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    restart: always
+    container_name: qdrant
+    ports:
+      - 6333:6333
+      - 6334:6334
+    expose:
+      - 6333
+      - 6334
+      - 6335
+    configs:
+      - source: qdrant_config
+        target: /qdrant/config/production.yaml
+    volumes:
+      - ./qdrant_data:/qdrant_data
+  
+  typesense:
+    image: typesense/typesense:0.25.2
+    restart: on-failure
+    ports:
+      - "8108:8108"
+    volumes:
+      - ./typesense-data:/data
+    command: '--data-dir /data --api-key=xyz --enable-cors'
+
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis-data:/data
+
   ocular-db:
     image: postgres:14-alpine
     ports:
@@ -31,11 +65,19 @@ services:
         condition: service_started
       ocular-db-migration:
         condition: service_completed_successfully
+      qdrant:
+        condition: service_started
     ports:
       - 9000:9000
     environment:
       - DATABASE_URL=postgresql://ocular:ocular@ocular-db:5432/ocular
       - DATABASE_NAME=ocular
+      - NODE_ENV=development
+      - INFISICAL_TOKEN=${INFISICAL_TOKEN_FOR_API}
+      - QDRANT_DB_URL=http://qdrant:6333
+      - TYPESENSE_HOST=typesense
+      - UI_CORS=http://ocular-ui:9000
+      - REDIS_URL=http://redis:6379
 
   ocular-ui:
     container_name: ocular-ui
@@ -46,3 +88,8 @@ services:
       - 3001:3001
     depends_on:
       - ocular-backend
+
+configs:
+  qdrant_config:
+    content: |
+      log_level: INFO 

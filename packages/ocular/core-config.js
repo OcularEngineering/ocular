@@ -35,10 +35,6 @@ module.exports = {
     database_type: "postgres",
     redis_url: process.env.REDIS_URL,
     ui_cors: UI_CORS,
-    search_engine_options: {
-      apiKey: process.env.AZURE_SEARCH_API_KEY,
-      endpoint: process.env.AZURE_SEARCH_ENDPOINT,
-    },
     azure_open_ai_options: {
       apiKey: process.env.AZURE_OPENAI_API_KEY,
       serviceName: process.env.AZURE_OPEN_AI_SERVICE_NAME,
@@ -101,5 +97,18 @@ module.exports = {
         chat_model: process.env.AZURE_OPEN_AI_CHAT_MODEL,
       }
     },
+    {
+      resolve: `qdrant-vector-search-service`,
+      options:{
+        quadrant_db_url: process.env.QDRANT_DB_URL || "http://localhost:6333",
+        embedding_size: 1536
+      }
+    },
+    {
+      resolve: "typesense-text-search-service",
+      options:{
+         typesense_host: process.env.TYPESENSE_HOST || "localhost"
+      }
+    }
   ]
 };

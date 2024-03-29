@@ -3,7 +3,7 @@ import { Readable } from 'node:stream';
 import { SearchService, UserService } from "../../../../services"
 import { Type } from "class-transformer"
 import { validator } from "@ocular/utils"
-import { ApproachDefinitions, ApproachContext} from "@ocular/types";
+import { ApproachDefinitions, SearchContext} from "@ocular/types";
 
 /**
  * @oas [post] /v1/ask

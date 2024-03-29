@@ -1,0 +1,19 @@
+{
+   "name": "qdrant-vector-search",
+   "version": "0.0.0",
+   "description": "Resend PlugIn for Ocular",
+   "main": "dist/index.js",
+   "types": "dist/index.d.ts",
+   "author": "Louis Murerwa",
+   "scripts": {
+      "prepare": "cross-env NODE_ENV=production npm run build",
+      "test": "jest --passWithNoTests src",
+      "build": "tsc",
+      "watch": "tsc --watch"
+   },
+   "dependencies": {
+      "@ocular/types": "*",
+      "@qdrant/js-client-rest": "^1.8.1",
+      "uuid": "^9.0.1"
+   }
+}

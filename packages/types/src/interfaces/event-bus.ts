@@ -33,6 +33,7 @@ export abstract class AbstractEventBusModuleService implements IEventBusModule
     subscriberId: string
     subscriber: Subscriber
   }) {
+    console.error(event)
     const newSubscriberDescriptor = { subscriber, id: subscriberId }
 
     const existingSubscribers = this.eventToSubscribersMap_.get(event) ?? []
