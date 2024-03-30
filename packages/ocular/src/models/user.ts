@@ -3,7 +3,6 @@ import { Organisation } from "./organisation";
 import { BaseEntity, UserRoles  } from "@ocular/types";
 import { DbAwareColumn } from "../../../utils/src/db-aware-column";
 import { generateEntityId } from "../utils/generate-entity-id";
-import { Team } from "./team";
 @Entity()
 export class User extends BaseEntity {
   @DbAwareColumn({
@@ -52,11 +51,6 @@ export class User extends BaseEntity {
       referencedColumnName: "id",
     },
   })
-  @ManyToMany(() => Team, (team) => team.members,{
-    onDelete: "CASCADE"
-  })
-  teams: Team[];
-
   /**
   * @apiIgnore
   */

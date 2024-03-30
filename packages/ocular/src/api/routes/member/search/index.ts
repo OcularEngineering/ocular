@@ -1,5 +1,4 @@
 import { Router } from "express"
-import { Invite } from "../../../../models/invite"
 import middlewares from "../../../middlewares"
 import "reflect-metadata"
 

@@ -1,4 +1,3 @@
-import { Component} from "../models";
 import {
   IsArray,
   IsOptional,
