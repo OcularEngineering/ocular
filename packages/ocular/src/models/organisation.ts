@@ -10,10 +10,7 @@ import { BaseEntity, InstalledApp } from "@ocular/types"
 import { DbAwareColumn } from "../../../utils/src/db-aware-column"
 import { generateEntityId } from "../utils/generate-entity-id"
 import { User } from "./user";
-import { Invite } from "./invite";
-import { Component, } from "./component";
 import { OAuth } from "./oauth";
-import { Team } from "./team";
 import { Event } from "./event";
 
 @Entity()
@@ -26,15 +23,6 @@ export class Organisation extends BaseEntity {
 
   @OneToMany(() => User, (user) => user?.organisation)
   members?: User[];
-
-  @OneToMany(() => Team, (team) => team?.organisation)
-  teams?: Team[];
-
-  @OneToMany(() => Invite, invite => invite?.organisation)
-  invites?: Invite[];
-
-  @OneToMany(() => Component, component => component?.organisation)
-  components?: Component[];
 
   @OneToMany(() => OAuth, oauth => oauth?.organisation)
   oauth?: OAuth[];

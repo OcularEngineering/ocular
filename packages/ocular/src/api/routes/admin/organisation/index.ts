@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { Router } from "express"
-import { Invite } from "../../../../models/invite"
 import middlewares from "../../../middlewares"
 import { transformQuery } from "../../../middlewares/transform-query"
 import { GetOrganisationParams } from "./get-organisation"

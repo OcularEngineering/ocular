@@ -3,9 +3,7 @@ import { BaseEntity } from "@ocular/types"
 import { generateEntityId } from "../utils/generate-entity-id"
 import { Organisation } from "./organisation"
 import { DbAwareColumn } from "../../../utils/src/db-aware-column"
-import { Team } from "./team"
 import { OAuth } from "./oauth"
-import { Component } from "./component"
 
 
 @Entity()
@@ -35,11 +33,6 @@ export class Event extends BaseEntity {
 
   @Column({ type: "varchar", nullable: true })
   component_id: string;
-
-  @ManyToOne(() => Component, (component) => component.events)
-  @JoinColumn({ name: 'component_id', referencedColumnName: 'id' })
-  component: Component;
-
   /**
   * @apiIgnore
   */

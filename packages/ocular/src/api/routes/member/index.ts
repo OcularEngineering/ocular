@@ -1,7 +1,6 @@
 import { Router } from "express"
 
 import auth from "./auth"
-import invites  from "./invites"
 import middlewares from "../../middlewares"
 // import apps from "./apps"
 // import components from "./member/components"
@@ -16,7 +15,6 @@ export default (app, container, config) => {
 
   // Unauthenticated Routes
   auth(route)
-  invites(route)
  
   // Authenticated routes
   route.use(middlewares.authenticate())
