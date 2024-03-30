@@ -64,4 +64,4 @@ We love contributions. Check out our guide to see how to [get started](https://g
 
 Not sure where to get started? You can:
 
-- Join our <a href="">Slack</a>, and ask us any questions there.
+- Join our <a href="https://join.slack.com/share/enQtNjg4MDUyNjQ3MTk5MC04ZWM0ZDMwYWNiZDFmNDFjNWZmNzNlODc5N2RiNzlhNWU0MjU2OGVjNGZmZDIxMjY0NTE1ZTU0YjFjNTNkZmE1">Slack</a>, and ask us any questions there.
