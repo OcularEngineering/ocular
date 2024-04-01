@@ -21,6 +21,7 @@ type InjectedDependencies = {
   jobSchedulerService: JobSchedulerService
   configModule: ConfigModule
   logger: Logger
+  indexName: string
 }
 
 class SearchIndexingSubscriber {
@@ -31,6 +32,7 @@ class SearchIndexingSubscriber {
   private readonly jobSchedulerService_: JobSchedulerService
   private readonly configModule_: ConfigModule;
   private readonly logger_: Logger
+  private readonly indexName_: string
 
   constructor({
     indexerService,
@@ -40,6 +42,7 @@ class SearchIndexingSubscriber {
     jobSchedulerService,
     configModule,
     logger,
+    indexName,
   }: InjectedDependencies) {
     this.indexerService_ = indexerService
     this.batchJobService_ = batchJobService
@@ -50,11 +53,12 @@ class SearchIndexingSubscriber {
     this.eventBusService_.subscribe(SEARCH_INDEX_EVENT, this.buildSearchIndex)
     this.eventBusService_.subscribe(INDEX_DOCUMENT_EVENT, this.registerIndexDocumentJobHandler)
     this.eventBusService_.subscribe(OAuthService.Events.TOKEN_GENERATED, this.addSearchIndexingJob)
+    this.indexName_ = indexName
   }
 
-  // Schedules Jobs That Index Apps Connected To Ocualar.
   buildSearchIndex = async (): Promise<void> => {
       console.error("Building Search Indexes")
+      await this.indexerService_.createIndex(this.indexName_)
       const orgs: Organisation[] =  await this.organisationService_.list({})
       orgs.forEach((org) => {
         if (!org.installed_apps) return;
@@ -129,8 +133,7 @@ class SearchIndexingSubscriber {
       console.log("Indexing Data", data.length)
       console.log(data[0])
       const org = await this.organisationService_.retrieve(data[0].organisationId)
-      await this.indexerService_.createIndex(orgIdToIndexName(org.id))
-      await this.indexerService_.indexDocuments(orgIdToIndexName(org.id), data)
+      await this.indexerService_.indexDocuments(this.indexName_, data)
     }catch(e){
       console.error(e)
     }

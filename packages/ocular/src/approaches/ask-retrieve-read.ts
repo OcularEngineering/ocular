@@ -40,7 +40,7 @@ export default class AskRetrieveThenRead implements IAskApproach {
   }
 
   async run(indexName: string, userQuery: string, context?: SearchContext): Promise<ApproachResponse> {
-    let { query, docs, ai_content } = await this.searchService_.search(indexName, userQuery, context);
+    let { query, docs, ai_content } = await this.searchService_.search(null, userQuery, context);
 
     docs = docs.filter(doc => doc !== null);
     console.log("Found Docs", docs)

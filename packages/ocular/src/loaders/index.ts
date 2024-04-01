@@ -54,6 +54,7 @@ export default async ({
  
   container.register({
     [ContainerRegistrationKeys.LOGGER]: asValue(Logger),
+    [ContainerRegistrationKeys.INDEX_NAME]: asValue("Ocular")
   })
 
   await redisLoader({ container, configModule, logger: Logger })

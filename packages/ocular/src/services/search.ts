@@ -10,6 +10,7 @@ import { ISearchService } from "@ocular/types"
 type InjectedDependencies = {
   searchIndexClient: SearchIndexClient
   logger: Logger
+  indexName: string
 }
 
 class SearchService extends AbstractSearchService {
@@ -18,7 +19,7 @@ class SearchService extends AbstractSearchService {
   protected readonly openAiService_:  ILLMInterface
   protected readonly config_: ConfigModule
   protected readonly logger_: Logger
-
+  protected readonly defaultIndexName_: string
   protected readonly vectorDBService_ : IVectorDB
   protected readonly searchIndexService_ : ISearchService
 
@@ -28,10 +29,12 @@ class SearchService extends AbstractSearchService {
     this.openAiService_ = container.openAiService
     this.vectorDBService_ = container.vectorDBService
     this.searchIndexService_ = container.searchIndexService
+    this.defaultIndexName_ = container.indexName
 
   }
 
   async search(indexName?:string, query?: string, context?: SearchContext): Promise<SearchResult> {
+    indexName = indexName? indexName:this.defaultIndexName_;
     // Query Has Text: Indicates to Query Full Text Search Index For Results.
     const hasText = ['text', 'hybrid', undefined].includes(context?.retrieval_mode);
 
@@ -52,10 +55,10 @@ class SearchService extends AbstractSearchService {
 
     // Retrieve Search Index Results
     // if (hasText){
-      const textSearch = await this.searchIndexService_.search(indexName,query)
-      console.log("textSearch Docs ")
-      console.log(textSearch)
-      allDocs.push(...textSearch.docs);
+      // const textSearch = await this.searchIndexService_.search(indexName,query)
+      // console.log("textSearch Docs ")
+      // console.log(textSearch)
+      // allDocs.push(...textSearch.docs);
     // }
 
 

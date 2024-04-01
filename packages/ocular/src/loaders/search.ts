@@ -24,7 +24,15 @@ async function searchIndexLoader({
   logger,
 }: Options): Promise<void> {
 
-  const searchService = container.resolve<AbstractSearchService>("searchService")
+  const searchService = container.resolve("searchIndexService")
+  if (searchService.isDefault) {
+    logger.warn(
+      "No search engine provider was found: make sure to include a search plugin to enable searching"
+    )
+    return
+  }
+
+  const vectorDBService = container.resolve("vectorDBService")
   if (searchService.isDefault) {
     logger.warn(
       "No search engine provider was found: make sure to include a search plugin to enable searching"

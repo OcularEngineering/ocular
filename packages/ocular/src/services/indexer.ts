@@ -1,10 +1,11 @@
-import { IndexableDocument, AutoflowContainer,IIndexerInterface,  IDocumentProcessorInterface ,IndexFields, semanticSearchProfile ,vectorSearchProfile, ILLMInterface  } from "@ocular/types"
+import { IndexableDocument, AutoflowContainer,IIndexerInterface,  IDocumentProcessorInterface, ILLMInterface  } from "@ocular/types"
 import { SearchIndexClient, SearchIndex} from "@azure/search-documents";
 import { ConfigModule } from "../types/config-module"
 import { Logger } from "@ocular/types";
 import { IndexableDocChunk } from "@ocular/types";
 import { IVectorDB } from "@ocular/types";
 import { ISearchService } from "@ocular/types";
+import { Index } from "typeorm";
 
 export default class IndexerService implements IIndexerInterface {
   private config_: ConfigModule
@@ -25,6 +26,15 @@ export default class IndexerService implements IIndexerInterface {
     this.searchIndexService_ = container.searchIndexService
   }
 
+  async createIndex(indexName:string){
+    try {
+     await this.vectorDBService_.createIndex(indexName)
+    } catch(err) {
+      this.logger_.error(`Failed To Create ${indexName}`)
+      throw err
+    }
+  }
+
   // Indexes a Batch of Docs To the Full Text Search + Vector Index and FileStorage.
   async indexDocuments(indexName: string, documents: IndexableDocument[]): Promise<void> {
     try {
@@ -35,9 +45,10 @@ export default class IndexerService implements IIndexerInterface {
       //   await this.blobStorage.upload(filename, data, type);
       // }
       const chunks = this.documentProcessorService_.chunkIndexableDocumentsBatch(documents)
-      chunks.map((chunk) => this.embedChunk(chunk))
-      await this.vectorDBService_.addDocuments(indexName, chunks)
-      await this.searchIndexService_.addDocuments(indexName, chunks)
+      const embeddedChunksPromises = await chunks.map((chunk) => this.embedChunk(chunk));
+      const embeddedChunks = await Promise.all(embeddedChunksPromises);
+      await this.vectorDBService_.addDocuments(indexName, embeddedChunks)
+      // await this.searchIndexService_.addDocuments(indexName, chunks)
     } catch (error) {
       this.logger_.error(`Error Indexing ${indexName}, error ${error.message}`)
     }
@@ -45,11 +56,12 @@ export default class IndexerService implements IIndexerInterface {
 
   private async embedChunk(chunk: IndexableDocChunk) {
     if(chunk?.title){
-      chunk.titleVector = await this.openAiService_.createEmbeddings(chunk.title)
+      const titleEmbeddings = await this.openAiService_.createEmbeddings(chunk.title)
+      chunk.titleEmbeddings = titleEmbeddings
     }
 
     if(chunk?.content){
-     chunk.contentVector = await this.openAiService_.createEmbeddings(chunk.content)
+     chunk.contentEmbeddings= await this.openAiService_.createEmbeddings(chunk.content)
     }
     return chunk
   }

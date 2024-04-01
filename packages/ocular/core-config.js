@@ -44,26 +44,26 @@ module.exports = {
     },
   },
   apps: [
-    {
-      resolve: `asana`,
-      options:{
-        client_id: process.env.ASANA_CLIENT_ID,
-        client_secret: process.env.ASANA_CLIENT_SECRET,
-        scope: "openid email profile",
-        redirect_uri: `${UI_CORS}/dashboard/marketplace/asana`
-      }
-    },
-    {
-      resolve: `github`,
-      options: {
-        client_id: process.env.GITHUB_CLIENT_ID,
-        client_secret: process.env.GITHUB_CLIENT_SECRET,
-        redirect_uri: `${UI_CORS}/dashboard/marketplace/github`,
-        app_id: process.env.GITHUB_APP_ID,
-        private_key: process.env.GITHUB_PRIVATE_KEY_PATH,
-        scope: "repo"
-      }
-    },
+    // {
+    //   resolve: `asana`,
+    //   options:{
+    //     client_id: process.env.ASANA_CLIENT_ID,
+    //     client_secret: process.env.ASANA_CLIENT_SECRET,
+    //     scope: "openid email profile",
+    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/asana`
+    //   }
+    // },
+    // {
+    //   resolve: `github`,
+    //   options: {
+    //     client_id: process.env.GITHUB_CLIENT_ID,
+    //     client_secret: process.env.GITHUB_CLIENT_SECRET,
+    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/github`,
+    //     app_id: process.env.GITHUB_APP_ID,
+    //     private_key: process.env.GITHUB_PRIVATE_KEY_PATH,
+    //     scope: "repo"
+    //   }
+    // },
     {
       resolve: `google-drive`,
       options: {
@@ -72,18 +72,23 @@ module.exports = {
         redirect_uri: `${UI_CORS}/dashboard/marketplace/google-drive`,
       }
     },
-    {
-      resolve: `gmail`,
-      options: {
-        client_id: process.env.GOOGLE_CLIENT_ID,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: `${UI_CORS}/dashboard/marketplace/gmail`,
-      }
-    },
+    // {
+    //   resolve: `gmail`,
+    //   options: {
+    //     client_id: process.env.GOOGLE_CLIENT_ID,
+    //     client_secret: process.env.GOOGLE_CLIENT_SECRET,
+    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/gmail`,
+    //   }
+    // },
   ],
   plugins: [
     {
       resolve: `document-processor`,
+      options: {
+        max_chunk_length:  1000,
+        sentence_search_limit: 100,
+        chunk_over_lap :100,
+      }
     },
     {
       resolve: `azure-open-ai`,
