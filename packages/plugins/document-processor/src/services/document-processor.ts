@@ -1,34 +1,74 @@
-import { IndexableDocument, IndexableDocChunk, AbstractDocumentProcesserService} from "@ocular/types";
+import { IndexableDocument, IndexableDocChunk, AbstractDocumentProcesserService, Section} from "@ocular/types";
 
 const SENTENCE_ENDINGS = new Set(['.', '。', '．', '!', '?', '‼', '⁇', '⁈', '⁉']);
 const WORD_BREAKS = new Set([',', '、', ';', ':', ' ', '(', ')', '[', ']', '{', '}', '\t', '\n']);
-const MAX_SECTION_LENGTH = 1000;
-const SENTENCE_SEARCH_LIMIT = 100;
-const SECTION_OVERLAP = 100;
-
-export default class DocumentProcessorService extends AbstractDocumentProcesserService {
+export default class documentProcessorService extends AbstractDocumentProcesserService {
   static identifier = "document-processor"
+  
+  protected max_chunk_length_ : number
+  protected sentence_search_limit_: number
+  protected chunk_over_lap_: number
 
+  constructor(container, options) {
+    super(container,options)
+    const { max_chunk_length, sentence_search_limit, chunk_over_lap} = options
+    this.max_chunk_length_  = max_chunk_length ? max_chunk_length : 1000;
+    this.sentence_search_limit_ = sentence_search_limit? sentence_search_limit: 100;
+    this.chunk_over_lap_ = chunk_over_lap? chunk_over_lap: 100;
+  }
 
+  // TODO: Use An Actual Tokenizer To Tokenize Chunks
+  // Rigt Now This is Manual. Use LangChain Tooling.
   chunkIndexableDocument(document: IndexableDocument): IndexableDocChunk[] {
-    const allText = document?.content;
-    const length = allText.length;
-    const chunks: IndexableDocChunk[] = [];
     
-    let start = 0;
-    let end = length;
-    let count = 0;
-    while (start + SECTION_OVERLAP < length) {
-      let lastWord = -1;
-      end = start + MAX_SECTION_LENGTH;
+ 
+    const sections: Section[] = document.sections
 
-      if (end > length) {
-        end = length;
+    // Returns a dictionary of the offsets And links held a Chunk
+    const findOffsetLinks = (start: number, end: number): Record<number,string>  => {
+      const offsetLinks: Record<number, string> = {};
+      const sectionCount = sections.length;
+      
+      sections.forEach(section => {
+        if (section.offset >= start && section.offset <= end) {
+          offsetLinks[section.offset] = section.link;
+        }
+      });
+      return offsetLinks
+    };
+    
+    const chunks: IndexableDocChunk[] = []
+    const allText = sections.map((section) => section.content).join('');
+    const allTextLength = allText.length
+
+    let start = 0;
+    let end = allTextLength;
+
+    if (end <= this.max_chunk_length_) {
+      return [{
+          chunkId: chunks.length,
+          organisationId: document.organisationId,
+          documentId: document.id,
+          source: document.source,
+          title: document.title,
+          content: allText,
+          metadata: document.metadata,
+          updatedAt: document.updatedAt,
+          offsets: findOffsetLinks(start,end)
+      }]
+    }
+    
+    while (start + this.chunk_over_lap_ < allTextLength) {
+      let lastWord = -1;
+      end = start + this.max_chunk_length_;
+
+      if (end > allTextLength) {
+        end = allTextLength;
       } else {
         // Try to find the end of the sentence
         while (
-          end < length &&
-          end - start - MAX_SECTION_LENGTH < SENTENCE_SEARCH_LIMIT &&
+          end < allTextLength &&
+          end - start -  this.max_chunk_length_< this.sentence_search_limit_ &&
           !SENTENCE_ENDINGS.has(allText[end])
         ) {
           if (WORD_BREAKS.has(allText[end])) {
@@ -36,10 +76,10 @@ export default class DocumentProcessorService extends AbstractDocumentProcesserS
           }
           end += 1;
         }
-        if (end < length && !SENTENCE_ENDINGS.has(allText[end]) && lastWord > 0) {
+        if (end < allTextLength && !SENTENCE_ENDINGS.has(allText[end]) && lastWord > 0) {
           end = lastWord; // Fall back to at least keeping a whole word
         }
-        if (end < length) {
+        if (end < allTextLength) {
           end += 1;
         }
       }
@@ -48,7 +88,7 @@ export default class DocumentProcessorService extends AbstractDocumentProcesserS
       lastWord = -1;
       while (
         start > 0 &&
-        start > end - MAX_SECTION_LENGTH - 2 * SENTENCE_SEARCH_LIMIT &&
+        start > end - this.max_chunk_length_ - 2 * this.sentence_search_limit_&&
         !SENTENCE_ENDINGS.has(allText[start])
       ) {
         if (WORD_BREAKS.has(allText[start])) {
@@ -63,33 +103,36 @@ export default class DocumentProcessorService extends AbstractDocumentProcesserS
         start += 1;
       }
 
-      const sectionText = document.content.slice(start, end);
+      const chunkText = allText.slice(start, end);
+
+
       chunks.push({
-        id: `source-${document.id}-section-${end}`,
+        chunkId: chunks.length,
         organisationId: document.organisationId,
-        sourceDocId: document.id,
-        title: document.title,
+        documentId: document.id,
         source: document.source,
-        content: sectionText,
+        title: document.title,
+        content: allText.slice(start, end),
         metadata: document.metadata,
         updatedAt: document.updatedAt,
-        location: document.location,
+        offsets: findOffsetLinks(start,end)
       });
-      start = end - SECTION_OVERLAP;
+      start = end - this.chunk_over_lap_;
     }
 
-    chunks.push({
-      id: `source-${document.id}-section-${end}`,
-      organisationId: document.organisationId,
-      sourceDocId: document.id,
-      title: document.title,
-      source: document.source,
-      content: document.content.slice(start, end),
-      metadata: document.metadata,
-      updatedAt: document.updatedAt,
-      location: document.location,
-    });
-    
+    if(start + this.chunk_over_lap_ < end){
+      chunks.push({
+        chunkId: chunks.length,
+        organisationId: document.organisationId,
+        documentId: document.id,
+        source: document.source,
+        title: document.title,
+        content: allText.slice(start, end),
+        metadata: document.metadata,
+        updatedAt: document.updatedAt,
+        offsets: findOffsetLinks(start,end)
+      });
+    }
     return chunks;
   }
 

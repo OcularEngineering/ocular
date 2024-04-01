@@ -1,10 +1,6 @@
 import {AbstractVectorDBService, IndexableDocument, IndexableDocChunk, SearchResult } from "@ocular/types"
 import {QdrantClient, Schemas } from '@qdrant/js-client-rest';
-import { v4 as uuidv4 } from 'uuid';
-
-const uid = uuidv4();
-console.log(uid);
-
+import { v5 as uuidv5 } from 'uuid';
 
 interface SearchResults {
   id: string | number;
@@ -17,8 +13,8 @@ interface SearchResults {
 
 export default class qdrantService extends AbstractVectorDBService  {
   protected qdrantClient_: QdrantClient
-  protected collectionName_: string = "ocular"
   protected embeddingSize_: number
+  protected UUIDHASH = '1b671a64-40d5-491e-99b0-da01ff1f3341';
  
   constructor(container, options) {
     super(container,options)
@@ -31,109 +27,120 @@ export default class qdrantService extends AbstractVectorDBService  {
     if (!embedding_size) {
       throw new Error("Please provide an embedding size")
     }
-    
+    this.embeddingSize_ = embedding_size
     this.qdrantClient_  = new QdrantClient({url: quadrant_db_url});
-    console.log(quadrant_db_url)
-    // Create A Collection In QDrant
-        // Try to get the collection
-      // const collection = this.qdrantClient_.getCollection(this.collectionName_);
-      // If the collection does not exist, create it
-      // if (!collection) {
-        const vectorCreationParams: Schemas["CollectionParams"] = {
-            vectors: {
-              title: { size: embedding_size, distance: "Cosine" },
-              content: { size: embedding_size,  distance: "Cosine" },
-            }, 
-        }
-        this.qdrantClient_.createCollection(this.collectionName_, 
-          vectorCreationParams
-        ).then(()=>{
-          this.qdrantClient_.createPayloadIndex(this.collectionName_, {
-            field_name: "source",
-            field_schema: "keyword",
-        })
-        }).catch((error)=>{
-          if (error.message !== 'Conflict') {
-            console.error(error.message)
-          }
-        })
   }
 
-  async addDocuments(indexName:string, doc: IndexableDocChunk[]){
+  async createIndex(indexName: string){
     try{
-      const points = doc.map(this.translateIndexableDocToQuadrantPoint);
-      await this.qdrantClient_.upsert(this.collectionName_, { points });
+      const vectorCreationParams: Schemas["CollectionParams"] = {
+        vectors: {
+          title: { size: this.embeddingSize_, distance: "Cosine" },
+          content: { size: this.embeddingSize_,  distance: "Cosine" },
+        }, 
+      }
+     await this.qdrantClient_.createCollection(indexName, 
+        vectorCreationParams
+      )
+    }catch(error){
+      if (error.statusText==="Conflict") {
+        console.log(`Index ${indexName} already exists`);
+      } else {
+        console.error(error.status)
+      }
+    }
+    
+  }
+   
+
+  async addDocuments(indexName:string, docs: IndexableDocChunk[]){
+    try{
+      const points = docs.map(this.translateIndexableDocToQuadrantPoint);
+      await this.qdrantClient_.upsert(indexName, { points });
     } catch(error) {
-        console.error(error)
+        console.log(error)
     }
   }
 
-  async searchDocuments(org_id: string, vector: number[], ): Promise<SearchResult>{
+  async searchDocuments(indexName: string, vector: number[] ): Promise<SearchResult>{
     try{
-    
-    // const filter = {
-    //   must: [{ key: "group_id", match: { value: org_id } }],
-    // }
-
-    // TODO
-    //Look Into Search Group By Points
-    //Look Into Search Filtering
-
-  console.log("Qdrant Searches", vector)
-    const searches: SearchResults[][] = await this.qdrantClient_.searchBatch(this.collectionName_, {
-      searches: [
-        {
-          vector: {
-            name: "title",
-            vector: vector
+      const searches: SearchResults[][] = await this.qdrantClient_.searchBatch(indexName, {
+        searches: [
+          {
+            vector: {
+              name: "title",
+              vector: vector
+            },
+            limit: 5,
+            with_payload: true,
           },
-          limit: 5,
-          with_payload: true,
-        },
-        {
-          vector: {
-            name: "content",
-            vector: vector
-          },
-          limit: 5,
-          with_payload: true,
+          {
+            vector: {
+              name: "content",
+              vector: vector
+            },
+            limit: 5,
+            with_payload: true,
+          }
+        ],
+      })
+
+      const flattenedSearches = searches.flat();
+      const uniqueSearchResults = flattenedSearches.reduce((acc, current) => {
+        const x = acc.find(item => item.id === current.id);
+        if (!x) {
+          return acc.concat([current]);
+        } else {
+          return acc;
         }
-      ],
-    })
+      }, []).map(doc => doc.payload as IndexableDocChunk);
 
-    console.log("qdrant searches",searches)
-
-    const flattenedSearches = searches.flat();
-
-    console.log("qdrant",flattenedSearches)
-          
+   
     return{
       ai_content: "",
       query: "",
-      docs:  flattenedSearches.map(result => result?.payload as IndexableDocChunk)
+      docs: uniqueSearchResults
     }
     }catch(error){
-      console.log("Error Reading Docs To Quadrant",error)
+      console.log("Error Searching Docs From Quadrant",error)
     }
   } 
 
+  async deleteIndex(indexName: string){
+    try{
+      await this.qdrantClient_.deleteCollection(indexName)
+    } catch(error){
+      console.log("Error Creating Index ", error)
+    }
+    
+  }
 
-  private translateIndexableDocToQuadrantPoint(doc: IndexableDocChunk){
+  private createDocUUID(doc : IndexableDocChunk){
+    let name = `${doc.organisationId}-${doc.documentId}-${doc.chunkId}`;
+    return uuidv5(name,this.UUIDHASH);
+  }
+
+
+  private translateIndexableDocToQuadrantPoint = (doc: IndexableDocChunk) => {
     return {
-      id: uuidv4(),
+      id: this.createDocUUID(doc),
       payload: {
-        id:doc.id,
+        chunkId:doc.chunkId,
         organisationId: doc.organisationId,
+        documentId: doc.documentId,
         title: doc.title,
         source: doc.source,
         content: doc.content,
         metadata: doc.metadata,
-        updatedAt: doc.updatedAt
+        updatedAt: doc.updatedAt,
+        offsets: doc.offsets
       },
       vector: {
-        title: doc.titleVector,
-        content: doc.contentVector
+        title: doc.titleEmbeddings,
+        content: doc.contentEmbeddings
       }
     };
   }
+
+  
 }

@@ -25,37 +25,15 @@ export default class IndexerService implements IIndexerInterface {
     this.searchIndexService_ = container.searchIndexService
   }
 
-  async createIndex(indexName: string, options?: unknown){
-    this.logger_.info(`Creating index ${indexName}`)
-
-    try{
-      // Store Existing Indexes In Memory To Avoid Unnecessary Calls To The Azure API
-      // const names: string[] = [];
-      // for await (const index of indexNames) {
-      //   names.push(index.name);
-      // }
-
-
-      // // Check if Index exists in the Search Service
-      // if (!names.includes(indexName)) {
-      //   this.logger_.info(` Create Search "${indexName}" Index`);
-      //   const searchIndex: SearchIndex = {
-      //     name: indexName,
-      //     fields: IndexFields,
-      //     vectorSearch: vectorSearchProfile,
-      //     semanticSearch:semanticSearchProfile,
-      //   }
-      //   await this.searchIndexClient_.createIndex(searchIndex, options);
-      // }
-    } catch(error){
-    this.logger_.error(`Error Creating Index ${indexName}, error ${error.message}`)
-    }
-  }
-
+  // Indexes a Batch of Docs To the Full Text Search + Vector Index and FileStorage.
   async indexDocuments(indexName: string, documents: IndexableDocument[]): Promise<void> {
     try {
       this.logger_.info(`Indexing ${documents.length} documents to index ${indexName}`)
-      // Optionally Add Indexable Document to a Blob Storage. Implement this in the future.
+      // Optionally Add Files To Content Store.
+      // if (options.uploadToStorage) {
+      //   // TODO: use separate containers for each index?
+      //   await this.blobStorage.upload(filename, data, type);
+      // }
       const chunks = this.documentProcessorService_.chunkIndexableDocumentsBatch(documents)
       chunks.map((chunk) => this.embedChunk(chunk))
       await this.vectorDBService_.addDocuments(indexName, chunks)

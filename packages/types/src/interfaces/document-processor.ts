@@ -1,5 +1,5 @@
 import { AutoflowContainer } from '../common';
-import { IndexableDocument,IndexableDocChunk } from '../common/indexable-document';
+import { IndexableDocument,IndexableDocChunk } from '../common/document';
 import { TransactionBaseService } from './transaction-base-service';
 
 export interface IDocumentProcessorInterface extends TransactionBaseService {
