@@ -11,8 +11,14 @@ import AppFilterOptions from "./app-filter-options";
 
 // AI Results Component
 export const AIResults = ({ content }) => (
-  <div>
-     {content}
+  <div className='flex flex-col bg-gray-100 rounded-xl shadow px-6 py-4'>
+    <div className='flex flex-row'>
+      <div className="flex items-center space-x-2">
+        <Image src="/Ocular-logo-light.svg" alt="Ocular Copilot" className="size-[50px]" width={50} height={10} /> 
+        <h1 className='font-semibold text-l'>Copilot</h1>
+      </div>
+    </div>
+    <p className="font-regular text-sm">{content}</p>
   </div>
 );
 

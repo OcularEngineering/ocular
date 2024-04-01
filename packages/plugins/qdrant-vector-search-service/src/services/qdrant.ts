@@ -49,7 +49,6 @@ export default class qdrantService extends AbstractVectorDBService  {
         console.error(error.status)
       }
     }
-    
   }
    
 
@@ -110,7 +109,7 @@ export default class qdrantService extends AbstractVectorDBService  {
     try{
       await this.qdrantClient_.deleteCollection(indexName)
     } catch(error){
-      console.log("Error Creating Index ", error)
+      console.log("Error Deleting Index ", error)
     }
     
   }
