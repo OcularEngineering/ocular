@@ -34,7 +34,6 @@ Repo is under [Apache License](https://github.com/OcularEngineering/ocular?tab=A
 
 If you are interested in managed Ocular Cloud of self-hosted Enterprise Offering [book a meeting with us](https://calendly.com/louis-murerwa):
 
-<a href="[https://calendly.com/louis-murerwa](https://calendly.com/louis-murerwa)"><img alt="Schedule a meeting" src="https://cal.com/book-with-cal-dark.svg" /></a>
 
 ## Getting started
 
@@ -64,4 +63,4 @@ We love contributions. Check out our guide to see how to [get started](https://g
 
 Not sure where to get started? You can:
 
-- Join our <a href="https://join.slack.com/share/enQtNjg4MDUyNjQ3MTk5MC04ZWM0ZDMwYWNiZDFmNDFjNWZmNzNlODc5N2RiNzlhNWU0MjU2OGVjNGZmZDIxMjY0NTE1ZTU0YjFjNTNkZmE1">Slack</a>, and ask us any questions there.
+- Join our <a href="https://join.slack.com/t/ocular-ai/shared_invite/zt-2g7ka0j1c-Tx~Q46MjplNma2Sk2Ruplw">Slack</a>, and ask us any questions there.
