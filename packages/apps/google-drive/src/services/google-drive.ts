@@ -73,9 +73,13 @@ export default class GoogleDriveService extends TransactionBaseService {
               organisationId: org.id,
               title: file.name,
               source: AppNameDefinitions.GOOGLEDRIVE,
-              content:  content,
+              sections: [{
+                link :file.webViewLink,
+                offset:content.length,
+                content: content
+              }],
+              metadata:{},
               updatedAt: new Date(file.modifiedTime),
-              location: file.webViewLink,
             };
             // Batch Documents To Be Yielded To Max 100 At A Time
             if(documents.length == 100){

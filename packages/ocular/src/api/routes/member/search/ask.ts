@@ -17,7 +17,9 @@ export default async (req, res) => {
 
   const validated = await validator(PostAskReq, req.body)
   const { approach } = validated ?? {};
- try {
+
+  // const askApproach = fastify.approaches.ask[approach ?? 'rtr'];
+  try {
 
 
   const loggedInUser = req.scope.resolve("loggedInUser")
