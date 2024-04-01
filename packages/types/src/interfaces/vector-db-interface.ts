@@ -1,13 +1,10 @@
-import { IndexableDocChunk } from "../common"
-import { SearchResult } from "./search-interface"
-
+import { IndexableDocChunk,SearchResult } from "../common"
 export interface IVectorDB {
   createIndex(indexName:string): Promise<void>
   addDocuments(indexName:string, doc: IndexableDocChunk[]): Promise<void>
   searchDocuments(org_id: string, vector: number[], ): Promise<SearchResult>
   deleteIndex(indexName: string): Promise<void>
 }
-
 
 export abstract class AbstractVectorDBService
   implements IVectorDB
