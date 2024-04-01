@@ -4,7 +4,7 @@ Thank you for contributing to Ocular!
 
 ## Getting Started
 
-For help setting up the code in this repo, please follow our [DEVELOPERS.md](https://github.com/OcularEngineering/ocular/blob/main/CONTRIBUTING.md) file.
+For help setting up the code in this repo, please follow our [DEVELOPERS.md](https://github.com/OcularEngineering/ocular/blob/main/DEVELOPERS.md) file.
 
 ## Issues
 
@@ -21,4 +21,4 @@ We actively welcome your Pull Requests!
 
 Reach out on Slack for further assistance.
 
-- [slack](https://slack.com)
+- [Slack](https://join.slack.com/t/ocular-ai/shared_invite/zt-2g7ka0j1c-Tx~Q46MjplNma2Sk2Ruplw)

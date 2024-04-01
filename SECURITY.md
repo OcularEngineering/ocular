@@ -2,7 +2,7 @@
 
 Contact: engineering@useocular.com
 
-Ocular considers the securitu of systems a top priority. 
+Ocular considers the security of systems a top priority. 
 
 If you discover a vulnerability, we would like to know about it so we can take steps to address it as quickly as possible. We would like to ask you to help us better protect our users and our systems.
 
