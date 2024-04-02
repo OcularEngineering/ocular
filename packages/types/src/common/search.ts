@@ -25,7 +25,7 @@ export interface SearchResult {
     index: number;
     message: SearchResultMessage;
   }>;
-  hits: IndexableDocChunk[]
+  hits: IndexableDocChunk[];
   object: 'chat.completion';
 }
 

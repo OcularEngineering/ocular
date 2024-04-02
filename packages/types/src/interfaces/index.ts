@@ -1,6 +1,6 @@
 export * from "./event-bus"
 export * from "./transaction-base-service"
-// export * from "./indexer"
+export * from "./approach-interface"
 export * from "./models"
 export * from "./notifications-service"
 export { default as OauthService } from "./oauth-service"

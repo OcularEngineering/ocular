@@ -1,5 +1,5 @@
 import { EntityManager } from "typeorm";
-import { AutoflowContainer , ApproachResponse, ApproachDefinitions, ApproachResponseChunk,IAskApproach, ISearchService, ILLMInterface, SearchResult, SearchContext } from "@ocular/types";
+import { AutoflowContainer , ApproachDefinitions, SearchResultChunk,IAskApproach, ISearchService, ILLMInterface, SearchResult, SearchContext } from "@ocular/types";
 import { MessageBuilder} from "../utils/message";
 
 const SYSTEM_CHAT_TEMPLATE = `You are an intelligent assistant who can helps Engineers at Ocular with a variety of tasks. Use 'you' to refer to the individual asking the questions even if they ask with 'I'.
@@ -38,7 +38,7 @@ export default class AskRetrieveThenRead implements IAskApproach {
     this.searchService_ = container.searchService;
   }
 
-  async run(userQuery: string, context?: SearchContext): Promise<SearchResult> {
+  async run(indexName: string, userQuery: string, context?: SearchContext): Promise<SearchResult> {
     let hits = await this.searchService_.search(null, userQuery, context);
 
     hits = hits.filter(doc => doc !== null);
@@ -47,6 +47,7 @@ export default class AskRetrieveThenRead implements IAskApproach {
     const sources = hits.map((c) => c.content).join(', ');
     const userContent = `${userQuery}\nSources:\n${sources}`;
     const messageBuilder = new MessageBuilder(context?.prompt_template || SYSTEM_CHAT_TEMPLATE);
+    messageBuilder.appendMessage('user', userContent);
 
     // Add shots/samples. This helps model to mimic response and make sure they match rules laid out in system message.
     messageBuilder.appendMessage('assistant', QUESTION);
@@ -63,7 +64,7 @@ export default class AskRetrieveThenRead implements IAskApproach {
           index: 0,
           message: {
             role: 'assistant' as const,
-            content: chatCompletion.choices[0].message.content ?? '',
+            content: chatCompletion,
             context: {
               data_points: hits,
               thoughts: `Question:<br>${userQuery}<br><br>Prompt:<br>${messageToDisplay.replace('\n', '<br>')}`,

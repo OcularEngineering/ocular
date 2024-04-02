@@ -1,4 +1,4 @@
-import { AbstractSearchService, IndexableDocChunk, SearchResult, SearchContext } from "@ocular/types"
+import { AbstractSearchService, IndexableDocChunk,SearchResult , SearchContext } from "@ocular/types"
 import { AzureOpenAIOptions, SearchEngineOptions, SearchOptions } from "../types/search/options"
 import { ConfigModule, Logger } from "../types"
 import { SearchIndexClient } from "@azure/search-documents"
@@ -33,7 +33,7 @@ class SearchService extends AbstractSearchService {
 
   }
 
-  async search(indexName?:string, query?: string, context?: SearchContext): Promise<SearchResult> {
+  async search(indexName?:string, query?: string, context?: SearchContext): Promise<IndexableDocChunk[]> {
     indexName = indexName? indexName:this.defaultIndexName_;
     // Query Has Text: Indicates to Query Full Text Search Index For Results.
     const hasText = ['text', 'hybrid', undefined].includes(context?.retrieval_mode);
@@ -49,9 +49,10 @@ class SearchService extends AbstractSearchService {
     let queryVector;
     // if (hasVectors) {
       queryVector = await this.openAiService_.createEmbeddings(query!);
-      const vectorSearch = await this.vectorDBService_.searchDocuments(indexName,queryVector )
-      allDocs.push(...vectorSearch.docs);
+      const hits = await this.vectorDBService_.searchDocuments(indexName,queryVector )
+      allDocs.push(...hits);
     // }
+
 
     // Retrieve Search Index Results
     // if (hasText){
@@ -62,11 +63,7 @@ class SearchService extends AbstractSearchService {
     // }
 
 
-    return {
-      query: query ?? '',
-      docs: allDocs,
-      ai_content: "",
-    };
+    return allDocs
   }
 
   addDocuments(indexName: string, documents: IndexableDocChunk[]){return "Not Implemented"}

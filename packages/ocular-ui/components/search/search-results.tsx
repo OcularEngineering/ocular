@@ -11,7 +11,7 @@ import AppFilterOptions from "./app-filter-options";
 
 // AI Results Component
 export const AIResults = ({ content }) => (
-  <div className='flex flex-col bg-gray-100 rounded-xl shadow px-6 py-4'>
+  <div className='flex flex-col bg-gray-100 rounded-xl shadow px-6 py-4 max-w-[900px]'>
     <div className='flex flex-row'>
       <div className="flex items-center space-x-2">
         <Image src="/Ocular-logo-light.svg" alt="Ocular Copilot" className="size-[50px]" width={50} height={10} /> 
@@ -28,7 +28,6 @@ const Results = ({ results, ai_content }) => (
       <AIResults content={ai_content} />
     {results.map((result: any, index: any) => (
       <div>
-        {/* <AIResults content={ai_content} /> */}
         <div
           key={index}
           className="dark:shadow-3xl group mb-4 flex max-w-4xl rounded-lg px-3 py-4 text-xs shadow ring-2 ring-gray-200 sm:text-base sm:shadow-none sm:ring-0 dark:ring-1 dark:ring-[#303134]"
@@ -93,10 +92,9 @@ const ResultsFilter = ({ results }) => (
 
 // Main Component
 export default function SearchResults({ search_results, ai_content  }) {
-  console.log(ai_content);
   const [showSideSheet, setShowSideSheet] = useState(false);
   return (
-    <div className="font-open-sans dark:bg-primary-dark mx-auto flex min-h-screen w-full flex-row gap-10 px-3 sm:pl-[5%] md:pl-[14%] lg:pl-52  dark:text-white" style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.01) 10%, transparent)'}}>
+    <div className="font-open-sans dark:bg-primary-dark flex min-h-screen w-full max-w-full flex-row gap-10 sm:pl-14 md:pl-20 lg:pl-60  dark:text-white" style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.01) 10%, transparent)'}}>
       <Results results={search_results} ai_content={ai_content} />
       <ResultsFilter results={search_results} />
     </div>

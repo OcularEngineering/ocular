@@ -23,7 +23,7 @@ export default function Search() {
       .then(data => {
         console.log(data)
         setAiResults(data.data.choices[0].message.content);
-        setSearchResults(data.data.docs); 
+        setSearchResults(data.data.hits); 
         setIsLoading(false); 
       })
       .catch(error => {
