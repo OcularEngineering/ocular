@@ -1,5 +1,5 @@
 import { EntityManager } from "typeorm";
-import { AutoflowContainer , ApproachDefinitions, SearchResultChunk,IAskApproach, ISearchService, ILLMInterface, SearchResult, SearchContext, Message, IApproach } from "@ocular/types";
+import { AutoflowContainer , ApproachDefinitions, SearchResultChunk, ISearchService, ILLMInterface, SearchResult, SearchContext, Message, IChatApproach } from "@ocular/types";
 import { MessageBuilder } from "../utils/message";
 
 const SYSTEM_MESSAGE_CHAT_CONVERSATION = `Assistant helps the Consto Real Estate company customers with support questions regarding terms of service, privacy policy, and questions about support requests. Be brief in your answers.
@@ -45,7 +45,7 @@ type InjectedDependencies = AutoflowContainer & {
  * It first retrieves top documents from search, then constructs a prompt with them, and then uses
  * OpenAI to generate an completion (answer) with that prompt.
  */
-export default class ChatReadRetrieveRead implements IApproach {
+export default class ChatReadRetrieveRead implements IChatApproach {
   identifier = ApproachDefinitions.ASK_RETRIEVE_READ;
   private openaiService_: ILLMInterface;
   private searchService_: ISearchService;
@@ -210,23 +210,23 @@ ${secondQuery}`.replaceAll('\n', '<br>');
     maxTokens = 4096,
   ): Message[] {
  
-    const messageBuilder = new MessageBuilder(systemPrompt, this.openaiService_.getTokenCount(systemPrompt));
+    const messageBuilder = new MessageBuilder(systemPrompt, this.openaiService_.getChatModelTokenCount(systemPrompt));
 
     // Add examples to show the chat what responses we want.
     // It will try to mimic any responses and make sure they match the rules laid out in the system message.
     for (const shot of fewShots.reverse()) {
-      messageBuilder.appendMessage(shot.role, shot.content, 1, this.openaiService_.getTokenCount(shot.content));
+      messageBuilder.appendMessage(shot.role, shot.content, 1, this.openaiService_.getChatModelTokenCount(shot.content));
     }
 
     const appendIndex = fewShots.length + 1;
-    messageBuilder.appendMessage('user', userContent, appendIndex, this.openaiService_.getTokenCount(userContent));
+    messageBuilder.appendMessage('user', userContent, appendIndex, this.openaiService_.getChatModelTokenCount(userContent));
 
     for (const historyMessage of history.slice(0, -1).reverse()) {
       if (messageBuilder.tokens > maxTokens) {
         break;
       }
       if (historyMessage.role === 'assistant' || historyMessage.role === 'user') {
-        messageBuilder.appendMessage(historyMessage.role, historyMessage.content, appendIndex, this.openaiService_.getTokenCount(historyMessage.content));
+        messageBuilder.appendMessage(historyMessage.role, historyMessage.content, appendIndex, this.openaiService_.getChatModelTokenCount(historyMessage.content));
       }
     }
 

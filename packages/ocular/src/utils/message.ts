@@ -1,6 +1,6 @@
 // import { getTokenCountFromMessages } from './tokens.js';
 import { Message, MessageRole } from '@ocular/types';
-import { encoding_for_model, type TiktokenModel } from '@dqbd/tiktoken';
+
 export class MessageBuilder {
   messages: Message[];
   tokens: number;

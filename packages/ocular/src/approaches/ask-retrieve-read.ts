@@ -1,5 +1,5 @@
 import { EntityManager } from "typeorm";
-import { AutoflowContainer , ApproachDefinitions, SearchResultChunk,IAskApproach, ISearchService, ILLMInterface, SearchResult, SearchContext } from "@ocular/types";
+import { AutoflowContainer, ApproachDefinitions, SearchResultChunk, IAskApproach, ISearchService, ILLMInterface, SearchResult, SearchContext } from "@ocular/types";
 import { MessageBuilder} from "../utils/message";
 
 const SYSTEM_CHAT_TEMPLATE = `You are an intelligent assistant who can helps Engineers at Ocular with a variety of tasks. Use 'you' to refer to the individual asking the questions even if they ask with 'I'.
@@ -27,7 +27,6 @@ type InjectedDependencies = AutoflowContainer & {
  * It first retrieves top documents from search, then constructs a prompt with them, and then uses
  * OpenAI to generate an completion (answer) with that prompt.
  */
-
 export default class AskRetrieveThenRead implements IAskApproach {
   identifier = ApproachDefinitions.ASK_RETRIEVE_READ;
   private openai_: ILLMInterface;
@@ -44,10 +43,18 @@ export default class AskRetrieveThenRead implements IAskApproach {
     hits = hits.filter(doc => doc !== null);
     console.log("Found Docs", hits)
 
+    // Initial System Message
+    const prompt = context?.prompt_template || SYSTEM_CHAT_TEMPLATE;
+    const tokens = this.openai_.getChatModelTokenCount(prompt)
+    const messageBuilder = new MessageBuilder(prompt, tokens);
+
+    // User Prompted Message With Sources
     const sources = hits.map((c) => c.content).join(', ');
     const userContent = `${userQuery}\nSources:\n${sources}`;
-    const messageBuilder = new MessageBuilder(context?.prompt_template || SYSTEM_CHAT_TEMPLATE);
-    messageBuilder.appendMessage('user', userContent);
+
+    const roleTokens: number = this.openai_.getChatModelTokenCount("user")
+    const messageTokens: number = this.openai_.getChatModelTokenCount(userContent)
+    messageBuilder.appendMessage('user', userContent, 1 ,(roleTokens + messageTokens));
 
     // Add shots/samples. This helps model to mimic response and make sure they match rules laid out in system message.
     // messageBuilder.appendMessage('assistant', QUESTION);
