@@ -1,21 +1,13 @@
 import { IsIn, ValidateNested, IsNumber, IsOptional, IsString, IsArray, IsBoolean, IsNotEmpty,IsEnum } from "class-validator"
-import { Readable } from 'node:stream';
 import { SearchService, UserService } from "../../../../services"
 import { Type } from "class-transformer"
 import { validator } from "@ocular/utils"
 import { ApproachDefinitions, SearchContext} from "@ocular/types";
 
-/**
- * @oas [post] /v1/chat
- * operationId: Post Chat
- * summary: Chat with Ocular
- * description: "Chat With Ocular."
- * 
- *  async run(indexName: string, userQuery: string, context?: ApproachContext): Promise
- */
+
 export default async (req, res) => {
 
-  const validated = await validator(PostAskReq, req.body)
+  const validated = await validator(PostChatReq, req.body)
   const { approach } = validated ?? {};
 
   // const askApproach = fastify.approaches.ask[approach ?? 'rtr'];
@@ -23,9 +15,10 @@ export default async (req, res) => {
     const loggedInUser = req.scope.resolve("loggedInUser")
     const { q, messages, context, stream } = req.body;
 
-    if (approach === ApproachDefinitions.ASK_RETRIEVE_READ) {
-      const searchApproach = req.scope.resolve("askRetrieveReadApproache")
-      const results = await searchApproach.run(loggedInUser.organisation_id.toLowerCase().substring(4),q , (context as any) ?? {});
+    if (approach === ApproachDefinitions.CHAT_RETRIEVE_READ) {
+      console.log(req.scope.registrations)
+      const chatApproach = req.scope.resolve("chatRetrieveReadRetrieveApproache")
+      const results = await chatApproach.run( messages, (context as any) ?? {});
       return res.status(200).send(results)
     }
 
@@ -50,44 +43,25 @@ export default async (req, res) => {
     // }
   } catch (_error: unknown) {
     const error = _error as Error & { error?: any; status?: number };
+    console.log(error)
     if (error.error) {
-      return res.status(error.status ?? 500).send(error);
+      return res.status(error.status ?? 500).send("Error: Failed to execute Chat");
     }
-    return res.status(500).send(error.message);
+    return res.status(500).send("Error: Failed to execute Chat");
   }
-  return res.status(500).send(`Error: Failed to execute AskApproach.`);
+  return res.status(500).send(`Error: Failed to execute Chat.`);
 }
 
-/**
- * @schema StorePostSearchReq
- * type: object
- * properties:
- *  q:
- *    type: string
- *    description: The search query.
- *  offset:
- *    type: number
- *    description: The number of products to skip when retrieving the products.
- *  limit:
- *    type: number
- *    description: Limit the number of products returned.
- *  filter:
- *    description: Pass filters based on the search service.
- */
-export class PostAskReq {
-
-  @IsOptional()
-  @IsString()
-  q?: string
+export class PostChatReq {
 
   @IsNotEmpty()
   @IsEnum(ApproachDefinitions)
   approach: ApproachDefinitions
   
-  // @IsArray()
-  // @ValidateNested({ each: true })
-  // @Type(() => Message)
-  // messages: Message[]
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => Message)
+  messages: Message[]
 
   @ValidateNested()
   context?: PostApproachContext 

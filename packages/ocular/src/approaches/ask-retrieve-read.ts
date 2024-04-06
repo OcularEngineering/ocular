@@ -63,7 +63,7 @@ export default class AskRetrieveThenRead implements IAskApproach {
     const messages = messageBuilder.messages;
 
     const chatCompletion = await this.openai_.completeChat(messages);
-    const messageToDisplay = messageBuilder.messagesToString(messages);
+    const messageToDisplay = MessageBuilder.messagesToString(messages);
 
     return {
       choices: [

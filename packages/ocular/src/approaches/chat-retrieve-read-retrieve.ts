@@ -1,6 +1,7 @@
 import { EntityManager } from "typeorm";
 import { AutoflowContainer , ApproachDefinitions, SearchResultChunk, ISearchService, ILLMInterface, SearchResult, SearchContext, Message, IChatApproach } from "@ocular/types";
 import { MessageBuilder } from "../utils/message";
+import { IndexableDocChunk } from "@ocular/types";
 
 const SYSTEM_MESSAGE_CHAT_CONVERSATION = `Assistant helps the Consto Real Estate company customers with support questions regarding terms of service, privacy policy, and questions about support requests. Be brief in your answers.
 Answer ONLY with the facts listed in the list of sources below. If there isn't enough information below, say you don't know. Do not generate answers that don't use the sources below. If asking a clarifying question to the user would help, ask the question.
@@ -55,67 +56,98 @@ export default class ChatReadRetrieveRead implements IChatApproach {
     this.searchService_ = container.searchService;
   }
 
+
+  // export interface SearchResult {
+  //   choices?: Array<{
+  //     index: number;
+  //     message: SearchResultMessage;
+  //   }>;
+  //   hits: IndexableDocChunk[];
+  //   object: 'chat.completion';
+  // }
+
   async run(messages: Message[], context?: SearchContext): Promise<SearchResult> {
-    const { completionRequest, dataPoints, thoughts } = await this.baseRun(messages, context);
-    const openService = await this.openai.getChat();
-    const chatCompletion = await openAiChat.completions.create(completionRequest);
-    const chatContent = chatCompletion.choices[0].message.content ?? '';
+    const { completionRequest, thoughts, hits } = await this.baseRun(messages, context);
+    const chatCompletion = await this.openaiService_.completeChat(completionRequest.messages);
     return {
       choices: [
         {
           index: 0,
           message: {
-            content: chatContent,
+            content: chatCompletion,
             role: 'assistant',
             context: {
-              data_points: {
-                text: dataPoints,
-              },
+              data_points: hits,
               thoughts: thoughts,
             },
           },
         },
       ],
+      hits:hits,
       object: 'chat.completion',
     };
   }
 
-  async *runWithStreaming(query: string, context?: SearchContext): AsyncGenerator<SearchResultChunk, void> {
-    const { completionRequest, dataPoints, thoughts } = await this.baseRun(messages, context);
-    const openAiChat = await this.openai.calculateTokens();
-    const chatCompletion = await openAiChat.completions.create({
-      ...completionRequest,
-      stream: true,
-    });
-    let id = 0;
-    for await (const chunk of chatCompletion) {
-      const responseChunk = {
-        choices: [
-          {
-            index: 0,
-            delta: {
-              content: chunk.choices[0].delta.content ?? '',
-              role: 'assistant' as const,
-              context: {
-                data_points: id === 0 ? { text: dataPoints } : undefined,
-                thoughts: id === 0 ? thoughts : undefined,
-              },
-            },
-            finish_reason: chunk.choices[0].finish_reason,
-          },
-        ],
-        object: 'chat.completion.chunk' as const,
-      };
-      yield responseChunk;
-      id++;
-    }
+  // return {
+  //   completionRequest: {
+  //     messages: finalMessages,
+  
+  //   },
+  //   hits: hits as IndexableDocChunk[],
+  // };
+
+  // choices: [
+  //   {
+  //     index: 0,
+  //     message: {
+  //       role: 'assistant' as const,
+  //       content: chatCompletion,
+  //       context: {
+  //         data_points: hits,
+  //         thoughts: `Question:<br>${userQuery}<br><br>Prompt:<br>${messageToDisplay.replace('\n', '<br>')}`,
+  //       },
+  //     },
+  //   },
+  // ],
+  // hits:hits,
+  // object: 'chat.completion',
+
+  async *runWithStreaming(messages: Message[], context?: SearchContext): AsyncGenerator<SearchResultChunk, void> {
+    // const { completionRequest, dataPoints, thoughts } = await this.baseRun(messages, context);
+    // const openAiChat = await this.openai.calculateTokens();
+    // const chatCompletion = await openAiChat.completions.create({
+    //   ...completionRequest,
+    //   stream: true,
+    // });
+    // let id = 0;
+    // for await (const chunk of chatCompletion) {
+    //   const responseChunk = {
+    //     choices: [
+    //       {
+    //         index: 0,
+    //         delta: {
+    //           content: chunk.choices[0].delta.content ?? '',
+    //           role: 'assistant' as const,
+    //           context: {
+    //             data_points: id === 0 ? { text: dataPoints } : undefined,
+    //             thoughts: id === 0 ? thoughts : undefined,
+    //           },
+    //         },
+    //         finish_reason: chunk.choices[0].finish_reason,
+    //       },
+    //     ],
+    //     object: 'chat.completion.chunk' as const,
+    //   };
+    //   yield responseChunk;
+    //   id++;
+    // }
   }
 
   private async baseRun(messages: Message[], context?: SearchContext) {
     const userQuery = 'Generate a search query for: ' + messages[messages.length - 1].content;
 
     // STEP 1: Generate an optimized keyword search query based on the chat history and the last question
-    const initialMessages = this.getMessagesFromHistory(
+    const initialMessages: Message[] = this.getMessagesFromHistory(
       QUERY_PROMPT_TEMPLATE,
       messages,
       userQuery,
@@ -123,14 +155,9 @@ export default class ChatReadRetrieveRead implements IChatApproach {
       this.openaiService_.getTokenLimit() - userQuery.length,
     );
    
-    const chatCompletion = await this.openaiService_.completeChat({
-      messages: initialMessages,
-      temperature: 0,
-      max_tokens: 32,
-      n: 1,
-    });
+    const chatCompletion = await this.openaiService_.completeChat(initialMessages);
 
-    let queryText = chatCompletion.choices[0].message.content?.trim();
+    let queryText = chatCompletion.trim();
     if (queryText === '0') {
       // Use the last user input if we failed to generate a better query
       queryText = messages[messages.length - 1].content;
@@ -178,17 +205,12 @@ export default class ChatReadRetrieveRead implements IChatApproach {
       // Moving sources to latest user conversation to solve follow up questions prompt.
       `${messages[messages.length - 1].content}\n\nSources:\n${sources}`,
       [],
-      this.openaiService_.getMaxTokens()
+      this.openaiService_.getTokenLimit()
     );
-    const firstQuery = messagesToString(initialMessages);
-    const secondQuery = messagesToString(finalMessages);
-    const thoughts = `Search query:
-${query}
 
-Conversations:
-${firstQuery}
-
-${secondQuery}`.replaceAll('\n', '<br>');
+    const firstQuery = MessageBuilder.messagesToString(initialMessages);
+    const secondQuery = MessageBuilder.messagesToString(finalMessages);
+    const thoughts = `Search query:${queryText} Conversations: ${firstQuery} ${secondQuery}`.replace(/\n/g, '<br>');
 
     return {
       completionRequest: {
@@ -197,8 +219,8 @@ ${secondQuery}`.replaceAll('\n', '<br>');
         max_tokens: 1024,
         n: 1,
       },
-      dataPoints: results,
       thoughts,
+      hits: hits as IndexableDocChunk[],
     };
   }
 
@@ -232,5 +254,4 @@ ${secondQuery}`.replaceAll('\n', '<br>');
 
     return messageBuilder.messages;
   }
-
 }

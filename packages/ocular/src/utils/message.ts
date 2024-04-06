@@ -27,11 +27,11 @@ export class MessageBuilder {
     this.tokens += tokens
   }
 
-  messageToString(message: Message): string {
+  static messageToString(message: Message): string {
     return `${message.role}: ${message.content}`;
   }
   
-  messagesToString(messages: Message[]): string {
+  static messagesToString(messages: Message[]): string {
     return messages.map((m) => this.messageToString(m)).join('\n\n');
   }
 }

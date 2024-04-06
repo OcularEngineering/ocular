@@ -18,4 +18,11 @@ export function ask(app) {
   return app
 }
 
+export function chat(app) {
+  const route = Router()
+  app.use("/chat", route)
+  route.post("/", middlewares.wrap(require("./chat").default))
+  return app
+}
+
 export * from "./search"
