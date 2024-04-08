@@ -14,7 +14,8 @@
       "prepare": "cross-env NODE_ENV=production npm run build",
       "test": "jest src",
       "build": "tsc",
-      "watch": "tsc --watch"
+      "watch": "tsc --watch",
+      "clean": "rimraf dist node_modules"
    },
    "dependencies": {
       "@ocular/types": "*",

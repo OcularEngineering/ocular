@@ -1,7 +1,7 @@
 {
   "name": "root",
   "private": true,
-  "packageManager": "npm@6.14.15",
+  "packageManager": "npm@7.0.0",
   "workspaces": [
     "packages/utils",
     "packages/types",
@@ -10,7 +10,8 @@
     "packages/apps/*"
   ],
   "scripts": {
-    "build": "turbo run build  --concurrency=50% --no-daemon"
+    "build": "turbo run build  --concurrency=50% --no-daemon",
+    "clean": "rimraf dist node_modules"
   },
   "engines": {
     "node": ">=18.0.0"

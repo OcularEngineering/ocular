@@ -21,6 +21,7 @@
     "prepublishOnly": "cross-env NODE_ENV=production tsc --build",
     "build": "rimraf dist && tsc --build",
     "start": "npm run build && nodemon dist/ocular/src/main.js",
+    "clean": "rimraf dist node_modules",
     "test": "jest --runInBand --bail --detectOpenHandles --forceExit",
     "typeorm": "npm run build && typeorm-ts-node-esm -d dist/ocular/src/data-source.js"
   },

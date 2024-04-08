@@ -9,5 +9,5 @@ export function parseBoolean(value: string | boolean | undefined): boolean {
 }
 
 export function removeNewlines(s: string = ''): string {
-  return s.replaceAll(/[\n\r]+/g, ' ');
+  return s.replace(/[\n\r]+/g, ' ');
 }
