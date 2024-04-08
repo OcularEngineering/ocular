@@ -1,0 +1,34 @@
+
+FROM node:18-alpine
+
+WORKDIR /usr/src/app
+
+RUN npm cache clean --force
+
+# Install turbo
+RUN npm install -g turbo 
+
+# Copy root package.json and lockfile
+COPY package.json ./
+
+COPY package-lock.json ./
+
+# Copy the docs package.json
+COPY packages/ocular/package.json ./packages/ocular/package.json
+
+COPY packages/ocular/env.local ./packages/ocular/.env.local
+
+# Copy turbo.json
+COPY turbo.json ./
+
+# Copy app source
+COPY . .
+
+RUN npm install --verbose
+RUN turbo build
+
+EXPOSE 8080
+
+WORKDIR /usr/src/app/packages/ocular
+
+CMD ["npm", "run", "start"]

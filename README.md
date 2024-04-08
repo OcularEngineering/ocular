@@ -48,7 +48,7 @@ First, make sure you have the Docker installed on your device. You can download 
 1. In the home directory, run docker.
 
    ```sh
-   docker compose -f docker-compose.dev.yml up
+   docker compose -f docker-compose.local.yml up
    ```
 
 This command initializes the containers specified in the `docker-compose.yml` file. It might take a few moments to complete, depending on your computer and internet connection.
