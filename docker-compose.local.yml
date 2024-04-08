@@ -25,6 +25,11 @@ services:
     volumes:
       - ./typesense-data:/data
     command: "--data-dir /data --api-key=xyz --enable-cors"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8108/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   redis:
     image: redis:latest
@@ -49,7 +54,7 @@ services:
       - ocular-db
     build:
       context: .
-      dockerfile: packages/ocular/Dockerfile
+      dockerfile: packages/ocular/Dockerfile.local
     environment:
       - DATABASE_URL=postgresql://ocular:ocular@ocular-db:5432/ocular
       - DATABASE_NAME=ocular
@@ -59,7 +64,7 @@ services:
     container_name: ocular-backend
     build:
       context: .
-      dockerfile: packages/ocular/Dockerfile
+      dockerfile: packages/ocular/Dockerfile.local
     depends_on:
       ocular-db:
         condition: service_started
@@ -73,11 +78,10 @@ services:
       - DATABASE_URL=postgresql://ocular:ocular@ocular-db:5432/ocular
       - DATABASE_NAME=ocular
       - NODE_ENV=development
-      - INFISICAL_TOKEN=${INFISICAL_TOKEN_FOR_API}
       - QDRANT_DB_URL=http://qdrant:6333
       - TYPESENSE_HOST=typesense
       - UI_CORS=http://ocular-ui:9000
-      - REDIS_URL=http://redis:6379
+      - REDIS_URL=redis:6379
 
   ocular-ui:
     container_name: ocular-ui
