@@ -72,6 +72,8 @@ services:
         condition: service_completed_successfully
       qdrant:
         condition: service_started
+      typesense:
+        condition: service_started
     ports:
       - 9000:9000
     environment:
