@@ -6,7 +6,7 @@
     "esModuleInterop": true,
     "declaration": true,
     "module": "commonjs",
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "sourceMap": true,

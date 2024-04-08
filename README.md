@@ -48,6 +48,21 @@ First, make sure you have the Docker installed on your device. You can download 
 1. In the home directory, run docker.
 
    ```sh
+   git clone https://github.com/OcularEngineering/ocular.git
+   ```
+
+2. In the home directory, open `.env.local` add the required env variables
+
+  - Required Keys
+    - Open AI Keys (Azure|Open AI)
+  - Optional Keys
+    - Apps
+      - (Gmail|GoogleDrive|Asana|GitHub etc)
+
+
+3. In the home directory, run docker.
+
+   ```sh
    docker compose -f docker-compose.local.yml up
    ```
 
