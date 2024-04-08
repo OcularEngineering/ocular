@@ -24,7 +24,6 @@
       "watch": "tsc --watch"
    },
    "dependencies": {
-      "@ocular/ocular": "*",
       "@ocular/types": "*",
       "@ocular/utils": "*"
    }

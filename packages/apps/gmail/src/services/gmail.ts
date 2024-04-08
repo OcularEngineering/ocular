@@ -81,9 +81,13 @@ export default class GmailService extends TransactionBaseService {
                   organisationId: org.id,
                   title: subjectHeader.value,
                   source: AppNameDefinitions.GMAIL,
-                  content:  emailContent,
+                  sections: [{
+                    link : `https://mail.google.com/mail/u/0/#inbox/${message.id}`,
+                    offset: emailContent.length,
+                    content: emailContent
+                  }],
                   updatedAt: new Date(parseInt(emailData.internalDate)),
-                  location: `https://mail.google.com/mail/u/0/#inbox/${message.id}`,
+                  metadata: {}
                 };
                  documents.push(doc);
                  if (documents.length >= 100) {

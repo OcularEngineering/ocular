@@ -1,4 +1,4 @@
-import {Client} from 'typesense';
+import { Client } from 'typesense';
 import { AbstractSearchService, IndexableDocument, IndexableDocChunk, SearchContext, SearchResult } from "@ocular/types"
 
 declare type FieldType = "string" | "int32" | "int64" | "float" | "bool" | "geopoint" | "geopoint[]" | "string[]" | "int32[]" | "int64[]" | "float[]" | "bool[]" | "object" | "object[]" | "auto" | "string*";
@@ -94,15 +94,15 @@ export default class typesenseService extends AbstractSearchService  {
 
   private translateIndexableDocToTypesenseDoc(doc: IndexableDocChunk){
     return {
-        id:doc.id,
+        chunkId:doc.chunkId,
         organisationId: doc.organisationId,
-        sourceDocId: doc.sourceDocId,
+        documentId: doc.documentId,
         title: doc.title,
         source: doc.source,
         content: doc.content,
         metadata: doc.metadata,
-        location: doc.location,
-        updatedAt: new Date().getTime()
+        updatedAt: new Date().getTime(),
+        offsets: doc.offsets
     };
   }
 }
