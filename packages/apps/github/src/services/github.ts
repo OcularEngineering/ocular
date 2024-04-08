@@ -69,10 +69,13 @@ export default class GitHubService extends TransactionBaseService {
               organisationId: org.id,
               title: pr.title,
               source: AppNameDefinitions.GITHUB,
-              content: pr.body,
+              sections: [{
+                link : pr.html_url,
+                offset: pr.body.length,
+                content: pr.body
+              }],
               updatedAt: new Date(pr.updated_at),
-              location: pr.html_url,
-              metadata: JSON.stringify({ state: pr.state }) 
+              metadata: { state: pr.state } 
             };
             documents.push(doc);
             if (documents.length >= 100) {
@@ -96,10 +99,13 @@ export default class GitHubService extends TransactionBaseService {
               organisationId: org.id,
               title: issue.title,
               source: AppNameDefinitions.GITHUB,
-              content: issue.body,
+              sections: [{
+                link :  issue.html_url,
+                offset: issue.body.length,
+                content: issue.body
+              }],
               updatedAt: new Date(issue.updated_at),
-              location: issue.html_url,
-              metadata: JSON.stringify({ state: issue.state }) 
+              metadata: { state: issue.state } 
             };
             if (documents.length >= 100) {
               yield documents;
@@ -112,10 +118,14 @@ export default class GitHubService extends TransactionBaseService {
           id: String(repo.id),
           organisationId: org.id,
           title: repo.name,
-          content: repo.description,
+          sections: [{
+            link :  repo.html_url,
+            offset: repo.description.length,
+            content: repo.description,
+          }],
           source: AppNameDefinitions.GITHUB,
           updatedAt: new Date(repo.updated_at),
-          location: repo.html_url
+          metadata: {}
         }
         documents.push(repoDoc); 
         }

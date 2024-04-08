@@ -6,8 +6,8 @@
     "packages/utils",
     "packages/types",
     "packages/ocular",
-    "packages/apps/*",
-    "packages/plugins/*"
+    "packages/plugins/*",
+    "packages/apps/*"
   ],
   "scripts": {
     "build": "turbo run build  --concurrency=50% --no-daemon"

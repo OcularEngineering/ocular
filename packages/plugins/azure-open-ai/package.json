@@ -17,7 +17,6 @@
       "watch": "tsc --watch"
    },
    "dependencies": {
-      "@ocular/ocular": "*",
       "@ocular/types": "*",
       "@ocular/utils": "*",
       "openai": "^4.29.2"

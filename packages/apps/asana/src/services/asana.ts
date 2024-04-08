@@ -50,10 +50,13 @@ export default class AsanaService extends TransactionBaseService {
               organisationId: org.id,
               title: task.name,
               source: AppNameDefinitions.ASANA,
-              content: task.notes,
+              sections: [{
+                link : `https://app.asana.com/0/${project.gid}/${task.gid}`,
+                offset:task.notes.length,
+                content: task.notes,
+              }],
               updatedAt: new Date(task.modified_at),
-              location: `https://app.asana.com/0/${project.gid}/${task.gid}`,
-              metadata: JSON.stringify({ completed: task.completed }) 
+              metadata: { completed: task.completed }
             };
             documents.push(doc);
             if (documents.length >= 100) {
@@ -61,6 +64,8 @@ export default class AsanaService extends TransactionBaseService {
               documents = [];
             }
         }
+
+
         
           // Add Project To Documents
           const projectDoc:IndexableDocument = {
@@ -68,10 +73,13 @@ export default class AsanaService extends TransactionBaseService {
           organisationId: org.id,
           title: project.name,
           source: AppNameDefinitions.ASANA,
-          content: project.notes,
+          sections: [{
+            link : `https://app.asana.com/0/${project.gid}`,
+            offset: project.notes.length,
+            content: project.notes,
+          }],
           updatedAt: new Date(project.modified_at),
-          location: `https://app.asana.com/0/${project.gid}`,
-          metadata: JSON.stringify({ completed: project.completed }) 
+          metadata: { completed: project.completed }
         }
         documents.push(projectDoc);
       }
