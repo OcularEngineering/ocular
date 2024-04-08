@@ -20,7 +20,7 @@ export interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
 
 // ICON TYPES
 
-export type IconKeys = 'Search' | 'Bot' | 'Settings' | 'LayoutGrid' | 'HelpCircle' | 'BarChart2' | 'Users'; 
+export type IconKeys = 'Search' | 'Bot' | 'Chat' | 'Settings' | 'LayoutGrid' | 'HelpCircle' | 'BarChart2' | 'Users'; 
 export type VariantKeys = "ghost" | "link" | "default" | "destructive" | "outline" | "secondary" | null | undefined;
 
 // LINK TYPES

@@ -24,6 +24,6 @@
     ],
     "strictNullChecks": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "types/**/*.ts" ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "types/**/*.ts", "components/chat/chat-helpers/index", "components/chat/chat-files-display" ],
   "exclude": ["node_modules"]
 }
