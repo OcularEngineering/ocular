@@ -21,14 +21,14 @@ class SearchService extends AbstractSearchService {
   protected readonly logger_: Logger
   protected readonly defaultIndexName_: string
   protected readonly vectorDBService_ : IVectorDB
-  protected readonly searchIndexService_ : ISearchService
+  // protected readonly searchIndexService_ : ISearchService
 
   constructor(container, config) {
     super(container, config)
     this.logger_ = container.logger
     this.openAiService_ = container.openAiService
     this.vectorDBService_ = container.vectorDBService
-    this.searchIndexService_ = container.searchIndexService
+    // this.searchIndexService_ = container.searchIndexService
     this.defaultIndexName_ = container.indexName
 
   }
@@ -48,9 +48,12 @@ class SearchService extends AbstractSearchService {
     let allDocs = []
     let queryVector;
     // if (hasVectors) {
+      console.log("Vector Search", query, indexName)
       queryVector = await this.openAiService_.createEmbeddings(query!);
+      console.log("After Vector Embeddings",queryVector)
       const vectorSearch = await this.vectorDBService_.searchDocuments(indexName,queryVector )
       allDocs.push(...vectorSearch.docs);
+      console.log("Vector Search Docs ", vectorSearch.docs)
     // }
 
     // Retrieve Search Index Results

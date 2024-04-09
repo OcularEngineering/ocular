@@ -39,6 +39,8 @@ export default class OpenAIService extends AbstractLLMService {
   constructor(container, options) {
     super(arguments[0],options)
 
+    console.log("Azure Open AI: Options",options)
+
     this.azureOpenAiApiVersion_ = options.open_ai_version,
     this.endpoint_= options.endpoint
 
@@ -72,25 +74,33 @@ export default class OpenAIService extends AbstractLLMService {
   }
 
   async createEmbeddings(text:string): Promise<number[]> {
-    const result = await this.embeddingsClient_.embeddings.create({ 
-      input: text, 
-      model: this.embeddingModel_,
-    });
-    return result.data[0].embedding;
+    try{
+      const result = await this.embeddingsClient_.embeddings.create({ 
+        input: text, 
+        model: this.embeddingModel_,
+      });
+      return result.data[0].embedding;
+    } catch(error){
+      console.log("Azure Open AI: Error",error)
+    }
   }
 
   async completeChat(messages: Message[]): Promise<string> {
-    console.log("Model",this.chatModel_)
-    console.log("Deploynment",this.chatDeploymentName_)
-    console.log("Messages",messages)
-    const result = await this.chatClient_.chat.completions.create({
-      model: this.chatModel_,
-      messages,
-      temperature:  0.3,
-      max_tokens: 1024,
-      n: 1,
-    });
-    console.log("Result",result.choices[0].message.content)
-    return result.choices[0].message.content;
+    try{
+      console.log("Model",this.chatModel_)
+      console.log("Deploynment",this.chatDeploymentName_)
+      console.log("Messages",messages)
+      const result = await this.chatClient_.chat.completions.create({
+        model: this.chatModel_,
+        messages,
+        temperature:  0.3,
+        max_tokens: 1024,
+        n: 1,
+      });
+      console.log("Result",result.choices[0].message.content)
+      return result.choices[0].message.content;
+    }catch(error){
+      console.log("Azure Open AI: Error",error)
+    }
   }
 }

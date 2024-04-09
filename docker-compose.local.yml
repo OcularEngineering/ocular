@@ -17,19 +17,14 @@ services:
     volumes:
       - ./qdrant_data:/qdrant_data
 
-  typesense:
-    image: typesense/typesense:0.25.2
-    restart: on-failure
-    ports:
-      - "8108:8108"
-    volumes:
-      - ./typesense-data:/data
-    command: "--data-dir /data --api-key=xyz --enable-cors"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8108/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+  # typesense:
+  #   image: typesense/typesense:0.25.2
+  #   restart: on-failure
+  #   ports:
+  #     - "8108:8108"
+  #   volumes:
+  #     - ./typesense-data:/data
+  #   command: "--data-dir /data --api-key=xyz --enable-cors"
 
   redis:
     image: redis:latest
@@ -72,8 +67,8 @@ services:
         condition: service_completed_successfully
       qdrant:
         condition: service_started
-      typesense:
-        condition: service_started
+      # typesense:
+      #   condition: service_started
     ports:
       - 9000:9000
     environment:
@@ -81,7 +76,7 @@ services:
       - DATABASE_NAME=ocular
       - NODE_ENV=development
       - QDRANT_DB_URL=http://qdrant:6333
-      - TYPESENSE_HOST=typesense
+      # - TYPESENSE_HOST=typesense
       - UI_CORS=http://ocular-ui:9000
       - REDIS_URL=redis:6379
 
