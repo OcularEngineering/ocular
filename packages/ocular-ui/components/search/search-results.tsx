@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button"
 import Image from 'next/image';
 import {
-  SparklesIcon,
   LinkIcon
 } from "@heroicons/react/outline";
 
@@ -21,10 +20,10 @@ export const AIResults = ({ content, search_results }) => {
         </div>
       </div>
       <ReactMarkdown className="font-regular text-md space-y-4">{content}</ReactMarkdown>
-      <div className="flex flex-row flex-wrap space-x-5 mt-5">
-        {search_results.slice(0, 3).map((result: any, index: any) => (
+      <div className="flex flex-row space-x-5 mt-5 overflow-auto scrollbar-hide">
+        {search_results.slice(0, 10).map((result: any, index: any) => (
           <div
-            className="bg-gray-100 flex flex-row max-w-4xl rounded-2xl p-4 text-xs sm:text-base max-w-[200px]"
+            className="bg-gray-100 flex flex-row rounded-2xl p-4 text-xs sm:text-base w-[200px]  flex-none"
             key={index}
           >
             <div className='space-y-1 overflow-hidden'>
@@ -114,7 +113,6 @@ const ResultsFilter = ({ results }) => (
 
 // Main Component
 export default function SearchResults({ search_results, ai_content  }) {
-  console.log("Content:", ai_content);
 
   return (
     <div className="font-open-sans dark:bg-primary-dark mx-auto flex min-h-screen w-full flex-col gap-10 px-3 sm:pl-[5%] md:pl-[14%] lg:pl-52  dark:text-white" style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.015) 1%, transparent)'}} >

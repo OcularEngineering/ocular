@@ -21,7 +21,6 @@ export default function Search() {
     setIsLoading(true); 
     api.search.ask(router.query.q)
       .then(data => {
-        console.log("Result Data Structure: ", data)
         setAiResults(data.data.choices[0].message.content);
         setSearchResults(data.data.docs); 
         setIsLoading(false); 
@@ -61,7 +60,6 @@ export default function Search() {
         <title>{router.query.q} - Ocular</title>
         <link rel="icon" href="/Ocular-Profile-Logo.png" />
       </Head>
-      
       <Header />
       <SearchResults search_results={search_results} ai_content={ai_content}  />
     </div>
