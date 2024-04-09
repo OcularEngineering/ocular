@@ -45,20 +45,21 @@ To run Ocular locally, you'll need to setup Docker in addition to Ocular.
 
 First, make sure you have the Docker installed on your device. You can download and install it from [here](https://docs.docker.com/get-docker/).
 
-1. In the home directory, run docker.
+1. In the home directory, clone the Ocular directory.
 
    ```sh
    git clone https://github.com/OcularEngineering/ocular.git
    ```
 
-2. In the home directory, open `.env.local` add the required env variables
+2. In the home directory, open `env.local` add the required env variables
 
-  - Required Keys
-    - Open AI Keys (Azure|Open AI)
-  - Optional Keys
-    - Apps
-      - (Gmail|GoogleDrive|Asana|GitHub etc)
+    - <u>Required Keys</u>
 
+      -  Open AI Keys (Azure|Open AI) - To run Ocular **an LLM provider must be setup in the backend** . By default Azure Open AI is the LLM Provider for Ocular so please add the Azure Open AI keys in `env.local`.
+      - Support for Open AI is coming soon!
+  
+    - <u>Optional Keys</u>
+      - Apps (Gmail|GoogleDrive|Asana|GitHub etc) - To Index Documents from Apps the Api keys have to be set up in the `env.local` for that specific app. Please read our docs on how to set up each app.
 
 3. In the home directory, run docker.
 
@@ -66,7 +67,7 @@ First, make sure you have the Docker installed on your device. You can download 
    docker compose -f docker-compose.local.yml up
    ```
 
-This command initializes the containers specified in the `docker-compose.yml` file. It might take a few moments to complete, depending on your computer and internet connection.
+This command initializes the containers specified in the `docker-compose.local.yml` file. It might take a few moments to complete, depending on your computer and internet connection.
 
 Once the `docker compose up` process completes, you should have your local version of Ocular up and running within Docker containers. You can access it at `http://localhost:3001`.
 
