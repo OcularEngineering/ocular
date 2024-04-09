@@ -57,13 +57,25 @@ export default class typesenseService extends AbstractSearchService  {
   }
   
   async addDocuments(indexName: string, docs: IndexableDocChunk[]){
-    try{
-      console.log("Indexer")
-      const translatedDocs = docs.map(this.translateIndexableDocToTypesenseDoc);
-      console.log(translatedDocs)
-      await this.typesenseClient_.collections(this.collectionName_).documents().import(translatedDocs, {action: 'create',batch_size: docs.length})
-    } catch(error) {
-      console.log(error)
+    let retries = 0;
+  
+    while (retries < 5) {
+      try {
+        console.log("Indexer");
+        const translatedDocs = docs.map(this.translateIndexableDocToTypesenseDoc);
+        console.log(translatedDocs);
+        await this.typesenseClient_.collections(this.collectionName_).documents().import(translatedDocs, {action: 'create',batch_size: docs.length});
+        break; // If successful, break the loop
+      } catch(error) {
+        if (error.message === 'Not Ready or Lagging') {
+          console.log('Typesense server is not ready or lagging. Retrying...');
+          retries++;
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } else {
+          console.log(error);
+          break; // If error is not 'Not Ready or Lagging', break the loop
+        }
+      }
     }
   }
 

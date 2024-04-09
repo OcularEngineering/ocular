@@ -33,3 +33,5 @@ node_modules
 docker-compose.dev.yml 
 typesense-data/
 redis-data/
+
+env.local

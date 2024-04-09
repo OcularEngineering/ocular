@@ -72,14 +72,14 @@ module.exports = {
         redirect_uri: `${UI_CORS}/dashboard/marketplace/google-drive`,
       }
     },
-    // {
-    //   resolve: `gmail`,
-    //   options: {
-    //     client_id: process.env.GOOGLE_CLIENT_ID,
-    //     client_secret: process.env.GOOGLE_CLIENT_SECRET,
-    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/gmail`,
-    //   }
-    // },
+    {
+      resolve: `gmail`,
+      options: {
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/gmail`,
+      }
+    },
   ],
   plugins: [
     {
@@ -109,11 +109,11 @@ module.exports = {
         embedding_size: 1536
       }
     },
-    {
-      resolve: "typesense-text-search-service",
-      options:{
-         typesense_host: process.env.TYPESENSE_HOST || "localhost"
-      }
-    }
+    // {
+    //   resolve: "typesense-text-search-service",
+    //   options:{
+    //      typesense_host: process.env.TYPESENSE_HOST || "localhost"
+    //   }
+    // }
   ]
 };
