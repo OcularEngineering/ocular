@@ -4,7 +4,7 @@ import { useState } from 'react';
 import AppFilterOption from "./app-filter-option";
 import Image from 'next/image';
 
-const iconsArray = ['Jira.svg', 'Github.png', 'PagerDuty.png', 'GoogleDrive.png', 'stackoverflow.svg', 'Notion.png' ];
+const iconsArray = ['Jira.svg', 'Github.png', 'PagerDuty.png', 'stackoverflow.svg', 'Notion.png' ];
 
 type AppFilterOptionsProps = {
     results: any; 

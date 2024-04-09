@@ -21,7 +21,7 @@ export default function Search() {
     setIsLoading(true); 
     api.search.ask(router.query.q)
       .then(data => {
-        console.log(data)
+        console.log("Result Data Structure: ", data)
         setAiResults(data.data.choices[0].message.content);
         setSearchResults(data.data.docs); 
         setIsLoading(false); 
