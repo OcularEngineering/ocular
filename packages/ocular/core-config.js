@@ -62,6 +62,14 @@ module.exports = {
         redirect_uri: `${UI_CORS}/dashboard/marketplace/confluence`,
       },
     },
+    {
+      resolve: `jira`,
+      options: {
+        client_id: process.env.JIRA_CLIENT_ID,
+        client_secret: process.env.JIRA_CLIENT_SECRET,
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/jira`,
+      },
+    },
     // {
     //   resolve: `github`,
     //   options: {
