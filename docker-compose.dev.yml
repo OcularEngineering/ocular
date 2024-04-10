@@ -17,15 +17,6 @@ services:
     volumes:
       - ./qdrant_data:/qdrant_data
 
-  typesense:
-    image: typesense/typesense:0.25.2
-    restart: on-failure
-    ports:
-      - "8108:8108"
-    volumes:
-      - ./typesense-data:/data
-    command: "--data-dir /data --api-key=xyz --enable-cors"
-
   redis:
     image: redis:latest
     restart: always
@@ -37,7 +28,7 @@ services:
   ocular-db:
     image: postgres:14-alpine
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       POSTGRES_PASSWORD: ocular
       POSTGRES_USER: ocular
@@ -54,40 +45,6 @@ services:
       - DATABASE_URL=postgresql://ocular:ocular@ocular-db:5432/ocular
       - DATABASE_NAME=ocular
     command: npm run typeorm migration:run
-
-  ocular-backend:
-    container_name: ocular-backend
-    build:
-      context: .
-      dockerfile: packages/ocular/Dockerfile
-    depends_on:
-      ocular-db:
-        condition: service_started
-      ocular-db-migration:
-        condition: service_completed_successfully
-      qdrant:
-        condition: service_started
-    ports:
-      - 9000:9000
-    environment:
-      - DATABASE_URL=postgresql://ocular:ocular@ocular-db:5432/ocular
-      - DATABASE_NAME=ocular
-      - NODE_ENV=development
-      - INFISICAL_TOKEN=${INFISICAL_TOKEN_FOR_API}
-      - QDRANT_DB_URL=http://qdrant:6333
-      - TYPESENSE_HOST=typesense
-      - UI_CORS=http://ocular-ui:9000
-      - REDIS_URL=http://redis:6379
-
-  ocular-ui:
-    container_name: ocular-ui
-    build:
-      context: .
-      dockerfile: packages/ocular-ui/Dockerfile
-    ports:
-      - 3001:3001
-    depends_on:
-      - ocular-backend
 
 configs:
   qdrant_config:

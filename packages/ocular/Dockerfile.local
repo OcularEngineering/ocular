@@ -31,4 +31,4 @@ EXPOSE 8080
 
 WORKDIR /usr/src/app/packages/ocular
 
-CMD ["npm", "run", "start"]
+CMD ["NODE_ENV", "=", "development", "npm", "run", "start"]

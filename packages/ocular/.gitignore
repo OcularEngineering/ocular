@@ -1,1 +1,4 @@
 env.local
+.env.dev
+.env.local
+.env

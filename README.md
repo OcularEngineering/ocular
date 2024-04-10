@@ -45,13 +45,19 @@ To run Ocular locally, you'll need to setup Docker in addition to Ocular.
 
 First, make sure you have the Docker installed on your device. You can download and install it from [here](https://docs.docker.com/get-docker/).
 
-1. In the home directory, clone the Ocular directory.
+1. Clone the Ocular directory.
 
    ```sh
    git clone https://github.com/OcularEngineering/ocular.git
    ```
 
-2. In the home directory, open `env.local` add the required env variables
+2. Navigate to Ocular Dir
+
+   ```sh
+    cd ocular
+   ```
+
+3. In the home directory, open `env.local.example` add the required env variables
 
     - <u>Required Keys</u>
 
@@ -61,7 +67,13 @@ First, make sure you have the Docker installed on your device. You can download 
     - <u>Optional Keys</u>
       - Apps (Gmail|GoogleDrive|Asana|GitHub etc) - To Index Documents from Apps the Api keys have to be set up in the `env.local` for that specific app. Please read our docs on how to set up each app.
 
-3. In the home directory, run docker.
+4. Copy the example `env.local.example` to `.env.local`
+
+   ```sh
+      cp env.local.example packages/ocular/.env.local
+   ```
+
+5. Run Docker.
 
    ```sh
    docker compose -f docker-compose.local.yml up
@@ -69,7 +81,7 @@ First, make sure you have the Docker installed on your device. You can download 
 
 This command initializes the containers specified in the `docker-compose.local.yml` file. It might take a few moments to complete, depending on your computer and internet connection.
 
-Once the `docker compose up` process completes, you should have your local version of Ocular up and running within Docker containers. You can access it at `http://localhost:3001`.
+Once the `docker compose` process completes, you should have your local version of Ocular up and running within Docker containers. You can access it at `http://localhost:3001`.
 
 Remember to keep the Docker application open as long as you're working with your local Ocular instance.
 
