@@ -1,20 +1,19 @@
-# Jira
+## 🚀 Integrate Ocular with Jira
 
-Intergrate Ocular with Jira.
+### Features
 
-## Features
+- Fetch Jira Projects and Issues directly into Ocular.
 
-- Get Jira Projects and Issues into Ocular.
+### Installation Steps
 
-## How to Install
-
-1\. In `ocular/core-config.js` add the following at the end of the `apps` array:
+1. Open the `ocular/core-config.js` file.
+2. Add the following configuration snippet at the end of the `apps` array:
 
 ```js
 const apps = [
-  // ...
+  // Other configurations...
   {
-    resolve: `jira`,
+    resolve: "jira",
     options: {
       client_id: process.env.JIRA_CLIENT_ID,
       client_secret: process.env.JIRA_CLIENT_SECRET,
@@ -23,5 +22,3 @@ const apps = [
   },
 ];
 ```
-
----
