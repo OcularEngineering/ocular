@@ -161,4 +161,5 @@ We don't have a process for assigning issues to contributors yet.
 
 ## Community channels
 
-If you get stuck somewhere or have any questions, join our [Slack Channel](https://join.slack.com/t/ocular-ai/shared_invite/zt-2g7ka0j1c-Tx~Q46MjplNma2Sk2Ruplw)!
+
+If you get stuck somewhere or have any questions, join our [Slack Workspace](https://join.slack.com/t/ocular-ai/shared_invite/zt-2g7ka0j1c-Tx~Q46MjplNma2Sk2Ruplw)!
