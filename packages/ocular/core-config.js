@@ -12,6 +12,8 @@ switch (process.env.NODE_ENV) {
     ENV_FILE_NAME = ".env.test";
     break;
   case "development":
+    ENV_FILE_NAME = ".env.dev";
+    break;
   default:
     ENV_FILE_NAME = ".env.local";
     break;
@@ -19,11 +21,10 @@ switch (process.env.NODE_ENV) {
 
 try {
   dotenv.config({ path: process.cwd() + "/" + ENV_FILE_NAME });
-} catch (e) { }
- 
+} catch (e) {}
+
 // UI_CORS is the URL of the UI that is allowed to access the API
 const UI_CORS = process.env.ADMIN_CORS || "http://localhost:3001";
-
 
 /** @type {import('./src/types/config-module').ConfigModule} */
 module.exports = {
@@ -40,19 +41,27 @@ module.exports = {
       serviceName: process.env.AZURE_OPEN_AI_SERVICE_NAME,
       apiVersion: process.env.AZURE_OPENAI_API_VERSION,
       deploymentName: process.env.AZURE_OPENAI_DEPLOYMENT_NAME,
-      openAIModel: "gpt-4"
+      openAIModel: "gpt-4",
     },
   },
   apps: [
-    // {
-    //   resolve: `asana`,
-    //   options:{
-    //     client_id: process.env.ASANA_CLIENT_ID,
-    //     client_secret: process.env.ASANA_CLIENT_SECRET,
-    //     scope: "openid email profile",
-    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/asana`
-    //   }
-    // },
+    {
+      resolve: `asana`,
+      options: {
+        client_id: process.env.ASANA_CLIENT_ID,
+        client_secret: process.env.ASANA_CLIENT_SECRET,
+        scope: "openid email profile",
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/asana`,
+      },
+    },
+    {
+      resolve: `confluence`,
+      options: {
+        client_id: process.env.CONFLUENCE_CLIENT_ID,
+        client_secret: process.env.CONFLUENCE_CLIENT_SECRET,
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/confluence`,
+      },
+    },
     // {
     //   resolve: `github`,
     //   options: {
@@ -70,25 +79,25 @@ module.exports = {
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/google-drive`,
-      }
+      },
     },
-    // {
-    //   resolve: `gmail`,
-    //   options: {
-    //     client_id: process.env.GOOGLE_CLIENT_ID,
-    //     client_secret: process.env.GOOGLE_CLIENT_SECRET,
-    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/gmail`,
-    //   }
-    // },
+    {
+      resolve: `gmail`,
+      options: {
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/gmail`,
+      },
+    },
   ],
   plugins: [
     {
       resolve: `document-processor`,
       options: {
-        max_chunk_length:  1000,
+        max_chunk_length: 1000,
         sentence_search_limit: 100,
-        chunk_over_lap :100,
-      }
+        chunk_over_lap: 100,
+      },
     },
     {
       resolve: `azure-open-ai`,
@@ -96,24 +105,25 @@ module.exports = {
         open_ai_key: process.env.AZURE_OPEN_AI_KEY,
         open_ai_version: "2023-05-15",
         endpoint: process.env.AZURE_OPEN_AI_ENDPOINT,
-        embedding_deployment_name: process.env.AZURE_OPEN_AI_EMBEDDER_DEPLOYMENT_NAME,
+        embedding_deployment_name:
+          process.env.AZURE_OPEN_AI_EMBEDDER_DEPLOYMENT_NAME,
         embedding_model: process.env.AZURE_OPEN_AI_EMBEDDING_MODEL,
         chat_deployment_name: process.env.AZURE_OPEN_AI_CHAT_DEPLOYMENT_NAME,
         chat_model: process.env.AZURE_OPEN_AI_CHAT_MODEL,
-      }
+      },
     },
     {
       resolve: `qdrant-vector-search-service`,
-      options:{
+      options: {
         quadrant_db_url: process.env.QDRANT_DB_URL || "http://localhost:6333",
-        embedding_size: 1536
-      }
+        embedding_size: 1536,
+      },
     },
-    {
-      resolve: "typesense-text-search-service",
-      options:{
-         typesense_host: process.env.TYPESENSE_HOST || "localhost"
-      }
-    }
-  ]
+    // {
+    //   resolve: "typesense-text-search-service",
+    //   options:{
+    //      typesense_host: process.env.TYPESENSE_HOST || "localhost"
+    //   }
+    // }
+  ],
 };

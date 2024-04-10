@@ -1,4 +1,4 @@
-import {Client} from 'typesense';
+import { Client } from 'typesense';
 import { AbstractSearchService, IndexableDocument, IndexableDocChunk, SearchContext, SearchResult } from "@ocular/types"
 
 declare type FieldType = "string" | "int32" | "int64" | "float" | "bool" | "geopoint" | "geopoint[]" | "string[]" | "int32[]" | "int64[]" | "float[]" | "bool[]" | "object" | "object[]" | "auto" | "string*";
@@ -57,13 +57,25 @@ export default class typesenseService extends AbstractSearchService  {
   }
   
   async addDocuments(indexName: string, docs: IndexableDocChunk[]){
-    try{
-      console.log("Indexer")
-      const translatedDocs = docs.map(this.translateIndexableDocToTypesenseDoc);
-      console.log(translatedDocs)
-      await this.typesenseClient_.collections(this.collectionName_).documents().import(translatedDocs, {action: 'create',batch_size: docs.length})
-    } catch(error) {
-      console.log(error)
+    let retries = 0;
+  
+    while (retries < 5) {
+      try {
+        console.log("Indexer");
+        const translatedDocs = docs.map(this.translateIndexableDocToTypesenseDoc);
+        console.log(translatedDocs);
+        await this.typesenseClient_.collections(this.collectionName_).documents().import(translatedDocs, {action: 'create',batch_size: docs.length});
+        break; // If successful, break the loop
+      } catch(error) {
+        if (error.message === 'Not Ready or Lagging') {
+          console.log('Typesense server is not ready or lagging. Retrying...');
+          retries++;
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } else {
+          console.log(error);
+          break; // If error is not 'Not Ready or Lagging', break the loop
+        }
+      }
     }
   }
 
@@ -94,15 +106,15 @@ export default class typesenseService extends AbstractSearchService  {
 
   private translateIndexableDocToTypesenseDoc(doc: IndexableDocChunk){
     return {
-        id:doc.id,
+        chunkId:doc.chunkId,
         organisationId: doc.organisationId,
-        sourceDocId: doc.sourceDocId,
+        documentId: doc.documentId,
         title: doc.title,
         source: doc.source,
         content: doc.content,
         metadata: doc.metadata,
-        location: doc.location,
-        updatedAt: new Date().getTime()
+        updatedAt: new Date().getTime(),
+        offsets: doc.offsets
     };
   }
 }

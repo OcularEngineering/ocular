@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "Ocular utilities functions shared by Ocular CoreBackend and Modules",
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/OcularEngineering/OcularAI",
@@ -32,7 +32,8 @@
     "prepublishOnly": "cross-env NODE_ENV=production tsc --build",
     "build": "rimraf dist && tsc --build",
     "watch": "tsc --build --watch",
-    "test": "jest --runInBand --bail --forceExit"
+    "test": "jest --runInBand --bail --forceExit",
+    "clean": "rimraf dist node_modules"
   },
   "devDependencies": {
     "typescript": "^5.4.2"

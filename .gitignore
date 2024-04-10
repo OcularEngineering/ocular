@@ -22,8 +22,6 @@ www/**/.yarn/*
 build/**
 **/dist
 **/stats
-package-lock.json
-**/package-lock.json
 node_modules
 node_modules
 
@@ -35,3 +33,5 @@ node_modules
 docker-compose.dev.yml 
 typesense-data/
 redis-data/
+
+env.local

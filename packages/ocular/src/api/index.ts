@@ -1,4 +1,3 @@
-// import cors from "cors"
 import { Router } from "express"
 // import errorHandler from "./middlewares/error-handler"
 import cors from "cors"

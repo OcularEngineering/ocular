@@ -29,6 +29,7 @@ export default class qdrantService extends AbstractVectorDBService  {
     }
     this.embeddingSize_ = embedding_size
     this.qdrantClient_  = new QdrantClient({url: quadrant_db_url});
+    console.log("Qdrant Service Initialized", quadrant_db_url, embedding_size)
   }
 
   async createIndex(indexName: string){
@@ -53,11 +54,13 @@ export default class qdrantService extends AbstractVectorDBService  {
    
 
   async addDocuments(indexName:string, docs: IndexableDocChunk[]){
+    console.log("Adding Docs to Qdrant", docs)
+    console.log("Index Name", indexName)
     try{
       const points = docs.map(this.translateIndexableDocToQuadrantPoint);
       await this.qdrantClient_.upsert(indexName, { points });
     } catch(error) {
-        console.log(error)
+        console.log("QDrant: Error Adding Docs", error)
     }
   }
 
@@ -97,7 +100,7 @@ export default class qdrantService extends AbstractVectorDBService  {
    
     return uniqueSearchResults
     }catch(error){
-      console.log("Error Searching Docs From Quadrant",error)
+      console.log("Qdrant: Error Searching Docs From Quadrant",error)
     }
   } 
 

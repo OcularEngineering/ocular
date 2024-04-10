@@ -14,7 +14,7 @@ export default class IndexerService implements IIndexerInterface {
   protected readonly openAiService_:  ILLMInterface
 
   protected readonly vectorDBService_ : IVectorDB
-  protected readonly searchIndexService_ : ISearchService
+  // protected readonly searchIndexService_ : ISearchService
 
   constructor(container, config: ConfigModule) {
     this.config_ = config
@@ -23,7 +23,7 @@ export default class IndexerService implements IIndexerInterface {
     this.openAiService_ = container.openAiService
 
     this.vectorDBService_ = container.vectorDBService
-    this.searchIndexService_ = container.searchIndexService
+    // this.searchIndexService_ = container.searchIndexService
   }
 
   async createIndex(indexName:string){
