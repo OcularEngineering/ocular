@@ -1,0 +1,20 @@
+{
+  "name": "confluence",
+  "version": "0.0.0",
+  "description": "Confluence Application for Ocular",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "Vivek Lahole",
+  "scripts": {
+    "prepare": "cross-env NODE_ENV=production npm run build",
+    "test": "jest --passWithNoTests src",
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.24.1",
+    "@babel/core": "^7.24.1",
+    "@babel/preset-env": "^7.24.1",
+    "@babel/preset-react": "^7.23.3"
+  }
+}
