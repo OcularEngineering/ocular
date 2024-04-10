@@ -1,20 +1,20 @@
-# Confluence
+# 📝 Confluence Integration
 
-Intergrate Ocular with Confluence.
+Integrate Ocular with Confluence to enable fetching Confluence spaces and pages within Ocular.
 
-## Features
+## 🚀 Features
 
-- Get Confluence spaces and pages into Ocular.
+- Retrieve Confluence spaces and pages directly within Ocular.
 
-## How to Install
+## 🛠️ Installation Steps
 
-1\. In `ocular/core-config.js` add the following at the end of the `apps` array:
+1. Open `ocular/core-config.js` and add the following configuration at the end of the `apps` array:
 
-```js
+```javascript
 const apps = [
-  // ...
+  // ...other configurations
   {
-    resolve: `confluence`,
+    resolve: "confluence",
     options: {
       client_id: process.env.CONFLUENCE_CLIENT_ID,
       client_secret: process.env.CONFLUENCE_CLIENT_SECRET,
@@ -23,5 +23,3 @@ const apps = [
   },
 ];
 ```
-
----

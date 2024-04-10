@@ -70,6 +70,14 @@ module.exports = {
         redirect_uri: `${UI_CORS}/dashboard/marketplace/jira`,
       },
     },
+    {
+      resolve: `notion`,
+      options: {
+        client_id: process.env.NOTION_CLIENT_ID,
+        client_secret: process.env.NOTION_CLIENT_SECRET,
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/notion`,
+      },
+    },
     // {
     //   resolve: `github`,
     //   options: {
