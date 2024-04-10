@@ -22,7 +22,8 @@ To contribute code to Ocular, you must fork the [Ocular repo](https://github.com
 1. Clone your GitHub forked repo:
 
    ```sh
-   git clone your-forked-repo
+   git clone your-forked-repo-ocular-repo
+   
    ```
 
 2. Go to the Ocular directory:
@@ -39,51 +40,84 @@ To contribute code to Ocular, you must fork the [Ocular repo](https://github.com
    npm install # install dependencies
 ```
 
-### Start Backend
+2. Install the dependencies in the root of the repo.
+
+```sh
+   npm install -g turbo # install dependencies
+```
+
+### Starting the Backend
 
 1. Build repo with turbo.
 
+   ```sh
+      turbo build
+   ```
+
+2. Copy the example `env.dev.example` to `.env.dev`
+
+   ```sh
+      cp env.dev.example packages/ocular/.env.dev
+   ```
+
+3. Navigate to Ocular Dir
+
+   ```sh
+      cd packages/ocular/
+   ```
+
+4. Configure .env with app and plugin secrets of the apps and plugins you want to connect.
+
+   - Azure Keys are **required** since they allow Ocular to connect to an LLM Service
+
+   ```sh
+      AZURE_OPEN_AI_KEY=
+      AZURE_OPEN_AI_ENDPOINT=
+      AZURE_OPEN_AI_EMBEDDER_DEPLOYMENT_NAME=
+      AZURE_OPEN_AI_EMBEDDING_MODEL=
+      AZURE_OPEN_AI_CHAT_DEPLOYMENT_NAME=
+      AZURE_OPEN_AI_CHAT_MODEL=
+   ```
+
+   - Additional ApiKeys for other apps are optionnal but needed if you intend to connect Ocular to other apps.
+
+5. Run Postgress DB + Redis + QDrant in Docker
+
 ```sh
-   turbo build  # install dependencies
+   docker compose -f docker-compose.dev.yml up
 ```
 
-2. Copy the example `.env.local.example` to `.env.local`
+6. Start the backend.
 
 ```sh
-   cp packages/ocular/.env.local.example packages/ocular/.env
-```
-
-3. Navigate into core-backend "packages/ocular" and uncomment "apps" and "plugins" to activate apps and plugins in Ocular.
-
-4. Configure .env with app and plugin secrets of the apps added above.
-
-5. After that start the backend.
-
-```sh
-   npm run start # start all the applications
+   npm run start # start the backend
 ```
 
 ### Start UI
 
-1. Install the dependencies in the root of the repo.
+1. Navigate to Ocular UI in "packages/ocular-ui".
 
    ```sh
-   npm install # install dependencies
+      cd packages/ocular/
    ```
 
-2. Navigate to Ocular UI in "packages/ocular-ui".
+2. Install front end dependencies with the following command.
 
-3. After that you can run the apps simultaneously with the following.
+   ```sh
+      npm install --legacy-peer-deps # start all the applications
+   ```
 
-```sh
-   npm run dev # start all the applications
-```
+3. After that you can start the front end with the following.
+
+   ```sh
+      npm run dev 
+   ```
 
 Then visit the following sites:
 
 | Site                                                     | Directory      | Scope name | Description                                   | Local development server   |
 | -------------------------------------------------------- | -------------- | ---------- | --------------------------------------------- | -------------------------- |
-| [useocular.com/dashboard](https://useocular.com/dashboard) | `/packages/ocular-ui` | front-end    | Ocular UI (requires Docker, see below) | http://localhost:3001/create-account      |
+| [useocular.com](https://useocular.com) | `/packages/ocular-ui` | front-end    | Ocular UI | http://localhost:3001/create-account      |
 
 #### Shared components
 
@@ -109,25 +143,9 @@ For example:
 
 ---
 
-## Running Docker for Ocular
+## Running All Of Ocular in Docker (Check the Ocular ReadMe)
 
-To run Studio locally, you'll need to setup Docker in addition to your NextJS frontend.
-
-#### Prerequsites
-
-First, make sure you have the Docker installed on your device. You can download and install it from [here](https://docs.docker.com/get-docker/).
-
-1. In the home directory, run docker.
-
-   ```sh
-   docker compose -f docker-compose.dev.yml up
-   ```
-
-This command initializes the containers specified in the `docker-compose.yml` file. It might take a few moments to complete, depending on your computer and internet connection.
-
-Once the `docker compose up` process completes, you should have your local version of Ocular up and running within Docker containers. You can access it at `http://localhost:3001`.
-
-Remember to keep the Docker application open as long as you're working with your local Ocular instance.
+---
 
 ## Create a pull request
 
@@ -142,5 +160,6 @@ We don't have a process for assigning issues to contributors yet.
 ---
 
 ## Community channels
+
 
 If you get stuck somewhere or have any questions, join our [Slack Workspace](https://join.slack.com/t/ocular-ai/shared_invite/zt-2g7ka0j1c-Tx~Q46MjplNma2Sk2Ruplw)!
