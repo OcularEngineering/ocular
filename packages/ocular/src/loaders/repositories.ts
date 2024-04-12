@@ -1,5 +1,6 @@
 // Glob only works with require
 const glob = require("glob");
+const fg = require('fast-glob');
 
 import path from "path"
 
@@ -18,7 +19,7 @@ export default ({
   isTest?: boolean
 }): void => {
   const corePath = isTest ? "../repositories/*.ts" : "../repositories/*.js"
-  const coreFull = path.join(__dirname, corePath)
+  const coreFull = fg.convertPathToPattern(path.join(__dirname, corePath))
 
   const core = glob.sync(coreFull, { cwd: __dirname })
   core.forEach((fn) => {
