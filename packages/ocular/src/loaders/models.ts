@@ -7,6 +7,7 @@ import { EntitySchema } from "typeorm"
 import { asClass, asValue } from "awilix"
 // Glob only works with require
 const glob = require("glob");
+const fg = require('fast-glob');
 
 type ModelLoaderParams = {
   container: AutoflowContainer
@@ -27,12 +28,12 @@ export default (
 ) => {
   const coreModelsFullGlob = path.join(__dirname, corePathGlob)
   const models: (ClassConstructor<unknown> | EntitySchema)[] = []
-  
-  const coreModels = glob.sync(coreModelsFullGlob, {
+
+  const coreModels = glob.sync(fg.convertPathToPattern(coreModelsFullGlob), {
     cwd: __dirname,
     ignore: ["**/index.js", "**/index.ts", "**/index.js.map"],
   })
-
+  
   coreModels.forEach((modelPath) => {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const loaded = require(modelPath) as

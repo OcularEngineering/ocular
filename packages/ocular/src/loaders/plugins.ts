@@ -1,4 +1,5 @@
 const glob = require("glob");
+const fg = require('fast-glob');
 import { Express } from "express"
 import fs from "fs"
 import { sync as existsSync } from "fs-exists-cached"
@@ -112,10 +113,8 @@ async function runLoaders(
   pluginDetails: PluginDetails,
   container: AutoflowContainer
 ): Promise<void> {
-  const loaderFiles = glob.sync(
-    `${pluginDetails.resolve}/loaders/[!__]*.js`,
-    {}
-  )
+  const loaderFilesGlob = fg.convertPathToPattern(`${pluginDetails.resolve}/loaders/[!__]*.js`)
+  const loaderFiles = glob.sync(loaderFilesGlob,{})
   await Promise.all(
     loaderFiles.map(async (loader) => {
       try {
@@ -149,7 +148,8 @@ function registerRepositories(
   pluginDetails: PluginDetails,
   container: AutoflowContainer
 ): void {
-  const files = glob.sync(`${pluginDetails.resolve}/repositories/*.js`, {})
+  const registerRepositoriesGlob = fg.convertPathToPattern(`${pluginDetails.resolve}/repositories/*.js`)
+  const files = glob.sync(registerRepositoriesGlob, {})
   files.forEach((fn) => {
     const loaded = require(fn)
 
@@ -178,7 +178,8 @@ export async function registerServices(
   pluginDetails: PluginDetails,
   container: AutoflowContainer
 ): Promise<void> {
-  const files = glob.sync(`${pluginDetails.resolve}/dist/services/[!__]*.js`, {})
+  const registerServicesGlob = fg.convertPathToPattern(`${pluginDetails.resolve}/dist/services/[!__]*.js`)
+  const files = glob.sync(registerServicesGlob, {})
   
   await promiseAll(
     files.map(async (fn) => {
@@ -301,7 +302,8 @@ function registerSubscribers(
   pluginDetails: PluginDetails,
   container: AutoflowContainer
 ): void {
-  const files = glob.sync(`${pluginDetails.resolve}/dist/subscribers/*.js`, {})
+  const registerSubscribersGlob = fg.convertPathToPattern(`${pluginDetails.resolve}/dist/subscribers/*.js`)
+  const files = glob.sync(registerSubscribersGlob, {})
   files.forEach((fn) => {
     const loaded = require(fn).default
 
@@ -320,7 +322,8 @@ function registerSubscribers(
  * @param pluginDetails The plugin details including plugin options, version, id, resolved path, etc.
  */
 async function runSetupFunctions(pluginDetails: PluginDetails): Promise<void> {
-  const files = glob.sync(`${pluginDetails.resolve}/setup/*.js`, {})
+  const runSetupFunctionsGlob = fg.convertPathToPattern(`${pluginDetails.resolve}/setup/*.js`)
+  const files = glob.sync(runSetupFunctionsGlob, {})
   await promiseAll(
     files.map(async (fn) => {
       const loaded = require(fn).default

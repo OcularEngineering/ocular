@@ -1,5 +1,6 @@
 // Glob only works with require
 const glob = require("glob");
+const fg = require('fast-glob');
 
 import { asFunction } from "awilix"
 import path from "path"
@@ -19,7 +20,7 @@ export default ({ container, configModule}: Options): void => {
 
 
   const corePath = "../services/*.js"
-  const coreFull = path.join(__dirname, corePath)
+  const coreFull = fg.convertPathToPattern(path.join(__dirname, corePath))
 
   const core = glob.sync(coreFull, { cwd: __dirname })
   core.forEach((fn) => {

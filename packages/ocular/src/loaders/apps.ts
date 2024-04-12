@@ -16,6 +16,7 @@ import { asValue, asFunction , Lifetime } from "awilix"
 import { OauthService } from "@ocular/types"
 import { AppService } from "../services";
 import { error } from "console";
+const fg = require('fast-glob');
 
 type Options = {
   rootDirectory: string
@@ -108,10 +109,8 @@ async function runLoaders(
   appDetails: AppDetails,
   container: AutoflowContainer
 ): Promise<void> {
-  const loaderFiles = glob.sync(
-    `${appDetails.resolve}/loaders/[!__]*.js`,
-    {}
-  )
+  const loaderFilesGlob = fg.convertPathToPattern(`${appDetails.resolve}/loaders/[!__]*.js`)
+  const loaderFiles = glob.sync(loaderFilesGlob,{})
   await Promise.all(
     loaderFiles.map(async (loader) => {
       try {
@@ -145,7 +144,8 @@ function registerRepositories(
   appDetails: AppDetails,
   container: AutoflowContainer
 ): void {
-  const files = glob.sync(`${appDetails.resolve}/repositories/*.js`, {})
+  const registerRepositoriesGlob = fg.convertPathToPattern(`${appDetails.resolve}/repositories/*.js`)
+  const files = glob.sync(registerRepositoriesGlob, {})
   files.forEach((fn) => {
     const loaded = require(fn)
 
@@ -174,7 +174,8 @@ export async function registerServices(
   appDetails: AppDetails,
   container: AutoflowContainer
 ): Promise<void> {
-  const files = glob.sync(`${appDetails.resolve}/dist/services/[!__]*.js`, {})
+  const registerServicesGlob = fg.convertPathToPattern(`${appDetails.resolve}/dist/services/[!__]*.js`)
+  const files = glob.sync(registerServicesGlob, {})
   await promiseAll(
     files.map(async (fn) => {
       const loaded = require(fn).default
@@ -232,7 +233,8 @@ function registerSubscribers(
   appDetails: AppDetails,
   container: AutoflowContainer
 ): void {
-  const files = glob.sync(`${appDetails.resolve}/dist/subscribers/*.js`, {})
+  const registerSubscribersGlob = fg.convertPathToPattern(`${appDetails.resolve}/dist/subscribers/*.js`)
+  const files = glob.sync(registerSubscribersGlob, {})
   files.forEach((fn) => {
     const loaded = require(fn).default
 
@@ -257,7 +259,8 @@ function registerStrategies(
   appDetails: AppDetails,
   container: AutoflowContainer): void {
 
-const files = glob.sync(`${appDetails.resolve}/dist/strategies/*.js`, {})
+const registerStrategiesGlob = fg.convertPathToPattern(`${appDetails.resolve}/dist/strategies/*.js`)
+const files = glob.sync(registerStrategiesGlob, {})
   files.forEach((fn) => {
     const loaded = require(fn).default
     const name = formatRegistrationName(fn)
@@ -280,7 +283,8 @@ const files = glob.sync(`${appDetails.resolve}/dist/strategies/*.js`, {})
  * @param appDetails The app details including app options, version, id, resolved path, etc.
  */
 async function runSetupFunctions(appDetails: AppDetails): Promise<void> {
-  const files = glob.sync(`${appDetails.resolve}/setup/*.js`, {})
+  const runSetupFunctionsGlob = fg.convertPathToPattern(`${appDetails.resolve}/setup/*.js`)
+  const files = glob.sync(runSetupFunctionsGlob, {})
   await promiseAll(
     files.map(async (fn) => {
       const loaded = require(fn).default

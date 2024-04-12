@@ -6,6 +6,8 @@ import { AutoflowContainer } from "@ocular/types"
 import  {ConfigModule} from "../types/config-module"
 import formatRegistrationName from "../utils/format-registration-name"
 
+const fg = require('fast-glob');
+
 type Options = {
   container: AutoflowContainer
   configModule: ConfigModule
@@ -16,7 +18,7 @@ type Options = {
  */ 
 export default ({ container, configModule}: Options): void => {
   const corePath = "../approaches/*.js"
-  const coreFull = path.join(__dirname, corePath)
+  const coreFull = fg.convertPathToPattern(path.join(__dirname, corePath))
 
   const approaches = glob.sync(coreFull, { cwd: __dirname })
   approaches.forEach((fn) => {

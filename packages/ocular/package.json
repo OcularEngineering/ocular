@@ -35,6 +35,7 @@
     "core-js": "^3.36.1",
     "cors": "^2.8.5",
     "express-session": "^1.18.0",
+    "fast-glob": "^3.3.2",
     "fs-exists-cached": "^1.0.0",
     "ioredis-mock": "^8.9.0",
     "morgan": "^1.10.0",

@@ -12,6 +12,7 @@ import databaseLoader from "./loaders/database"
 import modelsLoader from "./loaders/models"
 import  getConfigFile  from "./utils/get-config-file"
 const glob = require("glob");
+const fg = require('fast-glob');
 
 const rootDirectory = path.resolve(`.`)   
 
@@ -25,8 +26,8 @@ const getMigrations = (directory) => {
 
   migrationDirs.push(path.join(corePackageMigrations, "*.js"))
 
-  const coreMigrations = migrationDirs.flatMap((dir) => {
-    return glob.sync(dir)
+  const coreMigrations = migrationDirs.flatMap((dir) => {    
+    return glob.sync(fg.convertPathToPattern(dir))
   })
 
   const migrations = coreMigrations
