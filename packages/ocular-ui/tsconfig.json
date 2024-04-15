@@ -24,6 +24,6 @@
     ],
     "strictNullChecks": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "types/**/*.ts", "components/chat/chat-helpers/index", "components/chat/chat-files-display" ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "types/**/*.ts", "components/chat/chat-helpers/index.tsx", "components/chat/chat-files-disp", "lib/build-prompt", "components/chat/chat-hooks/use-chat-handler", "components/chat/chat-input", "components/chat/quick-settings", "components/chat/quick-setting-option", "components/messages/message-actions", "services/api.JS", "components/chat/prompt-picker", "components/chat/quick-settings", "components/chat/quick-setting-option", "components/chat/chat-messages", "components/chat/chat-help", "components/chat/chat-input", "components/chat/chat-settings", "components/chat/tool-picker", "components/chat/file-picker", "components/chat/chat-hooks/use-select-file-handler", "components/chat/chat-hooks/use-prompt-and-command", "components/chat/chat-hooks/use-chat-handler" ],
   "exclude": ["node_modules"]
 }

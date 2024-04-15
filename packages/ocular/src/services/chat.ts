@@ -1,6 +1,6 @@
 import { EntityManager} from "typeorm"
 import { TransactionBaseService } from "@ocular/types"
-import {Chat, User} from "../models"
+import {Chat, Message, User} from "../models"
 import { ChatRepository } from "../repositories"
 import { CreateChatInput } from "../types/chat"
 import { FindConfig, Selector } from "../types/common"
@@ -62,7 +62,6 @@ class ChatService extends TransactionBaseService {
 
     return chat
   }
-
 
   async list(selector, config = {}): Promise<Chat[]> {
     const chatRepo = this.activeManager_.withRepository(this.chatRepository_)

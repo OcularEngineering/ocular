@@ -1,6 +1,6 @@
-// // Only used in use-chat-handler.tsx to keep it clean
+// Only used in use-chat-handler.tsx to keep it clean
 
-// // import { createChatFiles } from "@/db/chat-files"
+// import { createChatFiles } from "@/db/chat-files"
 // import { createChat } from "@/db/chats"
 // import { createMessageFileItems } from "@/db/message-file-items"
 // import { createMessages, updateMessage } from "@/db/messages"
@@ -9,19 +9,24 @@
 //   buildFinalMessages,
 //   buildGoogleGeminiFinalMessages
 // } from "@/lib/build-prompt"
-// import { consumeReadableStream } from "@/lib/consume-stream"
+import { consumeReadableStream } from "@/lib/consume-stream"
+import api from "@/services/api"
 // import { Tables, TablesInsert } from "@/supabase/types"
-// import {
-//   ChatFile,
-//   ChatMessage,
-//   ChatPayload,
-//   ChatSettings,
-//   LLM,
-//   MessageImage
-// } from "@/types"
-// import React from "react"
-// import { toast } from "sonner"
-// import { v4 as uuidv4 } from "uuid"
+import {
+  Chat,
+  ChatFile,
+  ChatMessage,
+  ChatPayload,
+  ChatSettings,
+  // LLM,
+  // MessageImage
+} from "@/types/chat"
+import { Profile } from "@/types/types"
+import { Cancel, CancelTokenSource } from "axios"
+import router from "next/router"
+import React from "react"
+import { toast } from "sonner"
+import { v4 as uuidv4 } from "uuid"
 
 // export const validateChatSettings = (
 //   chatSettings: ChatSettings | null,
@@ -82,38 +87,37 @@
 // export const createTempMessages = (
 //   messageContent: string,
 //   chatMessages: ChatMessage[],
-//   chatSettings: ChatSettings,
-//   b64Images: string[],
+//   // chatSettings: ChatSettings,
+//   // b64Images: string[],
 //   isRegeneration: boolean,
 //   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-//   selectedAssistant: Tables<"assistants"> | null
+//   // selectedAssistant: Tables<"assistants"> | null
 // ) => {
 //   let tempUserChatMessage: ChatMessage = {
 //     message: {
 //       chat_id: "",
-//       assistant_id: null,
 //       content: messageContent,
 //       created_at: "",
-//       id: uuidv4(),
-//       image_paths: b64Images,
-//       model: chatSettings.model,
+//       // id: uuidv4(),
+//       // image_paths: b64Images,
+//       // model: chatSettings.model,
 //       role: "user",
-//       sequence_number: chatMessages.length,
+//       // sequence_number: chatMessages.length,
 //       updated_at: "",
-//       user_id: ""
+//       // user_id: ""
 //     },
-//     fileItems: []
+//     // fileItems: []
 //   }
 
 //   let tempAssistantChatMessage: ChatMessage = {
 //     message: {
 //       chat_id: "",
-//       assistant_id: selectedAssistant?.id || null,
+//       // assistant_id: selectedAssistant?.id || null,
 //       content: "",
 //       created_at: "",
 //       id: uuidv4(),
-//       image_paths: [],
-//       model: chatSettings.model,
+//       // image_paths: [],
+//       // model: chatSettings.model,
 //       role: "assistant",
 //       sequence_number: chatMessages.length + 1,
 //       updated_at: "",
@@ -187,205 +191,205 @@
 //   )
 // }
 
-// export const handleHostedChat = async (
-//   payload: ChatPayload,
-//   profile: Tables<"profiles">,
-//   modelData: LLM,
-//   tempAssistantChatMessage: ChatMessage,
-//   isRegeneration: boolean,
-//   newAbortController: AbortController,
-//   newMessageImages: MessageImage[],
-//   chatImages: MessageImage[],
-//   setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
-//   setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
-//   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-//   setToolInUse: React.Dispatch<React.SetStateAction<string>>
-// ) => {
-//   const provider =
-//     modelData.provider === "openai" && profile.use_azure_openai
-//       ? "azure"
-//       : modelData.provider
+export const handleChat = async (
+  chat: Chat,
+  messageContent: string,
+  // payload: ChatPayload,
+  // profile: Profile,
+  // modelData: LLM,
+  // tempAssistantChatMessage: ChatMessage,
+  // isRegeneration: boolean,
+  cancelTokenSource: CancelTokenSource,
+  // newMessageImages: MessageImage[],
+  // chatImages: MessageImage[],
+  setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
+  setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
+  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
+  // setToolInUse: React.Dispatch<React.SetStateAction<string>>
+) => {
+  const requestBody = {
+    // chatSettings: payload.chatSettings,
+  
+    // customModelId: provider === "custom" ? modelData.hostedId : ""
+  }
 
-//   let formattedMessages = []
+  const response = await fetchChatResponse(
+    chat,
+    messageContent, 
+    true,
+    cancelTokenSource,
+    setIsGenerating,
+    setChatMessages
+  )
 
-//   if (provider === "google") {
-//     formattedMessages = await buildGoogleGeminiFinalMessages(
-//       payload,
-//       profile,
-//       newMessageImages
-//     )
-//   } else {
-//     formattedMessages = await buildFinalMessages(payload, profile, chatImages)
-//   }
+      // isRegeneration
+    //   ? payload.chatMessages[payload.chatMessages.length - 1]
+    //   : tempAssistantChatMessage,
 
-//   const apiEndpoint =
-//     provider === "custom" ? "/api/chat/custom" : `/api/chat/${provider}`
+  return await processResponse(
+    response,
+    // true,
+    cancelTokenSource,
+    setFirstTokenReceived,
+    setChatMessages,
+    // setToolInUse
+  )
+}
 
-//   const requestBody = {
-//     chatSettings: payload.chatSettings,
-//     messages: formattedMessages,
-//     customModelId: provider === "custom" ? modelData.hostedId : ""
-//   }
+export const fetchChatResponse = async (
+  chat: Chat,
+  content: string,
+  isHosted: boolean,
+  cancelTokenSource: CancelTokenSource,
+  setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
+  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>
+) => {
+  const response = await api.chats.sendMessage(chat.id,{message:content,stream:false},cancelTokenSource)
+  if (!response.data.ok) {
+    if (response.status === 404) {
+      toast.error(
+        "Failed To Chat",
+      )
+    }
+    const errorData = await response.data
+    toast.error(errorData.message)
+    setIsGenerating(false)
+  }
+  return response.data
+}
 
-//   const response = await fetchChatResponse(
-//     apiEndpoint,
-//     requestBody,
-//     true,
-//     newAbortController,
-//     setIsGenerating,
-//     setChatMessages
-//   )
 
-//   return await processResponse(
-//     response,
-//     isRegeneration
-//       ? payload.chatMessages[payload.chatMessages.length - 1]
-//       : tempAssistantChatMessage,
-//     true,
-//     newAbortController,
-//     setFirstTokenReceived,
-//     setChatMessages,
-//     setToolInUse
-//   )
-// }
 
-// export const fetchChatResponse = async (
-//   url: string,
-//   body: object,
-//   isHosted: boolean,
-//   controller: AbortController,
-//   setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
-//   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>
-// ) => {
-//   const response = await fetch(url, {
-//     method: "POST",
-//     body: JSON.stringify(body),
-//     signal: controller.signal
-//   })
 
-//   if (!response.ok) {
-//     if (response.status === 404 && !isHosted) {
-//       toast.error(
-//         "Model not found. Make sure you have it downloaded via Ollama."
-//       )
-//     }
 
-//     const errorData = await response.json()
+  // lastChatMessage: ChatMessage,
+export const processResponse = async (
+  response: Response,
+  cancelTokenSource: CancelTokenSource,
+  setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
+  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
+  // setToolInUse: React.Dispatch<React.SetStateAction<string>>
+) => {
+  let fullText = ""
+  let contentToAdd = ""
 
-//     toast.error(errorData.message)
+  // console.log("processResponse",response.message)
 
-//     setIsGenerating(false)
-//     setChatMessages(prevMessages => prevMessages.slice(0, -2))
-//   }
+  if (response) {
+    // await consumeReadableStream(
+    //   response.body,
+    //   chunk => {
+    //     setFirstTokenReceived(true)
+    //     // setToolInUse("none")
 
-//   return response
-// }
+    //     try {
+    //       contentToAdd = isHosted
+    //         ? chunk
+    //         : // Ollama's streaming endpoint returns new-line separated JSON
+    //           // objects. A chunk may have more than one of these objects, so we
+    //           // need to split the chunk by new-lines and handle each one
+    //           // separately.
+    //           chunk
+    //             .trimEnd()
+    //             .split("\n")
+    //             .reduce(
+    //               (acc, line) => acc + JSON.parse(line).message.content,
+    //               ""
+    //             )
+    //       fullText += contentToAdd
+    //     } catch (error) {
+    //       console.error("Error parsing JSON:", error)
+    //     }
 
-// export const processResponse = async (
-//   response: Response,
-//   lastChatMessage: ChatMessage,
-//   isHosted: boolean,
-//   controller: AbortController,
-//   setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
-//   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-//   setToolInUse: React.Dispatch<React.SetStateAction<string>>
-// ) => {
-//   let fullText = ""
-//   let contentToAdd = ""
+    //     setChatMessages(prev =>
+    //       prev.map(chatMessage => {
+    //         // if (chatMessage.message.id === lastChatMessage.message.id) {
+    //         //   const updatedChatMessage: ChatMessage = {
+    //         //     message: {
+    //         //       ...chatMessage.message,
+    //         //       content: fullText
+    //         //     },
+    //         //     fileItems: chatMessage.fileItems
+    //         //   }
 
-//   if (response.body) {
-//     await consumeReadableStream(
-//       response.body,
-//       chunk => {
-//         setFirstTokenReceived(true)
-//         setToolInUse("none")
+    //         //   return updatedChatMessage
+    //         // }
 
-//         try {
-//           contentToAdd = isHosted
-//             ? chunk
-//             : // Ollama's streaming endpoint returns new-line separated JSON
-//               // objects. A chunk may have more than one of these objects, so we
-//               // need to split the chunk by new-lines and handle each one
-//               // separately.
-//               chunk
-//                 .trimEnd()
-//                 .split("\n")
-//                 .reduce(
-//                   (acc, line) => acc + JSON.parse(line).message.content,
-//                   ""
-//                 )
-//           fullText += contentToAdd
-//         } catch (error) {
-//           console.error("Error parsing JSON:", error)
-//         }
+    //         return chatMessage
+    //       })
+    //     )
+    //   },
+    //   cancelTokenSource.token
+    // )
+    
+    router.push(`/dashboard/chat/${response.message.chat_id}`)
+    setChatMessages(prevChatMessages => [...prevChatMessages, 
+      {
+        message: {
+          chat_id: response.message.chat_id,
+          content: response.message.content,
+          created_at: response.message.created_at,
+          id: response.message.id,
+          role: response.message.role,
+          updated_at: response.message.updated_at,
+          user_id: response.message.user_id
+        },
+        fileItems: []
+      }
+    ]);
+    // return fullText
+    return response.message.content
+  } else {
+    throw new Error("Response body is null")
+  }
+}
 
-//         setChatMessages(prev =>
-//           prev.map(chatMessage => {
-//             if (chatMessage.message.id === lastChatMessage.message.id) {
-//               const updatedChatMessage: ChatMessage = {
-//                 message: {
-//                   ...chatMessage.message,
-//                   content: fullText
-//                 },
-//                 fileItems: chatMessage.fileItems
-//               }
+export const handleCreateChat = async (
+  // chatSettings: ChatSettings,
+  // profile: Tables<"profiles">,
+  // selectedWorkspace: Tables<"workspaces">,
+  messageContent: string,
+  // selectedAssistant: Tables<"assistants">,
+  // newMessageFiles: ChatFile[],
+  setSelectedChat: React.Dispatch<React.SetStateAction<Chat | null>>,
+  setChats: React.Dispatch<React.SetStateAction<Chat[]>>,
+  // setChatFiles: React.Dispatch<React.SetStateAction<ChatFile[]>>
+) => {
+  const createdChat = await api.chats.create({name:messageContent})
 
-//               return updatedChatMessage
-//             }
+  if (createdChat.status!==200) {
+    throw new Error('Created Chat Request Failed');
+  }
 
-//             return chatMessage
-//           })
-//         )
-//       },
-//       controller.signal
-//     )
+  // const createdChat = await createChat({
+  //   user_id: profile.user_id,
+  //   workspace_id: selectedWorkspace.id,
+  //   assistant_id: selectedAssistant?.id || null,
+  //   context_length: chatSettings.contextLength,
+  //   include_profile_context: chatSettings.includeProfileContext,
+  //   include_workspace_instructions: chatSettings.includeWorkspaceInstructions,
+  //   model: chatSettings.model,
+  //   name: messageContent.substring(0, 100),
+  //   prompt: chatSettings.prompt,
+  //   temperature: chatSettings.temperature,
+  //   embeddings_provider: chatSettings.embeddingsProvider
+  // })
 
-//     return fullText
-//   } else {
-//     throw new Error("Response body is null")
-//   }
-// }
+  setSelectedChat(createdChat.data.chat)
+  setChats(chats => [createdChat.data.chat, ...chats])
 
-// export const handleCreateChat = async (
-//   chatSettings: ChatSettings,
-//   profile: Tables<"profiles">,
-//   selectedWorkspace: Tables<"workspaces">,
-//   messageContent: string,
-//   selectedAssistant: Tables<"assistants">,
-//   newMessageFiles: ChatFile[],
-//   setSelectedChat: React.Dispatch<React.SetStateAction<Tables<"chats"> | null>>,
-//   setChats: React.Dispatch<React.SetStateAction<Tables<"chats">[]>>,
-//   setChatFiles: React.Dispatch<React.SetStateAction<ChatFile[]>>
-// ) => {
-//   const createdChat = await createChat({
-//     user_id: profile.user_id,
-//     workspace_id: selectedWorkspace.id,
-//     assistant_id: selectedAssistant?.id || null,
-//     context_length: chatSettings.contextLength,
-//     include_profile_context: chatSettings.includeProfileContext,
-//     include_workspace_instructions: chatSettings.includeWorkspaceInstructions,
-//     model: chatSettings.model,
-//     name: messageContent.substring(0, 100),
-//     prompt: chatSettings.prompt,
-//     temperature: chatSettings.temperature,
-//     embeddings_provider: chatSettings.embeddingsProvider
-//   })
+  // await createChatFiles(
+  //   newMessageFiles.map(file => ({
+  //     user_id: profile.user_id,
+  //     chat_id: createdChat.id,
+  //     file_id: file.id
+  //   }))
+  // )
 
-//   setSelectedChat(createdChat)
-//   setChats(chats => [createdChat, ...chats])
+  // setChatFiles(prev => [...prev, ...newMessageFiles])
 
-//   await createChatFiles(
-//     newMessageFiles.map(file => ({
-//       user_id: profile.user_id,
-//       chat_id: createdChat.id,
-//       file_id: file.id
-//     }))
-//   )
-
-//   setChatFiles(prev => [...prev, ...newMessageFiles])
-
-//   return createdChat
-// }
+  return createdChat.data.chat
+}
 
 // export const handleCreateMessages = async (
 //   chatMessages: ChatMessage[],

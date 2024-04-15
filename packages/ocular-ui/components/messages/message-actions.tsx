@@ -11,8 +11,6 @@ interface MessageActionsProps {
   isEditing: boolean
   isHovering: boolean
   onCopy: () => void
-  onEdit: () => void
-  onRegenerate: () => void
 }
 
 export const MessageActions: FC<MessageActionsProps> = ({
@@ -21,8 +19,6 @@ export const MessageActions: FC<MessageActionsProps> = ({
   isEditing,
   isHovering,
   onCopy,
-  onEdit,
-  onRegenerate
 }) => {
   const { isGenerating } = useContext(ChatbotUIContext)
 
@@ -47,36 +43,6 @@ export const MessageActions: FC<MessageActionsProps> = ({
 
   return (isLast && isGenerating) || isEditing ? null : (
     <div className="text-muted-foreground flex items-center space-x-2">
-      {/* {((isAssistant && isHovering) || isLast) && (
-        <WithTooltip
-          delayDuration={1000}
-          side="bottom"
-          display={<div>Fork Chat</div>}
-          trigger={
-            <IconGitFork
-              className="cursor-pointer hover:opacity-50"
-              size={MESSAGE_ICON_SIZE}
-              onClick={handleForkChat}
-            />
-          }
-        />
-      )} */}
-
-      {!isAssistant && isHovering && (
-        <WithTooltip
-          delayDuration={1000}
-          side="bottom"
-          display={<div>Edit</div>}
-          trigger={
-            <IconEdit
-              className="cursor-pointer hover:opacity-50"
-              size={MESSAGE_ICON_SIZE}
-              onClick={onEdit}
-            />
-          }
-        />
-      )}
-
       {(isHovering || isLast) && (
         <WithTooltip
           delayDuration={1000}
@@ -95,23 +61,6 @@ export const MessageActions: FC<MessageActionsProps> = ({
           }
         />
       )}
-
-      {isLast && (
-        <WithTooltip
-          delayDuration={1000}
-          side="bottom"
-          display={<div>Regenerate</div>}
-          trigger={
-            <IconRepeat
-              className="cursor-pointer hover:opacity-50"
-              size={MESSAGE_ICON_SIZE}
-              onClick={onRegenerate}
-            />
-          }
-        />
-      )}
-
-      {/* {1 > 0 && isAssistant && <MessageReplies />} */}
     </div>
   )
 }

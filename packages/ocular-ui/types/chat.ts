@@ -13,6 +13,25 @@ export interface AssistantRetrievalItem {
   type: string
 }
 
+export interface Chat{
+  id: string
+  name: string
+  created_at: Date
+  updated_at: Date
+  organisation_id: string
+  user_id: string
+}
+
+export interface Message {
+  id: string
+  content: string
+  role: string
+  chat_id: string
+  user_id: string // Add this line
+  created_at: Date
+  updated_at: Date
+}
+
 export interface ChatFile {
   id: string
   name: string
@@ -22,19 +41,19 @@ export interface ChatFile {
 
 
 export interface ChatMessage {
-  // message: Tables<"messages">
+  message: Message
   fileItems: string[]
 }
 
 
-export interface ChatSettings {
-  prompt: string
-  temperature: number
-  contextLength: number
-  includeProfileContext: boolean
-  includeWorkspaceInstructions: boolean
-  embeddingsProvider: "openai" | "local"
-}
+// export interface ChatSettings {
+//   prompt: string
+//   temperature: number
+//   contextLength: number
+//   includeProfileContext: boolean
+//   includeWorkspaceInstructions: boolean
+//   embeddingsProvider: "openai" | "local"
+// }
 
 export interface ChatPayload {
   chatSettings: ChatSettings

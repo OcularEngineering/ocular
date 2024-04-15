@@ -58,10 +58,9 @@ export class PostChatReq {
   @IsEnum(ApproachDefinitions)
   approach: ApproachDefinitions
   
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => Message)
-  messages: Message[]
+  @IsString()
+  @IsNotEmpty()
+  message: string
 
   @ValidateNested()
   context?: PostApproachContext 

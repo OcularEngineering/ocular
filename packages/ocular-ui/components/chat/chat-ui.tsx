@@ -1,5 +1,5 @@
 // import Loading from "@/app/[locale]/loading"
-// import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
+import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatbotUIContext } from "@/context/context"
 // import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 // import { getChatFilesByChatId } from "@/db/chat-files"
@@ -13,11 +13,12 @@ import { useParams } from "next/navigation"
 import { FC, useContext, useEffect, useState } from "react"
 import { ChatHelp } from "./chat-help"
 import { useScroll } from "./chat-hooks/use-scroll"
-// import { ChatInput } from "./chat-input"
+import { ChatInput } from "./chat-input"
 import { ChatMessages } from "./chat-messages"
 import { ChatScrollButtons } from "./chat-scroll-buttons"
 import api from "@/services/api"
-// import { ChatSecondaryButtons } from "./chat-secondary-buttons"
+import { se } from "date-fns/locale"
+import { ChatSecondaryButtons } from "./chat-secondary-buttons"
 
 interface ChatUIProps {}
 
@@ -26,22 +27,24 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
 
   const params = useParams()
 
+
+
   const {
     setChatMessages,
     selectedChat,
     setSelectedChat,
-    setChatSettings,
-    setChatImages,
-    assistants,
-    setSelectedAssistant,
-    setChatFileItems,
-    setChatFiles,
-    setShowFilesDisplay,
-    setUseRetrieval,
-    setSelectedTools
+    // setChatSettings,
+    // setChatImages,
+    // assistants,
+    // setSelectedAssistant,
+    // setChatFileItems,
+    // setChatFiles,
+    // setShowFilesDisplay,
+    // setUseRetrieval,
+    // setSelectedTools
   } = useContext(ChatbotUIContext)
 
-  // const { handleNewChat, handleFocusChatInput } = useChatHandler()
+  const { handleNewChat, handleFocusChatInput } = useChatHandler()
 
   const {
     messagesStartRef,
@@ -58,33 +61,26 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    console.log('Component mounted');
-  }, []);
-
-  useEffect(() => {
     const fetchData = async () => {
-      console.log("In Chat UI", params.chatid)
       await fetchMessages()
-      // await fetchChat()
+      await fetchChat()
 
       scrollToBottom()
       setIsAtBottom(true)
     }
 
-    // if (params.chatid) {
+    if (params && params.chatid) {
       fetchData().then(() => {
-        // handleFocusChatInput()
+        handleFocusChatInput()
         setLoading(false)
       })
-    // } else {
-    //   setLoading(false)
-    // }
-  }, [])
+    } else {
+      setLoading(false)
+    }
+  }, [params])
 
   const fetchMessages = async () => {
-    const fetchedMessages = await api.chats.retrieve("chat_01HTXJFTN6P4YV0FMYD2MG8QVG" as string)
-    console.log("fetchedMessages")
-    console.log(fetchedMessages)
+    const fetchedMessages = await api.chats.retrieve(params.chatid as string)
 
     // const imagePromises: Promise<MessageImage>[] = fetchedMessages.flatMap(
     //   message =>
@@ -140,10 +136,10 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     //   }))
     // )
 
-    setUseRetrieval(true)
-    setShowFilesDisplay(true)
+    // setUseRetrieval(true)
+    // setShowFilesDisplay(true)
 
-    const fetchedChatMessages = fetchedMessages.data.map(message => {
+    const fetchedChatMessages = fetchedMessages.data.chat.messages.map(message => {
       return {
         message,
         // fileItems: messageFileItems
@@ -153,30 +149,28 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
         //   )
       }
     })
-
     setChatMessages(fetchedChatMessages)
   }
 
-  // const fetchChat = async () => {
-  //   const chat = await getChatById(params.chatid as string)
-  //   if (!chat) return
+  const fetchChat = async () => {
+    const response = await api.chats.retrieve(params.chatid as string)
+    if (!response.data.chat) return
 
-  //   if (chat.assistant_id) {
-  //     const assistant = assistants.find(
-  //       assistant => assistant.id === chat.assistant_id
-  //     )
+    // if (chat.assistant_id) {
+      // const assistant = assistants.find(
+      //   assistant => assistant.id === chat.assistant_id
+      // )
 
-  //     if (assistant) {
-  //       setSelectedAssistant(assistant)
+      // if (assistant) {
+      //   setSelectedAssistant(assistant)
 
-  //       // const assistantTools = (
-  //       //   await getAssistantToolsByAssistantId(assistant.id)
-  //       // ).tools
-  //       // setSelectedTools(assistantTools)
-  //     }
-  //   }
-
-    // setSelectedChat(chat)
+      //   // const assistantTools = (
+      //   //   await getAssistantToolsByAssistantId(assistant.id)
+      //   // ).tools
+      //   // setSelectedTools(assistantTools)
+      // }
+    // }
+    setSelectedChat(response.data.chat)
     // setChatSettings({
     //   model: chat.model as LLMID,
     //   prompt: chat.prompt,
@@ -186,11 +180,11 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     //   includeWorkspaceInstructions: chat.include_workspace_instructions,
     //   embeddingsProvider: chat.embeddings_provider as "openai" | "local"
     // })
-  // }
+  }
 
-  // if (loading) {
-  //   return <Loading />
-  // }
+  if (loading) {
+    return < div> Loading </div>
+  }
 
   return (
     <div className="relative flex h-full flex-col items-center">
@@ -205,12 +199,12 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       </div>
 
       <div className="absolute right-4 top-1 flex h-[40px] items-center space-x-2">
-        {/* <ChatSecondaryButtons /> */}
+        <ChatSecondaryButtons />
       </div>
 
       <div className="bg-secondary flex max-h-[50px] min-h-[50px] w-full items-center justify-center border-b-2 font-bold">
         <div className="max-w-[200px] truncate sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px] xl:max-w-[700px]">
-          {selectedChat?.name || "Chat"}
+          {selectedChat?.name || "Type To Create New Chat"}
         </div>
       </div>
 
@@ -225,13 +219,13 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* <div className="relative w-full min-w-[300px] items-end px-2 pb-3 pt-0 sm:w-[600px] sm:pb-8 sm:pt-5 md:w-[700px] lg:w-[700px] xl:w-[800px]">
+      <div className="relative w-full min-w-[300px] items-end px-2 pb-3 pt-0 sm:w-[600px] sm:pb-8 sm:pt-5 md:w-[700px] lg:w-[700px] xl:w-[800px]">
         <ChatInput />
-      </div> */}
-{/* 
+      </div>
+
       <div className="absolute bottom-2 right-2 hidden md:block lg:bottom-4 lg:right-4">
         <ChatHelp />
-      </div> */}
+      </div>
     </div>
   )
 }

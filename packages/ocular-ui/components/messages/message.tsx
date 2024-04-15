@@ -20,16 +20,17 @@ import { FileIcon } from "../ui/file-icon"
 // import { FilePreview } from "../ui/file-preview"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { WithTooltip } from "../ui/with-tooltip"
-// import { MessageActions } from "./message-actions"
-// import { MessageMarkdown } from "./message-markdown"
+import { MessageActions } from "./message-actions"
+import { MessageMarkdown } from "./message-markdown"
 import {  MessageInterface } from "../../types/message"
+import  Bot  from "../../public/bot.png"
 
 const ICON_SIZE = 32
 
 interface MessageProps {
   message: MessageInterface
   isEditing: boolean
-  // isLast: boolean
+  isLast: boolean
   // onStartEdit: (message: Tables<"messages">) => void
   // onCancelEdit: () => void
   // onSubmitEdit: (value: string, sequenceNumber: number) => void
@@ -39,29 +40,29 @@ export const Message: FC<MessageProps> = ({
   message,
   // fileItems,
   isEditing,
-  // isLast,
+  isLast,
   // onStartEdit,
   // onCancelEdit,
   // onSubmitEdit
 }) => {
   const {
-    assistants,
-    profile,
+    // assistants,
+    // profile,
     isGenerating,
     setIsGenerating,
     firstTokenReceived,
-    availableLocalModels,
-    availableOpenRouterModels,
+    // availableLocalModels,
+    // availableOpenRouterModels,
     chatMessages,
-    selectedAssistant,
-    chatImages,
-    assistantImages,
-    toolInUse,
-    files,
-    models
+    // selectedAssistant,
+    // chatImages,
+    // assistantImages,
+    // toolInUse,
+    // files,
+    // models
   } = useContext(ChatbotUIContext)
 
-  // const { handleSendMessage } = useChatHandler()
+  //  const { handleSendMessage } = useChatHandler()
 
   const editInputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -184,75 +185,63 @@ export const Message: FC<MessageProps> = ({
         "flex w-full justify-center",
         message.role === "user" ? "" : "bg-secondary"
       )}
-      // onMouseEnter={() => setIsHovering(true)}
-      // onMouseLeave={() => setIsHovering(false)}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
       // onKeyDown={handleKeyDown}
     >
       <div className="relative flex w-full flex-col p-6 sm:w-[550px] sm:px-0 md:w-[650px] lg:w-[650px] xl:w-[700px]">
         <div className="absolute right-5 top-7 sm:right-0">
-          {/* <MessageActions
+          <MessageActions
             onCopy={handleCopy}
             // onEdit={handleStartEdit}
             isAssistant={message.role === "assistant"}
             isLast={isLast}
             isEditing={isEditing}
             isHovering={isHovering}
-            onRegenerate={handleRegenerate}
-          /> */}
+            // onRegenerate={handleRegenerate}
+          />
         </div>
-        {/* <div className="space-y-3">
+        <div className="space-y-3">
           {message.role === "system" ? (
             <div className="flex items-center space-x-4">
               <IconPencil
                 className="border-primary bg-primary text-secondary rounded border-DEFAULT p-1"
                 size={ICON_SIZE}
               />
-
               <div className="text-lg font-semibold">Prompt</div>
             </div>
           ) : (
             <div className="flex items-center space-x-3">
               {message.role === "assistant" ? (
-                messageAssistantImage ? (
                   <Image
                     style={{
                       width: `${ICON_SIZE}px`,
                       height: `${ICON_SIZE}px`
                     }}
                     className="rounded"
-                    src={messageAssistantImage}
+                    src={Bot}
                     alt="assistant image"
                     height={ICON_SIZE}
                     width={ICON_SIZE}
                   />
-                ) : (
-                  <WithTooltip
-                    display={<div>{MODEL_DATA?.modelName}</div>}
-                    trigger={
-                      <ModelIcon
-                        provider={modelDetails?.provider || "custom"}
-                        height={ICON_SIZE}
-                        width={ICON_SIZE}
-                      />
-                    }
-                  />
-                )
-              ) : profile?.image_url ? (
-                <Image
-                  className={`size-[32px] rounded`}
-                  src={profile?.image_url}
-                  height={32}
-                  width={32}
-                  alt="user image"
-                />
-              ) : (
+              ) : 
+              // profile?.image_url ?
+               (
+              //   <Image
+              //     className={`size-[32px] rounded`}
+              //     src={profile?.image_url}
+              //     height={32}
+              //     width={32}
+              //     alt="user image"
+              //   />
+              // ) : (
                 <IconMoodSmile
                   className="bg-primary text-secondary border-primary rounded border-DEFAULT p-1"
                   size={ICON_SIZE}
                 />
               )}
 
-              <div className="font-semibold">
+              {/* <div className="font-semibold">
                 {message.role === "assistant"
                   ? message.assistant_id
                     ? assistants.find(
@@ -262,40 +251,11 @@ export const Message: FC<MessageProps> = ({
                       ? selectedAssistant?.name
                       : MODEL_DATA?.modelName
                   : profile?.display_name ?? profile?.username}
-              </div>
+              </div> */}
             </div>
           )}
-          {!firstTokenReceived &&
-          isGenerating &&
-          isLast &&
-          message.role === "assistant" ? (
-            <>
-              {(() => {
-                switch (toolInUse) {
-                  case "none":
-                    return (
-                      <IconCircleFilled className="animate-pulse" size={20} />
-                    )
-                  case "retrieval":
-                    return (
-                      <div className="flex animate-pulse items-center space-x-2">
-                        <IconFileText size={20} />
 
-                        <div>Searching files...</div>
-                      </div>
-                    )
-                  default:
-                    return (
-                      <div className="flex animate-pulse items-center space-x-2">
-                        <IconBolt size={20} />
-
-                        <div>Using {toolInUse}...</div>
-                      </div>
-                    )
-                }
-              })()}
-            </>
-          ) : isEditing ? (
+        {isEditing ? (
             <TextareaAutosize
               textareaRef={editInputRef}
               className="text-md"
@@ -306,7 +266,7 @@ export const Message: FC<MessageProps> = ({
           ) : (
             <MessageMarkdown content={message.content} />
           )}
-        </div> */}
+        </div>
 
         {/* {fileItems.length > 0 && (
           <div className="border-primary mt-6 border-t pt-4 font-bold">

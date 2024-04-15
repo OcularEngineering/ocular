@@ -42,6 +42,13 @@ export default {
       const path = `/chat`
       return  ocularRequest("DELETE", path, data)
     },
+    sendMessage(id,data,cancelToken){
+      console.log("controller",cancelToken)
+      console.log("data",data)
+      const path = `/chat/${id}/message`
+      console.log("path",data)
+      return  ocularRequest("POST", path, data, false, cancelToken)
+    },
     getMessages(id){
       const path = `/chat/${id}/messages`
       return  ocularRequest("GET", path)

@@ -71,3 +71,16 @@ export interface Integration {
   oauth_url: string
   install_url: string
 }
+
+// User Profile
+export interface Profile {
+  id: string
+  first_name: string
+  last_name: string
+  email: string
+  avatar: string
+  role: string
+  created_at: string
+  updated_at: string
+  organisation_id: string
+}

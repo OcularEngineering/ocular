@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { siteConfig } from "@/config/site"
 import { fontSans } from "@/lib/fonts"
 import { ThemeProvider } from "@/components/theme-provider"
+import { GlobalState } from "@/lib/global-state";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -20,20 +21,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             )}
             />
         </Head>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <div className="flex h-screen justify-center">
-                <div className="border-default flex w-14 flex-col justify-between overflow-y-auto border-r bg-background p-2">
-                    <SideNav
-                        links={links}
-                    />
-                </div>
-                <div className="grow justify-center overflow-auto">
-                    <div className="flex items-center justify-center">
-                    <div className="w-full-14">{children}</div> 
+        <GlobalState>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+                <div className="flex h-screen justify-center">
+                    <div className="border-default flex w-14 flex-col justify-between overflow-y-auto border-r bg-background p-2">
+                        <SideNav
+                            links={links}
+                        />
+                    </div>
+                    <div className="grow justify-center overflow-auto">
+                        {/* <div className="flex-row items-center justify-center"> */}
+                        <div className="w-full-14">{children}</div> 
+                        {/* </div> */}
                     </div>
                 </div>
-            </div>
-        </ThemeProvider>
+            </ThemeProvider>
+        </GlobalState> 
     </>
   );
 }

@@ -90,7 +90,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
         <div className="flex w-full items-center justify-between bg-zinc-700 px-4 text-white">
           <span className="text-xs lowercase">{language}</span>
           <div className="flex items-center space-x-1">
-            <Button
+           <Button
               variant="ghost"
               size="icon"
               className="hover:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0"
@@ -112,7 +112,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
         <SyntaxHighlighter
           language={language}
           style={oneDark}
-          // showLineNumbers
+          showLineNumbers
           customStyle={{
             margin: 0,
             width: "100%",
