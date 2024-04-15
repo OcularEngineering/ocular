@@ -1,4 +1,6 @@
 export * from "./auth"
 export * from "./config-module"
+export * from "./chat"
 export * from "../../../types/src/logger/logger"
+export * from "./message"
 export * from "./search"

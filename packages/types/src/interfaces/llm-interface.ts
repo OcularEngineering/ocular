@@ -5,6 +5,8 @@ import { TransactionBaseService } from './transaction-base-service';
 export interface ILLMInterface extends TransactionBaseService {
   createEmbeddings(text:string): Promise<number[]> ;
   completeChat(messages: Message[]): Promise<string>;
+  getChatModelTokenCount(content: string): number;
+  getTokenLimit(): number
 }
 
 /**
@@ -33,4 +35,6 @@ export abstract class AbstractLLMService
   }
   abstract createEmbeddings(text:string): Promise<number[]> ;
   abstract completeChat(messages: Message[]): Promise<string>;
+  abstract getChatModelTokenCount(content: string): number;
+  abstract getTokenLimit(): number
 }

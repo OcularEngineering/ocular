@@ -20,7 +20,7 @@ export interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
 
 // ICON TYPES
 
-export type IconKeys = 'Search' | 'Bot' | 'Settings' | 'LayoutGrid' | 'HelpCircle' | 'BarChart2' | 'Users'; 
+export type IconKeys = 'Search' | 'Bot' | 'Chat' | 'Settings' | 'LayoutGrid' | 'HelpCircle' | 'BarChart2' | 'Users'; 
 export type VariantKeys = "ghost" | "link" | "default" | "destructive" | "outline" | "secondary" | null | undefined;
 
 // LINK TYPES
@@ -70,4 +70,17 @@ export interface Integration {
   docs: string
   oauth_url: string
   install_url: string
+}
+
+// User Profile
+export interface Profile {
+  id: string
+  first_name: string
+  last_name: string
+  email: string
+  avatar: string
+  role: string
+  created_at: string
+  updated_at: string
+  organisation_id: string
 }

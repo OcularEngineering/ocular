@@ -56,6 +56,13 @@ export const links: LinkProps[] =[
     variant: "ghost",
     link: "/dashboard/marketplace"
   },
+  {
+    title: "Chat",
+    label: "",
+    icon: "Bot", // Changed from "LayoutGrid" to "Chat"
+    variant: "ghost",
+    link: "/dashboard/chat"
+  },
 ]
 
 export type Link = (typeof links)[number]

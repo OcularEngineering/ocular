@@ -33,7 +33,36 @@ export default {
       return ocularRequest("GET", path)
     },
   },
-  components:{
+  chats:{
+    create(data) {
+      const path = `/chat`
+      return  ocularRequest("POST", path, data)
+    },
+    delete(data){
+      const path = `/chat`
+      return  ocularRequest("DELETE", path, data)
+    },
+    sendMessage(id,data,cancelToken){
+      console.log("controller",cancelToken)
+      console.log("data",data)
+      const path = `/chat/${id}/message`
+      console.log("path",data)
+      return  ocularRequest("POST", path, data, false, cancelToken)
+    },
+    getMessages(id){
+      const path = `/chat/${id}/messages`
+      return  ocularRequest("GET", path)
+    },
+    list(search="") {
+      const path = `/chat/${search}`
+      return  ocularRequest("GET", path)
+    },
+    retrieve(id) {
+      const path = `/chat/${id}`
+      return  ocularRequest("GET", path)
+    }
+  },
+  components: {
     create(data) {
       const path = `/components`
       return  ocularRequest("POST", path, data)
@@ -62,7 +91,7 @@ export default {
     },
   },
   search: {
-    ask(q?: string) {
+    ask(q) {
       const path = `/ask`;
       const body = {
         approach: "ask-retrieve-read",

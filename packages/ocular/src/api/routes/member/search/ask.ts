@@ -20,16 +20,34 @@ export default async (req, res) => {
 
   // const askApproach = fastify.approaches.ask[approach ?? 'rtr'];
   try {
-
-
-  const loggedInUser = req.scope.resolve("loggedInUser")
+    const loggedInUser = req.scope.resolve("loggedInUser")
+    const { q, messages, context, stream } = req.body;
 
     if (approach === ApproachDefinitions.ASK_RETRIEVE_READ) {
-      const { q, messages, context, stream } = req.body;
       const searchApproach = req.scope.resolve("askRetrieveReadApproache")
       const results = await searchApproach.run(loggedInUser.organisation_id.toLowerCase().substring(4),q , (context as any) ?? {});
       return res.status(200).send(results)
     }
+
+    // if(approach === ApproachDefinitions.ASK_RETRIEVE_READ){
+    //   // Resolve Approach
+    //   // xxxxxxx
+    //   if (stream) {
+    //     const buffer = new Readable();
+    //     // Dummy implementation needed
+    //     buffer._read = () => {};
+    //     res.type('application/x-ndjson').send(buffer);
+
+    //     const chunks = await askApproach.runWithStreaming(messages[0].content, (context as any) ?? {});
+    //     for await (const chunk of chunks) {
+    //       buffer.push(JSON.stringify(chunk) + '\n');
+    //     }
+    //     // eslint-disable-next-line unicorn/no-null
+    //     buffer.push(null);
+    //   } else {
+    //     return await askApproach.run(messages[0].content, (context as any) ?? {});
+    //   }
+    // }
   } catch (_error: unknown) {
     const error = _error as Error & { error?: any; status?: number };
     if (error.error) {
@@ -40,22 +58,6 @@ export default async (req, res) => {
   return res.status(500).send(`Error: Failed to execute AskApproach.`);
 }
 
-/**
- * @schema StorePostSearchReq
- * type: object
- * properties:
- *  q:
- *    type: string
- *    description: The search query.
- *  offset:
- *    type: number
- *    description: The number of products to skip when retrieving the products.
- *  limit:
- *    type: number
- *    description: Limit the number of products returned.
- *  filter:
- *    description: Pass filters based on the search service.
- */
 export class PostAskReq {
 
   @IsOptional()

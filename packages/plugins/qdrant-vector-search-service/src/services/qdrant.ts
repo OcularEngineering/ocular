@@ -64,7 +64,7 @@ export default class qdrantService extends AbstractVectorDBService  {
     }
   }
 
-  async searchDocuments(indexName: string, vector: number[] ): Promise<SearchResult>{
+  async searchDocuments(indexName: string, vector: number[] ): Promise<IndexableDocChunk[]>{
     try{
       const searches: SearchResults[][] = await this.qdrantClient_.searchBatch(indexName, {
         searches: [
@@ -98,11 +98,7 @@ export default class qdrantService extends AbstractVectorDBService  {
       }, []).map(doc => doc.payload as IndexableDocChunk);
 
    
-    return{
-      ai_content: "",
-      query: "",
-      docs: uniqueSearchResults
-    }
+    return uniqueSearchResults
     }catch(error){
       console.log("Qdrant: Error Searching Docs From Quadrant",error)
     }

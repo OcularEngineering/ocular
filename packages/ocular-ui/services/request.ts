@@ -1,4 +1,4 @@
-import axios from "axios"
+import axios,  { CancelTokenSource } from "axios"
 
 axios.defaults.withCredentials = true;
 
@@ -7,11 +7,14 @@ export const OCULAR_BACKEND_URL =
 
 const client = axios.create({ baseURL: OCULAR_BACKEND_URL })
 
-export default function ocularRequest(method, path = "", payload = {}) {
+export default function ocularRequest(method, path = "", payload = {}, stream = false, cancelTokenSource: CancelTokenSource | null) {
+  console.log("Before Requesting", method, path, payload, cancelTokenSource)
   const options = {
     method,
     url: path,
     data: payload,
+    responseType: stream? 'stream': 'json',
+    cancelToken: cancelTokenSource ? cancelTokenSource.token : undefined,
     json: true,
     withCredentials: true,
     headers: {
@@ -19,10 +22,10 @@ export default function ocularRequest(method, path = "", payload = {}) {
       'Content-Type': 'application/json'
   }
   }
-  console.log("Requesting", options)
+  console.log("Requesting", method, path, payload)
   return client(options)
   .catch((error) => {
-    console.error("Error", error)
-    throw error
+      console.error("Error", error)
+      throw error
   })
 }

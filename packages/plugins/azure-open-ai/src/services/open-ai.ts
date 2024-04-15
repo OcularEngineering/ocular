@@ -1,5 +1,6 @@
 import { IndexableDocument, AbstractLLMService, IndexableDocChunk, Message  } from "@ocular/types";
 import { OpenAI } from 'openai';
+import { encoding_for_model, type TiktokenModel } from 'tiktoken';
 
 const SENTENCE_ENDINGS = new Set(['.', '。', '．', '!', '?', '‼', '⁇', '⁈', '⁉']);
 const WORD_BREAKS = new Set([',', '、', ';', ':', ' ', '(', ')', '[', ']', '{', '}', '\t', '\n']);
@@ -8,21 +9,6 @@ const SENTENCE_SEARCH_LIMIT = 100;
 const SECTION_OVERLAP = 100;
 
 export default class OpenAIService extends AbstractLLMService {
-
-  // MODEL_TOKEN_LIMITS: Record<string, number> = {
-  //   'gpt-35-turbo': 4000,
-  //   'gpt-3.5-turbo': 4000,
-  //   'gpt-35-turbo-16k': 16_000,
-  //   'gpt-3.5-turbo-16k': 16_000,
-  //   'gpt-4': 8100,
-  //   'gpt-4-32k': 32_000,
-  // };
-  
-  // AZURE_OPENAI_TO_TIKTOKEN_MODELS: Record<string, string> = {
-  //   'gpt-35-turbo': 'gpt-3.5-turbo',
-  //   'gpt-35-turbo-16k': 'gpt-35-turbo-16k',
-  // };
-
 
   static identifier = "azure-open-ai"
 
@@ -35,6 +21,7 @@ export default class OpenAIService extends AbstractLLMService {
   protected chatDeploymentName_: string
   protected embeddingModel_: string
   protected chatModel_: string
+  protected tokenLimit_:number = 4096
 
   constructor(container, options) {
     super(arguments[0],options)
@@ -102,5 +89,19 @@ export default class OpenAIService extends AbstractLLMService {
     }catch(error){
       console.log("Azure Open AI: Error",error)
     }
+  }
+
+  getChatModelTokenCount(content : string): number {
+    const encoder = encoding_for_model(this.chatModel_ as TiktokenModel);
+    let tokens = 2;
+    for (const value of Object.values(content)) {
+      tokens += encoder.encode(value).length;
+    }
+    encoder.free();
+    return tokens;
+  }
+
+  getTokenLimit(): number {
+    return this.tokenLimit_;
   }
 }

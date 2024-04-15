@@ -81,27 +81,28 @@ export default class typesenseService extends AbstractSearchService  {
 
 
   async search(indexName: string, query:string, context?: SearchContext): Promise<SearchResult>{
+    return null
 
-    console.log("In Text Search")
-    console.log(indexName, query)
-    try{
-      let searchParameters = {
-        'q'         : query,
-        'query_by'  : 'title,content',
-        // 'filter_by' : `organisationId:=${indexName}`,
-      }
-      const {hits} = await this.typesenseClient_.collections(this.collectionName_).documents().search(searchParameters)
+    // console.log("In Text Search")
+    // console.log(indexName, query)
+    // try{
+    //   let searchParameters = {
+    //     'q'         : query,
+    //     'query_by'  : 'title,content',
+    //     // 'filter_by' : `organisationId:=${indexName}`,
+    //   }
+    //   const {hits} = await this.typesenseClient_.collections(this.collectionName_).documents().search(searchParameters)
 
-      console.log("Hits Text",hits)
+    //   console.log("Hits Text",hits)
       
-    return{
-      ai_content: "",
-      query: query,
-      docs: hits?.map(hit => hit.document as IndexableDocChunk )
-    }
-    }catch(error){
-      console.log("Error Searching Docs From TypeSense",error)
-    }
+    // return{
+    //   ai_content: "",
+    //   query: query,
+    //   docs: hits?.map(hit => hit.document as IndexableDocChunk )
+    // }
+    // }catch(error){
+    //   console.log("Error Searching Docs From TypeSense",error)
+    // }
   } 
 
   private translateIndexableDocToTypesenseDoc(doc: IndexableDocChunk){
