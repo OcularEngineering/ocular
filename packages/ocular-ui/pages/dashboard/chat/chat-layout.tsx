@@ -24,12 +24,7 @@ interface ChatLayoutProps {
   children: ReactNode;
 }
 
-
 const ChatLayout: React.FC<ChatLayoutProps> = ({ children }) => {
-  // useHotkey("o", () => handleNewChat())
-  // useHotkey("l", () => {
-  //   handleFocusChatInput()
-  // })
   const pathname = usePathname()
   const router = useRouter()
 
@@ -62,9 +57,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ children }) => {
   // Get Chats From Server, Place Them In Context And Render Them On Sidebar
   useEffect(() => {
     fetchChats();
-  }, []);  // Empty array means this effect runs once on component mount
-
-  // const { handleNewChat, handleFocusChatInput } = useChatHandler()
+  }, []);
 
   const { theme } = useTheme()
 
@@ -76,7 +69,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ children }) => {
       //   "duration-200 dark:border-none " + (showSidebar ? "border-r-2" : "")
       // )}
         style={{
-          // Sidebar
           // minWidth: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
           // maxWidth: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
           // width: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px"

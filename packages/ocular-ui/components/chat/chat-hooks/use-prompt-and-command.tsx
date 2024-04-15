@@ -9,24 +9,9 @@ import { useContext } from "react"
 
 export const usePromptAndCommand = () => {
   const {
-    // chatFiles,
-    // setNewMessageFiles,
     userInput,
     setUserInput,
-    // setShowFilesDisplay,
     setIsPromptPickerOpen,
-    // setIsFilePickerOpen,
-    // setSlashCommand,
-    // setHashtagCommand,
-    // setUseRetrieval,
-    // setToolCommand,
-    // setIsToolPickerOpen,
-    // setSelectedTools,
-    // setAtCommand,
-    // setIsAssistantPickerOpen,
-    // setSelectedAssistant,
-    // setChatSettings,
-    // setChatFiles
   } = useContext(ChatbotUIContext)
 
   const handleInputChange = (value: string) => {
@@ -53,13 +38,6 @@ export const usePromptAndCommand = () => {
       // setToolCommand(toolMatch[1])
     } else {
       setIsPromptPickerOpen(false)
-      // setIsFilePickerOpen(false)
-      // setIsToolPickerOpen(false)
-      // setIsAssistantPickerOpen(false)
-      // setSlashCommand("")
-      // setHashtagCommand("")
-      // setToolCommand("")
-      // setAtCommand("")
     }
 
     setUserInput(value)
