@@ -1,12 +1,12 @@
 "use client";
 
 import { ChatUI } from '@/components/chat/chat-ui';
-import ChatLayout from './chat-layout'; // replace with the actual import path
+import ChatLayout from './chat-layout';
 
-const Chat = () => {
+export default function Chat() {
   return (
-   <ChatLayout> <ChatUI/></ChatLayout>
+    // <ChatLayout> <ChatUI/></ChatLayout>
+     <ChatUI/>
   );
 }
 
-export default Chat;

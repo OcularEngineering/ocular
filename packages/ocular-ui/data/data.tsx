@@ -50,18 +50,18 @@ export const links: LinkProps[] =[
     link: "/dashboard/search"
   },
   {
-    title: "Marketplace",
-    label: "",
-    icon: "LayoutGrid",
-    variant: "ghost",
-    link: "/dashboard/marketplace"
-  },
-  {
     title: "Chat",
     label: "",
     icon: "Bot", // Changed from "LayoutGrid" to "Chat"
     variant: "ghost",
     link: "/dashboard/chat"
+  },
+  {
+    title: "Marketplace",
+    label: "",
+    icon: "LayoutGrid",
+    variant: "ghost",
+    link: "/dashboard/marketplace"
   },
 ]
 

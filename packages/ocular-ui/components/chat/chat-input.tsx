@@ -69,16 +69,12 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   }
   return (
     <>
-      <div className="flex flex-col flex-wrap justify-center gap-2">
-      </div>
-
-      <div className="border-input relative mt-3 flex min-h-[60px] w-full items-center justify-center rounded-xl border-2">
+      <div className="dark:bg-background md:dark:hover:border-gray-100 mt-5 flex w-full items-center rounded-full border px-5 py-2 focus-within:shadow hover:shadow sm:max-w-xl sm:py-3 md:hover:border-white lg:max-w-5xl">
         <TextareaAutosize
           textareaRef={chatInputRef}
           className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           placeholder={
-            // `Ask anything. Type "@" for assistants, "/" for prompts, "#" for files, and "!" for tools.`
-            `Ask anything. Type @  /  #  !`
+            `Ask anything here...`
           }
           onValueChange={handleInputChange}
           value={userInput}
@@ -90,24 +86,24 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           onCompositionEnd={() => setIsTyping(false)}
         />
 
-        <div className="absolute bottom-[14px] right-3 cursor-pointer hover:opacity-50">
+        <div className="bottom-[14px] right-3 cursor-pointer hover:opacity-50">
           {isGenerating ? (
             <IconPlayerStopFilled
-              className="hover:bg-background animate-pulse rounded bg-transparent p-1"
-              // onClick={handleStopMessage}
-              size={30}
+              className="hover:bg-background animate-pulse rounded bg-transparent"
+              size={25}
             />
           ) : (
             <IconSend
               className={cn(
-                "bg-primary text-secondary rounded p-1",
+                "text-black",
                 !userInput && "cursor-not-allowed opacity-50"
               )}
               onClick={() => {
                 if (!userInput) return
-                handleSendMessage(userInput,false)
+
+                handleSendMessage(userInput, false)
               }}
-              size={30}
+              size={25}
             />
           )}
         </div>
