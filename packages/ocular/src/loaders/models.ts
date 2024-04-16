@@ -29,7 +29,7 @@ export default (
   const coreModelsFullGlob = path.join(__dirname, corePathGlob)
   const models: (ClassConstructor<unknown> | EntitySchema)[] = []
 
-  const coreModels = glob.sync(fg.convertPathToPattern(coreModelsFullGlob), {
+  const coreModels = glob.sync(coreModelsFullGlob, {
     cwd: __dirname,
     ignore: ["**/index.js", "**/index.ts", "**/index.js.map"],
   })
