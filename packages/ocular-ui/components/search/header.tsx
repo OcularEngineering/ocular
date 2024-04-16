@@ -33,19 +33,19 @@ export default function Header() {
   }
 
   return (
-    <header className={`dark:bg-background sticky top-0 bg-white font-sans dark:text-white shadow-sm dark:border-b`}>
+    <header className={`bg-background sticky top-0 font-sans dark:text-white shadow-sm dark:border-b`}>
       <div className="flex w-full items-center justify-between p-6">
         <div className="flex w-full flex-col items-center sm:flex-row ">
-          <form className={`dark:bg-secondary-dark mt-5 flex w-full max-w-3xl grow items-center rounded-full px-6 py-3 sm:ml-10 sm:mr-5 sm:mt-0 ${
+          <form className={`bg-background mt-5 flex w-full max-w-3xl grow items-center rounded-full px-6 py-3 sm:ml-10 sm:mr-5 sm:mt-0 ${
             showHeaderFilterToolbar ? 'border lg:max-w-5xl' : 'border lg:max-w-5xl'
-          } ease transition duration-500`}>
+          } `}>
           
             <input
               type="text"
               value={searchInput}
               onChange={handleInputChange}
               placeholder="Search for anything here"
-              className="dark:bg-background w-full grow focus:outline-none"
+              className="bg-background w-full grow focus:outline-none"
             />
 
             {searchInput && (

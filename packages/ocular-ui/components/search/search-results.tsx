@@ -27,12 +27,14 @@ export const AIResults = ({ content, search_results }) => {
       </div>
       <ReactMarkdown className="font-regular text-md space-y-4">{content}</ReactMarkdown>
       <div className='mt-2 mb-3'>
-        <button onClick={() => setShowResults(!showResults)}>
-          <div className='flex flex-row bg-blue-100/50 dark:bg-muted border border-input p-2 px-3 rounded-2xl text-sm font-semibold items-center gap-2'>
-            {search_results.length} sources
-            <ChevronDownIcon className={`h-4 ${showResults ? 'rotate-180' : ''}`} />
-          </div>
-        </button>
+        {search_results.length > 0 && (
+          <button onClick={() => setShowResults(!showResults)}>
+            <div className='flex flex-row bg-blue-100/50 dark:bg-muted border border-input p-2 px-3 rounded-2xl text-sm items-center gap-2'>
+              {search_results.length} sources
+              <ChevronDownIcon className={`h-4 ${showResults ? 'rotate-180' : ''}`} />
+            </div>
+          </button>
+        )}
         <div className={`flex flex-row space-x-5 mt-5 overflow-auto scrollbar-hide transition-all duration-300 ${showResults ? 'opacity-100 max-h-[1000px]' : 'opacity-0 max-h-0'}`}>
           {search_results.slice(0, 13).map((result: any, index: any) => (
             <div
