@@ -81,11 +81,6 @@ export const apps = [
   icon: "/GitHub.png",
 },
 {
-  value: "google drive",
-  label: "Google Drive",
-  icon: "/GoogleDrive.png",
-},
-{
   value: "jira",
   label: "Jira",
   icon: "/Jira.svg",

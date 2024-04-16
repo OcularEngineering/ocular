@@ -33,7 +33,7 @@ export default function Header() {
   }
 
   return (
-    <header className={`dark:bg-primary-dark sticky top-0 bg-white font-sans dark:text-white shadow-sm`}>
+    <header className={`dark:bg-background sticky top-0 bg-white font-sans dark:text-white shadow-sm dark:border-b`}>
       <div className="flex w-full items-center justify-between p-6">
         <div className="flex w-full flex-col items-center sm:flex-row ">
           <form className={`dark:bg-secondary-dark mt-5 flex w-full max-w-3xl grow items-center rounded-full px-6 py-3 sm:ml-10 sm:mr-5 sm:mt-0 ${
@@ -45,7 +45,7 @@ export default function Header() {
               value={searchInput}
               onChange={handleInputChange}
               placeholder="Search for anything here"
-              className="dark:bg-secondary-dark w-full grow focus:outline-none"
+              className="dark:bg-background w-full grow focus:outline-none"
             />
 
             {searchInput && (
