@@ -2,7 +2,7 @@ import fs from 'fs';
 import axios from 'axios';
 import { Readable } from 'stream';
 import { OAuthService, Organisation } from "@ocular/ocular";
-import { IndexableDocument, TransactionBaseService, Logger, AppNameDefinitions  } from "@ocular/types";
+import { IndexableDocument, DocType, TransactionBaseService, Logger, AppNameDefinitions  } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 
 
@@ -55,6 +55,7 @@ export default class AsanaService extends TransactionBaseService {
                 offset:task.notes.length,
                 content: task.notes,
               }],
+              type: DocType.TEXT ,
               updatedAt: new Date(task.modified_at),
               metadata: { completed: task.completed }
             };
@@ -78,6 +79,7 @@ export default class AsanaService extends TransactionBaseService {
             offset: project.notes.length,
             content: project.notes,
           }],
+          type: DocType.TEXT,
           updatedAt: new Date(project.modified_at),
           metadata: { completed: project.completed }
         }

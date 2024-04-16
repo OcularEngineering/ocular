@@ -1,3 +1,4 @@
+import e from "express";
 import { AppNameDefinitions, AppCategoryDefinitions } from "../apps";
 export const INDEX_DOCUMENT_EVENT = "INDEX_DOCUMENT_EVENT"
 
@@ -7,11 +8,20 @@ export interface Section {
   link: string;
 }
 
+export enum DocType {
+  PDF = 'pdf',
+  TEXT = 'text',
+  DOCX = 'docx',
+  HTML = 'html',
+  MD = 'md'
+}
+
 export type IndexableDocument = {
   id: string;
   organisationId: string;
   source: AppNameDefinitions;
   title: string;
+  type: DocType
   sections?: Section[];
   metadata: Record<string, unknown>;
   updatedAt: Date;

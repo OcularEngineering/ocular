@@ -7,6 +7,7 @@ import {
   TransactionBaseService,
   Logger,
   AppNameDefinitions,
+  DocType,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 
@@ -90,6 +91,7 @@ export default class ConfluenceService extends TransactionBaseService {
                 offset: pageInfo.text.length,
               },
             ],
+            type: DocType.TEXT,
             updatedAt: new Date(),
             metadata: {},
           };

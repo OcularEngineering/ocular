@@ -1,7 +1,7 @@
 import { Readable } from 'stream';
 import { EntityManager } from "typeorm";
 import { OAuthService, Organisation } from "@ocular/ocular";
-import { IndexableDocument, TransactionBaseService, Logger, AppNameDefinitions  } from "@ocular/types";
+import { IndexableDocument, TransactionBaseService, Logger, AppNameDefinitions, DocType  } from "@ocular/types";
 import {OAuth2Client} from 'google-auth-library';
 import { ConfigModule } from '@ocular/ocular/src/types';
 import fs from 'fs';
@@ -86,6 +86,7 @@ export default class GmailService extends TransactionBaseService {
                     offset: emailContent.length,
                     content: emailContent
                   }],
+                  type: DocType.TEXT,
                   updatedAt: new Date(parseInt(emailData.internalDate)),
                   metadata: {}
                 };
