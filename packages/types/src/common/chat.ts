@@ -1,4 +1,4 @@
 export type ChatContext = {
-  stream: boolean;
+  stream?: boolean;
   suggest_followup_questions?: boolean;
 };

@@ -19,7 +19,7 @@ type Options = {
 export default ({ container, configModule}: Options): void => {
 
   const corePath = "../modules/*.js"
-  const coreFull = fg.convertPathToPattern(path.join(__dirname, corePath))
+  const coreFull = path.join(__dirname, corePath)
 
   const core = glob.sync(coreFull, { cwd: __dirname })
   core.forEach((fn) => {

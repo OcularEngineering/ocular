@@ -1,5 +1,5 @@
 import { EntityManager} from "typeorm"
-import { TransactionBaseService, ChatContext } from "@ocular/types"
+import { TransactionBaseService, ChatContext, ILLMInterface } from "@ocular/types"
 import {Chat, Message, MessageRoles, User} from "../models"
 import { ChatRepository, MessageRepository } from "../repositories"
 import { CreateChatInput } from "../types/chat"
@@ -11,14 +11,16 @@ import { AutoflowAiError } from "@ocular/utils"
 type InjectedDependencies = {
   manager: EntityManager
   chatRepository: typeof ChatRepository
-  chatApproach: ChatApproach
+  // chatApproach: ChatApproach
+  openAiService: ILLMInterface
   messageRepository: typeof MessageRepository
   loggedInUser: User
 }
 
 class ChatService extends TransactionBaseService {
   protected readonly chatRepository_: typeof ChatRepository
-  protected readonly chatApproach_: ChatApproach
+  // protected readonly chatApproach_: ChatApproach
+  protected readonly openAiService_: ILLMInterface
   protected readonly messageRepository_: typeof MessageRepository
   protected readonly loggedInUser_: User
 
@@ -26,7 +28,8 @@ class ChatService extends TransactionBaseService {
     // eslint-disable-next-line prefer-rest-params
     super(arguments[0])
     this.chatRepository_ =  container.chatRepository
-    this.chatApproach_ = container.chatApproach
+    this.openAiService_ = container.openAiService
+    // this.chatApproach_ = container.chatApproach
     this.messageRepository_ = container.messageRepository
     this.loggedInUser_ = container.loggedInUser
   }
@@ -75,7 +78,13 @@ class ChatService extends TransactionBaseService {
         const chatRepository = transactionManager.withRepository(
           this.chatRepository_
         )
-        const chat = await chatRepository.findOne({id: chatId, organisation_id: this.loggedInUser_.organisation_id, user_id: this.loggedInUser_.id})
+        const chat = await chatRepository.findOne({
+          where: {
+            id: chatId,
+            organisation_id: this.loggedInUser_.organisation_id,
+            user_id: this.loggedInUser_.id
+          }
+        });
         if (!chat) {
           throw new AutoflowAiError(
             AutoflowAiError.Types.NOT_FOUND,
@@ -85,12 +94,10 @@ class ChatService extends TransactionBaseService {
         const messageRepository = transactionManager.withRepository(
           this.messageRepository_
         )
-        const userMessage = messageRepository.create({chat_id:chatId,content: message, role: MessageRoles.USER})
+        const userMessage = messageRepository.create({chat_id:chatId, user_id:this.loggedInUser_.id, content: message, role: MessageRoles.USER})
         await messageRepository.save(userMessage)
-
-        const responseMessage = this.chatApproach_.run(message, context)
-
-        const assistantMessage = messageRepository.create({chat_id:chatId,content: responseMessage, role: MessageRoles.ASSISTANT})
+        const responseMessage = await this.openAiService_.completeChat([{content: message, role: MessageRoles.USER}])
+        const assistantMessage = messageRepository.create({chat_id:chatId, user_id: this.loggedInUser_.id, content: responseMessage, role: MessageRoles.ASSISTANT})
         const savedAssistantMessage = await messageRepository.save(assistantMessage)
         return savedAssistantMessage
       }

@@ -7,12 +7,12 @@ export default async (req, res) => {
   const { id } = req.params
   const validated = await validator(PostMessageReq, req.body)
   try {
-    const { message, context } = validated;
+    const { message } = validated;
     const chatService = req.scope.resolve("chatService") as ChatService
-    const assistantMessage = await chatService.chat(id, message, context)
+    const assistantMessage = await chatService.chat(id, message, {})
     return res.status(200).send({message : assistantMessage})
-
   } catch (_error: unknown) {
+    console.error(_error)
     return res.status(500).send("Error: Failed to execute Chat");
   }
 }
