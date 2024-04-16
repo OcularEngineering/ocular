@@ -1,7 +1,7 @@
 import { Readable } from 'stream';
 import { EntityManager } from "typeorm";
 import { OAuthService, Organisation } from "@ocular/ocular";
-import { IndexableDocument, TransactionBaseService, Logger, AppNameDefinitions  } from "@ocular/types";
+import { IndexableDocument, TransactionBaseService, Logger, AppNameDefinitions, DocType  } from "@ocular/types";
 import {OAuth2Client} from 'google-auth-library';
 import { ConfigModule } from '@ocular/ocular/src/types';
 import fs from 'fs';
@@ -78,6 +78,7 @@ export default class GoogleDriveService extends TransactionBaseService {
                 offset:content.length,
                 content: content
               }],
+              type: DocType.TEXT,
               metadata:{},
               updatedAt: new Date(file.modifiedTime),
             };

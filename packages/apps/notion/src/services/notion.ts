@@ -7,6 +7,7 @@ import {
   TransactionBaseService,
   Logger,
   AppNameDefinitions,
+  DocType,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 import { RateLimit } from "async-sema";
@@ -70,6 +71,7 @@ export default class NotionService extends TransactionBaseService {
               offset: text.length,
             },
           ],
+          type: DocType.TEXT,
           updatedAt: new Date(page.last_edited_time),
           metadata: {},
         };
