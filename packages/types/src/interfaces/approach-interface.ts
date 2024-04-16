@@ -1,4 +1,4 @@
-import { IndexableDocChunk, Message, SearchResult, SearchResultChunk } from '../common';
+import { IndexableDocChunk, Message, SearchResult, SearchResultChunk, ChatContext, ChatResponse} from '../common';
 import { SearchContext } from "../common";
 
 export enum ApproachDefinitions {
@@ -12,6 +12,6 @@ export interface IAskApproach {
 }
 
 export interface IChatApproach {
-  run(messages: Message[], context?: SearchContext): Promise<SearchResult>;
-  runWithStreaming(messages: Message[], context?: SearchContext): AsyncGenerator<SearchResultChunk, void>;
+  run(messages: Message[], context?: ChatContext): Promise<ChatResponse>;
+  runWithStreaming(messages: Message[], context?: ChatContext): AsyncGenerator<SearchResultChunk, void>;
 }

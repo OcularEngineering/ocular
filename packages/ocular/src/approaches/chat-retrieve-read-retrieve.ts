@@ -1,5 +1,5 @@
 import { EntityManager } from "typeorm";
-import { AutoflowContainer , ApproachDefinitions, SearchResultChunk, ISearchService, ILLMInterface, SearchResult, SearchContext, Message, IChatApproach } from "@ocular/types";
+import { AutoflowContainer , ApproachDefinitions, SearchResultChunk, ISearchService, ILLMInterface, SearchResult, SearchContext, Message, IChatApproach, ChatContext, ChatResponse } from "@ocular/types";
 import { MessageBuilder } from "../utils/message";
 import { IndexableDocChunk } from "@ocular/types";
 
@@ -67,51 +67,30 @@ export default class ChatReadRetrieveRead implements IChatApproach {
   //   object: 'chat.completion';
   // }
 
-  async run(messages: Message[], context?: SearchContext): Promise<SearchResult> {
+  async run(messages: Message[], context?: ChatContext): Promise<ChatResponse> {
     const { completionRequest, thoughts, hits } = await this.baseRun(messages, context);
     const chatCompletion = await this.openaiService_.completeChat(completionRequest.messages);
     return {
-      choices: [
-        {
-          index: 0,
-          message: {
-            content: chatCompletion,
-            role: 'assistant',
-            context: {
-              data_points: hits,
-              thoughts: thoughts,
-            },
-          },
-        },
-      ],
-      hits:hits,
-      object: 'chat.completion',
+      // choices: [
+      //   {
+      //     index: 0,
+      //     message: {
+      //       content: chatCompletion,
+      //       role: 'assistant',
+      //       context: {
+      //         data_points: hits,
+      //         thoughts: thoughts,
+      //       },
+      //     },
+      //   },
+      // ],
+      message: {
+        role: 'assistant',
+        content: chatCompletion,
+      },
+      data_points: hits,
     };
   }
-
-  // return {
-  //   completionRequest: {
-  //     messages: finalMessages,
-  
-  //   },
-  //   hits: hits as IndexableDocChunk[],
-  // };
-
-  // choices: [
-  //   {
-  //     index: 0,
-  //     message: {
-  //       role: 'assistant' as const,
-  //       content: chatCompletion,
-  //       context: {
-  //         data_points: hits,
-  //         thoughts: `Question:<br>${userQuery}<br><br>Prompt:<br>${messageToDisplay.replace('\n', '<br>')}`,
-  //       },
-  //     },
-  //   },
-  // ],
-  // hits:hits,
-  // object: 'chat.completion',
 
   async *runWithStreaming(messages: Message[], context?: SearchContext): AsyncGenerator<SearchResultChunk, void> {
     // const { completionRequest, dataPoints, thoughts } = await this.baseRun(messages, context);
@@ -168,7 +147,7 @@ export default class ChatReadRetrieveRead implements IChatApproach {
     // -----------------------------------------------------------------------
 
 
-    let hits = await this.searchService_.search(null, userQuery, context);
+    let hits = await this.searchService_.search(null, queryText, context);
 
     hits = hits.filter(doc => doc !== null);
     console.log("Found Docs", hits)

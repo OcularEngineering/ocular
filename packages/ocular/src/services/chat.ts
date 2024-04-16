@@ -1,5 +1,5 @@
 import { EntityManager} from "typeorm"
-import { TransactionBaseService, ChatContext, ILLMInterface } from "@ocular/types"
+import { TransactionBaseService, ChatContext, ILLMInterface, IChatApproach, ChatResponse } from "@ocular/types"
 import {Chat, Message, MessageRoles, User} from "../models"
 import { ChatRepository, MessageRepository } from "../repositories"
 import { CreateChatInput } from "../types/chat"
@@ -7,11 +7,10 @@ import { FindConfig, Selector } from "../types/common"
 import { buildQuery } from "../utils/build-query"
 import { AutoflowAiError } from "@ocular/utils"
 
-
 type InjectedDependencies = {
   manager: EntityManager
   chatRepository: typeof ChatRepository
-  // chatApproach: ChatApproach
+  chatRetrieveReadRetrieveApproache: IChatApproach
   openAiService: ILLMInterface
   messageRepository: typeof MessageRepository
   loggedInUser: User
@@ -19,7 +18,7 @@ type InjectedDependencies = {
 
 class ChatService extends TransactionBaseService {
   protected readonly chatRepository_: typeof ChatRepository
-  // protected readonly chatApproach_: ChatApproach
+  protected readonly chatApproach_: IChatApproach
   protected readonly openAiService_: ILLMInterface
   protected readonly messageRepository_: typeof MessageRepository
   protected readonly loggedInUser_: User
@@ -29,11 +28,10 @@ class ChatService extends TransactionBaseService {
     super(arguments[0])
     this.chatRepository_ =  container.chatRepository
     this.openAiService_ = container.openAiService
-    // this.chatApproach_ = container.chatApproach
+    this.chatApproach_ = container.chatRetrieveReadRetrieveApproache
     this.messageRepository_ = container.messageRepository
     this.loggedInUser_ = container.loggedInUser
   }
-
 
   async create(chat: CreateChatInput): Promise<Chat> {
     return await this.atomicPhase_(
@@ -49,7 +47,6 @@ class ChatService extends TransactionBaseService {
   }
 
   async retrieve(chatId: string , config: FindConfig<Chat> = {}): Promise<Chat> {
-    console.log("Retrieve ChatId",chatId)
     if (!chatId) {
       throw new AutoflowAiError(
         AutoflowAiError.Types.NOT_FOUND,
@@ -57,9 +54,7 @@ class ChatService extends TransactionBaseService {
       )
     }
     const chatRepo = this.activeManager_.withRepository(this.chatRepository_)
-
     const query = buildQuery({ id: chatId, organisation_id:this.loggedInUser_.organisation_id, user_id: this.loggedInUser_.id }, config)
-
     const chat = await chatRepo.findOne(query)
 
     if (!chat) {
@@ -68,11 +63,10 @@ class ChatService extends TransactionBaseService {
         `Chat with id: ${chatId} was not found`
       )
     }
-
     return chat
   }
 
-  async chat(chatId: string, message:string, context: ChatContext): Promise<Message> {
+  async chat(chatId: string, message:string, context: ChatContext): Promise<ChatResponse> {
     return await this.atomicPhase_(
       async (transactionManager: EntityManager) => {
         const chatRepository = transactionManager.withRepository(
@@ -83,7 +77,8 @@ class ChatService extends TransactionBaseService {
             id: chatId,
             organisation_id: this.loggedInUser_.organisation_id,
             user_id: this.loggedInUser_.id
-          }
+          },
+          relations: ["messages"]
         });
         if (!chat) {
           throw new AutoflowAiError(
@@ -96,10 +91,18 @@ class ChatService extends TransactionBaseService {
         )
         const userMessage = messageRepository.create({chat_id:chatId, user_id:this.loggedInUser_.id, content: message, role: MessageRoles.USER})
         await messageRepository.save(userMessage)
-        const responseMessage = await this.openAiService_.completeChat([{content: message, role: MessageRoles.USER}])
-        const assistantMessage = messageRepository.create({chat_id:chatId, user_id: this.loggedInUser_.id, content: responseMessage, role: MessageRoles.ASSISTANT})
+        let messages = chat?.messages.map(message => ({
+          role: message.role,
+          content: message.content
+        }));
+        messages.push({role: MessageRoles.USER, content: message})
+        const chatResponse = await this.chatApproach_.run(messages, context)
+        const assistantMessage = messageRepository.create({chat_id:chatId, user_id: this.loggedInUser_.id, content: chatResponse.message.content, role: MessageRoles.ASSISTANT})
         const savedAssistantMessage = await messageRepository.save(assistantMessage)
-        return savedAssistantMessage
+        return {
+          message: savedAssistantMessage,
+          data_points: chatResponse.data_points
+        }
       }
     )
   }
@@ -110,7 +113,6 @@ class ChatService extends TransactionBaseService {
     selector.user_id = this.loggedInUser_.id
     return await chatRepo.find(buildQuery(selector, config))
   }
-
-  a
 }
+
 export default ChatService;
