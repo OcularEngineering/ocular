@@ -41,6 +41,7 @@ export const handleChat = async (
     setChatMessages
   )
 
+
   return await processResponse(
     response,
     // true,
@@ -72,10 +73,6 @@ export const fetchChatResponse = async (
   }
   return response.data
 }
-
-
-
-
 
   // lastChatMessage: ChatMessage,
 export const processResponse = async (

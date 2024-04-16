@@ -21,14 +21,12 @@ class SearchService extends AbstractSearchService {
   protected readonly logger_: Logger
   protected readonly defaultIndexName_: string
   protected readonly vectorDBService_ : IVectorDB
-  // protected readonly searchIndexService_ : ISearchService
 
   constructor(container, config) {
     super(container, config)
     this.logger_ = container.logger
     this.openAiService_ = container.openAiService
     this.vectorDBService_ = container.vectorDBService
-    // this.searchIndexService_ = container.searchIndexService
     this.defaultIndexName_ = container.indexName
 
   }
@@ -47,23 +45,9 @@ class SearchService extends AbstractSearchService {
     // If retrieval mode includes vectors, compute an embedding for the query
     let allDocs = []
     let queryVector;
-    // if (hasVectors) {
-      console.log("Vector Search", query, indexName)
-      queryVector = await this.openAiService_.createEmbeddings(query!);
-      const hits = await this.vectorDBService_.searchDocuments(indexName,queryVector )
-      allDocs.push(...hits);
-    // }
-
-
-    // Retrieve Search Index Results
-    // if (hasText){
-      // const textSearch = await this.searchIndexService_.search(indexName,query)
-      // console.log("textSearch Docs ")
-      // console.log(textSearch)
-      // allDocs.push(...textSearch.docs);
-    // }
-
-
+    queryVector = await this.openAiService_.createEmbeddings(query!);
+    const hits = await this.vectorDBService_.searchDocuments(indexName,queryVector )
+    allDocs.push(...hits);
     return allDocs
   }
 

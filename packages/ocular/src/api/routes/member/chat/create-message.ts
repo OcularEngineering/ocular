@@ -1,7 +1,6 @@
 import { IsString, IsNotEmpty, IsBoolean } from "class-validator"
 import { validator } from "@ocular/utils"
 import { ChatService } from "../../../../services"
-// import {ChatContext} from "@ocular/types";
 
 export default async (req, res) => {
   const { id } = req.params
@@ -9,8 +8,8 @@ export default async (req, res) => {
   try {
     const { message } = validated;
     const chatService = req.scope.resolve("chatService") as ChatService
-    const assistantMessage = await chatService.chat(id, message, {})
-    return res.status(200).send({message : assistantMessage})
+    const chatResponse = await chatService.chat(id, message, {})
+    return res.status(200).send(chatResponse)
   } catch (_error: unknown) {
     console.error(_error)
     return res.status(500).send("Error: Failed to execute Chat");

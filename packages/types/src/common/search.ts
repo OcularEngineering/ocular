@@ -1,11 +1,5 @@
 import { IndexableDocChunk } from "./document";
-
-export type MessageRole = 'system' | 'user' | 'assistant';
-
-export interface Message {
-  role: MessageRole;
-  content: string;
-}
+import { Message } from "./message";
 
 export type SearchContext = {
   retrieval_mode?: 'hybrid' | 'text' | 'vectors';
@@ -38,7 +32,7 @@ export interface SearchResultChunk {
   object: 'chat.completion.chunk';
 }
 
-export type  SearchResultMessage = Message & {
+export type SearchResultMessage = Message & {
   context?: Record<string, any> & {
     data_points?: IndexableDocChunk[]
     thoughts?: string;
