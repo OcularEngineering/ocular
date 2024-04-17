@@ -3,8 +3,8 @@ import { IndexableDocument,IndexableDocChunk } from '../common/document';
 import { TransactionBaseService } from './transaction-base-service';
 
 export interface IDocumentProcessorInterface extends TransactionBaseService {
-  chunkIndexableDocument(document: IndexableDocument): IndexableDocChunk[];
-  chunkIndexableDocumentsBatch(documents: IndexableDocument[]): IndexableDocChunk[];
+  chunkIndexableDocument(document: IndexableDocument):  Promise<IndexableDocChunk[]>;
+  chunkIndexableDocumentsBatch(documents: IndexableDocument[]):  Promise<IndexableDocChunk[]>;
 }
 
 /**
@@ -32,6 +32,6 @@ export abstract class AbstractDocumentProcesserService
     super(container, config)
   }
 
-  abstract chunkIndexableDocument(document: IndexableDocument): IndexableDocChunk[]
-  abstract chunkIndexableDocumentsBatch(documents: IndexableDocument[]): IndexableDocChunk[]
+  abstract chunkIndexableDocument(document: IndexableDocument): Promise<IndexableDocChunk[]>
+  abstract chunkIndexableDocumentsBatch(documents: IndexableDocument[]): Promise<IndexableDocChunk[]>
 }

@@ -131,7 +131,6 @@ export default class qdrantService extends AbstractVectorDBService  {
         content: doc.content,
         metadata: doc.metadata,
         updatedAt: doc.updatedAt,
-        offsets: doc.offsets
       },
       vector: {
         title: doc.titleEmbeddings,
