@@ -36,7 +36,7 @@ export type IndexableDocChunk = {
   titleEmbeddings?: number[] | null;
   content?: string;
   contentEmbeddings?: number[] | null;
+  tokens: number
   metadata: Record<string, unknown>;
   updatedAt: Date;
-  offsets: Record<number, string>;
 };
