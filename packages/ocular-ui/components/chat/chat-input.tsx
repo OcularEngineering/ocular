@@ -68,7 +68,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }
   }
   return (
-    <>
       <div className="dark:bg-background md:dark:hover:border-gray-100 mt-5 flex w-full items-center rounded-full border px-5 py-2 focus-within:shadow hover:shadow sm:max-w-xl sm:py-3 md:hover:border-white lg:max-w-5xl">
         <TextareaAutosize
           textareaRef={chatInputRef}
@@ -108,6 +107,5 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           )}
         </div>
       </div>
-    </>
   )
 }

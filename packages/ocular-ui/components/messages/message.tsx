@@ -141,7 +141,7 @@ export const Message: FC<MessageProps> = ({
           ) : (
             <div
               style={{ borderRadius: "15px 40px 30px 40px" }}
-              className="bg-custom-gray p-3"
+              className="bg-custom-gray p-3 dark:bg-muted"
             >
               <MessageMarkdown content={message.content} />
             </div>

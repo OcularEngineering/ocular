@@ -5,7 +5,6 @@ import { AppProps } from 'next/app';
 import { useEffect } from "react";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
-import Layout from '@/components/layout';
 
 NProgress.configure({
   easing: "ease",
@@ -14,8 +13,10 @@ NProgress.configure({
 });
 
 {/* Layouts */}
+import Layout from '@/components/layout';
 import DashboardLayout from '@/components/dashboard-layout';
 import AuthLayout from '@/components/auth-layout';
+import ChatLayout from '@/components/chat-layout';
 
 function MyApp({ Component, pageProps }: AppProps) {
 
@@ -41,15 +42,23 @@ function MyApp({ Component, pageProps }: AppProps) {
     
     if (router.pathname.startsWith('/dashboard')) {
 
+      // eslint-disable-next-line react/display-name
       return (page: ReactNode) => <DashboardLayout>{page}</DashboardLayout>;
       
     } else if ((router.pathname.startsWith('/sign-in')) || (router.pathname.startsWith('/create-account')) || (router.pathname.startsWith('/invite'))) {
 
+      // eslint-disable-next-line react/display-name
       return (page: ReactNode) => <AuthLayout>{page}</AuthLayout>;
 
     } else if (router.pathname.startsWith('/dashboard/search')){
 
+      // eslint-disable-next-line react/display-name
       return (page: ReactNode) => <Layout>{page}</Layout>;
+      
+    } else if (router.pathname.includes('/dashboard/chat')){
+
+      // eslint-disable-next-line react/display-name
+      return (page: ReactNode) => <ChatLayout>{page}</ChatLayout>;
       
     }
 
