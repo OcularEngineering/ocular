@@ -36,9 +36,9 @@ export default class IndexerService implements IIndexerInterface {
       this.logger_.info(`Indexing ${documents.length} documents to index ${indexName}`)
       const chunks = await this.documentProcessorService_.chunkIndexableDocumentsBatch(documents)
       console.log("Chunked Docs",chunks)
-      // const embeddedChunksPromises = await chunks.map((chunk) => this.embedChunk(chunk));
-      // const embeddedChunks = await Promise.all(embeddedChunksPromises);
-      // await this.vectorDBService_.addDocuments(indexName, embeddedChunks)
+      const embeddedChunksPromises = await chunks.map((chunk) => this.embedChunk(chunk));
+      const embeddedChunks = await Promise.all(embeddedChunksPromises);
+      await this.vectorDBService_.addDocuments(indexName, embeddedChunks)
     } catch (error) {
       this.logger_.error(`Error Indexing ${indexName}, error ${error.message}`)
     }

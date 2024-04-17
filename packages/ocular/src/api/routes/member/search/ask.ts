@@ -15,13 +15,13 @@ import { ApproachDefinitions, SearchContext} from "@ocular/types";
  */
 export default async (req, res) => {
 
-  const validated = await validator(PostAskReq, req.body)
-  const { approach } = validated ?? {};
+  // const validated = await validator(PostAskReq, req.body)
+//  const { approach } = validated ?? {};
 
   // const askApproach = fastify.approaches.ask[approach ?? 'rtr'];
   try {
     const loggedInUser = req.scope.resolve("loggedInUser")
-    const { q, messages, context, stream } = req.body;
+    const { q, approach, messages, context, stream } = req.body;
 
     if (approach === ApproachDefinitions.ASK_RETRIEVE_READ) {
       const searchApproach = req.scope.resolve("askRetrieveReadApproache")
@@ -74,7 +74,7 @@ export class PostAskReq {
   // messages: Message[]
 
   @ValidateNested()
-  context?: PostApproachContext 
+  context?: SearchContext 
 
   @IsBoolean()
   stream: Boolean

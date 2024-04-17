@@ -37,9 +37,9 @@ export default async (req, res) => {
       loggedInUser.organisation_id.toLowerCase().substring(4), 
       q, 
       {
-        retrieval_mode: "hybrid",
-        semantic_ranker: true,
-        semantic_captions: true,
+        // retrieval_mode: "hybrid",
+        // semantic_ranker: true,
+        // semantic_captions: true,
       }
     )
  
