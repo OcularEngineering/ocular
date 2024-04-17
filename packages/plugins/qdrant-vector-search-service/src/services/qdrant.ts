@@ -1,4 +1,4 @@
-import {AbstractVectorDBService, IndexableDocument, IndexableDocChunk, SearchResult } from "@ocular/types"
+import {AbstractVectorDBService, IndexableDocument, IndexableDocChunk, SearchResult, SearchContext } from "@ocular/types"
 import {QdrantClient, Schemas } from '@qdrant/js-client-rest';
 import { v5 as uuidv5 } from 'uuid';
 
@@ -54,8 +54,6 @@ export default class qdrantService extends AbstractVectorDBService  {
    
 
   async addDocuments(indexName:string, docs: IndexableDocChunk[]){
-    console.log("Adding Docs to Qdrant", docs)
-    console.log("Index Name", indexName)
     try{
       const points = docs.map(this.translateIndexableDocToQuadrantPoint);
       await this.qdrantClient_.upsert(indexName, { points });
@@ -64,39 +62,55 @@ export default class qdrantService extends AbstractVectorDBService  {
     }
   }
 
-  async searchDocuments(indexName: string, vector: number[] ): Promise<IndexableDocChunk[]>{
-    try{
-      const searches: SearchResults[][] = await this.qdrantClient_.searchBatch(indexName, {
-        searches: [
-          {
-            vector: {
-              name: "title",
-              vector: vector
-            },
-            limit: 5,
-            with_payload: true,
-          },
-          {
-            vector: {
-              name: "content",
-              vector: vector
-            },
-            limit: 5,
-            with_payload: true,
-          }
-        ],
-      })
+  // Vector Filter
+  // Top/Limit (Amount of Search Results to Return)
+  // Sources: Set<sources> -> example <"gmail", "drive">
+  //
+  // 
 
-      const flattenedSearches = searches.flat();
+  async searchDocuments(indexName: string, vector: number[], context?: SearchContext): Promise<IndexableDocChunk[]>{
+    try {
+      // Construct Search Filters
+      const filter = this.buildQdrantSearchFilter(context);
+      
+      // Build a Batch Search Query to Search for bot the Content and Title Vectors.
+      const searches = [
+        {
+          vector: {
+            name: "title",
+            vector: vector
+          },
+          limit: context?.top ? Number(context?.top) : 3,
+          filter: filter,
+          with_payload: true,
+        },
+        {
+          vector: {
+            name: "content",
+            vector: vector
+          },
+          limit: context?.top ? Number(context?.top) : 3,
+          filter: filter,
+          with_payload: true,
+        }
+      ]
+
+      // This is a batch search, so we get 2 arrays of results for both title and content vectors which will be combined below.
+      const searchResults: SearchResults[][] = await this.qdrantClient_.searchBatch(indexName, {searches})
+
+      const flattenedSearches = searchResults.flat();
       const uniqueSearchResults = flattenedSearches.reduce((acc, current) => {
-        const x = acc.find(item => item.id === current.id);
+        const x = acc.find(item => item.payload.documentId === current.payload.documentId && item.payload.chunkId === current.payload.chunkId);
         if (!x) {
           return acc.concat([current]);
         } else {
           return acc;
         }
-      }, []).map(doc => doc.payload as IndexableDocChunk);
-
+      }, []).map(doc => {
+        const payload = doc.payload as IndexableDocChunk;
+        payload.updatedAt = new Date(payload.updatedAt);
+        return payload;
+      });
    
     return uniqueSearchResults
     }catch(error){
@@ -139,5 +153,20 @@ export default class qdrantService extends AbstractVectorDBService  {
     };
   }
 
-  
+  private buildQdrantSearchFilter(context: SearchContext): Record<string, unknown> {
+    let filter = {};
+    if (context?.sources) {
+      filter = {
+        must: [
+          {
+            key: "source",
+            match: {
+              any: [...context.sources]
+            },
+          },
+        ],
+      };
+    }
+    return filter;
+  }
 }
