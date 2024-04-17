@@ -33,20 +33,17 @@ class SearchService extends AbstractSearchService {
 
   async search(indexName?:string, query?: string, context?: SearchContext): Promise<IndexableDocChunk[]> {
     indexName = indexName? indexName:this.defaultIndexName_;
-    // Query Has Text: Indicates to Query Full Text Search Index For Results.
-    const hasText = ['text', 'hybrid', undefined].includes(context?.retrieval_mode);
+    // // Query Has Text: Indicates to Query Full Text Search Index For Results.
+    // const hasText = ['text', 'hybrid', undefined].includes(context?.retrieval_mode);
 
-    // Query Has Vector Search: Indicates To Query Vector DB Search For Results.
-    const hasVectors = ['vectors', 'hybrid', undefined].includes(context?.retrieval_mode);
-
-    // Number of Results to Query: Default is 3
-    const top = context?.top ? Number(context?.top) : 3;
+    // // Query Has Vector Search: Indicates To Query Vector DB Search For Results.
+    // const hasVectors = ['vectors', 'hybrid', undefined].includes(context?.retrieval_mode);
 
     // If retrieval mode includes vectors, compute an embedding for the query
     let allDocs = []
     let queryVector;
     queryVector = await this.openAiService_.createEmbeddings(query!);
-    const hits = await this.vectorDBService_.searchDocuments(indexName,queryVector )
+    const hits = await this.vectorDBService_.searchDocuments(indexName,queryVector, context)
     allDocs.push(...hits);
     return allDocs
   }

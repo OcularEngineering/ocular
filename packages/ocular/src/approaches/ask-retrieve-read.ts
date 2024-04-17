@@ -44,7 +44,8 @@ export default class AskRetrieveThenRead implements IAskApproach {
     console.log("Found Docs", hits)
 
     // Initial System Message
-    const prompt = context?.prompt_template || SYSTEM_CHAT_TEMPLATE;
+    // const prompt = context?.prompt_template || SYSTEM_CHAT_TEMPLATE;
+    const prompt =  SYSTEM_CHAT_TEMPLATE;
     const tokens = this.openai_.getChatModelTokenCount(prompt)
     const messageBuilder = new MessageBuilder(prompt, tokens);
 

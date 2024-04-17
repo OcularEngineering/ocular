@@ -191,11 +191,12 @@ export default class ChatReadRetrieveRead implements IChatApproach {
     const firstQuery = MessageBuilder.messagesToString(initialMessages);
     const secondQuery = MessageBuilder.messagesToString(finalMessages);
     const thoughts = `Search query:${queryText} Conversations: ${firstQuery} ${secondQuery}`.replace(/\n/g, '<br>');
-
+    
+    // temperature: Number(context?.temperature ?? 0.7),
     return {
       completionRequest: {
         messages: finalMessages,
-        temperature: Number(context?.temperature ?? 0.7),
+        temperature:0.7,
         max_tokens: 1024,
         n: 1,
       },
