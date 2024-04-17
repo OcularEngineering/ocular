@@ -43,7 +43,9 @@ class SearchService extends AbstractSearchService {
     let allDocs = []
     let queryVector;
     queryVector = await this.openAiService_.createEmbeddings(query!);
-    const hits = await this.vectorDBService_.searchDocuments(indexName,queryVector, context)
+    const hits = await this.vectorDBService_.searchDocuments(indexName,queryVector,context)
+    // Convert ChunkHits To SearchResultDocuments
+    
     allDocs.push(...hits);
     return allDocs
   }
