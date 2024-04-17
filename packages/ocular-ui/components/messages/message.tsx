@@ -69,55 +69,66 @@ export const Message: FC<MessageProps> = ({
     <div
       className={cn(
         "flex w-full justify-center",
-        message.role === "user" ? "" : "bg-secondary"
       )}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
-      <div className="relative flex w-full flex-col p-6 sm:w-[550px] sm:px-0 md:w-[650px] lg:w-[650px] xl:w-[700px]">
-        <div className="absolute right-5 top-7 sm:right-0">
-          <MessageActions
-            onCopy={handleCopy}
-            isAssistant={message.role === "assistant"}
-            isLast={isLast}
-            isEditing={isEditing}
-            isHovering={isHovering}
-          />
-        </div>
-        <div className="space-y-3">
-          {message.role === "system" ? (
-            <div className="flex items-center space-x-4">
-              <IconPencil
-                className="border-primary bg-primary text-secondary rounded border-DEFAULT p-1"
-                size={ICON_SIZE}
-              />
-              <div className="text-lg font-semibold">Prompt</div>
-            </div>
-          ) : (
-            <div className="flex items-center space-x-3">
-              {message.role === "assistant" ? (
-                  <Image
-                    style={{
-                      width: `${ICON_SIZE}px`,
-                      height: `${ICON_SIZE}px`
-                    }}
-                    className="rounded"
-                    src={Bot}
-                    alt="assistant image"
-                    height={ICON_SIZE}
-                    width={ICON_SIZE}
-                  />
-              ) : 
-               (
-                <IconMoodSmile
-                  className="bg-primary text-secondary border-primary rounded border-DEFAULT p-1"
+      <div
+        className={cn(
+          "relative my-5 flex w-[1000px] flex-col",
+          message.role === "user" ? "" : "bg-custom-gray dark:bg-muted rounded-3xl p-5"
+        )}
+      >
+          <div className="absolute right-10 top-7">
+            <MessageActions
+              onCopy={handleCopy}
+              isAssistant={message.role === "assistant"}
+              isLast={isLast}
+              isEditing={isEditing}
+              isHovering={isHovering}
+            />
+          </div>
+          <div
+            className={cn(
+              "space-y-3",
+              message.role === "user"
+                ? "flex flex-row items-start gap-5"
+                : "flex flex-col items-start"
+            )}
+          >
+            {message.role === "system" ? (
+              <div className="flex items-center space-x-4">
+                <IconPencil
+                  className="border-primary bg-primary text-secondary rounded border-[1px] p-1"
                   size={ICON_SIZE}
                 />
-              )}
-            </div>
-          )}
+                <div className="text-lg font-semibold">Prompt</div>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-3">
+                {message.role === "assistant" ? (
+                    <Image
+                      style={{
+                        width: `${ICON_SIZE}px`,
+                        height: `${ICON_SIZE}px`
+                      }}
+                      className="rounded"
+                      src={Bot}
+                      alt="assistant image"
+                      height={ICON_SIZE}
+                      width={ICON_SIZE}
+                    />
+                ) : 
+                (
+                  <IconMoodSmile
+                    className="bg-primary text-secondary border-primary rounded border-DEFAULT p-1"
+                    size={ICON_SIZE}
+                  />
+                )}
+              </div>
+            )}
 
-        {isEditing ? (
+          {isEditing ? (
             <TextareaAutosize
               textareaRef={editInputRef}
               className="text-md"
@@ -125,10 +136,17 @@ export const Message: FC<MessageProps> = ({
               onValueChange={setEditedMessage}
               maxRows={20}
             />
-          ) : (
+          ) : message.role === "assistant" ? (
             <MessageMarkdown content={message.content} />
+          ) : (
+            <div
+              style={{ borderRadius: "15px 40px 30px 40px" }}
+              className="bg-custom-gray p-3"
+            >
+              <MessageMarkdown content={message.content} />
+            </div>
           )}
-        </div>
+          </div>
       </div>
     </div>
   )

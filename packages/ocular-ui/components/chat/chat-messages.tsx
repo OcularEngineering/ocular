@@ -7,8 +7,9 @@ import { Message as MessageType } from "@/types/chat"
 interface ChatMessagesProps {}
 
 export const ChatMessages: FC<ChatMessagesProps> = ({}) => {
-  const { chatMessages} = useContext(ChatbotUIContext)
+  const { chatMessages } = useContext(ChatbotUIContext)
   const [editingMessage, setEditingMessage] = useState<MessageType>()
+
   return chatMessages
     .sort((a, b) =>  new Date(a.message.created_at).getTime() - new Date(b.message.created_at).getTime())
     .map((chatMessage, index, array) => {

@@ -80,16 +80,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
 
   return (
     <div className="relative flex h-full flex-col items-center">
-      {/* <div className="absolute left-4 top-2.5 flex justify-center">
-        <ChatScrollButtons
-          isAtTop={isAtTop}
-          isAtBottom={isAtBottom}
-          isOverflowing={isOverflowing}
-          scrollToTop={scrollToTop}
-          scrollToBottom={scrollToBottom}
-        />
-      </div> */}
-
       <div className="absolute left-4 top-2.5 flex justify-center">
         <ChatSecondaryButtons />
         <div className="bg-background flex max-h-[50px] min-h-[50px] w-full items-center justify-center px-10 font-semibold">
@@ -100,23 +90,17 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       </div>
 
       <div
-        className="bg-background flex size-full flex-col overflow-auto border-b"
+        className="bg-background flex size-full flex-col overflow-auto border-b mt-10"
         onScroll={handleScroll}
       >
         <div ref={messagesStartRef} />
-
         <ChatMessages />
-
         <div ref={messagesEndRef} />
       </div>
 
       <div className="relative w-[1000px] items-end pb-8 pt-5 sm:w-[500px] md:w-[600px] lg:w-[900px] xl:w-[900px]">
         <ChatInput />
       </div>
-
-      {/* <div className="absolute bottom-2 right-2 hidden md:block lg:bottom-4 lg:right-4">
-        <ChatHelp />
-      </div> */}
     </div>
   )
 }
