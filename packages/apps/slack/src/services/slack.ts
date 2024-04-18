@@ -45,7 +45,7 @@ export default class SlackService extends TransactionBaseService {
     });
 
     if (!oauth) {
-      this.logger_.error(`No Jira OAuth found for ${org.id} organisation`);
+      this.logger_.error(`No Slack OAuth found for ${org.id} organisation`);
       return;
     }
 
@@ -62,8 +62,35 @@ export default class SlackService extends TransactionBaseService {
       const slackChannels = await this.fetchSlackChannels(config)
 
       for (const channel of slackChannels) {
-        const issues = await this.fetchChannelConversations(channel.id,config);
-        // TODO: store issues in documents
+        const conversations = await this.fetchChannelConversations(channel.id,config);
+        for(const conversation of conversations){
+          const doc : IndexableDocument = {
+            id: conversation.ts,
+            organisationId:org.id,
+            title:conversation.text,
+            source:AppNameDefinitions.SLACK,
+            updatedAt: new Date(Date.now()),
+            metadata:{sentByUser:conversation.user}
+          }
+          documents.push(doc);
+          if (documents.length >= 100) {
+            yield documents;
+            documents = [];
+          }
+        }
+        // add channel names to document(if we want find a context by channel names)
+        const channelDoc: IndexableDocument = {
+          id:channel.id,
+          organisationId:org.id,
+          source: AppNameDefinitions.SLACK,
+          title: channel.name,
+          updatedAt: new Date(channel.updated),
+          metadata:{
+            topic: channel.topic.value,
+            purpose: channel.purpose.value
+          }
+        }
+        documents.push(channelDoc)
       }
       yield documents;
       await this.oauthService_.update(oauth.id, {
@@ -103,10 +130,7 @@ export default class SlackService extends TransactionBaseService {
         return [];
       }
 
-      const channels = response.data.channels.map((channel) => ({
-        id: channel.id,
-        name: channel.name,
-      }));
+      const channels = response.data.channels
       return channels
     }catch(error){
       this.logger_.error(
@@ -123,8 +147,9 @@ export default class SlackService extends TransactionBaseService {
       const response = await axios.get(conversationsEndpoint,config)
       const conversationsArray = response.data.messages || []
       const conversations = conversationsArray.map((conversations)=>({
-        id:conversations.id,
-        text:conversations.text
+        id: conversations.ts,
+        text:conversations.text,
+        user: conversations.user
       }))
       return conversations
     }catch(error){
