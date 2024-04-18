@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation";
+import { useTheme } from 'next-themes';
 
 import { ChatbotUIContext } from "@/context/context"
 import { cn } from "@/lib/utils"
@@ -83,6 +84,7 @@ export const Message: FC<MessageProps> = ({
 
   const [firstName, setFirstName] = React.useState('')
   const [lastName, setLastName] = React.useState('')
+  const { theme } = useTheme();
 
   async function fetchUserData(){
 
@@ -150,7 +152,7 @@ export const Message: FC<MessageProps> = ({
                         height: `${ICON_SIZE}px`
                       }}
                       className="rounded"
-                      src="/Ocular-logo-light.svg"
+                      src={require(theme === 'dark' ? "@/components/Ocular-logo-dark.svg" : "@/components/Ocular-logo-light.svg")} 
                       alt="assistant image"
                       height={ICON_SIZE}
                       width={ICON_SIZE}

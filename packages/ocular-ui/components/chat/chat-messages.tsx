@@ -1,4 +1,3 @@
-import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatbotUIContext } from "@/context/context"
 import { FC, useContext, useState } from "react"
 import { Message } from "../messages/message"
@@ -24,4 +23,3 @@ export const ChatMessages: FC<ChatMessagesProps> = ({}) => {
     })
 }
 
-{/* <Image src="/Ocular-logo-light.svg" alt="Ocular AI Logo" width={40} height={40} /> */}

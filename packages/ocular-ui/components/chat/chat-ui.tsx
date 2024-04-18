@@ -30,10 +30,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     handleScroll,
     scrollToBottom,
     setIsAtBottom,
-    isAtTop,
-    isAtBottom,
-    isOverflowing,
-    scrollToTop
   } = useScroll()
 
   const [loading, setLoading] = useState(true)
