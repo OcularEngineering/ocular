@@ -1,82 +1,30 @@
- import { IsNumber, IsOptional, IsString } from "class-validator"
-
-import { SearchService, UserService } from "../../../../services"
-import { Type } from "class-transformer"
+import { ValidateNested, IsOptional, IsString } from "class-validator"
+import { SearchService } from "../../../../services"
 import { validator } from "@ocular/utils"
+import { SearchContext } from "@ocular/types"
 
-/**
- * @oas [post] /v1/search
- * operationId: Post Search
- * summary: Search User Index
- * description: "Run a search query using the search service installed on the backend."
- */
 export default async (req, res) => {
-  // As we want to allow wildcards, we pass a config allowing this
-  const validated = await validator(PostSearchReq, req.body, {
-    whitelist: false,
-    forbidNonWhitelisted: false,
-  })
-
-  const { q, offset, limit, categoryFilter, ...options } = validated
-
-  console.log(q, offset, limit, categoryFilter, options)
-
-  const paginationOptions = { offset, limit }
-
-  const searchService: SearchService = req.scope.resolve("searchService")
-  const loggedInUser = req.scope.resolve("loggedInUser")
-
-  
-
-  // const results = await searchService.search(loggedInUser.organisation_id.toLowerCase().substring(4), q, {
-  //   paginationOptions,
-  //   categoryFilter:categoryFilter,
-  //   additionalOptions: options,
-  // })
-  const results = await searchService.search(
-      loggedInUser.organisation_id.toLowerCase().substring(4), 
-      q, 
-      {
-        // retrieval_mode: "hybrid",
-        // semantic_ranker: true,
-        // semantic_captions: true,
-      }
-    )
- 
-  res.status(200).send(results)
+  try {
+    // const validated = await validator(PostSearchReq, req.body)
+    const { q, context} = req.body;
+    const loggedInUser = req.scope.resolve("loggedInUser")
+    // const searchService = req.scope.resolve("searchService") as SearchService;
+    // const searchResults = await searchService.executeSearchApproach(q,context);
+    const approach = req.scope.resolve("askRetrieveReadApproache")
+    const searchResults = await approach.run(loggedInUser.organisation_id.toLowerCase().substring(4),q, context);
+    return res.status(200).send(searchResults);
+  } catch (_error: unknown) {
+    console.log(_error)
+    return res.status(500).send(`Error: Failed to execute AskApproach.`);
+  }
 }
 
-/**
- * @schema StorePostSearchReq
- * type: object
- * properties:
- *  q:
- *    type: string
- *    description: The search query.
- *  offset:
- *    type: number
- *    description: The number of products to skip when retrieving the products.
- *  limit:
- *    type: number
- *    description: Limit the number of products returned.
- *  filter:
- *    description: Pass filters based on the search service.
- */
-export class PostSearchReq {
-  @IsOptional()
-  @IsString()
-  q?: string
 
-  @IsOptional()
-  @IsNumber()
-  @Type(() => Number)
-  offset?: number
+// export class PostSearchReq {
+//   @IsOptional()
+//   @IsString()
+//   q?: string
 
-  @IsOptional()
-  @IsNumber()
-  @Type(() => Number)
-  limit?: number
-
-  @IsOptional()
-  categoryFilter?: string
-}
+//   @ValidateNested()
+//   context?: SearchContext
+// }

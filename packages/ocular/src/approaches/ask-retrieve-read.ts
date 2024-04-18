@@ -1,6 +1,7 @@
 import { EntityManager } from "typeorm";
-import { AutoflowContainer, ApproachDefinitions, SearchResultChunk, IAskApproach, ISearchService, ILLMInterface, SearchResult, SearchContext } from "@ocular/types";
+import { AutoflowContainer, ApproachDefinitions, SearchResultChunk, ISearchApproach, ISearchService, ILLMInterface, SearchResult, SearchContext } from "@ocular/types";
 import { MessageBuilder} from "../utils/message";
+import { chunksToSearchDocs } from "../utils";
 
 const SYSTEM_CHAT_TEMPLATE = `You are an intelligent assistant who can helps Engineers at Ocular with a variety of tasks. Use 'you' to refer to the individual asking the questions even if they ask with 'I'.
 Answer the following question using only the data provided in the sources below. How can I assist you today?`;
@@ -23,11 +24,11 @@ type InjectedDependencies = AutoflowContainer & {
 }
 
 /**
- * Retrieve-then-read implementation, using the AI Search and OpenAI APIs directly.
- * It first retrieves top documents from search, then constructs a prompt with them, and then uses
+ * Retrieve-then-Read implementation, using the Ocular Search and OpenAI APIs directly.
+ * It first retrieves top documents from the Search Service, then constructs a Prompt with them, and then uses
  * OpenAI to generate an completion (answer) with that prompt.
  */
-export default class AskRetrieveThenRead implements IAskApproach {
+export default class AskRetrieveThenRead implements ISearchApproach {
   identifier = ApproachDefinitions.ASK_RETRIEVE_READ;
   private openai_: ILLMInterface;
   private searchService_: ISearchService;
@@ -41,47 +42,47 @@ export default class AskRetrieveThenRead implements IAskApproach {
     let hits = await this.searchService_.search(null, userQuery, context);
 
     hits = hits.filter(doc => doc !== null);
-    console.log("Found Docs", hits)
 
-    // Initial System Message
-    // const prompt = context?.prompt_template || SYSTEM_CHAT_TEMPLATE;
-    const prompt =  SYSTEM_CHAT_TEMPLATE;
-    const tokens = this.openai_.getChatModelTokenCount(prompt)
-    const messageBuilder = new MessageBuilder(prompt, tokens);
+    let message = null;
+    if (context && context.ai_completion) {
+      // Initial System Message
+      // const prompt = context?.prompt_template || SYSTEM_CHAT_TEMPLATE;
 
-    // User Prompted Message With Sources
-    const sources = hits.map((c) => c.content).join(', ');
-    const userContent = `${userQuery}\nSources:\n${sources}`;
+      const prompt =  SYSTEM_CHAT_TEMPLATE;
+      const tokens = this.openai_.getChatModelTokenCount(prompt)
+      const messageBuilder = new MessageBuilder(prompt, tokens);
 
-    const roleTokens: number = this.openai_.getChatModelTokenCount("user")
-    const messageTokens: number = this.openai_.getChatModelTokenCount(userContent)
-    messageBuilder.appendMessage('user', userContent, 1 ,(roleTokens + messageTokens));
+      // Use Top 3 Sources To Generate AI Completion.
+      // TODO: Use More Sophisticated Logic To Select Sources.
+      const sources =  hits.map((c) => c.content).slice(0,3).join('');
+      const userContent = `${userQuery}\nSources:\n${sources}`;
 
-    // Add shots/samples. This helps model to mimic response and make sure they match rules laid out in system message.
-    // messageBuilder.appendMessage('assistant', QUESTION);
-    // messageBuilder.appendMessage('user', ANSWER);
+      const roleTokens: number = this.openai_.getChatModelTokenCount("user")
+      const messageTokens: number = this.openai_.getChatModelTokenCount(userContent)
+      messageBuilder.appendMessage('user', userContent, 1 ,(roleTokens + messageTokens));
 
-    const messages = messageBuilder.messages;
-
-    const chatCompletion = await this.openai_.completeChat(messages);
-    const messageToDisplay = MessageBuilder.messagesToString(messages);
-
-    return {
-      choices: [
-        {
-          index: 0,
-          message: {
-            role: 'assistant' as const,
-            content: chatCompletion,
-            context: {
-              data_points: hits,
-              thoughts: `Question:<br>${userQuery}<br><br>Prompt:<br>${messageToDisplay.replace('\n', '<br>')}`,
-            },
-          },
+      // Add shots/samples. This helps model to mimic response and make sure they match rules laid out in system message.
+      // messageBuilder.appendMessage('assistant', QUESTION);
+      // messageBuilder.appendMessage('user', ANSWER);
+      const messages = messageBuilder.messages;
+      const chatCompletion = await this.openai_.completeChat(messages);
+      const messageToDisplay = MessageBuilder.messagesToString(messages);
+      message = {
+        role: 'assistant' as const,
+        content: chatCompletion,
+        context: {
+          data_points: hits.slice(0,3),
+          thoughts: `Question:<br>${userQuery}<br><br>Prompt:<br>${messageToDisplay.replace('\n', '<br>')}`,
         },
-      ],
-      hits:hits,
-      object: 'chat.completion',
+      };
+    }
+
+    // Remove Duplicates Convert IndexableChunks To SearchDocs for easy UI display
+    // TODO: Remove Duplicate Chunks Intelligently.
+    const searchResultDocs = chunksToSearchDocs(hits);
+    return {
+      message: message,
+      hits:searchResultDocs,
     };
   }
 
