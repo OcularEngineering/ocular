@@ -1,3 +1,7 @@
+"use client"
+
+import { useRouter } from "next/navigation";
+
 import { ChatbotUIContext } from "@/context/context"
 import { cn } from "@/lib/utils"
 import {
@@ -9,8 +13,16 @@ import {
   IconMoodSmile,
   IconPencil
 } from "@tabler/icons-react"
+
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
+
+
 import Image from "next/image"
-import { FC, useContext, useEffect, useRef, useState } from "react"
+import React, { FC, useContext, useEffect, useRef, useState } from "react"
 import { Button } from "../ui/button"
 import { FileIcon } from "../ui/file-icon"
 import { TextareaAutosize } from "../ui/textarea-autosize"
@@ -20,7 +32,10 @@ import { MessageMarkdown } from "./message-markdown"
 import {  MessageInterface } from "../../types/message"
 import  Bot  from "../../public/bot.png"
 
-const ICON_SIZE = 32
+// Importing API End Points
+import api from "@/services/api"
+
+const ICON_SIZE = 45
 
 interface MessageProps {
   message: MessageInterface
@@ -65,6 +80,28 @@ export const Message: FC<MessageProps> = ({
     }
   }
 
+
+  const [firstName, setFirstName] = React.useState('')
+  const [lastName, setLastName] = React.useState('')
+
+  async function fetchUserData(){
+
+    try {
+      const response = await api.auth.loggedInUserDetails();
+      console.log("response:", response)
+      if (response) {
+        setFirstName(response.data.user.first_name);
+        setLastName(response.data.user.last_name);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  }
+
+  useEffect(() => {
+    fetchUserData()
+  }, []) 
+
   return (
     <div
       className={cn(
@@ -92,7 +129,7 @@ export const Message: FC<MessageProps> = ({
             className={cn(
               "space-y-3",
               message.role === "user"
-                ? "flex flex-row items-start gap-5"
+                ? "flex flex-row items-start"
                 : "flex flex-col items-start"
             )}
           >
@@ -105,7 +142,7 @@ export const Message: FC<MessageProps> = ({
                 <div className="text-lg font-semibold">Prompt</div>
               </div>
             ) : (
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
                 {message.role === "assistant" ? (
                     <Image
                       style={{
@@ -113,18 +150,25 @@ export const Message: FC<MessageProps> = ({
                         height: `${ICON_SIZE}px`
                       }}
                       className="rounded"
-                      src={Bot}
+                      src="/Ocular-logo-light.svg"
                       alt="assistant image"
                       height={ICON_SIZE}
                       width={ICON_SIZE}
                     />
                 ) : 
                 (
-                  <IconMoodSmile
-                    className="bg-primary text-secondary border-primary rounded border-DEFAULT p-1"
-                    size={ICON_SIZE}
-                  />
+                  <Avatar className="h-[50px] w-[50px]">
+                    <AvatarImage src="" alt="User" />
+                    <AvatarFallback>
+                      {firstName[0]}{lastName[0]}
+                    </AvatarFallback>
+                  </Avatar>
                 )}
+                <div className="font-semibold">
+                  {message.role === "assistant"
+                    ?  "Copilot"
+                    : ""}
+                </div>
               </div>
             )}
 

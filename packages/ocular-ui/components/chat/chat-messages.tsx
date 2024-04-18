@@ -23,3 +23,5 @@ export const ChatMessages: FC<ChatMessagesProps> = ({}) => {
       )
     })
 }
+
+{/* <Image src="/Ocular-logo-light.svg" alt="Ocular AI Logo" width={40} height={40} /> */}
