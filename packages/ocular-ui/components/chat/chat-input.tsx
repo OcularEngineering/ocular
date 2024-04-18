@@ -68,10 +68,10 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }
   }
   return (
-      <div className="dark:bg-background md:dark:hover:border-gray-100 mt-5 flex w-full items-center rounded-full border px-5 py-2 focus-within:shadow hover:shadow sm:max-w-xl sm:py-3 md:hover:border-white lg:max-w-5xl">
+      <div className="bg-background md:dark:hover:border-gray-100 mt-0 flex w-full items-center rounded-full border px-5 py-2 focus-within:shadow hover:shadow sm:max-w-xl sm:py-3 md:hover:border-white lg:max-w-5xl">
         <TextareaAutosize
           textareaRef={chatInputRef}
-          className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-background px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           placeholder={
             `Ask anything here...`
           }
@@ -94,7 +94,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
           ) : (
             <IconSend
               className={cn(
-                "text-black",
+                "text-black dark:text-white",
                 !userInput && "cursor-not-allowed opacity-50"
               )}
               onClick={() => {

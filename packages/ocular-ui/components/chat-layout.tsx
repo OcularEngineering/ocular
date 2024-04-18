@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils"
 
 import { SidebarSwitcher } from "@/components/chat/chat-sidebar/sidebar-switcher"
 
-export const SIDEBAR_WIDTH = 500
+export const SIDEBAR_WIDTH = 600
 
 interface ChatLayoutProps {
   children: ReactNode;
@@ -37,10 +37,10 @@ export default function ChatLayout({ children }: ChatLayoutProps) {
     tabValue as ContentType
   )
 
-  // const [showSidebar, setShowSidebar] = useState(false)
-  const [showSidebar, setShowSidebar] = useState(
-    localStorage.getItem("showSidebar") === "true"
-  )
+  const [showSidebar, setShowSidebar] = useState(false)
+  // const [showSidebar, setShowSidebar] = useState(
+  //   localStorage.getItem("showSidebar") === "true"
+  // )
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -87,12 +87,12 @@ export default function ChatLayout({ children }: ChatLayoutProps) {
           <IconChevronCompactRight size={24} />
       </Button>
       <div
-        className={cn("bg-custom-gray/20 duration-200 rounded-r-3xl")}
+        className={cn("bg-custom-gray/20 duration-200 rounded-r-3xl mr-3")}
         style={{
-          // Sidebar
           minWidth: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
           maxWidth: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
-          width: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px"
+          width: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
+          boxShadow: showSidebar ? "0px 0px 15px -5px rgba(0, 0, 0, 0.25)" : "none"
         }}
       >
         {showSidebar && (

@@ -89,7 +89,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
       </div>
 
       <div
-        className="bg-background flex size-full flex-col overflow-auto border-b mt-10"
+        className="bg-transparent flex size-full flex-col overflow-auto mt-10"
         onScroll={handleScroll}
       >
         <div ref={messagesStartRef} />
@@ -97,7 +97,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="relative w-[1000px] items-end pb-8 pt-5 sm:w-[500px] md:w-[600px] lg:w-[900px] xl:w-[900px]" >
+    <div className="relative z-10 rounded-full items-end py-5 sm:w-[500px] md:w-[1000px] lg:w-[1000px] xl:w-[1000px]">
         <ChatInput />
       </div>
     </div>

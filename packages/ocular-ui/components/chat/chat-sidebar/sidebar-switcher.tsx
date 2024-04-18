@@ -30,7 +30,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         <SidebarSwitchItem
           icon={<IconHistory size={SIDEBAR_ICON_SIZE} />}
           contentType="chats"
-          name="Chats"
+          name="History"
           onContentTypeChange={onContentTypeChange}
         />
 
@@ -52,7 +52,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           onContentTypeChange={onContentTypeChange}
         /> */}
 
-        <SidebarSwitchItem
+        {/* <SidebarSwitchItem
           icon={<IconFile size={SIDEBAR_ICON_SIZE} />}
           contentType="files"
           name="Files"
@@ -64,7 +64,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
           contentType="collections"
           name="Collections"
           onContentTypeChange={onContentTypeChange}
-        />
+        /> */}
 
         {/* <SidebarSwitchItem
           icon={<IconRobot size={SIDEBAR_ICON_SIZE} />}
