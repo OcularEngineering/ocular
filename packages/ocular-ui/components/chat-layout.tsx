@@ -16,7 +16,9 @@ import { Button } from "@/components/ui/button"
 import { IconChevronCompactRight } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 
-export const SIDEBAR_WIDTH = 350
+import { SidebarSwitcher } from "@/components/chat/chat-sidebar/sidebar-switcher"
+
+export const SIDEBAR_WIDTH = 500
 
 interface ChatLayoutProps {
   children: ReactNode;
@@ -68,7 +70,7 @@ export default function ChatLayout({ children }: ChatLayoutProps) {
   const { theme } = useTheme()
 
   return (
-    <div className="flex size-full pl-1 dark:pl-0">
+    <div className="flex size-full">
 
       <Button
           className={cn(
@@ -85,7 +87,7 @@ export default function ChatLayout({ children }: ChatLayoutProps) {
           <IconChevronCompactRight size={24} />
       </Button>
       <div
-        className={cn("bg-custom-gray/25 duration-200 dark:border-none")}
+        className={cn("bg-custom-gray/20 duration-200 rounded-r-3xl")}
         style={{
           // Sidebar
           minWidth: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
@@ -95,14 +97,14 @@ export default function ChatLayout({ children }: ChatLayoutProps) {
       >
         {showSidebar && (
           <Tabs
-            className="flex h-full dark:bg-muted"
+            className="flex h-full dark:bg-muted rounded-r-3xl"
             value={contentType}
             onValueChange={tabValue => {
               setContentType(tabValue as ContentType)
               router.replace(`${pathname}?tab=${tabValue}`)
             }}
           >
-            {/* <SidebarSwitcher onContentTypeChange={setContentType} /> */}
+            <SidebarSwitcher onContentTypeChange={setContentType} />
 
             <ChatSideBar contentType={contentType} showSidebar={showSidebar} />
           </Tabs>

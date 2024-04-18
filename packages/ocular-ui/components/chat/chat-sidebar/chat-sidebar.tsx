@@ -27,65 +27,64 @@ export const ChatSideBar: FC<SidebarProps> = ({contentType, showSidebar }) => {
 
   return (
     <Tabs
-    className="flex h-full"
-    value={contentType}
-    // onValueChange={tabValue => {
-    //   setContentType(tabValue as ContentType)
-    //   router.replace(`${pathname}?tab=${tabValue}`)
-    // }}
-  >
-    <TabsContent
-      // className="m-0 w-full space-y-2"
-      style={{
-        // Sidebar - SidebarSwitcher
-        // minWidth: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)`: "0px",
-        // maxWidth: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)`: "0px",
-        // width: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)`: "0px"
-      }}
+      className="flex h-full"
       value={contentType}
+      // onValueChange={tabValue => {
+      //   setContentType(tabValue as ContentType)
+      //   router.replace(`${pathname}?tab=${tabValue}`)
+      // }}
     >
-      {/* <div className="flex h-full flex-col p-3"> */}
-        {(() => {
-          switch (contentType) {
-           
-            case "chats":
-              return renderSidebarContent("chats", chats)
+      <TabsContent
+        className="m-0 w-full space-y-2"
+        style={{
+          minWidth: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)`: "0px",
+          maxWidth: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)`: "0px",
+          width: showSidebar ? `calc(${SIDEBAR_WIDTH}px - 60px)`: "0px"
+        }}
+        value={contentType}
+      >
+        <div className="flex h-full flex-col p-3 px-3">
+          {(() => {
+            switch (contentType) {
+            
+              case "chats":
+                return renderSidebarContent("chats", chats)
 
-            // case "presets":
-            //   return renderSidebarContent("presets", presets, presetFolders)
+              // case "presets":
+              //   return renderSidebarContent("presets", presets, presetFolders)
 
-            // case "prompts":
-            //   return renderSidebarContent("prompts", prompts, promptFolders)
+              // case "prompts":
+              //   return renderSidebarContent("prompts", prompts, promptFolders)
 
-            // case "files":
-            //   return renderSidebarContent("files", files, filesFolders)
+              // case "files":
+              //   return renderSidebarContent("files", files, filesFolders)
 
-            // case "collections":
-            //   return renderSidebarContent(
-            //     "collections",
-            //     collections,
-            //     collectionFolders
-            //   )
+              // case "collections":
+              //   return renderSidebarContent(
+              //     "collections",
+              //     collections,
+              //     collectionFolders
+              //   )
 
-            // case "assistants":
-            //   return renderSidebarContent(
-            //     "assistants",
-            //     assistants,
-            //     assistantFolders
-            //   )
+              // case "assistants":
+              //   return renderSidebarContent(
+              //     "assistants",
+              //     assistants,
+              //     assistantFolders
+              //   )
 
-            // case "tools":
-            //   return renderSidebarContent("tools", tools, toolFolders)
+              // case "tools":
+              //   return renderSidebarContent("tools", tools, toolFolders)
 
-            // case "models":
-            //   return renderSidebarContent("models", models, modelFolders)
+              // case "models":
+              //   return renderSidebarContent("models", models, modelFolders)
 
-            default:
-              return null
-          }
-        })()}
-      {/* </div> */}
-   </TabsContent>
-  </Tabs>
+              default:
+                return null
+            }
+          })()}
+        </div>
+      </TabsContent>
+    </Tabs>
   )
 }

@@ -24,7 +24,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <GlobalState>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
                 <div className="flex h-screen justify-center">
-                    <div className="border-default flex w-14 flex-col justify-between overflow-y-auto shadow-md dark:border-r bg-background p-2">
+                    <div className="border-default flex w-14 flex-col justify-between overflow-y-auto shadow-md dark:border-r bg-background p-2 z-10">
                         <SideNav
                             links={links}
                         />
