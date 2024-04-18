@@ -1,18 +1,13 @@
-import { ChatbotUIContext } from "@/context/context"
-import { cn } from "@/lib/utils"
 import {
-  IconBolt,
-  IconCirclePlus,
   IconPlayerStopFilled,
   IconSend
 } from "@tabler/icons-react"
-import Image from "next/image"
-import { FC, useContext, useEffect, useRef, useState } from "react"
-import { toast } from "sonner"
-import { Input } from "../ui/input"
+
+import { ChatbotUIContext } from "@/context/context"
+import { cn } from "@/lib/utils"
+import { FC, useContext, useState } from "react"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { useChatHandler } from "./chat-hooks/use-chat-handler"
-import { useChatHistoryHandler } from "./chat-hooks/use-chat-history"
 import { usePromptAndCommand } from "./chat-hooks/use-prompt-and-command"
 
 interface ChatInputProps {}
@@ -22,7 +17,6 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
   const {
     userInput,
-    chatMessages,
     isGenerating,
     focusPrompt,
     setFocusPrompt,
@@ -33,23 +27,17 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
   const {
     chatInputRef,
     handleSendMessage,
-    // handleStopMessage,
-    handleFocusChatInput
   } = useChatHandler()
 
   const { handleInputChange } = usePromptAndCommand()
-
-  const {
-    setNewMessageContentToNextUserMessage,
-    setNewMessageContentToPreviousUserMessage
-  } = useChatHistoryHandler()
-
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (!isTyping && event.key === "Enter" && !event.shiftKey) {
       event.preventDefault()
       setIsPromptPickerOpen(false)
+      if (userInput) {
+        handleSendMessage(userInput, false)
+      }
     }
 
     // Consolidate conditions to avoid TypeScript error
@@ -68,50 +56,44 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     }
   }
   return (
-    <>
-      <div className="flex flex-col flex-wrap justify-center gap-2">
-      </div>
+    <div className="bg-background md:dark:hover:border-gray-100 mt-0 flex w-full items-center rounded-full border px-5 py-2 focus-within:shadow hover:shadow sm:max-w-xl sm:py-3 md:hover:border-white lg:max-w-5xl">
 
-      <div className="border-input relative mt-3 flex min-h-[60px] w-full items-center justify-center rounded-xl border-2">
-        <TextareaAutosize
-          textareaRef={chatInputRef}
-          className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-transparent px-14 py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          placeholder={
-            // `Ask anything. Type "@" for assistants, "/" for prompts, "#" for files, and "!" for tools.`
-            `Ask anything. Type @  /  #  !`
-          }
-          onValueChange={handleInputChange}
-          value={userInput}
-          minRows={1}
-          maxRows={18}
-          onKeyDown={handleKeyDown}
-          // onPaste={handlePaste}
-          onCompositionStart={() => setIsTyping(true)}
-          onCompositionEnd={() => setIsTyping(false)}
-        />
+      <TextareaAutosize
+        textareaRef={chatInputRef}
+        className="ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring text-md flex w-full resize-none rounded-md border-none bg-background py-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+        placeholder={
+          `Ask anything here...`
+        }
+        onValueChange={handleInputChange}
+        value={userInput}
+        minRows={1}
+        maxRows={18}
+        onKeyDown={handleKeyDown}
+        onCompositionStart={() => setIsTyping(true)}
+        onCompositionEnd={() => setIsTyping(false)}
+      />
 
-        <div className="absolute bottom-[14px] right-3 cursor-pointer hover:opacity-50">
-          {isGenerating ? (
-            <IconPlayerStopFilled
-              className="hover:bg-background animate-pulse rounded bg-transparent p-1"
-              // onClick={handleStopMessage}
-              size={30}
-            />
-          ) : (
-            <IconSend
-              className={cn(
-                "bg-primary text-secondary rounded p-1",
-                !userInput && "cursor-not-allowed opacity-50"
-              )}
-              onClick={() => {
-                if (!userInput) return
-                handleSendMessage(userInput,false)
-              }}
-              size={30}
-            />
-          )}
-        </div>
+      <div className="bottom-[14px] right-3 cursor-pointer hover:opacity-50">
+        {isGenerating ? (
+          <IconPlayerStopFilled
+            className="hover:bg-background animate-pulse rounded bg-transparent"
+            size={25}
+          />
+        ) : (
+          <IconSend
+            className={cn(
+              "text-black dark:text-white",
+              !userInput && "cursor-not-allowed opacity-50"
+            )}
+            onClick={() => {
+              if (!userInput) return
+
+              handleSendMessage(userInput, false)
+            }}
+            size={24}
+          />
+        )}
       </div>
-    </>
+    </div>
   )
 }

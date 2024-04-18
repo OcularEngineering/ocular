@@ -10,13 +10,13 @@ export default function PaginationButtons() {
   const term = searchParams.get('term');
 
   return (
-    <div className="mt-8 flex max-w-lg items-center justify-around pb-10 text-blue-700 dark:text-blue-400">
+    <div className="mt-8 flex max-w-lg items-center justify-around pb-10 text-black dark:text-white">
       {startIndex >= 30 && (
         <Link
           passHref={true}
           href={`/dashboard/search/results?term=${term}&start=${startIndex - 30}`}
         >
-          <div className="dark:hover:bg-secondary-dark flex max-w-[100px] grow cursor-pointer flex-row items-center justify-center rounded-full p-3 hover:bg-gray-100">
+          <div className="dark:hover:bg-muted flex max-w-[100px] grow cursor-pointer flex-row items-center justify-center rounded-full p-3 hover:bg-gray-100">
             <p>Previous</p>
           </div>
         </Link>
@@ -26,7 +26,7 @@ export default function PaginationButtons() {
         passHref={true}
         href={`/dashboard/search/results?term=${term}&start=${startIndex + 30}`}
       >
-        <div className="dark:hover:bg-secondary-dark flex max-w-[100px] grow cursor-pointer flex-row items-center justify-center rounded-full p-3 hover:bg-gray-100">
+        <div className="dark:hover:bg-muted flex max-w-[100px] grow cursor-pointer flex-row items-center justify-center rounded-full p-3 hover:bg-gray-100">
           <p>Next</p>
         </div>
       </Link>

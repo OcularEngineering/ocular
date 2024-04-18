@@ -1,4 +1,3 @@
-// import useHotkey from "@/lib/hooks/use-hotkey"
 import {
   IconBrandGithub,
   IconBrandX,
@@ -15,12 +14,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "../ui/dropdown-menu"
-// import { Announcements } from "../utility/announcements"
 
 interface ChatHelpProps {}
 
 export const ChatHelp: FC<ChatHelpProps> = ({}) => {
-  // useHotkey("/", () => setIsOpen(prevState => !prevState))
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -53,7 +50,6 @@ export const ChatHelp: FC<ChatHelpProps> = ({}) => {
           </div>
 
           <div className="flex space-x-2">
-            {/* <Announcements /> */}
 
             <Link
               className="cursor-pointer hover:opacity-50"

@@ -1,3 +1,8 @@
+"use client"
+
+import { useRouter } from "next/navigation";
+import { useTheme } from 'next-themes';
+
 import { ChatbotUIContext } from "@/context/context"
 import { cn } from "@/lib/utils"
 import {
@@ -9,8 +14,16 @@ import {
   IconMoodSmile,
   IconPencil
 } from "@tabler/icons-react"
+
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
+
+
 import Image from "next/image"
-import { FC, useContext, useEffect, useRef, useState } from "react"
+import React, { FC, useContext, useEffect, useRef, useState } from "react"
 import { Button } from "../ui/button"
 import { FileIcon } from "../ui/file-icon"
 import { TextareaAutosize } from "../ui/textarea-autosize"
@@ -20,7 +33,10 @@ import { MessageMarkdown } from "./message-markdown"
 import {  MessageInterface } from "../../types/message"
 import  Bot  from "../../public/bot.png"
 
-const ICON_SIZE = 32
+// Importing API End Points
+import api from "@/services/api"
+
+const ICON_SIZE = 45
 
 interface MessageProps {
   message: MessageInterface
@@ -65,59 +81,100 @@ export const Message: FC<MessageProps> = ({
     }
   }
 
+
+  const [firstName, setFirstName] = React.useState('')
+  const [lastName, setLastName] = React.useState('')
+  const { theme } = useTheme();
+
+  async function fetchUserData(){
+
+    try {
+      const response = await api.auth.loggedInUserDetails();
+      console.log("response:", response)
+      if (response) {
+        setFirstName(response.data.user.first_name);
+        setLastName(response.data.user.last_name);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  }
+
+  useEffect(() => {
+    fetchUserData()
+  }, []) 
+
   return (
     <div
       className={cn(
         "flex w-full justify-center",
-        message.role === "user" ? "" : "bg-secondary"
       )}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
-      <div className="relative flex w-full flex-col p-6 sm:w-[550px] sm:px-0 md:w-[650px] lg:w-[650px] xl:w-[700px]">
-        <div className="absolute right-5 top-7 sm:right-0">
-          <MessageActions
-            onCopy={handleCopy}
-            isAssistant={message.role === "assistant"}
-            isLast={isLast}
-            isEditing={isEditing}
-            isHovering={isHovering}
-          />
-        </div>
-        <div className="space-y-3">
-          {message.role === "system" ? (
-            <div className="flex items-center space-x-4">
-              <IconPencil
-                className="border-primary bg-primary text-secondary rounded border-DEFAULT p-1"
-                size={ICON_SIZE}
-              />
-              <div className="text-lg font-semibold">Prompt</div>
-            </div>
-          ) : (
-            <div className="flex items-center space-x-3">
-              {message.role === "assistant" ? (
-                  <Image
-                    style={{
-                      width: `${ICON_SIZE}px`,
-                      height: `${ICON_SIZE}px`
-                    }}
-                    className="rounded"
-                    src={Bot}
-                    alt="assistant image"
-                    height={ICON_SIZE}
-                    width={ICON_SIZE}
-                  />
-              ) : 
-               (
-                <IconMoodSmile
-                  className="bg-primary text-secondary border-primary rounded border-DEFAULT p-1"
+      <div
+        className={cn(
+          "relative my-5 flex w-[1000px] flex-col",
+          message.role === "user" ? "" : "bg-custom-gray dark:bg-muted rounded-3xl p-5"
+        )}
+      >
+          <div className="absolute right-10 top-7">
+            <MessageActions
+              onCopy={handleCopy}
+              isAssistant={message.role === "assistant"}
+              isLast={isLast}
+              isEditing={isEditing}
+              isHovering={isHovering}
+            />
+          </div>
+          <div
+            className={cn(
+              "space-y-3",
+              message.role === "user"
+                ? "flex flex-row items-start"
+                : "flex flex-col items-start"
+            )}
+          >
+            {message.role === "system" ? (
+              <div className="flex items-center space-x-4">
+                <IconPencil
+                  className="border-primary bg-primary text-secondary rounded border-[1px] p-1"
                   size={ICON_SIZE}
                 />
-              )}
-            </div>
-          )}
+                <div className="text-lg font-semibold">Prompt</div>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2">
+                {message.role === "assistant" ? (
+                    <Image
+                      style={{
+                        width: `${ICON_SIZE}px`,
+                        height: `${ICON_SIZE}px`
+                      }}
+                      className="rounded"
+                      src={require(theme === 'dark' ? "@/components/Ocular-logo-dark.svg" : "@/components/Ocular-logo-light.svg")} 
+                      alt="assistant image"
+                      height={ICON_SIZE}
+                      width={ICON_SIZE}
+                    />
+                ) : 
+                (
+                  <Avatar className="h-[50px] w-[50px]">
+                    <AvatarImage src="" alt="User" />
+                    <AvatarFallback>
+                      {firstName[0]}{lastName[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                )}
+                <div className="font-semibold">
+                  {message.role === "assistant"
+                    ?  "Copilot"
+                    : ""}
+                </div>
+              </div>
+            )}
 
-        {isEditing ? (
+          {isEditing ? (
             <TextareaAutosize
               textareaRef={editInputRef}
               className="text-md"
@@ -125,10 +182,17 @@ export const Message: FC<MessageProps> = ({
               onValueChange={setEditedMessage}
               maxRows={20}
             />
-          ) : (
+          ) : message.role === "assistant" ? (
             <MessageMarkdown content={message.content} />
+          ) : (
+            <div
+              style={{ borderRadius: "15px 40px 30px 40px" }}
+              className="bg-custom-gray p-3 dark:bg-muted"
+            >
+              <MessageMarkdown content={message.content} />
+            </div>
           )}
-        </div>
+          </div>
       </div>
     </div>
   )

@@ -9,7 +9,7 @@ import {
 import { useRef } from "react";
 import { useRouter } from "next/router";
 
-const iconsArray = ['asana.svg', 'Jira.svg', 'Github.png', 'Notion.png', 'google-drive.png', 'stackoverflow.svg', 'plus.png' ];
+const iconsArray = ['asana.svg', 'Jira.svg', 'Github.png', 'Notion.png', 'stackoverflow.svg', 'plus.png' ];
 
 export function Search() {
   const router = useRouter();
@@ -25,7 +25,7 @@ export function Search() {
   }
   return (
     <>
-      <div className="dark:bg-primary-dark group flex min-h-screen flex-col items-center dark:text-white" style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.01) 10%, transparent)'}}>
+      <div className="dark:bg-dark group flex min-h-screen flex-col items-center dark:text-white" style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.01) 10%, transparent)'}}>
 
         <Head>
             <meta charSet="utf-8" />
@@ -66,7 +66,9 @@ export function Search() {
             </div>
             <div className="flex flex-wrap items-center gap-5">
               {iconsArray.map((iconName) => (
-                <div className="w-full sm:w-auto bg-custom-gray dark:bg-muted p-6 rounded-2xl hover:opacity-80 hover:cursor-pointer transition-all hover:scale-110 hover:shadow-lg">
+                <div className="w-full sm:w-auto bg-custom-gray dark:bg-muted p-6 rounded-2xl hover:opacity-80 hover:cursor-pointer transition-all hover:scale-110 hover:shadow-lg"
+                  key={iconName}
+                >
                   <Image
                     src={`/${iconName}`}
                     className="w-12 h-12"

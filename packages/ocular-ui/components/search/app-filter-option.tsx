@@ -14,7 +14,7 @@ export default function AppFilterOption({ src, title, results }: AppFilterOption
 
   return (
     <div
-      className={`hover:dark:bg-secondary-dark box-border flex h-10 w-64 min-w-10 cursor-pointer items-center justify-start rounded-full px-5 hover:bg-gray-100 ${isSelected ? 'bg-blue-100' : ''}`}
+      className={`hover:dark:bg-muted box-border flex h-10 w-64 min-w-10 cursor-pointer items-center justify-start rounded-full px-5 hover:bg-gray-100 ${isSelected ? 'bg-transparent' : 'bg-blue-100 dark:dark:bg-muted border border-input'}`}
       onClick={() => setIsSelected(!isSelected)}
     >
       <div className='flex grow gap-2'>
