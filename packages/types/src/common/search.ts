@@ -1,5 +1,5 @@
 import { AppNameDefinitions } from "../apps";
-import { IndexableDocChunk } from "./document";
+import { IndexableDocChunk, SearchDocument } from "./document";
 import { Message } from "./message";
 
 // export type SearchContext = {
@@ -16,6 +16,7 @@ import { Message } from "./message";
 // };
 
 export type SearchContext = {
+  ai_completion?: boolean;
   prompt_template?: string;
   suggest_followup_questions?: boolean;
   sources?: Set<AppNameDefinitions>;
@@ -29,12 +30,8 @@ export type SearchContext = {
   // 
 
 export interface SearchResult {
-  choices?: Array<{
-    index: number;
-    message: SearchResultMessage;
-  }>;
-  hits: IndexableDocChunk[];
-  object: 'chat.completion';
+  message: SearchResultMessage;
+  hits: SearchDocument[];
 }
 
 export interface SearchResultChunk {
@@ -51,5 +48,4 @@ export type SearchResultMessage = Message & {
     data_points?: IndexableDocChunk[]
     thoughts?: string;
   };
-  session_state?: Record<string, any>;
 };

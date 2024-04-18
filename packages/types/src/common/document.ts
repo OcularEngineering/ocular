@@ -8,6 +8,7 @@ export interface Section {
   link: string;
 }
 
+
 export enum DocType {
   PDF = 'pdf',
   TEXT = 'text',
@@ -16,6 +17,7 @@ export enum DocType {
   MD = 'md'
 }
 
+// Document containing infomation from external intergrations to be indexed in the search engine
 export type IndexableDocument = {
   id: string;
   organisationId: string;
@@ -27,6 +29,7 @@ export type IndexableDocument = {
   updatedAt: Date;
 };
 
+// Document Chunk to be indexed in the search engine
 export type IndexableDocChunk = {
   chunkId: number;
   organisationId: string;
@@ -40,3 +43,15 @@ export type IndexableDocChunk = {
   metadata: Record<string, unknown>;
   updatedAt: Date;
 };
+
+// Document to be returned by the Search API to the client
+export interface SearchDocument {
+  chunkId: number;
+  documentId: string;
+  organisationId: string;
+  source: AppNameDefinitions;
+  title: string;
+  content: string;
+  metadata: Record<string, unknown>;
+  updatedAt: Date;
+}
