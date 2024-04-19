@@ -91,11 +91,13 @@ export default {
     },
   },
   search: {
-    ask(q) {
-      const path = `/ask`;
+    search(q) {
+      const path = `/search`;
       const body = {
-        approach: "ask-retrieve-read",
-        stream: false,
+        context:{
+          top: 10,
+          ai_completion: true
+        },
         q: q
       };
       return ocularRequest("POST", path, body);
