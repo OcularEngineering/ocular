@@ -1,30 +1,55 @@
-import { ValidateNested, IsOptional, IsString } from "class-validator"
+import { ValidateNested, IsOptional, IsString, IsBoolean, IsEnum, IsNumber   } from "class-validator"
 import { SearchService } from "../../../../services"
 import { validator } from "@ocular/utils"
-import { SearchContext } from "@ocular/types"
+import { AppNameDefinitions } from "@ocular/types"
+import { Type } from "class-transformer"
 
+// TODO: The SearchApproach used currently is hardcoded to be AskRetrieveReadApproach.
+// Improve to dynamically resolve the SearchApproaches based on the approach enum.
 export default async (req, res) => {
   try {
-    // const validated = await validator(PostSearchReq, req.body)
-    const { q, context} = req.body;
+    console.log("PostSearchReq",req.body)
+    const validated = await validator(PostSearchReq, req.body)
+    const { q, context } = validated;
     const loggedInUser = req.scope.resolve("loggedInUser")
-    // const searchService = req.scope.resolve("searchService") as SearchService;
-    // const searchResults = await searchService.executeSearchApproach(q,context);
-    const approach = req.scope.resolve("askRetrieveReadApproache")
-    const searchResults = await approach.run(loggedInUser.organisation_id.toLowerCase().substring(4),q, context);
-    return res.status(200).send(searchResults);
+    const searchApproach = req.scope.resolve("askRetrieveReadApproache")
+    const results = await searchApproach.run(loggedInUser.organisation_id.toLowerCase().substring(4),q , (context as any) ?? {});
+    return res.status(200).send(results)
   } catch (_error: unknown) {
     console.log(_error)
-    return res.status(500).send(`Error: Failed to execute AskApproach.`);
+    return res.status(500).send(`Error: Failed to execute SearchApproach.`);
   }
 }
 
 
-// export class PostSearchReq {
-//   @IsOptional()
-//   @IsString()
-//   q?: string
+class PostSearchReq {
+  @IsString()
+  q: string
 
-//   @ValidateNested()
-//   context?: SearchContext
-// }
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => SearchContextReq)
+  context?: SearchContextReq
+}
+
+class SearchContextReq {
+  @IsOptional()
+  @IsBoolean()
+  ai_completion?: boolean;
+
+  @IsOptional()
+  @IsString()
+  prompt_template?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  suggest_followup_questions?: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  top?: number;
+
+  @IsOptional()
+  @IsEnum(AppNameDefinitions, { each: true })
+  sources?: Set<AppNameDefinitions>;
+}

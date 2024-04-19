@@ -1,7 +1,6 @@
 import { IndexableDocChunk, Message, SearchContext, SearchResult } from "../common";
 export interface ISearchService {
     search(indexName: string, query: string, context?: SearchContext):  Promise<IndexableDocChunk[]>
-    executeSearchApproach(q: string, context?: SearchContext ): Promise<SearchResult>
   }
 
 export abstract class AbstractSearchService
@@ -28,5 +27,4 @@ export abstract class AbstractSearchService
     query: string ,
     context?: SearchContext
   ): Promise<IndexableDocChunk[]>
-  abstract executeSearchApproach(q: string, context?: SearchContext ): Promise<SearchResult>
 }

@@ -19,7 +19,7 @@ export type SearchContext = {
   ai_completion?: boolean;
   prompt_template?: string;
   suggest_followup_questions?: boolean;
-  sources?: Set<AppNameDefinitions>;
+  sources?: AppNameDefinitions[];
   top?: number;
 };
 

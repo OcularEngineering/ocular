@@ -40,14 +40,6 @@ class SearchService extends AbstractSearchService {
     const hits = await this.vectorDBService_.searchDocuments(indexName, queryVector, context ? context : {});
     return hits
   }
-
-  async executeSearchApproach(q: string, context: SearchContext ): Promise<SearchResult> {
-    // HardCode Search Approach
-    // TODO: Resolve Search Approach Dynamically From Context
-    // const results = await this.searchApproach_.run(this.defaultIndexName_, q , context);
-    // return results
-    return null
-  }
 }
 
 export default SearchService

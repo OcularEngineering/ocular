@@ -33,7 +33,7 @@ export default ({ container, configModule}: Options): void => {
 
     if (loaded) {
       container.registerAdd(
-        "searchApproaches",
+        "approaches",
         asFunction((cradle) => new loaded(cradle, configModule), {
         lifetime: Lifetime.SINGLETON,
       })
