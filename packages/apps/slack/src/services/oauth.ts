@@ -89,7 +89,7 @@ class SlackOauth extends OauthService {
     };
 
     return axios
-      .post('https:/slack.com/api/oauth.v2.exchange', body, config)
+      .post('https:/slack.com/api/oauth.v2.access', body, config)
       .then((res) => {
         return {
           type: res.data.token_type,

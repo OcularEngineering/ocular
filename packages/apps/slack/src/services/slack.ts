@@ -1,12 +1,13 @@
 import fs from "fs";
 import axios from "axios";
 import { Readable } from "stream";
-import { OAuthService, Organisation } from "@ocular/ocular";
+import { App, OAuthService, Organisation } from "@ocular/ocular";
 import {
   IndexableDocument,
   TransactionBaseService,
   Logger,
   AppNameDefinitions,
+  Section,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 
@@ -60,37 +61,31 @@ export default class SlackService extends TransactionBaseService {
 
     try {
       const slackChannels = await this.fetchSlackChannels(config)
-
       for (const channel of slackChannels) {
         const conversations = await this.fetchChannelConversations(channel.id,config);
         for(const conversation of conversations){
-          const doc : IndexableDocument = {
-            id: conversation.ts,
+          const thread = await this.fetchThreadForConversation(channel.id,conversation.ts,config)
+
+          const sections: Section[] = thread.map((message, index) => ({
+            offset: index,
+            content: message.text,
+            link: `https://slack.com/api/conversations.replies?channel_id=${channel.id}&ts=${conversation.ts}` 
+          }));
+          const threadDoc : IndexableDocument = {
+            id:conversation.ts, // conversation id
             organisationId:org.id,
-            title:conversation.text,
             source:AppNameDefinitions.SLACK,
-            updatedAt: new Date(Date.now()),
-            metadata:{sentByUser:conversation.user}
+            title:conversation.text, // the main message which lead to conversation
+            metadata:{channel_id:channel.id}, // passing channel id just for top down reference
+            sections:sections, // an array of messages in the specific conversation
+            updatedAt: new Date(Date.now())
           }
-          documents.push(doc);
+          documents.push(threadDoc);
           if (documents.length >= 100) {
             yield documents;
             documents = [];
           }
         }
-        // add channel names to document(if we want find a context by channel names)
-        const channelDoc: IndexableDocument = {
-          id:channel.id,
-          organisationId:org.id,
-          source: AppNameDefinitions.SLACK,
-          title: channel.name,
-          updatedAt: new Date(channel.updated),
-          metadata:{
-            topic: channel.topic.value,
-            purpose: channel.purpose.value
-          }
-        }
-        documents.push(channelDoc)
       }
       yield documents;
       await this.oauthService_.update(oauth.id, {
@@ -152,6 +147,16 @@ export default class SlackService extends TransactionBaseService {
         user: conversations.user
       }))
       return conversations
+    }catch(error){
+      throw new Error("Failed to fetch channel conversation.");
+    }
+  }
+
+  async fetchThreadForConversation(channelID, tsID, config){
+    try{
+      const threadsEndpoint = `https://slack.com/api/conversations.replies?channel_id=${channelID}&ts=${tsID}`
+      const response = await axios.get(threadsEndpoint,config)
+      return response.data.messages
     }catch(error){
       throw new Error("Failed to fetch channel conversation.");
     }
