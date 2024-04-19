@@ -1,6 +1,5 @@
-import { IndexableDocChunk, Message, SearchContext } from "../common";
+import { IndexableDocChunk, Message, SearchContext, SearchResult } from "../common";
 export interface ISearchService {
-    addDocuments(indexName: string, documents: IndexableDocChunk[]);
     search(indexName: string, query: string, context?: SearchContext):  Promise<IndexableDocChunk[]>
   }
 
@@ -23,8 +22,6 @@ export abstract class AbstractSearchService
   protected constructor(container, options) {
     this.options_ = options
   }
-  // abstract createIndex(indexName: string);
-  abstract addDocuments(indexName: string, documents: IndexableDocChunk[]);
   abstract search(
     indexName: string,
     query: string ,

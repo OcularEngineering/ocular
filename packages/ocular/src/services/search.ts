@@ -1,11 +1,8 @@
-import { AbstractSearchService, IndexableDocChunk,SearchResult , SearchContext } from "@ocular/types"
+import { AbstractSearchService, IndexableDocChunk,SearchResult , SearchContext, IVectorDB, ISearchService, ILLMInterface, ISearchApproach  } from "@ocular/types"
 import { AzureOpenAIOptions, SearchEngineOptions, SearchOptions } from "../types/search/options"
 import { ConfigModule, Logger } from "../types"
 import { SearchIndexClient } from "@azure/search-documents"
 import { parseBoolean, removeNewlines} from "@ocular/utils"
-import { ILLMInterface } from "@ocular/types"
-import { IVectorDB } from "@ocular/types"
-import { ISearchService } from "@ocular/types"
 
 type InjectedDependencies = {
   searchIndexClient: SearchIndexClient
@@ -28,7 +25,6 @@ class SearchService extends AbstractSearchService {
     this.openAiService_ = container.openAiService
     this.vectorDBService_ = container.vectorDBService
     this.defaultIndexName_ = container.indexName
-
   }
 
   async search(indexName?:string, query?: string, context?: SearchContext): Promise<IndexableDocChunk[]> {
@@ -40,18 +36,10 @@ class SearchService extends AbstractSearchService {
     // const hasVectors = ['vectors', 'hybrid', undefined].includes(context?.retrieval_mode);
 
     // If retrieval mode includes vectors, compute an embedding for the query
-    let allDocs = []
-    let queryVector;
-    queryVector = await this.openAiService_.createEmbeddings(query!);
-    const hits = await this.vectorDBService_.searchDocuments(indexName,queryVector,context)
-    // Convert ChunkHits To SearchResultDocuments
-    
-    allDocs.push(...hits);
-    return allDocs
+    const queryVector = await this.openAiService_.createEmbeddings(query!);
+    const hits = await this.vectorDBService_.searchDocuments(indexName, queryVector, context ? context : {});
+    return hits
   }
-
-  addDocuments(indexName: string, documents: IndexableDocChunk[]){return "Not Implemented"}
-
 }
 
 export default SearchService
