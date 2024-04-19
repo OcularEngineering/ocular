@@ -15,7 +15,6 @@ export function chunksToSearchDocs(chunks: IndexableDocChunk[]): SearchDocument[
     searchDocs.push({
       organisationId: chunk.organisationId,
       documentId: chunk.documentId,
-      chunkId: chunk.chunkId,
       source: chunk.source,
       title: chunk.title,
       content: chunk.content,

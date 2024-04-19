@@ -18,10 +18,10 @@ export default function Search() {
 
   useEffect(() => {
     setIsLoading(true); 
-    api.search.ask(router.query.q)
+    api.search.search(router.query.q)
       .then(data => {
         console.log(data)
-        setAiResults(data.data.choices[0].message.content);
+        setAiResults(data.data.message.content);
         setSearchResults(data.data.hits); 
         setIsLoading(false); 
       })
