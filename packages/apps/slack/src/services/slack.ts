@@ -10,6 +10,7 @@ import {
   Section,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
+import { DocType } from "@ocular/types/src/common";
 
 interface Config {
   headers: {
@@ -78,6 +79,7 @@ export default class SlackService extends TransactionBaseService {
             title:conversation.text, // the main message which lead to conversation
             metadata:{channel_id:channel.id}, // passing channel id just for top down reference
             sections:sections, // an array of messages in the specific conversation
+            type: DocType.TEXT,
             updatedAt: new Date(Date.now())
           }
           documents.push(threadDoc);
@@ -136,7 +138,7 @@ export default class SlackService extends TransactionBaseService {
     }
   }
 
-  async fetchChannelConversations(channelID ,config){
+  async fetchChannelConversations(channelID:string ,config:Config){
     try{
       const conversationsEndpoint = `https://slack.com/api/conversations.history?channel=${channelID}`
       const response = await axios.get(conversationsEndpoint,config)
@@ -152,7 +154,7 @@ export default class SlackService extends TransactionBaseService {
     }
   }
 
-  async fetchThreadForConversation(channelID, tsID, config){
+  async fetchThreadForConversation(channelID:string, tsID:string, config:Config){
     try{
       const threadsEndpoint = `https://slack.com/api/conversations.replies?channel_id=${channelID}&ts=${tsID}`
       const response = await axios.get(threadsEndpoint,config)
