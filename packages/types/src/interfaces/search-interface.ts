@@ -1,28 +1,6 @@
-import { IndexableDocChunk } from "../common";
-
-export type SearchContext = {
-  retrieval_mode?: 'hybrid' | 'text' | 'vectors';
-  semantic_ranker?: boolean;
-  semantic_captions?: boolean;
-  top?: number;
-  temperature?: number;
-  prompt_template?: string;
-  prompt_template_prefix?: string;
-  prompt_template_suffix?: string;
-  exclude_category?: string;
-};
-
-
-export interface SearchResult {
-  ai_content: string;
-  query: string;
-  docs:  IndexableDocChunk[];
-}
-
+import { IndexableDocChunk, Message, SearchContext, SearchResult } from "../common";
 export interface ISearchService {
-    // createIndex(indexName: string);
-    addDocuments(indexName: string, documents: IndexableDocChunk[]);
-    search(indexName: string, query: string, context?: SearchContext):  Promise<SearchResult>
+    search(indexName: string, query: string, context?: SearchContext):  Promise<IndexableDocChunk[]>
   }
 
 export abstract class AbstractSearchService
@@ -44,11 +22,9 @@ export abstract class AbstractSearchService
   protected constructor(container, options) {
     this.options_ = options
   }
-  // abstract createIndex(indexName: string);
-  abstract addDocuments(indexName: string, documents: IndexableDocChunk[]);
   abstract search(
     indexName: string,
     query: string ,
     context?: SearchContext
-  ): Promise<SearchResult>
+  ): Promise<IndexableDocChunk[]>
 }

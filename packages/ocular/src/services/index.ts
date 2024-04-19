@@ -9,4 +9,4 @@ export { default as StrategyResolverService } from "./strategy-resolver"
 export { default as UserService } from "./user"
 export { default as JobSchedulerService } from "./job-scheduler"
 export { default as IndexerService } from "./indexer"
-
+export { default as ChatService } from "./chat"

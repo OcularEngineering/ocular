@@ -7,6 +7,7 @@ import {
   TransactionBaseService,
   Logger,
   AppNameDefinitions,
+  DocType,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 
@@ -84,6 +85,7 @@ export default class JiraService extends TransactionBaseService {
                 offset: description.length,
               },
             ],
+            type: DocType.TEXT,
             updatedAt: new Date(updatedAt),
             metadata: {},
           };
@@ -111,6 +113,7 @@ export default class JiraService extends TransactionBaseService {
               offset: project.description.length,
             },
           ],
+          type: DocType.TEXT,
           updatedAt: new Date(),
 
           metadata: {},

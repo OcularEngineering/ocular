@@ -5,7 +5,6 @@ import Head from "next/head";
 import Header from "@/components/search/header";
 import { useRouter } from "next/router";
 import SearchResults from "@/components/search/search-results";
-import {AIResults} from "@/components/search/search-results";
 import Image from 'next/image'
 
 // Importing API End Points
@@ -23,7 +22,7 @@ export default function Search() {
       .then(data => {
         console.log(data)
         setAiResults(data.data.choices[0].message.content);
-        setSearchResults(data.data.docs); 
+        setSearchResults(data.data.hits); 
         setIsLoading(false); 
       })
       .catch(error => {
@@ -56,12 +55,11 @@ export default function Search() {
   );
 
   return (
-    <div className="dark:bg-primary-dark w-full bg-white text-black">
+    <div className="dark:bg-background w-full bg-white text-black">
       <Head>
         <title>{router.query.q} - Ocular</title>
         <link rel="icon" href="/Ocular-Profile-Logo.png" />
       </Head>
-      
       <Header />
       <SearchResults search_results={search_results} ai_content={ai_content}  />
     </div>

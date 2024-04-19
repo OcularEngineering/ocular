@@ -18,7 +18,7 @@ type Options = {
  */ 
 export default ({ container, configModule}: Options): void => {
   const corePath = "../approaches/*.js"
-  const coreFull = fg.convertPathToPattern(path.join(__dirname, corePath))
+  const coreFull = path.join(__dirname, corePath)
 
   const approaches = glob.sync(coreFull, { cwd: __dirname })
   approaches.forEach((fn) => {
@@ -33,7 +33,7 @@ export default ({ container, configModule}: Options): void => {
 
     if (loaded) {
       container.registerAdd(
-        "searchApproaches",
+        "approaches",
         asFunction((cradle) => new loaded(cradle, configModule), {
         lifetime: Lifetime.SINGLETON,
       })

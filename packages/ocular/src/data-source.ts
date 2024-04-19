@@ -27,7 +27,7 @@ const getMigrations = (directory) => {
   migrationDirs.push(path.join(corePackageMigrations, "*.js"))
 
   const coreMigrations = migrationDirs.flatMap((dir) => {    
-    return glob.sync(fg.convertPathToPattern(dir))
+    return glob.sync(dir)
   })
 
   const migrations = coreMigrations

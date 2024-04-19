@@ -54,7 +54,7 @@ export function ResultsFacetedFilter<TData, TValue>({
       <PopoverTrigger asChild>
         <Button variant={"outline"} 
             className={cn(
-            "dark:bg-secondary-dark mb-5 box-border flex h-10 min-w-10 cursor-pointer items-center justify-center gap-2 rounded-full bg-gray-100 px-5"
+            "dark:bg-muted mb-5 box-border flex h-10 min-w-10 cursor-pointer items-center justify-center gap-2 rounded-full bg-gray-100 px-5"
             )}
             onClick={() => setIsSelected(!isSelected)}
         >

@@ -12,18 +12,14 @@ export default class IndexerService implements IIndexerInterface {
   protected readonly logger_: Logger
   protected readonly documentProcessorService_:  IDocumentProcessorInterface
   protected readonly openAiService_:  ILLMInterface
-
   protected readonly vectorDBService_ : IVectorDB
-  // protected readonly searchIndexService_ : ISearchService
 
   constructor(container, config: ConfigModule) {
     this.config_ = config
     this.logger_ = container.logger
     this.documentProcessorService_ = container.documentProcessorService
     this.openAiService_ = container.openAiService
-
     this.vectorDBService_ = container.vectorDBService
-    // this.searchIndexService_ = container.searchIndexService
   }
 
   async createIndex(indexName:string){
@@ -35,20 +31,14 @@ export default class IndexerService implements IIndexerInterface {
     }
   }
 
-  // Indexes a Batch of Docs To the Full Text Search + Vector Index and FileStorage.
   async indexDocuments(indexName: string, documents: IndexableDocument[]): Promise<void> {
     try {
       this.logger_.info(`Indexing ${documents.length} documents to index ${indexName}`)
-      // Optionally Add Files To Content Store.
-      // if (options.uploadToStorage) {
-      //   // TODO: use separate containers for each index?
-      //   await this.blobStorage.upload(filename, data, type);
-      // }
-      const chunks = this.documentProcessorService_.chunkIndexableDocumentsBatch(documents)
+      const chunks = await this.documentProcessorService_.chunkIndexableDocumentsBatch(documents)
+      console.log("Chunked Docs",chunks)
       const embeddedChunksPromises = await chunks.map((chunk) => this.embedChunk(chunk));
       const embeddedChunks = await Promise.all(embeddedChunksPromises);
       await this.vectorDBService_.addDocuments(indexName, embeddedChunks)
-      // await this.searchIndexService_.addDocuments(indexName, chunks)
     } catch (error) {
       this.logger_.error(`Error Indexing ${indexName}, error ${error.message}`)
     }

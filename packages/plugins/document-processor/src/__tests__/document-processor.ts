@@ -1,4 +1,4 @@
-import { IndexableDocument, IndexableDocChunk, AppNameDefinitions, AbstractDocumentProcesserService, Section } from "@ocular/types";
+import { IndexableDocument, IndexableDocChunk, AppNameDefinitions, AbstractDocumentProcesserService, Section, DocType } from "@ocular/types";
 import documentProcessorService from '../services/document-processor';
 import fs from 'fs';
 import path from 'path';
@@ -16,17 +16,16 @@ function getSections(): Section[]{
       link: `http://example.com/section${sections.length}`
     });
   }
-  console.log(sections)
   return sections
 }
 
-describe('DocumentProcessor', () => {
+describe('DocumentProcessor Split Text Document', () => {
   let processor:  AbstractDocumentProcesserService;
   beforeEach(() => {
     processor = new documentProcessorService({},{ max_chunk_length:200, sentence_search_limit:50, chunk_over_lap:20});
   });
 
-  it('should chunk an indexable document correctly', () => {
+  it('should chunk an indexable document correctly', async () => {
     const date =new Date()
     const document: IndexableDocument = {
       id: '1',
@@ -34,6 +33,7 @@ describe('DocumentProcessor', () => {
       title: 'Test Document',
       sections: getSections(),
       source: AppNameDefinitions.ASANA,
+      type: DocType.TEXT,
       metadata: {
         "name": 'done',
         "status": 'done'
@@ -48,14 +48,13 @@ describe('DocumentProcessor', () => {
         documentId: document.id,
         title: document.title,
         source: AppNameDefinitions.ASANA,
-        content: "\"Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked " ,
+        content: "\"Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin" ,
         metadata: {
           "name": 'done',
           "status": 'done'
         },
-        updatedAt: date ,
-        offsets: {
-        }
+        tokens: 46,
+        updatedAt: date
       },
       {
         chunkId: 1,
@@ -63,15 +62,13 @@ describe('DocumentProcessor', () => {
         documentId: document.id,
         title: document.title,
         source: AppNameDefinitions.ASANA,
-        content:"McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.",
+        content: "McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in" ,
         metadata: {
           "name": 'done',
           "status": 'done'
         },
+        tokens: 45,
         updatedAt: document.updatedAt,
-        offsets: {
-          "400": "http://example.com/section0",
-        }
       },
       {
         chunkId: 2,
@@ -79,14 +76,13 @@ describe('DocumentProcessor', () => {
         documentId: document.id,
         title: document.title,
         source: AppNameDefinitions.ASANA,
-        content:" Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of de Finibus Bonorum et Malorum (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance." ,
+        content: "of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of de Finibus Bonorum et Malorum (The Extremes of Good and Evil) by Cicero,",
         metadata: {
           "name": 'done',
           "status": 'done'
         },
+        tokens: 55,
         updatedAt: document.updatedAt,
-        offsets: {
-        }
       },
       {
         chunkId: 3,
@@ -94,15 +90,13 @@ describe('DocumentProcessor', () => {
         documentId: document.id,
         title: document.title,
         source: AppNameDefinitions.ASANA,
-        content:" This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, Lorem ipsum dolor sit amet.., comes from a line in section 1.10.32. The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested." ,
+        content: "Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, Lorem ipsum dolor sit amet.., comes from a line",
         metadata: {
           "name": 'done',
           "status": 'done'
         },
+        tokens: 49,
         updatedAt: document.updatedAt,
-        offsets: {
-          "800": "http://example.com/section1",
-        }
       },
       {
         chunkId: 4,
@@ -110,15 +104,13 @@ describe('DocumentProcessor', () => {
         documentId: document.id,
         title: document.title,
         source: AppNameDefinitions.ASANA,
-        content:" The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from de Finibus Bonorum et Malorum by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H." ,
+        content: "comes from a line in section 1.10.32. The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from de Finibus Bonorum et Malorum",
         metadata: {
           "name": 'done',
           "status": 'done'
         },
         updatedAt: document.updatedAt,
-        offsets: {
-          "800": "http://example.com/section1"
-        }
+        tokens: 56,
       },
       {
         chunkId: 5,
@@ -126,22 +118,20 @@ describe('DocumentProcessor', () => {
         documentId: document.id,
         title: document.title,
         source: AppNameDefinitions.ASANA,
-        content:"33 from de Finibus Bonorum et Malorum by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.\"",
+        content: "Bonorum et Malorum by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.\"",
         metadata: {
           "name": 'done',
           "status": 'done'
         },
         updatedAt: document.updatedAt,
-        offsets: {
-          "1055": "http://example.com/section2",
-        }
+        tokens: 33,
       },
     ];
-    const chunks = processor.chunkIndexableDocument(document);
+    const chunks = await processor.chunkIndexableDocument(document);
     expect(chunks).toEqual(expectedChunks);
   });
 
-  it('should chunk a document without sections correctly', () => {
+  it('should chunk a document without sections correctly', async () => {
     const date =new Date()
     const document: IndexableDocument = {
       id: '1',
@@ -153,6 +143,7 @@ describe('DocumentProcessor', () => {
         "name": 'done',
         "status": 'done'
       },
+      type: DocType.TEXT,
       updatedAt: date,
     };
 
@@ -168,12 +159,11 @@ describe('DocumentProcessor', () => {
           "name": 'done',
           "status": 'done'
         },
+        tokens: 0,
         updatedAt: date ,
-        offsets: {
-        }
       },
     ];
-    const chunks = processor.chunkIndexableDocument(document);
+    const chunks = await processor.chunkIndexableDocument(document);
     expect(chunks).toEqual(expectedChunks);
   });
 });

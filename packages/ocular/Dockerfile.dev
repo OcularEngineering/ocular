@@ -18,7 +18,7 @@ COPY package-lock.json ./
 # Copy the docs package.json
 COPY packages/ocular/package.json ./packages/ocular/package.json
 
-COPY packages/ocular/env.local ./packages/ocular/.env.local
+# COPY packages/ocular/env.local ./packages/ocular/.env.local
 
 # Copy turbo.json
 COPY turbo.json ./

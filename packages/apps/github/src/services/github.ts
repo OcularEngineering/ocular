@@ -2,7 +2,7 @@ import { Readable } from 'stream';
 import { EntityManager } from "typeorm";
 import { App } from "octokit";
 import { OAuthService, Organisation } from "@ocular/ocular";
-import { IndexableDocument, TransactionBaseService, Logger, AppNameDefinitions  } from "@ocular/types";
+import { IndexableDocument, TransactionBaseService, Logger, AppNameDefinitions, DocType  } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";;
 import fs from 'fs';
 import e from 'express';
@@ -74,6 +74,7 @@ export default class GitHubService extends TransactionBaseService {
                 offset: pr.body.length,
                 content: pr.body
               }],
+              type: DocType.TEXT,
               updatedAt: new Date(pr.updated_at),
               metadata: { state: pr.state } 
             };
@@ -104,6 +105,7 @@ export default class GitHubService extends TransactionBaseService {
                 offset: issue.body.length,
                 content: issue.body
               }],
+              type: DocType.TEXT,
               updatedAt: new Date(issue.updated_at),
               metadata: { state: issue.state } 
             };
@@ -123,6 +125,7 @@ export default class GitHubService extends TransactionBaseService {
             offset: repo.description.length,
             content: repo.description,
           }],
+          type: DocType.TEXT,
           source: AppNameDefinitions.GITHUB,
           updatedAt: new Date(repo.updated_at),
           metadata: {}

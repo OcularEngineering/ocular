@@ -109,8 +109,10 @@ async function runLoaders(
   appDetails: AppDetails,
   container: AutoflowContainer
 ): Promise<void> {
-  const loaderFilesGlob = fg.convertPathToPattern(`${appDetails.resolve}/loaders/[!__]*.js`)
-  const loaderFiles = glob.sync(loaderFilesGlob,{})
+  const loaderFiles = glob.sync(
+    `${appDetails.resolve}/loaders/[!__]*.js`,
+    {}
+  )
   await Promise.all(
     loaderFiles.map(async (loader) => {
       try {
@@ -144,8 +146,7 @@ function registerRepositories(
   appDetails: AppDetails,
   container: AutoflowContainer
 ): void {
-  const registerRepositoriesGlob = fg.convertPathToPattern(`${appDetails.resolve}/repositories/*.js`)
-  const files = glob.sync(registerRepositoriesGlob, {})
+  const files = glob.sync(`${appDetails.resolve}/repositories/*.js`, {})
   files.forEach((fn) => {
     const loaded = require(fn)
 
@@ -174,8 +175,7 @@ export async function registerServices(
   appDetails: AppDetails,
   container: AutoflowContainer
 ): Promise<void> {
-  const registerServicesGlob = fg.convertPathToPattern(`${appDetails.resolve}/dist/services/[!__]*.js`)
-  const files = glob.sync(registerServicesGlob, {})
+  const files = glob.sync(`${appDetails.resolve}/dist/services/[!__]*.js`, {})
   await promiseAll(
     files.map(async (fn) => {
       const loaded = require(fn).default
@@ -233,8 +233,7 @@ function registerSubscribers(
   appDetails: AppDetails,
   container: AutoflowContainer
 ): void {
-  const registerSubscribersGlob = fg.convertPathToPattern(`${appDetails.resolve}/dist/subscribers/*.js`)
-  const files = glob.sync(registerSubscribersGlob, {})
+  const files = glob.sync(`${appDetails.resolve}/dist/subscribers/*.js`, {})
   files.forEach((fn) => {
     const loaded = require(fn).default
 
@@ -259,8 +258,7 @@ function registerStrategies(
   appDetails: AppDetails,
   container: AutoflowContainer): void {
 
-const registerStrategiesGlob = fg.convertPathToPattern(`${appDetails.resolve}/dist/strategies/*.js`)
-const files = glob.sync(registerStrategiesGlob, {})
+  const files = glob.sync(`${appDetails.resolve}/dist/strategies/*.js`, {})
   files.forEach((fn) => {
     const loaded = require(fn).default
     const name = formatRegistrationName(fn)
@@ -283,8 +281,7 @@ const files = glob.sync(registerStrategiesGlob, {})
  * @param appDetails The app details including app options, version, id, resolved path, etc.
  */
 async function runSetupFunctions(appDetails: AppDetails): Promise<void> {
-  const runSetupFunctionsGlob = fg.convertPathToPattern(`${appDetails.resolve}/setup/*.js`)
-  const files = glob.sync(runSetupFunctionsGlob, {})
+  const files = glob.sync(`${appDetails.resolve}/setup/*.js`, {})
   await promiseAll(
     files.map(async (fn) => {
       const loaded = require(fn).default

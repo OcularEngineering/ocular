@@ -50,6 +50,13 @@ export const links: LinkProps[] =[
     link: "/dashboard/search"
   },
   {
+    title: "Chat",
+    label: "",
+    icon: "Bot", // Changed from "LayoutGrid" to "Chat"
+    variant: "ghost",
+    link: "/dashboard/chat"
+  },
+  {
     title: "Marketplace",
     label: "",
     icon: "LayoutGrid",
@@ -72,11 +79,6 @@ export const apps = [
   value: "github",
   label: "GitHub",
   icon: "/GitHub.png",
-},
-{
-  value: "google drive",
-  label: "Google Drive",
-  icon: "/GoogleDrive.png",
 },
 {
   value: "jira",

@@ -20,6 +20,7 @@
    "dependencies": {
       "@ocular/types": "*",
       "@ocular/utils": "*",
-      "openai": "^4.29.2"
+      "openai": "^4.29.2",
+      "tiktoken": "^1.0.13"
    }
 }

@@ -40,7 +40,7 @@ services:
       - ocular-db
     build:
       context: .
-      dockerfile: packages/ocular/Dockerfile
+      dockerfile: packages/ocular/Dockerfile.dev
     environment:
       - DATABASE_URL=postgresql://ocular:ocular@ocular-db:5432/ocular
       - DATABASE_NAME=ocular
