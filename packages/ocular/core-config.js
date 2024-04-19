@@ -78,6 +78,14 @@ module.exports = {
         redirect_uri: `${UI_CORS}/dashboard/marketplace/notion`,
       },
     },
+    {
+      resolve: `slack`,
+      options: {
+        client_id: process.env.SLACK_CLIENT_ID,
+        client_secret: process.env.SLACK_CLIENT_SECRET,
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/slack`,
+      },
+    },
     // {
     //   resolve: `github`,
     //   options: {
