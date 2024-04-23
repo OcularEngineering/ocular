@@ -86,17 +86,17 @@ module.exports = {
         redirect_uri: `${UI_CORS}/dashboard/marketplace/slack`,
       },
     },
-    // {
-    //   resolve: `github`,
-    //   options: {
-    //     client_id: process.env.GITHUB_CLIENT_ID,
-    //     client_secret: process.env.GITHUB_CLIENT_SECRET,
-    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/github`,
-    //     app_id: process.env.GITHUB_APP_ID,
-    //     private_key: process.env.GITHUB_PRIVATE_KEY_PATH,
-    //     scope: "repo"
-    //   }
-    // },
+    {
+      resolve: `github`,
+      options: {
+        client_id: process.env.GITHUB_CLIENT_ID,
+        client_secret: process.env.GITHUB_CLIENT_SECRET,
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/github`,
+        app_id: process.env.GITHUB_APP_ID,
+        private_key: process.env.GITHUB_PRIVATE_KEY_PATH,
+        scope: "repo"
+      }
+    },
     {
       resolve: `google-drive`,
       options: {
@@ -118,9 +118,9 @@ module.exports = {
     {
       resolve: `document-processor`,
       options: {
-        max_chunk_length: 1000,
+        max_chunk_length: 500,
         sentence_search_limit: 100,
-        chunk_over_lap: 100,
+        chunk_over_lap: 0,
       },
     },
     {
@@ -142,12 +142,6 @@ module.exports = {
         quadrant_db_url: process.env.QDRANT_DB_URL || "http://localhost:6333",
         embedding_size: 1536,
       },
-    },
-    // {
-    //   resolve: "typesense-text-search-service",
-    //   options:{
-    //      typesense_host: process.env.TYPESENSE_HOST || "localhost"
-    //   }
-    // }
+    }
   ],
 };
