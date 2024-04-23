@@ -87,7 +87,7 @@ export default function ChatLayout({ children }: ChatLayoutProps) {
           <IconChevronCompactRight size={24} />
       </Button>
       <div
-        className={cn("bg-custom-gray/20 duration-200 rounded-r-3xl mr-3")}
+        className={cn("bg-custom-gray/20 duration-200 rounded-r-3xl max-h-screen mr-3")}
         style={{
           minWidth: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",
           maxWidth: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",

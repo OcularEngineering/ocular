@@ -27,7 +27,7 @@ export const ChatSideBar: FC<SidebarProps> = ({contentType, showSidebar }) => {
 
   return (
     <Tabs
-      className="flex h-full"
+      className="flex h-screen"
       value={contentType}
       // onValueChange={tabValue => {
       //   setContentType(tabValue as ContentType)

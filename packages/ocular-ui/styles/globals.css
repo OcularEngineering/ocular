@@ -90,3 +90,22 @@
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+
+.scrollbar-custom::-webkit-scrollbar {
+    width: 1px; /* width of the entire scrollbar */
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+    background: #f0f0f0; /* color of the tracking area */
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+    background-color: #888; /* color of the scroll thumb */
+    border-radius: 20px; /* roundness of the scroll thumb */
+    border: 3px solid #f0f0f0; /* creates padding around scroll thumb */
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+    background-color: #555; /* color of the scroll thumb on hover */
+}
