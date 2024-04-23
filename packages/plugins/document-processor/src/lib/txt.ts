@@ -10,48 +10,56 @@ export const processTxt = async (document: IndexableDocument, max_chunk_size: nu
     chunkOverlap: chunk_overlap
   })
 
+  const title = document.title
+  const organisationId = document.organisationId
+  const documentId = document.id
+  const source = document.source
+  const metadata = document.metadata
+  const updatedAt = document.updatedAt
+
   const sections: Section[] = document.sections
   // If the document has no sections, return the document as a single chunk 
   if(!sections || sections.length === 0) {
     return [
       {
         chunkId: 0,
-        organisationId: document.organisationId,
-        documentId: document.id,
-        source: document.source,
-        title: document.title,
-        tokens: encode(document.title).length,
+        organisationId: organisationId,
+        documentId: documentId,
+        source: source,
+        title: title,
+        tokens: 0,
         content: '',
-        metadata: document.metadata,
-        updatedAt: document.updatedAt,
+        metadata: metadata,
+        updatedAt: updatedAt,
       }
     ]
   }
 
   // Split the document into chunks
   let chunk_text = ''
+  let chunk_links = {}
   let chunks: IndexableDocChunk[] = []
   for (const section of sections) {
     // If the current section is bigger than the chunk size, split the section into chunks
-    console.log("Before Splitting Section", section.content.length, max_chunk_size)
     if(encode(section.content).length > max_chunk_size) {
     // Create a new document for the remaining chunk_text
-      console.log("Splitting Section", section.content.length)
       if(chunk_text.length > 0) {
         const tokens = encode(chunk_text).length
         const chunk = {
           chunkId: chunks.length,
-          organisationId: document.organisationId,
-          documentId: document.id,
-          source: document.source,
-          title: document.title,
+          organisationId: organisationId,
+          documentId: documentId,
+          source: source,
+          title: title,
           content: chunk_text,
           tokens: tokens,
-          metadata: document.metadata,
-          updatedAt: document.updatedAt,
+          chunkLinks: chunk_links,
+          metadata: metadata,
+          updatedAt: updatedAt,
         }
         chunks.push(chunk)
         chunk_text = ''
+        chunk_links = {}
       }
 
       // Split the big section into chunks
@@ -61,14 +69,15 @@ export const processTxt = async (document: IndexableDocument, max_chunk_size: nu
         chunks.push(
           {
             chunkId: chunks.length,
-            organisationId: document.organisationId,
-            documentId: document.id,
-            source: document.source,
-            title: document.title,
+            organisationId: organisationId,
+            documentId: documentId,
+            source: source,
+            title: title,
             content: doc.pageContent,
             tokens: encode(doc.pageContent).length,
-            metadata: document.metadata,
-            updatedAt: document.updatedAt,
+            chunkLinks: {0: section.link},
+            metadata: metadata,
+            updatedAt: updatedAt,
           }
         )
       }
@@ -86,13 +95,17 @@ export const processTxt = async (document: IndexableDocument, max_chunk_size: nu
         title: document.title,
         content: chunk_text,
         tokens: tokens,
+        chunkLinks: chunk_links,
         metadata: document.metadata,
         updatedAt: document.updatedAt,
       }
       chunks.push(chunk)
       chunk_text = section.content
+      chunk_links = {0: section.link}
     } else {
       chunk_text += section.content
+      let links_size = Object.keys(chunk_links).length;
+      chunk_links[links_size] = section.link
     }
   }
 
@@ -107,6 +120,7 @@ export const processTxt = async (document: IndexableDocument, max_chunk_size: nu
       title: document.title,
       content: chunk_text,
       tokens: tokens,
+      chunkLinks: chunk_links,
       metadata: document.metadata,
       updatedAt: document.updatedAt,
     }

@@ -38,7 +38,8 @@ export type IndexableDocChunk = {
   titleEmbeddings?: number[] | null;
   content?: string;
   contentEmbeddings?: number[] | null;
-  tokens: number
+  tokens: number;
+  chunkLinks?: Record<number, string>;
   metadata: Record<string, unknown>;
   updatedAt: Date;
 };
