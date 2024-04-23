@@ -10,7 +10,7 @@ import {
   Section,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
-import { DocType } from "@ocular/types/src/common";
+import { DocType } from "@ocular/types";
 
 interface Config {
   headers: {

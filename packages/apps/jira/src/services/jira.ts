@@ -82,7 +82,6 @@ export default class JiraService extends TransactionBaseService {
               {
                 content: description,
                 link: `${url}/browse/${key}`,
-                offset: description.length,
               },
             ],
             type: DocType.TEXT,
@@ -110,7 +109,6 @@ export default class JiraService extends TransactionBaseService {
               link: `${url}/jira/software/projects/${
                 project.key
               }/issues?jql=${encodeURIComponent(jqlQuery)}`,
-              offset: project.description.length,
             },
           ],
           type: DocType.TEXT,

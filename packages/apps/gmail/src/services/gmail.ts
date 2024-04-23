@@ -83,7 +83,6 @@ export default class GmailService extends TransactionBaseService {
                   source: AppNameDefinitions.GMAIL,
                   sections: [{
                     link : `https://mail.google.com/mail/u/0/#inbox/${message.id}`,
-                    offset: emailContent.length,
                     content: emailContent
                   }],
                   type: DocType.TEXT,

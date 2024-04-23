@@ -88,7 +88,6 @@ export default class ConfluenceService extends TransactionBaseService {
               {
                 content: pageInfo.text,
                 link: pageInfo.location,
-                offset: pageInfo.text.length,
               },
             ],
             type: DocType.TEXT,

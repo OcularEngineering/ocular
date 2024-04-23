@@ -52,7 +52,6 @@ export default class AsanaService extends TransactionBaseService {
               source: AppNameDefinitions.ASANA,
               sections: [{
                 link : `https://app.asana.com/0/${project.gid}/${task.gid}`,
-                offset:task.notes.length,
                 content: task.notes,
               }],
               type: DocType.TEXT ,
@@ -76,7 +75,6 @@ export default class AsanaService extends TransactionBaseService {
           source: AppNameDefinitions.ASANA,
           sections: [{
             link : `https://app.asana.com/0/${project.gid}`,
-            offset: project.notes.length,
             content: project.notes,
           }],
           type: DocType.TEXT,

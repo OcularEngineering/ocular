@@ -68,7 +68,6 @@ export default class NotionService extends TransactionBaseService {
             {
               content: text,
               link: page.url,
-              offset: text.length,
             },
           ],
           type: DocType.TEXT,
