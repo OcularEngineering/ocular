@@ -3,7 +3,6 @@ import { AppNameDefinitions, AppCategoryDefinitions } from "../apps";
 export const INDEX_DOCUMENT_EVENT = "INDEX_DOCUMENT_EVENT"
 
 export interface Section {
-  offset: number
   content: string;
   link: string;
 }
@@ -46,7 +45,6 @@ export type IndexableDocChunk = {
 
 // Document to be returned by the Search API to the client
 export interface SearchDocument {
-  chunkId: number;
   documentId: string;
   organisationId: string;
   source: AppNameDefinitions;
