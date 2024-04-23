@@ -71,7 +71,6 @@ export default class GitHubService extends TransactionBaseService {
               source: AppNameDefinitions.GITHUB,
               sections: [{
                 link : pr.html_url,
-                offset: pr.body.length,
                 content: pr.body
               }],
               type: DocType.TEXT,
@@ -102,7 +101,6 @@ export default class GitHubService extends TransactionBaseService {
               source: AppNameDefinitions.GITHUB,
               sections: [{
                 link :  issue.html_url,
-                offset: issue.body.length,
                 content: issue.body
               }],
               type: DocType.TEXT,
@@ -122,7 +120,6 @@ export default class GitHubService extends TransactionBaseService {
           title: repo.name,
           sections: [{
             link :  repo.html_url,
-            offset: repo.description.length,
             content: repo.description,
           }],
           type: DocType.TEXT,

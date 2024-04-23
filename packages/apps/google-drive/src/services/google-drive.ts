@@ -75,7 +75,6 @@ export default class GoogleDriveService extends TransactionBaseService {
               source: AppNameDefinitions.GOOGLEDRIVE,
               sections: [{
                 link :file.webViewLink,
-                offset:content.length,
                 content: content
               }],
               type: DocType.TEXT,
