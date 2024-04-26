@@ -87,6 +87,14 @@ module.exports = {
       },
     },
     {
+      resolve: "bitbucket",
+      options: {
+        client_id: process.env.BITBUCKET_CLIENT_ID,
+        client_secret: process.env.BITBUCKET_CLIENT_SECRET,
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/bitbucket`,
+      },
+    },
+    {
       resolve: `github`,
       options: {
         client_id: process.env.GITHUB_CLIENT_ID,

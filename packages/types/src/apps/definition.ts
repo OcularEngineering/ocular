@@ -1,6 +1,6 @@
 /**
  * @enum
- * 
+ *
  * Apps To Installed in the DB.
  */
 export enum AppNameDefinitions {
@@ -14,7 +14,8 @@ export enum AppNameDefinitions {
   GOOGLEDRIVE = "google-drive",
   JIRA = "jira",
   NOTION = "notion",
-  SLACK= "slack"
+  SLACK= "slack",
+  BITBUCKET = "bitbucket",
 }
 
 export enum AppCategoryDefinitions {
