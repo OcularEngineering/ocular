@@ -65,15 +65,15 @@ export default class SlackService extends TransactionBaseService {
       for (const channel of slackChannels) {
         const conversations = await this.fetchChannelConversations(channel.id,config);
         for(const conversation of conversations){
-          const thread = await this.fetchThreadForConversation(channel.id,conversation.ts,config)
+          const thread = await this.fetchThreadForConversation(channel.id,conversation.id,config)
 
           const sections: Section[] = thread.map((message, index) => ({
             offset: index,
             content: message.text,
-            link: `https://slack.com/api/conversations.replies?channel_id=${channel.id}&ts=${conversation.ts}` 
+            link: `https://slack.com/api/conversations.replies?channel_id=${channel.id}&ts=${conversation.id}`
           }));
           const threadDoc : IndexableDocument = {
-            id:conversation.ts, // conversation id
+            id:conversation.id, // conversation id
             organisationId:org.id,
             source:AppNameDefinitions.SLACK,
             title:conversation.text, // the main message which lead to conversation
