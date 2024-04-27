@@ -43,11 +43,11 @@ export abstract class AbstractQueueService implements IQueueService {
   }
 
   protected async clearConsumers(){
-    for (const [topicName, consumers] of this.topicToConsumersMap_) {
+    this.topicToConsumersMap_.forEach(async (consumers, topicName) => {
       for (const { consumer } of consumers) {
-        await consumer.disconnect()
+        await consumer.disconnect();
       }
-    }
+    })
     console.log("All consumers disconnected")
     this.topicToConsumersMap_.clear()
   }

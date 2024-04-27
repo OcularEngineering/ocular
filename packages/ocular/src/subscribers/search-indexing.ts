@@ -1,7 +1,7 @@
-import { IndexableDocument,AppNameDefinitions, IEventBusService, INDEX_DOCUMENT_EVENT, BatchJobCreateProps  } from "@ocular/types"
+import { IndexableDocument,AppNameDefinitions, IEventBusService, INDEX_DOCUMENT_EVENT, BatchJobCreateProps, SEARCH_INDEXING_TOPIC   } from "@ocular/types"
 import { defaultSearchIndexingProductRelations, indexTypes } from "../utils/search"
 import OrganisationService from "../services/organisation"
-import { BatchJobService, UserService } from "../services"
+import { BatchJobService, QueueService, UserService } from "../services"
 import { Organisation, User } from "../models"
 import JobSchedulerService from "../services/job-scheduler"
 import { ConfigModule, Logger } from "../types"
@@ -19,6 +19,7 @@ type InjectedDependencies = {
   batchJobService: BatchJobService
   organisationService: OrganisationService
   jobSchedulerService: JobSchedulerService
+  queueService: QueueService
   configModule: ConfigModule
   logger: Logger
   indexName: string
@@ -30,6 +31,7 @@ class SearchIndexingSubscriber {
   private readonly batchJobService_: BatchJobService
   private readonly organisationService_: OrganisationService
   private readonly jobSchedulerService_: JobSchedulerService
+  private readonly queueService_: QueueService
   private readonly configModule_: ConfigModule;
   private readonly logger_: Logger
   private readonly indexName_: string
@@ -40,6 +42,7 @@ class SearchIndexingSubscriber {
     batchJobService,
     organisationService,
     jobSchedulerService,
+    queueService,
     configModule,
     logger,
     indexName,
@@ -49,6 +52,7 @@ class SearchIndexingSubscriber {
     this.organisationService_ = organisationService
     this.eventBusService_ = eventBusService
     this.jobSchedulerService_ = jobSchedulerService
+    this.queueService_ = queueService
     this.logger_ = logger
     this.eventBusService_.subscribe(SEARCH_INDEX_EVENT, this.buildSearchIndex)
     this.eventBusService_.subscribe(INDEX_DOCUMENT_EVENT, this.registerIndexDocumentJobHandler)
@@ -58,6 +62,13 @@ class SearchIndexingSubscriber {
 
   buildSearchIndex = async (): Promise<void> => {
       console.error("Building Search Indexes")
+
+      // Register Kafka Consumers To Consume Indexable Documents From Apps Sent By Kafka
+      // TODO: Refactor This To Use EventBus
+      this.queueService_.subscribe(SEARCH_INDEXING_TOPIC, async (doc:IndexableDocument, topic) => {
+        await this.indexerService_.indexDocuments(this.indexName_, [doc])
+      }, {groupId: "ocular-group"});
+
       await this.indexerService_.createIndex(this.indexName_)
       const orgs: Organisation[] =  await this.organisationService_.list({})
       orgs.forEach((org) => {

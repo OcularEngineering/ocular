@@ -16,7 +16,7 @@
     "noImplicitThis": true,
     "allowJs": true,
     "skipLibCheck": true,
-    "downlevelIteration": true
+    "downlevelIteration": true,
   },
   "include": ["src"],
   "exclude": [
