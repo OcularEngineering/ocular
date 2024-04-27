@@ -19,14 +19,14 @@ export default class BitBucketStrategy extends AbstractBatchJobStrategy {
 
   async processJob(batchJobId: string): Promise<void> {
     const batchJob = await this.batchJobService_.retrieve(batchJobId);
-    const stream = await this.bitbucketService_.getSlackData(
+    const stream = await this.bitbucketService_.getBitBucketData(
       batchJob.context?.org as Organisation
     );
     stream.on('data', (documents) => {
       this.eventBusService_.emit(INDEX_DOCUMENT_EVENT, documents);
     });
     stream.on('end', () => {
-      console.log('No more data');
+      throw new Error('No bitbucket event was retrieved');
     });
   }
 

@@ -29,16 +29,16 @@ class BitBucketOauth extends OauthService {
       name: AppNameDefinitions.BITBUCKET,
       logo: '/bitbucket.svg',
       description:
-        'Slack is a new way to communicate with your team. Its faster, better organised and more secure than email.',
+        'Bitbucket is a Git-based source code repository hosting service owned by Atlassian',
       oauth_url: `https://bitbucket.org/site/oauth2/authorize?client_id=${client_id}&response_type=code.`,
       slug: AppNameDefinitions.BITBUCKET,
       category: AppCategoryDefinitions.FILE_STORAGE,
       developer: 'Ocular AI',
       images: ['/bitbucket.svg'],
       overview:
-        'Slack is a new way to communicate with your team. Its faster, better organised and more secure than email.',
-      docs: 'https://api.slack.com/docs',
-      website: 'https://slack.com/',
+        'Bitbucket is a Git-based source code repository hosting service owned by Atlassian',
+      docs: 'https://developer.atlassian.com/cloud/bitbucket/rest',
+      website: 'https://bitbucket.org/product/',
     };
   }
 

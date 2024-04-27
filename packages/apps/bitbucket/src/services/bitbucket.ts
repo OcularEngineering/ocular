@@ -32,7 +32,7 @@ export default class BitBucketService extends TransactionBaseService {
   ): AsyncGenerator<IndexableDocument[]> {
     this.logger_.info(`Starting oculation of BitBucket for ${org.id} organisation`);
 
-    // Get Slack OAuth for the organisation
+    // Get BitBucket OAuth for the organisation
     const oauth = await this.oauthService_.retrieve({
       id: org.id,
       app_name: AppNameDefinitions.BITBUCKET,
@@ -114,12 +114,6 @@ export default class BitBucketService extends TransactionBaseService {
               documents = [];
             }
           }
-          // const sections: Section[] = pr.map((message, index) => ({
-          //   offset: index,
-          //   content: message.text,
-          //   link: `https://slack.com/api/repositories.replies?channel_id=${channel.id}&ts=${conversation.ts}`
-          // }))
-
         }
       }
       yield documents;
@@ -129,10 +123,10 @@ export default class BitBucketService extends TransactionBaseService {
     } catch (error) {
       if (error.response && error.response.status === 401) {
         // Check if it's an unauthorized error
-        this.logger_.info(`Refreshing Slack token for ${org.id} organisation`);
+        this.logger_.info(`Refreshing bitbucket token for ${org.id} organisation`);
 
         // Refresh the token
-        const oauthToken = await this.container_["slackOauth"].refreshToken(
+        const oauthToken = await this.container_["bitbucketOauth"].refreshToken(
           oauth.refresh_token
         );
 
@@ -142,7 +136,7 @@ export default class BitBucketService extends TransactionBaseService {
         // Retry the request
         return this.getBitBucketInformation(org);
       } else {
-        console.error(error);
+        throw new Error(error)
       }
     }
 
