@@ -1,11 +1,19 @@
-/* eslint-disable */
-export default {
-  displayName: 'core-backend',
-  preset: '../../jest.preset.js',
-  testEnvironment: 'node',
-  transform: {
-    '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
+module.exports = {
+  globals: {
+    preset: 'ts-jest',
+    testEnvironment: 'node',
+    "ts-jest": {
+      tsconfig: "tsconfig.spec.json",
+      isolatedModules: false,
+    },
   },
-  moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../coverage/packages/core-backend',
-};
+  transform: {
+    "^.+\\.[jt]s?$": "ts-jest",
+  },
+  transformIgnorePatterns: [
+    "/node_modules/(?!(axios)/).*",
+   "/dist/"
+  ],
+  testEnvironment: `node`,
+  moduleFileExtensions: [`js`, `jsx`, `ts`, `tsx`, `json`],
+}
