@@ -35,7 +35,6 @@ export default class QueueService extends AbstractQueueService {
     data: T,
     options?: Record<string, unknown>
   ): Promise<void> {
-    // Check if the producer is connected
     try{
       await this.producer_.connect()
       const record = await this.producer_.send({
@@ -66,11 +65,7 @@ export default class QueueService extends AbstractQueueService {
         }
       },
     })
-
-    /**
-     * If context is provided, we use the subscriberId from it
-     * otherwise we generate a random using a ulid
-     */
+    
     const randId = ulid()
     const topic = topicName.toString()
 
