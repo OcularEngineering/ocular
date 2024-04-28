@@ -26,7 +26,7 @@ export default class BitBucketStrategy extends AbstractBatchJobStrategy {
       this.eventBusService_.emit(INDEX_DOCUMENT_EVENT, documents);
     });
     stream.on('end', () => {
-      throw new Error('No bitbucket event was retrieved');
+      console.log('No more data');
     });
   }
 
