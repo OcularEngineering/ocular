@@ -17,6 +17,7 @@ export default class documentProcessorService extends AbstractDocumentProcesserS
 
   async chunkIndexableDocument(document: IndexableDocument): Promise<IndexableDocChunk[]> {
     let chunks: IndexableDocChunk[] = [];
+    console.log("Document Type",document.type)
     switch (document.type) {
       case DocType.TEXT:
         chunks = await processTxt(document, this.max_chunk_length_, this.chunk_over_lap_)

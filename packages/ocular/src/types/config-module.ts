@@ -23,6 +23,8 @@ export type ProjectConfigOptions = {
   redis_prefix?: string
   redis_options?: RedisOptions
 
+  kafka_url?: string
+
   session_options?: SessionOptions
 
   jwt_secret?: string

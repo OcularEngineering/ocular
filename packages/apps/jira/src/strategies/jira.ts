@@ -1,6 +1,6 @@
-import { BatchJobService, Organisation, EventBusService } from '@ocular/ocular';
+import { BatchJobService, Organisation, QueueService } from '@ocular/ocular';
 import JiraService from '../services/jira';
-import { INDEX_DOCUMENT_EVENT } from '@ocular/types';
+import { INDEX_DOCUMENT_EVENT, SEARCH_INDEXING_TOPIC } from '@ocular/types';
 import { AbstractBatchJobStrategy } from '@ocular/types';
 
 export default class JiraStrategy extends AbstractBatchJobStrategy {
@@ -8,13 +8,13 @@ export default class JiraStrategy extends AbstractBatchJobStrategy {
   static batchType = 'jira';
   protected batchJobService_: BatchJobService;
   protected jiraService_: JiraService;
-  protected eventBusService_: EventBusService;
+  protected queueService_: QueueService
 
   constructor(container) {
     super(arguments[0]);
     this.jiraService_ = container.jiraService;
     this.batchJobService_ = container.batchJobService;
-    this.eventBusService_ = container.eventBusService;
+    this.queueService_ = container.queueService;
   }
 
   async processJob(batchJobId: string): Promise<void> {
@@ -24,7 +24,9 @@ export default class JiraStrategy extends AbstractBatchJobStrategy {
       batchJob.context?.org as Organisation
     );
     stream.on('data', (documents) => {
-      this.eventBusService_.emit(INDEX_DOCUMENT_EVENT, documents);
+      for (const document of documents) {
+        this.queueService_.send(SEARCH_INDEXING_TOPIC, document)
+      }
     });
     stream.on('end', () => {
       console.log('No more data');

@@ -1,6 +1,7 @@
 import { Kafka, Message, Producer,ProducerBatch, TopicMessages } from "kafkajs"
 import { Consumer, ConsumerContext, TransactionBaseService, AbstractQueueService, Logger } from "@ocular/types"
 import { ulid } from "ulid"
+import { IndexableDocument } from "@ocular/types"
 
 type InjectedDependencies = {
   logger: Logger
@@ -29,7 +30,8 @@ export default class QueueService extends AbstractQueueService {
       await this.clearConsumers()
     });
   }
-
+  
+  // TODO: Implement Send Batch Documents to Queue Service
   async send<T>(
     topicName: string,
     data: T,
@@ -59,7 +61,8 @@ export default class QueueService extends AbstractQueueService {
     kafkaConsumer.run({
       eachMessage: async ({ topic, partition, message }) => {
         try {
-          await consumer(message.value.toString(), topic)
+          const doc:IndexableDocument = JSON.parse(message.value.toString())
+          await consumer(doc, topic)
         } catch (error) {
           this.logger_.error(`Error processing message: ${error.message}`)
         }

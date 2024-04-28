@@ -29,6 +29,7 @@ import repositoriesLoader from "./repositories"
 import searchIndexLoader from "./search"
 import servicesLoader from "./services.js"
 import redisLoader from './redis';
+import kafkaLoader from './kafka';
 import subscribersLoader from "./subscribers"
 
 type Options = {
@@ -58,6 +59,7 @@ export default async ({
   })
 
   await redisLoader({ container, configModule, logger: Logger })
+  await kafkaLoader({ container, configModule, logger: Logger })
 
   const modelsActivity = Logger.activity(`Initializing models${EOL}`)
   modelsLoader({ container})
