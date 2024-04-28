@@ -8,6 +8,11 @@ export interface IQueueService {
     data: T,
     options?: Record<string, unknown>
   ): Promise<void>
+  sendBatch<T>(
+    topicName: string,
+    data: T[],
+    options?: Record<string, unknown>
+  ) : Promise<void>
   subscribe<T>(topicName: string, consumer: Consumer, context:ConsumerContext): Promise<void>
 }
 
@@ -56,6 +61,12 @@ export abstract class AbstractQueueService implements IQueueService {
   abstract send<T>(
     topicName: string,
     data: T,
+    options?: Record<string, unknown>
+  ): Promise<void>
+
+  abstract sendBatch<T>(
+    topicName: string,
+    data: T[],
     options?: Record<string, unknown>
   ): Promise<void>
 

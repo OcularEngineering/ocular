@@ -24,9 +24,7 @@ class GmailStrategy extends AbstractBatchJobStrategy {
     const batchJob = await this.batchJobService_.retrieve(batchJobId)
     const stream = await this.gmailService_.getGmailData(batchJob.context?.org as Organisation)
     stream.on('data', (documents) => {
-      for (const document of documents) {
-        this.queueService_.send(SEARCH_INDEXING_TOPIC, document)
-      }
+      this.queueService_.sendBatch(SEARCH_INDEXING_TOPIC, documents)
     });
     stream.on('end', () => {
       console.log('No more data');

@@ -22,9 +22,7 @@ export default class AsanaStrategy extends AbstractBatchJobStrategy {
     const batchJob = await this.batchJobService_.retrieve(batchJobId)
     const stream = await this.asanaService_.getAsanaData(batchJob.context?.org as Organisation)
     stream.on('data', (documents) => {
-      for (const document of documents) {
-        this.queueService_.send(SEARCH_INDEXING_TOPIC, document)
-      }
+      this.queueService_.sendBatch(SEARCH_INDEXING_TOPIC, documents)
     });
     stream.on('end', () => {
       console.log('No more data');
