@@ -88,7 +88,9 @@ export default class JiraService extends TransactionBaseService {
             updatedAt: new Date(updatedAt),
             metadata: {
               project_id:project.id,
-              project_name: project.name
+              project_name: project.name,
+              project_link:project.link,
+              project_description: project.description
             },
           };
           documents.push(issueDoc);
@@ -191,6 +193,8 @@ export default class JiraService extends TransactionBaseService {
         id: project.id,
         key: project.key,
         name: project.name,
+        description: project.description,
+        link: project.self
       }));
 
       return projects;

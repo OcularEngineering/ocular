@@ -59,7 +59,8 @@ export default class AsanaService extends TransactionBaseService {
               metadata: {
                 completed: task.completed ,
                 project_id : project.gid,
-                project_name: project.name
+                project_name: project.name,
+                project_link: `https://app.asana.com/api/1.0/projects/${project.gid}`
               }
             };
             documents.push(doc);
