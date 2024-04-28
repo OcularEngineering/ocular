@@ -121,7 +121,6 @@ export default class JobSchedulerService {
     handler: ScheduledJobHandler,
     options?: CreateJobOptions
   ): Promise<Job> {
-    this.logger_.info(`Registering ${eventName}`)
     this.registerHandler(eventName, handler)
 
     const jobToCreate = {

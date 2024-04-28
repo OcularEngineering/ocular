@@ -1,5 +1,5 @@
-import {AbstractBatchJobStrategy } from "@ocular/types"
-import { BatchJobService, Organisation, EventBusService } from "@ocular/ocular"
+import {AbstractBatchJobStrategy, SEARCH_INDEXING_TOPIC } from "@ocular/types"
+import { BatchJobService, Organisation, QueueService} from "@ocular/ocular"
 import { EntityManager } from "typeorm"
 import GitHubService from "../services/github"
 import JobSchedulerService from "@ocular/ocular"
@@ -11,13 +11,13 @@ class GithubStrategy extends AbstractBatchJobStrategy {
   static batchType = "github"
   protected batchJobService_: BatchJobService
   protected githubService_: GitHubService
-  protected eventBusService_: EventBusService
+  protected queueService_: QueueService
 
   constructor(container) {
     super(arguments[0])
     this.githubService_ = container.githubService
     this.batchJobService_ = container.batchJobService
-    this.eventBusService_ = container.eventBusService
+    this.queueService_ = container.queueService
   }
 
   async processJob(batchJobId: string): Promise<void> {
@@ -27,8 +27,8 @@ class GithubStrategy extends AbstractBatchJobStrategy {
 
     const stream = await this.githubService_.getRepositoriesOcular(batchJob.context?.org as Organisation)
 
-    stream.on('data', (documents) => {
-      this.eventBusService_.emit(INDEX_DOCUMENT_EVENT, documents)
+   stream.on('data', (documents) => {
+      this.queueService_.sendBatch(SEARCH_INDEXING_TOPIC, documents)
     });
 
 

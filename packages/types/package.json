@@ -38,6 +38,7 @@
     "@qdrant/js-client-rest": "^1.8.1",
     "bullmq": "^5.4.3",
     "express": "^4.18.3",
+    "kafkajs": "^2.2.4",
     "ulid": "^2.3.0"
   }
 }
