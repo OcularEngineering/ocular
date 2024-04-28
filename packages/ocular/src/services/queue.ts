@@ -50,6 +50,31 @@ export default class QueueService extends AbstractQueueService {
     }
   }
 
+  async sendBatch<T>(
+    topicName: string,
+    data: T[],
+    options?: Record<string, unknown>
+  ): Promise<void> {
+    try {
+      await this.producer_.connect()
+      const messages = data.map((doc) => {
+        return { value: JSON.stringify(doc) }
+      })
+      const topicMessages: TopicMessages = {
+        topic: topicName,
+        messages: messages
+      }
+      const batch: ProducerBatch = {
+        topicMessages: [topicMessages]
+      }
+      await this.producer_.sendBatch(batch)
+      await this.producer_.disconnect()
+    } catch (error) {
+      this.logger_.error(`Error sending batch message to Kafka: ${error.message}`)
+      throw error
+    }
+  }
+
   async subscribe<T>(topicName: string, consumer: Consumer, context: ConsumerContext ): Promise<void> {
     // Check if the consumer is a function
     if (typeof consumer !== `function`) {

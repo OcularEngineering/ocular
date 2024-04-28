@@ -31,6 +31,7 @@ describe('queueService', () => {
         clientId: 'ocular',
         brokers: ['localhost:9092'],
       })
+    
     const moduleDeps = {
       logger: loggerMock,
       eventBusRedisConnection: {},
@@ -51,4 +52,15 @@ describe('queueService', () => {
       done()
     }, {groupId: "ocular-group"});
   });
-})
+
+
+  it('should send batch messages to a topic', (done) => {
+    queueService.sendBatch("ocular", [{message: "Hello World 1"}, {message: "Hello World 2"}, {message: "Hello World 3"}, {message: "Hello World 4"}]);
+    queueService.subscribe("ocular", async (message, topic) => {
+      console.log("Message Received", message)
+      expect(message).toEqual("expectedMessage");
+      done()
+    }, {groupId: "ocular-group"});
+  });
+}
+)

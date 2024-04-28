@@ -28,9 +28,7 @@ class GithubStrategy extends AbstractBatchJobStrategy {
     const stream = await this.githubService_.getRepositoriesOcular(batchJob.context?.org as Organisation)
 
     stream.on('data', (documents) => {
-      for (const document of documents) {
-        this.queueService_.send(SEARCH_INDEXING_TOPIC, document)
-      }
+      this.queueService_.sendBatch(SEARCH_INDEXING_TOPIC, documents)
     });
 
 

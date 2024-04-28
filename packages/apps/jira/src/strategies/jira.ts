@@ -24,9 +24,7 @@ export default class JiraStrategy extends AbstractBatchJobStrategy {
       batchJob.context?.org as Organisation
     );
     stream.on('data', (documents) => {
-      for (const document of documents) {
-        this.queueService_.send(SEARCH_INDEXING_TOPIC, document)
-      }
+      this.queueService_.sendBatch(SEARCH_INDEXING_TOPIC, documents)
     });
     stream.on('end', () => {
       console.log('No more data');

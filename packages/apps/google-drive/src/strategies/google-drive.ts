@@ -11,14 +11,12 @@ class GoogleDriveStrategy extends AbstractBatchJobStrategy {
   static batchType = "google-drive"
   protected batchJobService_: BatchJobService
   protected googleDriveService_: GoogleDriveService
-  protected eventBusService_: EventBusService
   protected queueService_: QueueService
 
   constructor(container) {
     super(arguments[0])
     this.googleDriveService_ = container.googleDriveService
     this.batchJobService_ = container.batchJobService
-    this.eventBusService_ = container.eventBusService
     this.queueService_ = container.queueService
   }
 
@@ -26,9 +24,7 @@ class GoogleDriveStrategy extends AbstractBatchJobStrategy {
     const batchJob = await this.batchJobService_.retrieve(batchJobId)
     const stream = await this.googleDriveService_.getGoogleDriveData(batchJob.context?.org as Organisation)
     stream.on('data', (documents) => {
-      for (const document of documents) {
-        this.queueService_.send(SEARCH_INDEXING_TOPIC, document)
-      }
+      this.queueService_.sendBatch(SEARCH_INDEXING_TOPIC, documents)
     });
     stream.on('end', () => {
       console.log('No more data');
