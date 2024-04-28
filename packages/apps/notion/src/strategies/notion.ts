@@ -22,7 +22,7 @@ export default class AsanaStrategy extends AbstractBatchJobStrategy {
     const stream = await this.asanaService_.getNotionPagesData(
       batchJob.context?.org as Organisation
     );
-    stream.on('data', (documents) => {
+   stream.on('data', (documents) => {
       this.queueService_.sendBatch(SEARCH_INDEXING_TOPIC, documents)
     });
     stream.on('end', () => {

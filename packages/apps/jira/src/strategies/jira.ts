@@ -23,7 +23,7 @@ export default class JiraStrategy extends AbstractBatchJobStrategy {
       // Confluenec method need to be implemmented
       batchJob.context?.org as Organisation
     );
-    stream.on('data', (documents) => {
+   stream.on('data', (documents) => {
       this.queueService_.sendBatch(SEARCH_INDEXING_TOPIC, documents)
     });
     stream.on('end', () => {
