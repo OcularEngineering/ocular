@@ -35,6 +35,7 @@ module.exports = {
     database_database: process.env.DATABASE_NAME,
     database_type: "postgres",
     redis_url: process.env.REDIS_URL,
+    kafka_url: process.env.KAFKA_URL,
     ui_cors: UI_CORS,
     azure_open_ai_options: {
       apiKey: process.env.AZURE_OPENAI_API_KEY,
