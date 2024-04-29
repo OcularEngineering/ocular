@@ -71,13 +71,17 @@ export default class SlackService extends TransactionBaseService {
             offset: index,
             content: message.text,
             link: `https://slack.com/api/conversations.replies?channel_id=${channel.id}&ts=${conversation.id}`
+
           }));
           const threadDoc : IndexableDocument = {
             id:conversation.id, // conversation id
             organisationId:org.id,
             source:AppNameDefinitions.SLACK,
             title:conversation.text, // the main message which lead to conversation
-            metadata:{channel_id:channel.id}, // passing channel id just for top down reference
+            metadata:{
+              channel_id:channel.id,
+              channel_name: channel.name
+            }, // passing channel id just for top down reference
             sections:sections, // an array of messages in the specific conversation
             type: DocType.TEXT,
             updatedAt: new Date(Date.now())

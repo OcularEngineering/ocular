@@ -86,7 +86,12 @@ export default class JiraService extends TransactionBaseService {
             ],
             type: DocType.TEXT,
             updatedAt: new Date(updatedAt),
-            metadata: {},
+            metadata: {
+              project_id:project.id,
+              project_name: project.name,
+              project_link:project.link,
+              project_description: project.description
+            },
           };
           documents.push(issueDoc);
           if (documents.length >= 100) {
@@ -94,29 +99,6 @@ export default class JiraService extends TransactionBaseService {
             documents = [];
           }
         }
-
-        const jqlQuery = `project = "OT" ORDER BY created DESC`;
-
-        // Add Project To Documents
-        const projectDoc: IndexableDocument = {
-          id: project.id,
-          organisationId: org.id,
-          title: project.name,
-          source: AppNameDefinitions.JIRA,
-          sections: [
-            {
-              content: project.description,
-              link: `${url}/jira/software/projects/${
-                project.key
-              }/issues?jql=${encodeURIComponent(jqlQuery)}`,
-            },
-          ],
-          type: DocType.TEXT,
-          updatedAt: new Date(),
-
-          metadata: {},
-        };
-        documents.push(projectDoc);
       }
 
       yield documents;
@@ -211,6 +193,8 @@ export default class JiraService extends TransactionBaseService {
         id: project.id,
         key: project.key,
         name: project.name,
+        description: project.description,
+        link: project.self
       }));
 
       return projects;
@@ -280,7 +264,7 @@ export default class JiraService extends TransactionBaseService {
       const { data } = response;
       const { fields } = data;
 
-      const description = this.extractDescription(fields);
+      const description = this.extractDescription(fields)+ this.extractComments(fields);
       const updatedAt = fields.updated;
       const title = fields.summary;
       const key = data.key;
@@ -324,6 +308,28 @@ export default class JiraService extends TransactionBaseService {
       return issueDescription.trim();
     } else {
       // If description field is missing or empty, return an empty string
+      return "";
+    }
+  }
+
+  extractComments(fields: any) {
+    if(fields.comments) {
+      const commentContent = fields.comments.body.content || [];
+
+      let commentDescription = "";
+      commentContent.forEach((element) => {
+        if (element.type === "paragraph") {
+          const paragraphContent = element.content || [];
+          paragraphContent.forEach((innerElement) => {
+            if (innerElement.type === "text" && innerElement.text) {
+              commentDescription += innerElement.text + " ";
+            }
+          });
+        }
+      })
+
+      return commentDescription.trim();
+    }else{
       return "";
     }
   }

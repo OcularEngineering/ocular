@@ -56,7 +56,12 @@ export default class AsanaService extends TransactionBaseService {
               }],
               type: DocType.TEXT ,
               updatedAt: new Date(task.modified_at),
-              metadata: { completed: task.completed }
+              metadata: {
+                completed: task.completed ,
+                project_id : project.gid,
+                project_name: project.name,
+                project_link: `https://app.asana.com/api/1.0/projects/${project.gid}`
+              }
             };
             documents.push(doc);
             if (documents.length >= 100) {
@@ -64,24 +69,6 @@ export default class AsanaService extends TransactionBaseService {
               documents = [];
             }
         }
-
-
-        
-          // Add Project To Documents
-          const projectDoc:IndexableDocument = {
-          id: project.gid,
-          organisationId: org.id,
-          title: project.name,
-          source: AppNameDefinitions.ASANA,
-          sections: [{
-            link : `https://app.asana.com/0/${project.gid}`,
-            content: project.notes,
-          }],
-          type: DocType.TEXT,
-          updatedAt: new Date(project.modified_at),
-          metadata: { completed: project.completed }
-        }
-        documents.push(projectDoc);
       }
       yield documents;
       await this.oauthService_.update(oauth.id, {last_sync: new Date()});
@@ -91,10 +78,10 @@ export default class AsanaService extends TransactionBaseService {
 
           // Refresh the token
           const oauthToken = await this.container_["asanaOauth"].refreshToken(oauth.refresh_token);
-    
+
           // Update the OAuth record with the new token
           await this.oauthService_.update(oauth.id, oauthToken);
-    
+
           // Retry the request
           return this.getAsanaTasksAndProjects(org);
         } else {
