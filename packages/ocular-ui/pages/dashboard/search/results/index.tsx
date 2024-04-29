@@ -20,7 +20,7 @@ export default function Search() {
     setIsLoading(true); 
     api.search.search(router.query.q)
       .then(data => {
-        console.log(data)
+        console.log("Unprocessed Results: ",data)
         setAiResults(data.data.message.content);
         setSearchResults(data.data.hits); 
         setIsLoading(false); 
@@ -31,28 +31,28 @@ export default function Search() {
       });
   }, [router.query.q]); 
 
-  if (isLoading) return (      
-    <div className="flex items-center justify-center min-h-screen min-w-full">
-      <Image 
-          src={"/AI.svg"} 
-          alt="Loading..." 
-          width={600} 
-          height={600} 
-          className="animate-pulse duration-5000"
-      />
-    </div>
-  );
-  if (!search_results) return (      
-    <div className="flex items-center justify-center min-h-screen min-w-full">
-      <Image 
-          src={"/AI.svg"} 
-          alt="Loading..." 
-          width={600} 
-          height={600} 
-          className="animate-pulse duration-5000"
-      />
-    </div>
-  );
+  // if (isLoading) return (      
+  //   <div className="flex items-center justify-center min-h-screen min-w-full">
+  //     <Image 
+  //         src={"/AI.svg"} 
+  //         alt="Loading..." 
+  //         width={600} 
+  //         height={600} 
+  //         className="animate-pulse duration-5000"
+  //     />
+  //   </div>
+  // );
+  // if (!search_results) return (      
+  //   <div className="flex items-center justify-center min-h-screen min-w-full">
+  //     <Image 
+  //         src={"/AI.svg"} 
+  //         alt="Loading..." 
+  //         width={600} 
+  //         height={600} 
+  //         className="animate-pulse duration-5000"
+  //     />
+  //   </div>
+  // );
 
   return (
     <div className="dark:bg-background w-full bg-white text-black">

@@ -15,7 +15,8 @@
   "dependencies": {
     "@ocular/types": "*",
     "fs": "^0.0.1-security",
-    "gpt-tokenizer": "^2.1.2"
+    "gpt-tokenizer": "^2.1.2",
+    "langchain": "^0.1.35"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
