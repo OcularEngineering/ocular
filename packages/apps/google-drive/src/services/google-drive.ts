@@ -1,6 +1,6 @@
 import { Readable } from 'stream';
 import { EntityManager } from "typeorm";
-import { OAuthService, Organisation } from "@ocular/ocular";
+import { App, OAuthService, Organisation, RateLimiterService } from "@ocular/ocular";
 import { IndexableDocument, TransactionBaseService, Logger, AppNameDefinitions, DocType  } from "@ocular/types";
 import {OAuth2Client} from 'google-auth-library';
 import { ConfigModule } from '@ocular/ocular/src/types';
@@ -9,12 +9,14 @@ import { google, drive_v3 } from 'googleapis';
 
 export default class GoogleDriveService extends TransactionBaseService {
   protected oauthService_: OAuthService;
+  protected rateLimiterService_: RateLimiterService;
   protected logger_: Logger;
   protected container_: ConfigModule;
 
   constructor(container) {
     super(arguments[0]);
     this.oauthService_ = container.oauthService;
+    this.rateLimiterService_ = container.rateLimiterService;
     this.logger_ = container.logger;
     this.container_ = container;
   }
@@ -26,6 +28,9 @@ export default class GoogleDriveService extends TransactionBaseService {
 
   async *getGoogleDriveFiles(org: Organisation): AsyncGenerator<IndexableDocument[]> {
       this.logger_.info(`Starting oculation of Google Drive for ${org.id} organisation`);
+
+      // Get the request queue for the Google Drive App
+      const requestQueue = await this.rateLimiterService_.getRequestQueue(AppNameDefinitions.GOOGLEDRIVE);
      
       // Check if the OAuth record exists for this App in this Organisation.
       const oauth = await this.oauthService_.retrieve({id: org.id, app_name: AppNameDefinitions.GOOGLEDRIVE});
@@ -59,11 +64,21 @@ export default class GoogleDriveService extends TransactionBaseService {
         // Paginate To Get All Files From Google Drive
         let pageToken = null;
         do {
-          const { data } = await drive.files.list({
-            q: query,
-            fields: 'files(id,name,modifiedTime,webViewLink)',
-            pageToken: pageToken
+          // Wrap Api Calls in Ocular Rate Limiter To Avoid Hitting Google Drive API Rate Limits
+          const data = await requestQueue.removeTokens(1,AppNameDefinitions.GOOGLEDRIVE)
+           .then(async()=>{
+            const { data } = await drive.files.list({
+              q: query,
+              fields: 'files(id,name,modifiedTime,webViewLink)',
+              pageToken: pageToken
+            });
+            return data;
+           })
+          .catch((error)=>{
+            console.error(error)
+            return { files: [], nextPageToken: null};
           });
+        
           // Get the content of each file
           for(const file of data.files){
             // Get Each Files Content As Plain Text
@@ -115,7 +130,7 @@ export default class GoogleDriveService extends TransactionBaseService {
         console.error('The API returned an error: ' + error);
         return null;
       }
-      this.logger_.info(`Finished oculation of Github for ${org.id} organisation`);
+      this.logger_.info(`Finished oculation of Google Drive for ${org.id} organisation`);
   }
 
   // Get The Content Of A Google Drive File
