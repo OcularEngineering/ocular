@@ -43,7 +43,7 @@ class RateLimiterService extends TransactionBaseService {
     }
   }
 
-  async getRequestQueue(apiName: string): Promise<RateLimiterQueue> {
+  getRequestQueue(apiName: string): RateLimiterQueue {
     return this.apiToRateLimiterMap_.get(apiName)
   }
 }

@@ -6,12 +6,14 @@ import {OAuth2Client} from 'google-auth-library';
 import { ConfigModule } from '@ocular/ocular/src/types';
 import fs from 'fs';
 import { google, drive_v3 } from 'googleapis';
+import { RateLimiterQueue } from "rate-limiter-flexible"
 
 export default class GoogleDriveService extends TransactionBaseService {
   protected oauthService_: OAuthService;
   protected rateLimiterService_: RateLimiterService;
   protected logger_: Logger;
   protected container_: ConfigModule;
+  protected requestQueue_: RateLimiterQueue
 
   constructor(container) {
     super(arguments[0]);
@@ -19,6 +21,7 @@ export default class GoogleDriveService extends TransactionBaseService {
     this.rateLimiterService_ = container.rateLimiterService;
     this.logger_ = container.logger;
     this.container_ = container;
+    this.requestQueue_ = this.rateLimiterService_.getRequestQueue(AppNameDefinitions.GOOGLEDRIVE);
   }
 
 
@@ -29,8 +32,6 @@ export default class GoogleDriveService extends TransactionBaseService {
   async *getGoogleDriveFiles(org: Organisation): AsyncGenerator<IndexableDocument[]> {
       this.logger_.info(`Starting oculation of Google Drive for ${org.id} organisation`);
 
-      // Get the request queue for the Google Drive App
-      const requestQueue = await this.rateLimiterService_.getRequestQueue(AppNameDefinitions.GOOGLEDRIVE);
      
       // Check if the OAuth record exists for this App in this Organisation.
       const oauth = await this.oauthService_.retrieve({id: org.id, app_name: AppNameDefinitions.GOOGLEDRIVE});
@@ -64,21 +65,13 @@ export default class GoogleDriveService extends TransactionBaseService {
         // Paginate To Get All Files From Google Drive
         let pageToken = null;
         do {
-          // Wrap Api Calls in Ocular Rate Limiter To Avoid Hitting Google Drive API Rate Limits
-          const data = await requestQueue.removeTokens(1,AppNameDefinitions.GOOGLEDRIVE)
-           .then(async()=>{
-            const { data } = await drive.files.list({
-              q: query,
-              fields: 'files(id,name,modifiedTime,webViewLink)',
-              pageToken: pageToken
-            });
-            return data;
-           })
-          .catch((error)=>{
-            console.error(error)
-            return { files: [], nextPageToken: null};
+          // Block Until Rate Limit Allows Request
+          await this.requestQueue_.removeTokens(1,AppNameDefinitions.GOOGLEDRIVE)
+          const { data } = await drive.files.list({
+            q: query,
+            fields: 'files(id,name,modifiedTime,webViewLink)',
+            pageToken: pageToken
           });
-        
           // Get the content of each file
           for(const file of data.files){
             // Get Each Files Content As Plain Text
@@ -135,6 +128,7 @@ export default class GoogleDriveService extends TransactionBaseService {
 
   // Get The Content Of A Google Drive File
   async getGoogleDriveFileContent(fileId: string, drive: drive_v3.Drive) {
+    await this.requestQueue_.removeTokens(1,AppNameDefinitions.GOOGLEDRIVE)
     return await new Promise<string>((resolve, reject) => {
       let data = '';
       drive.files.export({
