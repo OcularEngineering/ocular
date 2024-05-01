@@ -19,7 +19,7 @@ export default class AsanaService extends TransactionBaseService {
     this.logger_ = container.logger;
     this.container_ = container;
     this.rateLimiterService_ = container.rateLimiterService;
-    this.requestQueue_ = this.rateLimiterService_.getRequestQueue(AppNameDefinitions.GMAIL);
+    this.requestQueue_ = this.rateLimiterService_.getRequestQueue(AppNameDefinitions.ASANA);
   }
 
 

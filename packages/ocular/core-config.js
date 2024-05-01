@@ -65,6 +65,10 @@ module.exports = {
         client_id: process.env.CONFLUENCE_CLIENT_ID,
         client_secret: process.env.CONFLUENCE_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/confluence`,
+        rate_limiter_opts: {
+          requests: 10, // Number of Requests
+          interval: 1, // Interval in Seconds
+        },
       },
     },
     {
@@ -73,6 +77,10 @@ module.exports = {
         client_id: process.env.JIRA_CLIENT_ID,
         client_secret: process.env.JIRA_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/jira`,
+        rate_limiter_opts: {
+          requests: 10, // Number of Requests
+          interval: 1, // Interval in Seconds
+        },
       },
     },
     {
