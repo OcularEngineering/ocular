@@ -1,12 +1,8 @@
 import { IndexableDocument, AbstractLLMService, IndexableDocChunk, Message  } from "@ocular/types";
 import { OpenAI } from 'openai';
 import { encoding_for_model, type TiktokenModel } from 'tiktoken';
-
-const SENTENCE_ENDINGS = new Set(['.', '。', '．', '!', '?', '‼', '⁇', '⁈', '⁉']);
-const WORD_BREAKS = new Set([',', '、', ';', ':', ' ', '(', ')', '[', ']', '{', '}', '\t', '\n']);
-const MAX_SECTION_LENGTH = 1000;
-const SENTENCE_SEARCH_LIMIT = 100;
-const SECTION_OVERLAP = 100;
+import { RateLimiterService } from "@ocular/ocular";
+import { RateLimiterQueue } from "rate-limiter-flexible"
 
 export default class OpenAIService extends AbstractLLMService {
 
@@ -22,11 +18,17 @@ export default class OpenAIService extends AbstractLLMService {
   protected embeddingModel_: string
   protected chatModel_: string
   protected tokenLimit_:number = 4096
+  protected rateLimiterService_: RateLimiterService;
+  protected requestQueue_: RateLimiterQueue
 
   constructor(container, options) {
     super(arguments[0],options)
 
     console.log("Azure Open AI: Options",options)
+
+    // Rate Limiter Service 
+    this.rateLimiterService_ = container.rateLimiterService;
+    this.requestQueue_ = this.rateLimiterService_.getRequestQueue("OpenAI");
 
     this.azureOpenAiApiVersion_ = options.open_ai_version,
     this.endpoint_= options.endpoint
@@ -62,6 +64,8 @@ export default class OpenAIService extends AbstractLLMService {
 
   async createEmbeddings(text:string): Promise<number[]> {
     try{
+      const tokenCount = this.getChatModelTokenCount(text)
+      await this.requestQueue_.removeTokens(tokenCount,"OpenAI")
       const result = await this.embeddingsClient_.embeddings.create({ 
         input: text, 
         model: this.embeddingModel_,
@@ -74,9 +78,6 @@ export default class OpenAIService extends AbstractLLMService {
 
   async completeChat(messages: Message[]): Promise<string> {
     try{
-      console.log("Model",this.chatModel_)
-      console.log("Deploynment",this.chatDeploymentName_)
-      console.log("Messages",messages)
       const result = await this.chatClient_.chat.completions.create({
         model: this.chatModel_,
         messages,

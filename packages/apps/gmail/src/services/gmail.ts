@@ -1,14 +1,17 @@
 import { Readable } from 'stream';
 import { EntityManager } from "typeorm";
-import { OAuthService, Organisation } from "@ocular/ocular";
+import { OAuthService, Organisation, RateLimiterService } from "@ocular/ocular";
 import { IndexableDocument, TransactionBaseService, Logger, AppNameDefinitions, DocType  } from "@ocular/types";
 import {OAuth2Client} from 'google-auth-library';
 import { ConfigModule } from '@ocular/ocular/src/types';
 import fs from 'fs';
 import { google } from 'googleapis';
+import { RateLimiterQueue } from "rate-limiter-flexible"
 
 export default class GmailService extends TransactionBaseService {
   protected oauthService_: OAuthService;
+  protected rateLimiterService_: RateLimiterService;
+  protected requestQueue_: RateLimiterQueue
   protected logger_: Logger;
   protected container_: ConfigModule;
 
@@ -17,6 +20,8 @@ export default class GmailService extends TransactionBaseService {
     this.oauthService_ = container.oauthService;
     this.logger_ = container.logger;
     this.container_ = container;
+    this.rateLimiterService_ = container.rateLimiterService;
+    this.requestQueue_ = this.rateLimiterService_.getRequestQueue(AppNameDefinitions.GMAIL);
   }
 
 
@@ -55,6 +60,8 @@ export default class GmailService extends TransactionBaseService {
 
         let nextPageToken = "";
         do {
+          // Block Until Rate Limit Allows Request
+          await this.requestQueue_.removeTokens(1,AppNameDefinitions.GMAIL)
           const {data} = await gmail.users.messages.list({
             userId: 'me',
             pageToken: nextPageToken,
@@ -62,6 +69,8 @@ export default class GmailService extends TransactionBaseService {
           })
 
           for (const message of data.messages) {
+            // Block Until Rate Limit Allows Request
+            await this.requestQueue_.removeTokens(1,AppNameDefinitions.GMAIL)
             const {data} = await gmail.users.messages.get({
               userId: 'me',
               id: message.id,
@@ -106,7 +115,7 @@ export default class GmailService extends TransactionBaseService {
       } catch (error) {
 
         if (error.response && error.response.status === 401) { // Check if it's an unauthorized error
-          this.logger_.info(`Refreshing Asana token for ${org.id} organisation`);
+          this.logger_.info(`Refreshing Gmail token for ${org.id} organisation`);
 
           // Refresh the token
           const oauthToken = await this.container_["google-driveOauth"].refreshToken(oauth.refresh_token);
@@ -124,6 +133,6 @@ export default class GmailService extends TransactionBaseService {
         console.error('The API returned an error: ' + error);
         return null;
       }
-      this.logger_.info(`Finished oculation of Github for ${org.id} organisation`);
+      this.logger_.info(`Finished oculation of Gmail for ${org.id} organisation`);
   }
 }

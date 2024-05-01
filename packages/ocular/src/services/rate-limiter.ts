@@ -31,6 +31,7 @@ class RateLimiterService extends TransactionBaseService {
 
   
   async register(apiName:string , requests: number, interval: number): Promise<void> {
+    console.log("Registering Rate Limiter for ", apiName, requests, interval)
     try {
       const rateLimiter = new RateLimiterRedis({storeClient: this.redisClient_, keyPrefix: apiName, points: requests, duration: interval})
       const limiterQueue = new RateLimiterQueue(rateLimiter);
