@@ -5,54 +5,34 @@ import Head from "next/head";
 import Header from "@/components/search/header";
 import { useRouter } from "next/router";
 import SearchResults from "@/components/search/search-results";
-import Image from 'next/image'
 
 // Importing API End Points
 import api from "@/services/api"
+import { set } from 'nprogress';
 
 export default function Search() {
   const [ai_content, setAiResults] = useState(null);
   const [search_results, setSearchResults] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingResults, setIsLoadingResults] = useState(false);
+  const [isLoadingCopilot, setIsLoadingCopilot] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    setIsLoading(true); 
+    setIsLoadingResults(true); 
+    setIsLoadingCopilot(true);
     api.search.search(router.query.q)
       .then(data => {
-        console.log("Unprocessed Results: ",data)
         setAiResults(data.data.message.content);
+        setIsLoadingCopilot(false);
         setSearchResults(data.data.hits); 
-        setIsLoading(false); 
+        setIsLoadingResults(false); 
       })
       .catch(error => {
-        console.error(error);
-        setIsLoading(false); 
+        setIsLoadingResults(false); 
+        setIsLoadingCopilot(false);
+
       });
   }, [router.query.q]); 
-
-  // if (isLoading) return (      
-  //   <div className="flex items-center justify-center min-h-screen min-w-full">
-  //     <Image 
-  //         src={"/AI.svg"} 
-  //         alt="Loading..." 
-  //         width={600} 
-  //         height={600} 
-  //         className="animate-pulse duration-5000"
-  //     />
-  //   </div>
-  // );
-  // if (!search_results) return (      
-  //   <div className="flex items-center justify-center min-h-screen min-w-full">
-  //     <Image 
-  //         src={"/AI.svg"} 
-  //         alt="Loading..." 
-  //         width={600} 
-  //         height={600} 
-  //         className="animate-pulse duration-5000"
-  //     />
-  //   </div>
-  // );
 
   return (
     <div className="dark:bg-background w-full bg-white text-black">
@@ -61,7 +41,7 @@ export default function Search() {
         <link rel="icon" href="/Ocular-Profile-Logo.png" />
       </Head>
       <Header />
-      <SearchResults search_results={search_results} ai_content={ai_content}  />
+      <SearchResults search_results={search_results} ai_content={ai_content} isLoadingResults={isLoadingResults} isLoadingCopilot={isLoadingCopilot} />
     </div>
   );
 }
