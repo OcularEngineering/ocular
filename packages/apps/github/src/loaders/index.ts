@@ -9,7 +9,7 @@ export default async (container, options) => {
     }
     const rateLimiterOpts: RateLimiterOpts = options.rate_limiter_opts
     const rateLimiterService: RateLimiterService = container.resolve("rateLimiterService")
-    await rateLimiterService.register(AppNameDefinitions.CONFLUENCE, rateLimiterOpts.requests, rateLimiterOpts.interval);
+    await rateLimiterService.register(AppNameDefinitions.GITHUB, rateLimiterOpts.requests, rateLimiterOpts.interval);
   } catch (err) {
     throw(err)
   }
