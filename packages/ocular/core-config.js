@@ -97,6 +97,10 @@ module.exports = {
         client_id: process.env.SLACK_CLIENT_ID,
         client_secret: process.env.SLACK_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/slack`,
+        rate_limiter_opts: {
+          requests: 60, // Number of Requests
+          interval: 60, // Interval in Seconds
+        },
       },
     },
     {
