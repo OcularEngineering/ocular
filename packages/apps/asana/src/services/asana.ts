@@ -1,21 +1,25 @@
 import fs from 'fs';
 import axios from 'axios';
 import { Readable } from 'stream';
-import { OAuthService, Organisation } from "@ocular/ocular";
+import { OAuthService, Organisation, RateLimiterService } from "@ocular/ocular";
 import { IndexableDocument, DocType, TransactionBaseService, Logger, AppNameDefinitions  } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
-
+import { RateLimiterQueue } from "rate-limiter-flexible"
 
 export default class AsanaService extends TransactionBaseService {
   protected oauthService_: OAuthService;
   protected logger_: Logger;
   protected container_: ConfigModule;
+  protected rateLimiterService_: RateLimiterService;
+  protected requestQueue_: RateLimiterQueue
 
   constructor(container) {
     super(arguments[0]);
     this.oauthService_ = container.oauthService;
     this.logger_ = container.logger;
     this.container_ = container;
+    this.rateLimiterService_ = container.rateLimiterService;
+    this.requestQueue_ = this.rateLimiterService_.getRequestQueue(AppNameDefinitions.GMAIL);
   }
 
 
@@ -93,6 +97,8 @@ export default class AsanaService extends TransactionBaseService {
 
   // Get Asana Projects
   async getAsanaProjects (accessToken: string, datetime: string) {
+    // Block Until Rate Limit Allows Request
+    await this.requestQueue_.removeTokens(1,AppNameDefinitions.ASANA)
     const response = await axios.get(`https://app.asana.com/api/1.0/projects?opt_expand=name,description,notes,completed,created_at`, {
       headers: {
         'Authorization': `Bearer ${accessToken}`
@@ -103,6 +109,8 @@ export default class AsanaService extends TransactionBaseService {
 
   // Get Asana Tasks
   async getAsanaTasks(accessToken: string, projectId: string, datetime: string){
+    // Block Until Rate Limit Allows Request
+    await this.requestQueue_.removeTokens(1,AppNameDefinitions.ASANA)
     let url = `https://app.asana.com/api/1.0/projects/${projectId}/tasks?opt_expand=name,description,notes,completed,created_at`;
     if(datetime){
       url += `&modified_since=${datetime}`;
