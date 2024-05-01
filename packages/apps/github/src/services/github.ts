@@ -1,22 +1,27 @@
 import { Readable } from 'stream';
 import { EntityManager } from "typeorm";
 import { App } from "octokit";
-import { OAuthService, Organisation } from "@ocular/ocular";
+import { OAuthService, Organisation, RateLimiterService } from "@ocular/ocular";
 import { IndexableDocument, TransactionBaseService, Logger, AppNameDefinitions, DocType  } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";;
 import fs from 'fs';
 import e from 'express';
+import { RateLimiterQueue } from "rate-limiter-flexible"
 
 export default class GitHubService extends TransactionBaseService {
   protected oauthService_: OAuthService;
   protected logger_: Logger;
   protected container_: ConfigModule;
+  protected rateLimiterService_: RateLimiterService;
+  protected requestQueue_: RateLimiterQueue
 
   constructor(container) {
     super(arguments[0]);
     this.oauthService_ = container.oauthService;
     this.logger_ = container.logger;
     this.container_ = container;
+    this.rateLimiterService_ = container.rateLimiterService;
+    this.requestQueue_ = this.rateLimiterService_.getRequestQueue(AppNameDefinitions.GITHUB);
   }
 
 
@@ -33,7 +38,6 @@ export default class GitHubService extends TransactionBaseService {
         this.logger_.error(`No Github OAuth Cred found for ${org.id} organisation`);
         return;
       }
-
     
       // Get the last sync date - this is the time the latest document that was synced from Gmail.
       let last_sync = ''
@@ -49,12 +53,16 @@ export default class GitHubService extends TransactionBaseService {
       
       const octokit = await app.getInstallationOctokit(Number(oauth.metadata.installation_id));
       try {
+        // Block Until Rate Limit Allows Request
+        await this.requestQueue_.removeTokens(1,AppNameDefinitions.GITHUB)
         const { data } = await octokit.rest.apps.listReposAccessibleToInstallation();
 
         for (const repo of data.repositories) {
           console.log(repo.name);
           console.log(repo.owner);
           // Get Commits For This Repository
+              // Block Until Rate Limit Allows Request
+          await this.requestQueue_.removeTokens(1,AppNameDefinitions.GITHUB)
           const prs = await octokit.rest.pulls.list({
             owner: repo.owner.login,
             repo: repo.name,
@@ -84,6 +92,8 @@ export default class GitHubService extends TransactionBaseService {
             }
           }
 
+          // Block Until Rate Limit Allows Request
+          await this.requestQueue_.removeTokens(1,AppNameDefinitions.GITHUB)
           // Get Issues For This Repository
           const issues = await octokit.rest.issues.listForRepo({
             owner: repo.owner.login,

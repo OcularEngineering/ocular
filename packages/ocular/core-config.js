@@ -53,6 +53,10 @@ module.exports = {
         client_secret: process.env.ASANA_CLIENT_SECRET,
         scope: "openid email profile",
         redirect_uri: `${UI_CORS}/dashboard/marketplace/asana`,
+        rate_limiter_opts: {
+          requests: 1500, // Number of Requests
+          interval: 60, // Interval in Seconds
+        },
       },
     },
     {
@@ -61,6 +65,10 @@ module.exports = {
         client_id: process.env.CONFLUENCE_CLIENT_ID,
         client_secret: process.env.CONFLUENCE_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/confluence`,
+        rate_limiter_opts: {
+          requests: 10, // Number of Requests
+          interval: 1, // Interval in Seconds
+        },
       },
     },
     {
@@ -69,6 +77,10 @@ module.exports = {
         client_id: process.env.JIRA_CLIENT_ID,
         client_secret: process.env.JIRA_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/jira`,
+        rate_limiter_opts: {
+          requests: 10, // Number of Requests
+          interval: 1, // Interval in Seconds
+        },
       },
     },
     {
@@ -85,6 +97,10 @@ module.exports = {
         client_id: process.env.SLACK_CLIENT_ID,
         client_secret: process.env.SLACK_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/slack`,
+        rate_limiter_opts: {
+          requests: 60, // Number of Requests
+          interval: 60, // Interval in Seconds
+        },
       },
     },
     {
