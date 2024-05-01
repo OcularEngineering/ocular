@@ -15,7 +15,7 @@ switch (process.env.NODE_ENV) {
     ENV_FILE_NAME = ".env.dev";
     break;
   default:
-    ENV_FILE_NAME = ".env.local";
+    ENV_FILE_NAME = ".env.";
     break;
 }
 
@@ -104,6 +104,10 @@ module.exports = {
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/google-drive`,
+        rate_limiter_opts: {
+          requests: 60, // Number of Requests
+          interval: 60, // Interval in Seconds
+        },
       },
     },
     {
@@ -112,6 +116,10 @@ module.exports = {
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/gmail`,
+        rate_limiter_opts: {
+          requests: 60, // Number of Requests
+          interval: 60, // Interval in Seconds
+        },
       },
     },
   ],
@@ -135,6 +143,10 @@ module.exports = {
         embedding_model: process.env.AZURE_OPEN_AI_EMBEDDING_MODEL,
         chat_deployment_name: process.env.AZURE_OPEN_AI_CHAT_DEPLOYMENT_NAME,
         chat_model: process.env.AZURE_OPEN_AI_CHAT_MODEL,
+        rate_limiter_opts: {
+          requests: 120000, // Number of Tokens
+          interval: 60, // Interval in Seconds
+        },
       },
     },
     {

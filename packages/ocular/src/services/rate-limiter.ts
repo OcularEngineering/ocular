@@ -1,6 +1,5 @@
 import Redis from "ioredis"
 import { RateLimiterRedis, RateLimiterQueue } from "rate-limiter-flexible"
-import { RateLimiterOpts } from "../types"
 import { TransactionBaseService } from "@ocular/types"
 import { AutoflowAiError } from "@ocular/utils"
 
@@ -31,9 +30,10 @@ class RateLimiterService extends TransactionBaseService {
   }
 
   
-  async register(apiName:string , points: number, duration: number): Promise<void> {
+  async register(apiName:string , requests: number, interval: number): Promise<void> {
+    console.log("Registering Rate Limiter for ", apiName, requests, interval)
     try {
-      const rateLimiter = new RateLimiterRedis({storeClient: this.redisClient_, keyPrefix: apiName, points: points, duration: duration})
+      const rateLimiter = new RateLimiterRedis({storeClient: this.redisClient_, keyPrefix: apiName, points: requests, duration: interval})
       const limiterQueue = new RateLimiterQueue(rateLimiter);
       this.storeRateLimiterQueues({apiName, limiterQueue})
     } catch(e) {
@@ -44,7 +44,7 @@ class RateLimiterService extends TransactionBaseService {
     }
   }
 
-  async getRequestQueue(apiName: string): Promise<RateLimiterQueue> {
+  getRequestQueue(apiName: string): RateLimiterQueue {
     return this.apiToRateLimiterMap_.get(apiName)
   }
 }

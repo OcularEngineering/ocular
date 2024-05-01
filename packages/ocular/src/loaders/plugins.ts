@@ -114,7 +114,7 @@ async function runLoaders(
   container: AutoflowContainer
 ): Promise<void> {
   const loaderFiles = glob.sync(
-    `${pluginDetails.resolve}/loaders/[!__]*.js`,
+    `${pluginDetails.resolve}/dist/loaders/[!__]*.js`,
     {}
   )
   await Promise.all(

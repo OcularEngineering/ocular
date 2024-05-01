@@ -1,22 +1,27 @@
 import { Readable } from 'stream';
 import { EntityManager } from "typeorm";
-import { OAuthService, Organisation } from "@ocular/ocular";
+import { App, OAuthService, Organisation, RateLimiterService } from "@ocular/ocular";
 import { IndexableDocument, TransactionBaseService, Logger, AppNameDefinitions, DocType  } from "@ocular/types";
 import {OAuth2Client} from 'google-auth-library';
 import { ConfigModule } from '@ocular/ocular/src/types';
 import fs from 'fs';
 import { google, drive_v3 } from 'googleapis';
+import { RateLimiterQueue } from "rate-limiter-flexible"
 
 export default class GoogleDriveService extends TransactionBaseService {
   protected oauthService_: OAuthService;
+  protected rateLimiterService_: RateLimiterService;
   protected logger_: Logger;
   protected container_: ConfigModule;
+  protected requestQueue_: RateLimiterQueue
 
   constructor(container) {
     super(arguments[0]);
     this.oauthService_ = container.oauthService;
+    this.rateLimiterService_ = container.rateLimiterService;
     this.logger_ = container.logger;
     this.container_ = container;
+    this.requestQueue_ = this.rateLimiterService_.getRequestQueue(AppNameDefinitions.GOOGLEDRIVE);
   }
 
 
@@ -26,6 +31,7 @@ export default class GoogleDriveService extends TransactionBaseService {
 
   async *getGoogleDriveFiles(org: Organisation): AsyncGenerator<IndexableDocument[]> {
       this.logger_.info(`Starting oculation of Google Drive for ${org.id} organisation`);
+
      
       // Check if the OAuth record exists for this App in this Organisation.
       const oauth = await this.oauthService_.retrieve({id: org.id, app_name: AppNameDefinitions.GOOGLEDRIVE});
@@ -59,6 +65,8 @@ export default class GoogleDriveService extends TransactionBaseService {
         // Paginate To Get All Files From Google Drive
         let pageToken = null;
         do {
+          // Block Until Rate Limit Allows Request
+          await this.requestQueue_.removeTokens(1,AppNameDefinitions.GOOGLEDRIVE)
           const { data } = await drive.files.list({
             q: query,
             fields: 'files(id,name,modifiedTime,webViewLink)',
@@ -115,11 +123,12 @@ export default class GoogleDriveService extends TransactionBaseService {
         console.error('The API returned an error: ' + error);
         return null;
       }
-      this.logger_.info(`Finished oculation of Github for ${org.id} organisation`);
+      this.logger_.info(`Finished oculation of Google Drive for ${org.id} organisation`);
   }
 
   // Get The Content Of A Google Drive File
   async getGoogleDriveFileContent(fileId: string, drive: drive_v3.Drive) {
+    await this.requestQueue_.removeTokens(1,AppNameDefinitions.GOOGLEDRIVE)
     return await new Promise<string>((resolve, reject) => {
       let data = '';
       drive.files.export({
