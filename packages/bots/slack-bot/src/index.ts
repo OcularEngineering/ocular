@@ -1,5 +1,7 @@
 import {App} from '@slack/bolt'
 
+import api from '../../../ocular-ui/services/api'
+
 // Initializes your app with your bot token and signing secret
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -9,10 +11,21 @@ const app = new App({
   port: 3000
 });
 
-app.event('app_mention', async ({ event, context, client, say }) => {
-    try {
-      await say('Hello from Ocular');
-      // call ocular co-pilot query and display the result
+app.event('app_mention', async ({ event, client,logger }) => {
+  try {
+      let response;
+      api.search.search(event.text)
+      .then(data => {
+        console.log(data.data)
+        response = client.chat.postMessage({
+          channel:event.channel,
+          text:data.data
+        })
+      })
+      .catch(err => {
+        console.error(err);
+      });
+      logger.info(response)
     }
     catch (error) {
       console.error(error);
