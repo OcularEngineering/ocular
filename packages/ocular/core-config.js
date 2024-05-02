@@ -1,3 +1,4 @@
+const { PluginNameDefinitions } = require('@ocular/types');
 const dotenv = require("dotenv");
 
 let ENV_FILE_NAME = "";
@@ -149,7 +150,7 @@ module.exports = {
       },
     },
     {
-      resolve: `azure-open-ai`,
+      resolve: PluginNameDefinitions.AZUREOPENAI,
       options: {
         open_ai_key: process.env.AZURE_OPEN_AI_KEY,
         open_ai_version: "2023-05-15",
@@ -165,6 +166,18 @@ module.exports = {
         },
       },
     },
+    // {
+    //   resolve: PluginNameDefinitions.OPENAI,
+    //   options: {
+    //     open_ai_key: process.env.OPEN_AI_KEY,
+    //     embedding_model: process.env.OPEN_AI_EMBEDDING_MODEL,
+    //     chat_model: process.env.OPEN_AI_CHAT_MODEL,
+    //     rate_limiter_opts: {
+    //       requests: 1000000, // Number of Tokens
+    //       interval: 60, // Interval in Seconds
+    //     },
+    //   },
+    // },
     {
       resolve: `qdrant-vector-search-service`,
       options: {

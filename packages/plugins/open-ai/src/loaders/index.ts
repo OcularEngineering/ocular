@@ -1,4 +1,4 @@
-import { AppNameDefinitions,  PluginNameDefinitions,  RateLimiterOpts} from "@ocular/types";
+import { AppNameDefinitions,  RateLimiterOpts, PluginNameDefinitions} from "@ocular/types";
 import { RateLimiterService } from "@ocular/ocular";
 
 export default async (container, options) => {
@@ -9,7 +9,8 @@ export default async (container, options) => {
     }
     const rateLimiterOpts: RateLimiterOpts = options.rate_limiter_opts
     const rateLimiterService: RateLimiterService = container.resolve("rateLimiterService")
-    await rateLimiterService.register(PluginNameDefinitions.AZUREOPENAI,rateLimiterOpts.requests, rateLimiterOpts.interval);
+    console.log("Registering Rate Limiter For OpenAI",options)
+    await rateLimiterService.register(PluginNameDefinitions.OPENAI,rateLimiterOpts.requests, rateLimiterOpts.interval);
   } catch (err) {
     console.log(err)
   }
