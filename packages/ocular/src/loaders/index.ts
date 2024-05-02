@@ -55,8 +55,13 @@ export default async ({
  
   container.register({
     [ContainerRegistrationKeys.LOGGER]: asValue(Logger),
-    [ContainerRegistrationKeys.INDEX_NAME]: asValue("Ocular")
   })
+
+  // Register Qdrant Default Index Name
+  const indexName = configModule.projectConfig.use_local_embedder ? "OcularLocal" : "Ocular";
+  container.register({
+    [ContainerRegistrationKeys.INDEX_NAME]: asValue(indexName)
+  });
 
   await redisLoader({ container, configModule, logger: Logger })
   await kafkaLoader({ container, configModule, logger: Logger })

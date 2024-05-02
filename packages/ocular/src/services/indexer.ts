@@ -1,10 +1,8 @@
-import { IndexableDocument, AutoflowContainer,IIndexerInterface,  IDocumentProcessorInterface, ILLMInterface  } from "@ocular/types"
+import {IndexableDocChunk, Logger ,IVectorDB, IndexableDocument, AutoflowContainer,IIndexerInterface,  IDocumentProcessorInterface, ILLMInterface  } from "@ocular/types"
 import { SearchIndexClient, SearchIndex} from "@azure/search-documents";
 import { ConfigModule } from "../types/config-module"
-import { Logger } from "@ocular/types";
-import { IndexableDocChunk } from "@ocular/types";
-import { IVectorDB } from "@ocular/types";
-import { ISearchService } from "@ocular/types";
+import {generateLocalEmbeddings } from "../utils";
+
 import { Index } from "typeorm";
 
 export default class IndexerService implements IIndexerInterface {
@@ -36,8 +34,16 @@ export default class IndexerService implements IIndexerInterface {
       this.logger_.info(`Indexing ${documents.length} documents to index ${indexName}`)
       const chunks = await this.documentProcessorService_.chunkIndexableDocumentsBatch(documents)
       console.log("Chunked Docs",chunks)
-      const embeddedChunksPromises = await chunks.map((chunk) => this.embedChunk(chunk));
-      const embeddedChunks = await Promise.all(embeddedChunksPromises);
+      let embeddedChunks = [];
+      if (this.config_.projectConfig.use_local_embedder) {
+        console.log("Local Embedding")
+        const embeddedChunksPromises = await chunks.map((chunk) => this.embedLocalChunk(chunk));
+        embeddedChunks = await Promise.all(embeddedChunksPromises);
+      } else {
+        console.log("Remote Embedding")
+        const embeddedChunksPromises = await chunks.map((chunk) => this.embedChunk(chunk));
+        embeddedChunks = await Promise.all(embeddedChunksPromises);
+      }
       await this.vectorDBService_.addDocuments(indexName, embeddedChunks)
     } catch (error) {
       this.logger_.error(`Error Indexing ${indexName}, error ${error.message}`)
@@ -52,6 +58,18 @@ export default class IndexerService implements IIndexerInterface {
 
     if(chunk?.content){
      chunk.contentEmbeddings= await this.openAiService_.createEmbeddings(chunk.content)
+    }
+    return chunk
+  }
+
+  private async embedLocalChunk(chunk: IndexableDocChunk) {
+    if(chunk?.title){
+      const titleEmbeddings = await generateLocalEmbeddings(chunk.title)
+      chunk.titleEmbeddings = titleEmbeddings
+    }
+
+    if(chunk?.content){
+     chunk.contentEmbeddings= await generateLocalEmbeddings(chunk.content)
     }
     return chunk
   }

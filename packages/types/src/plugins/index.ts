@@ -9,4 +9,5 @@ export enum PluginNameDefinitions {
    */
   AZUREOPENAI="azure-open-ai",
   OPENAI="open-ai",
+  LOCAL_LLM="local-llm"
 }

@@ -44,10 +44,7 @@ export type ProjectConfigOptions = {
     ssl: { rejectUnauthorized: false }
   }
   ui_cors?: string
-  client_id?: string
-  github_client_secret?: string
-  search_engine_options?:SearchEngineOptions
-  azure_open_ai_options?: AzureOpenAIOptions 
+  use_local_embedder: boolean
 }
 
 export type ConfigModule = {

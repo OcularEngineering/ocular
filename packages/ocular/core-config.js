@@ -38,13 +38,7 @@ module.exports = {
     redis_url: process.env.REDIS_URL,
     kafka_url: process.env.KAFKA_URL,
     ui_cors: UI_CORS,
-    azure_open_ai_options: {
-      apiKey: process.env.AZURE_OPENAI_API_KEY,
-      serviceName: process.env.AZURE_OPEN_AI_SERVICE_NAME,
-      apiVersion: process.env.AZURE_OPENAI_API_VERSION,
-      deploymentName: process.env.AZURE_OPENAI_DEPLOYMENT_NAME,
-      openAIModel: "gpt-4",
-    },
+    use_local_embedder: process.env.USE_LOCAL_EMBEDDER === "true",
   },
   apps: [
     {
