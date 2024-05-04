@@ -1,8 +1,9 @@
 import axios from "axios";
 import {Readable} from "stream";
-import {OAuthService, Organisation} from "@ocular/ocular";
+import {OAuthService, Organisation, RateLimiterService} from "@ocular/ocular";
 import {AppNameDefinitions, DocType, IndexableDocument, Logger, Section, TransactionBaseService,} from "@ocular/types";
 import {ConfigModule} from "@ocular/ocular/src/types";
+import { RateLimiterQueue } from "rate-limiter-flexible"
 
 interface Config {
   headers: {
@@ -15,12 +16,16 @@ export default class BitBucketService extends TransactionBaseService {
   protected oauthService_: OAuthService;
   protected logger_: Logger;
   protected container_: ConfigModule;
+  protected rateLimiterService_: RateLimiterService;
+  protected requestQueue_: RateLimiterQueue
 
   constructor(container) {
     super(arguments[0]);
     this.oauthService_ = container.oauthService;
     this.logger_ = container.logger;
     this.container_ = container;
+    this.rateLimiterService_ = container.rateLimiterService;
+    this.requestQueue_ = this.rateLimiterService_.getRequestQueue(AppNameDefinitions.BITBUCKET);
   }
 
   async getBitBucketData(org: Organisation) {
@@ -144,6 +149,8 @@ export default class BitBucketService extends TransactionBaseService {
   }
 
   async fetchWorkspaces(config:Config){
+    // Block Until Rate Limit Allows Request
+    await this.requestQueue_.removeTokens(1,AppNameDefinitions.BITBUCKET)
     try{
       const workspaceEndpoint = await axios.get("https://api.bitbucket.org/2.0/workspaces",config)
       const workspaceArray = workspaceEndpoint.data.values || []
@@ -154,6 +161,7 @@ export default class BitBucketService extends TransactionBaseService {
   }
 
   async fetchRepositoriesForWorkspace(workspace_slug:string, config:Config) {
+    await this.requestQueue_.removeTokens(1,AppNameDefinitions.BITBUCKET)
     try {
       const repoEndpoint = await axios.get(`https://api.bitbucket.org/2.0/repositories/${workspace_slug}`, config)
       const repoArray = repoEndpoint.data.values || []
@@ -164,6 +172,7 @@ export default class BitBucketService extends TransactionBaseService {
   }
 
   async fetchPRForRepositories(workspace_slug:string,repo_slug:string,config:Config){
+    await this.requestQueue_.removeTokens(1,AppNameDefinitions.BITBUCKET)
       try{
         const prEndpoint = await axios.get(`https://api.bitbucket.org/2.0/repositories/${workspace_slug}/${repo_slug}/pullrequests`,config)
         const prArray = prEndpoint.data.values || []
@@ -173,6 +182,7 @@ export default class BitBucketService extends TransactionBaseService {
       }
   }
   async fetchIssueForRepositories(workspace_slug:string,repo_slug:string,config:Config){
+    await this.requestQueue_.removeTokens(1,AppNameDefinitions.BITBUCKET)
     try{
       const issueEndpoint = await axios.get(`https://api.bitbucket.org/2.0/repositories/${workspace_slug}/${repo_slug}/issues`,config)
       const issueArray = issueEndpoint.data.values || []
@@ -183,6 +193,7 @@ export default class BitBucketService extends TransactionBaseService {
   }
 
   async fetchCommentsForIssue(workspace_slug:string,repo_slug:string,issue_id:string,config:Config){
+    await this.requestQueue_.removeTokens(1,AppNameDefinitions.BITBUCKET)
     try{
       const commentsEndpoint = await axios.get(`https://api.bitbucket.org/2.0/repositories/${workspace_slug}/${repo_slug}/issues/${issue_id}/comments`,config)
       const commentsArray = commentsEndpoint.data.values || []
@@ -193,6 +204,7 @@ export default class BitBucketService extends TransactionBaseService {
   }
 
   async fetchCommentsForPR(workspace_slug:string,repo_slug:string,pr_id:string,config:Config){
+    await this.requestQueue_.removeTokens(1,AppNameDefinitions.BITBUCKET)
     try{
       const commentsEndpoint = await axios.get(`https://api.bitbucket.org/2.0/repositories/${workspace_slug}/${repo_slug}/pullrequests/${pr_id}/comments`,config)
       const commentsArray = commentsEndpoint.data.values || []
