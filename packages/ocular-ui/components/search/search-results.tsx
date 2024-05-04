@@ -8,7 +8,7 @@ import {
   ChevronDownIcon,
 } from "@heroicons/react/outline";
 
-import { SearchCopilotSkeleton, SearchResultsSkeleton } from '@/components/ui/skeletons';
+import { SearchCopilotSkeleton, SearchResultsSkeleton, SearchByAppFilterSkeleton } from '@/components/ui/skeletons';
 
 // AI Results Component
 export const AIResults = ({ content, search_results, isLoadingCopilot }) => {
@@ -104,11 +104,13 @@ const Results = ({ results, isLoadingResults }) => (
 );
 
 // Results Filter Component
-const ResultsFilter = ({ results, num_results }) => (
+const ResultsFilter = ({ results, num_results, isLoadingResults }) => (
   <div className="mt-5 flex w-2/5 flex-col items-start justify-start">
     <div className="flex flex-col items-center">
-      {results && num_results &&
-          <AppFilterOptions results={results.searchInformation?.formattedTotalResults} num_results={num_results} />
+      {isLoadingResults ? 
+        <SearchByAppFilterSkeleton /> :
+        results && num_results &&
+        <AppFilterOptions results={results.searchInformation?.formattedTotalResults} num_results={num_results} />
       }
     </div>
   </div>
@@ -116,8 +118,7 @@ const ResultsFilter = ({ results, num_results }) => (
 
 // Main Component
 export default function SearchResults({ search_results, ai_content, isLoadingResults, isLoadingCopilot }) {
-  // style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.015) 1%, transparent)'}}
-  console.log("Search Results:", search_results)
+
   return (
     <div className="font-open-sans dark:bg-background mx-auto flex min-h-screen w-full flex-col  dark:text-white" >
       <div className='sm:pl-[5%] md:pl-[14%] lg:pl-52' style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.015) 1%, transparent)'}}>
@@ -127,9 +128,7 @@ export default function SearchResults({ search_results, ai_content, isLoadingRes
         {search_results && 
           <>
             <Results results={search_results} isLoadingResults={isLoadingResults} />
-            {!isLoadingResults && (
-              <ResultsFilter results={search_results} num_results={search_results.length} />
-            )}
+            <ResultsFilter results={search_results} num_results={search_results.length} isLoadingResults={isLoadingResults} />
           </>
         }
       </div>

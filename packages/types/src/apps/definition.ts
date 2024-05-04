@@ -4,9 +4,6 @@
  * Apps To Installed in the DB.
  */
 export enum AppNameDefinitions {
-  /**
-   * GitHub
-   */
   ASANA="asana",
   CONFLUENCE = "confluence",
   GITHUB = "github",
@@ -18,9 +15,6 @@ export enum AppNameDefinitions {
 }
 
 export enum AppCategoryDefinitions {
-  /**
-   * GitHub
-   */
   SOTWARE_DEVELOPMENT = "Software Development",
   FILE_STORAGE = "File Storage",
   PRODUCTIVITY = "Productivity",

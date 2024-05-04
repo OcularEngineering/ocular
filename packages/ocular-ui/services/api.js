@@ -91,24 +91,20 @@ export default {
     },
   },
   search: {
-    search(q) {
-      const path = `/search`;
-      const body = {
-        context:{
-          top: 10,
-          ai_completion: true
-        },
-        q: q
-      };
-      return ocularRequest("POST", path, body);
+    search(q, sources) {
+        const path = `/search`;
+        const body = {
+            context: {
+                top: 10,
+                ai_completion: true,
+            },
+            q: q
+        };
+        if (sources && sources.length > 0) {
+            body.context.sources = sources;
+        }
+        return ocularRequest("POST", path, body);
     },
-    // search(q?: string) {
-    //   const path = `/search`;
-    //   const body = {
-    //     q: q
-    //   };
-    //   return ocularRequest("POST", path, body);
-    // }
   },
   users:{
     create(data) {

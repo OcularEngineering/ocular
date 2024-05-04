@@ -8,7 +8,6 @@ import SearchResults from "@/components/search/search-results";
 
 // Importing API End Points
 import api from "@/services/api"
-import { set } from 'nprogress';
 
 export default function Search() {
   const [ai_content, setAiResults] = useState(null);
@@ -20,8 +19,11 @@ export default function Search() {
   useEffect(() => {
     setIsLoadingResults(true); 
     setIsLoadingCopilot(true);
-    api.search.search(router.query.q)
+
+    
+    api.search.search(router.query.q) //Pass the sources array here as (q, ["source1", "source2", "source3"])
       .then(data => {
+        console.log("Results:", data);
         setAiResults(data.data.message.content);
         setIsLoadingCopilot(false);
         setSearchResults(data.data.hits); 

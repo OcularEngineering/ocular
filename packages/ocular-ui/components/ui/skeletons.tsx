@@ -19,6 +19,7 @@ export function SearchResultSkeleton() {
         </div>
     )
 }
+
 export function SearchResultsSkeleton() {
     return (
         <div className="flex flex-col w-full z-0">
@@ -51,6 +52,20 @@ export function SearchCopilotSkeleton() {
                 <div className={`${shimmer} relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-3 w-4/5`}/>
                 <div className={`${shimmer} relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-3 w-3/5`}/>
                 <div className={`${shimmer} relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-3 w-2/5`}/>
+            </div>
+        </div>
+    )
+}
+
+export function SearchByAppFilterSkeleton() {
+    return (
+        <div className="mt-3 flex w-full lg:justify-start">
+            <div className="flex w-full flex-col justify-start space-y-2 sm:w-auto">
+                <div className={`${shimmer} relative overflow-hidden dark:bg-muted bg-gray-200 box-border flex h-10 w-64 min-w-10 items-center justify-start rounded-full px-5`} />
+                <div className={`${shimmer} relative overflow-hidden dark:bg-muted bg-gray-200 box-border flex h-10 w-64 min-w-10 items-center justify-start rounded-full px-5`} />
+                <div className={`${shimmer} relative overflow-hidden dark:bg-muted bg-gray-200 box-border flex h-10 w-64 min-w-10 items-center justify-start rounded-full px-5`} />
+                <div className={`${shimmer} relative overflow-hidden dark:bg-muted bg-gray-200 box-border flex h-10 w-64 min-w-10 items-center justify-start rounded-full px-5`} />
+                <div className={`${shimmer} relative overflow-hidden dark:bg-muted bg-gray-200 box-border flex h-10 w-64 min-w-10 items-center justify-start rounded-full px-5`} />
             </div>
         </div>
     )
