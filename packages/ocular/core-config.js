@@ -16,7 +16,7 @@ switch (process.env.NODE_ENV) {
     ENV_FILE_NAME = ".env.dev";
     break;
   default:
-    ENV_FILE_NAME = ".env.dev";
+    ENV_FILE_NAME = ".env.start";
     break;
 }
 
