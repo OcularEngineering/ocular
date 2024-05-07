@@ -36,16 +36,11 @@ export default class IndexerService implements IIndexerInterface {
 
   async indexDocuments(indexName: string, documents: IndexableDocument[]): Promise<void> {
     try {
+      this.logger_.info(`Indexing ${documents.length} documents to index ${indexName}`)
       // Batch CreateOrUpdate DocumentMetadata in Database for the Docs
       // Create a DocumentMetadata if it does not exist else update the document metadata.
-      const createdDocs = this.documentMetadataService_.batchCreateOrUpdate(documents)
-
-
-
-      // Chunk Documents and Embed them
-      this.logger_.info(`Indexing ${documents.length} documents to index ${indexName}`)
+      const createdDocs = await this.documentMetadataService_.batchCreateOrUpdate(documents)
       const chunks = await this.documentProcessorService_.chunkIndexableDocumentsBatch(documents)
-      console.log("Chunked Docs",chunks)
       const embeddedChunksPromises = await chunks.map((chunk) => this.embedChunk(chunk));
       const embeddedChunks = await Promise.all(embeddedChunksPromises);
       await this.vectorDBService_.addDocuments(indexName, embeddedChunks)
