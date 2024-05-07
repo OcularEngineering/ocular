@@ -15,7 +15,7 @@ switch (process.env.NODE_ENV) {
     ENV_FILE_NAME = ".env.dev";
     break;
   default:
-    ENV_FILE_NAME = ".env.local";
+    ENV_FILE_NAME = ".env.dev";
     break;
 }
 
@@ -86,17 +86,6 @@ module.exports = {
         redirect_uri: `${UI_CORS}/dashboard/marketplace/slack`,
       },
     },
-    // {
-    //   resolve: `github`,
-    //   options: {
-    //     client_id: process.env.GITHUB_CLIENT_ID,
-    //     client_secret: process.env.GITHUB_CLIENT_SECRET,
-    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/github`,
-    //     app_id: process.env.GITHUB_APP_ID,
-    //     private_key: process.env.GITHUB_PRIVATE_KEY_PATH,
-    //     scope: "repo"
-    //   }
-    // },
     {
       resolve: `google-drive`,
       options: {
@@ -113,6 +102,25 @@ module.exports = {
         redirect_uri: `${UI_CORS}/dashboard/marketplace/gmail`,
       },
     },
+    {
+      resolve: `webConnector`,
+      options: {
+        client_id: "FAKE_ID",
+        client_secret: "FAKE_SECRET",
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/webConnector`,
+      },
+    },
+    // {
+    //   resolve: `github`,
+    //   options: {
+    //     client_id: process.env.GITHUB_CLIENT_ID,
+    //     client_secret: process.env.GITHUB_CLIENT_SECRET,
+    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/github`,
+    //     app_id: process.env.GITHUB_APP_ID,
+    //     private_key: process.env.GITHUB_PRIVATE_KEY_PATH,
+    //     scope: "repo"
+    //   }
+    // },
   ],
   plugins: [
     {

@@ -14,7 +14,8 @@ export enum AppNameDefinitions {
   GOOGLEDRIVE = "google-drive",
   JIRA = "jira",
   NOTION = "notion",
-  SLACK= "slack"
+  SLACK= "slack",
+  WEBCONNECTOR="webConnector"
 }
 
 export enum AppCategoryDefinitions {

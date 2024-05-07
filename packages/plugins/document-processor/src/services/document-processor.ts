@@ -1,35 +1,52 @@
-import { IndexableDocument, IndexableDocChunk, AbstractDocumentProcesserService, Section, DocType} from "@ocular/types";
+import {
+  IndexableDocument,
+  IndexableDocChunk,
+  AbstractDocumentProcesserService,
+  Section,
+  DocType,
+} from "@ocular/types";
 import { processTxt } from "../lib/txt";
 export default class documentProcessorService extends AbstractDocumentProcesserService {
-  static identifier = "document-processor"
-  
-  protected max_chunk_length_ : number
-  protected sentence_search_limit_: number
-  protected chunk_over_lap_: number
+  static identifier = "document-processor";
+
+  protected max_chunk_length_: number;
+  protected sentence_search_limit_: number;
+  protected chunk_over_lap_: number;
 
   constructor(container, options) {
-    super(container,options)
-    const { max_chunk_length, sentence_search_limit, chunk_over_lap} = options
-    this.max_chunk_length_  = max_chunk_length ? max_chunk_length : 1000;
-    this.sentence_search_limit_ = sentence_search_limit? sentence_search_limit: 100;
-    this.chunk_over_lap_ = chunk_over_lap? chunk_over_lap: 100;
+    console.log("CHECK PLUGIN LOADED");
+    super(container, options);
+    const { max_chunk_length, sentence_search_limit, chunk_over_lap } = options;
+    this.max_chunk_length_ = max_chunk_length ? max_chunk_length : 1000;
+    this.sentence_search_limit_ = sentence_search_limit
+      ? sentence_search_limit
+      : 100;
+    this.chunk_over_lap_ = chunk_over_lap ? chunk_over_lap : 100;
   }
 
-  async chunkIndexableDocument(document: IndexableDocument): Promise<IndexableDocChunk[]> {
+  async chunkIndexableDocument(
+    document: IndexableDocument
+  ): Promise<IndexableDocChunk[]> {
     let chunks: IndexableDocChunk[] = [];
     switch (document.type) {
       case DocType.TEXT:
-        chunks = await processTxt(document, this.max_chunk_length_, this.chunk_over_lap_)
-        break
-      default: 
-        console.log("Document Type Not Supported")
-        return []
+        chunks = await processTxt(
+          document,
+          this.max_chunk_length_,
+          this.chunk_over_lap_
+        );
+        break;
+      default:
+        console.log("Document Type Not Supported");
+        return [];
     }
-    console.log("Chunks 1",chunks[0])
-    return chunks
+    console.log("Chunks 1", chunks[0]);
+    return chunks;
   }
 
-  async chunkIndexableDocumentsBatch(documents: IndexableDocument[]): Promise<IndexableDocChunk[]> {
+  async chunkIndexableDocumentsBatch(
+    documents: IndexableDocument[]
+  ): Promise<IndexableDocChunk[]> {
     let chunks: IndexableDocChunk[] = [];
     for (const document of documents) {
       chunks = await chunks.concat(await this.chunkIndexableDocument(document));

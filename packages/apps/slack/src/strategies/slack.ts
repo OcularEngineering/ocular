@@ -1,11 +1,11 @@
-import { BatchJobService, Organisation, EventBusService } from '@ocular/ocular';
-import SlackService from '../services/slack';
-import { INDEX_DOCUMENT_EVENT } from '@ocular/types';
-import { AbstractBatchJobStrategy } from '@ocular/types';
+import { BatchJobService, Organisation, EventBusService } from "@ocular/ocular";
+import SlackService from "../services/slack";
+import { INDEX_DOCUMENT_EVENT } from "@ocular/types";
+import { AbstractBatchJobStrategy } from "@ocular/types";
 
 export default class SlackStrategy extends AbstractBatchJobStrategy {
-  static identifier = 'slack-indexing-strategy';
-  static batchType = 'slack';
+  static identifier = "slack-indexing-strategy";
+  static batchType = "slack";
   protected batchJobService_: BatchJobService;
   protected slackService_: SlackService;
   protected eventBusService_: EventBusService;
@@ -22,15 +22,15 @@ export default class SlackStrategy extends AbstractBatchJobStrategy {
     const stream = await this.slackService_.getSlackData(
       batchJob.context?.org as Organisation
     );
-    stream.on('data', (documents) => {
+    stream.on("data", (documents) => {
       this.eventBusService_.emit(INDEX_DOCUMENT_EVENT, documents);
     });
-    stream.on('end', () => {
-      console.log('No more data');
+    stream.on("end", () => {
+      console.log("No more data");
     });
   }
 
   buildTemplate(): Promise<string> {
-    throw new Error('Method not implemented.');
+    throw new Error("Method not implemented.");
   }
 }

@@ -8,9 +8,9 @@ import {
   Logger,
   AppNameDefinitions,
   Section,
+  DocType,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
-import { DocType } from "@ocular/types/src/common";
 
 interface Config {
   headers: {
@@ -61,27 +61,33 @@ export default class SlackService extends TransactionBaseService {
     let documents: IndexableDocument[] = [];
 
     try {
-      const slackChannels = await this.fetchSlackChannels(config)
+      const slackChannels = await this.fetchSlackChannels(config);
       for (const channel of slackChannels) {
-        const conversations = await this.fetchChannelConversations(channel.id,config);
-        for(const conversation of conversations){
-          const thread = await this.fetchThreadForConversation(channel.id,conversation.ts,config)
+        const conversations = await this.fetchChannelConversations(
+          channel.id,
+          config
+        );
+        for (const conversation of conversations) {
+          const thread = await this.fetchThreadForConversation(
+            channel.id,
+            conversation.ts,
+            config
+          );
 
           const sections: Section[] = thread.map((message, index) => ({
-            offset: index,
             content: message.text,
-            link: `https://slack.com/api/conversations.replies?channel_id=${channel.id}&ts=${conversation.ts}` 
+            link: `https://slack.com/api/conversations.replies?channel_id=${channel.id}&ts=${conversation.ts}`,
           }));
-          const threadDoc : IndexableDocument = {
-            id:conversation.ts, // conversation id
-            organisationId:org.id,
-            source:AppNameDefinitions.SLACK,
-            title:conversation.text, // the main message which lead to conversation
-            metadata:{channel_id:channel.id}, // passing channel id just for top down reference
-            sections:sections, // an array of messages in the specific conversation
+          const threadDoc: IndexableDocument = {
+            id: conversation.ts, // conversation id
+            organisationId: org.id,
+            source: AppNameDefinitions.SLACK,
+            title: conversation.text, // the main message which lead to conversation
+            metadata: { channel_id: channel.id }, // passing channel id just for top down reference
+            sections: sections, // an array of messages in the specific conversation
             type: DocType.TEXT,
-            updatedAt: new Date(Date.now())
-          }
+            updatedAt: new Date(Date.now()),
+          };
           documents.push(threadDoc);
           if (documents.length >= 100) {
             yield documents;
@@ -116,20 +122,20 @@ export default class SlackService extends TransactionBaseService {
     this.logger_.info(`Finished oculation of Slack for ${org.id} organisation`);
   }
 
-  async fetchSlackChannels(config:Config){
-    try{
+  async fetchSlackChannels(config: Config) {
+    try {
       const response = await axios.get(
         "https://slack.com/api/conversations.list",
         config
-      )
+      );
 
-      if (!response.data)  {
+      if (!response.data) {
         return [];
       }
 
-      const channels = response.data.channels
-      return channels
-    }catch(error){
+      const channels = response.data.channels;
+      return channels;
+    } catch (error) {
       this.logger_.error(
         "Error fetching Slack Channels in fetchSlackChannels:",
         error
@@ -138,28 +144,32 @@ export default class SlackService extends TransactionBaseService {
     }
   }
 
-  async fetchChannelConversations(channelID:string ,config:Config){
-    try{
-      const conversationsEndpoint = `https://slack.com/api/conversations.history?channel=${channelID}`
-      const response = await axios.get(conversationsEndpoint,config)
-      const conversationsArray = response.data.messages || []
-      const conversations = conversationsArray.map((conversations)=>({
+  async fetchChannelConversations(channelID: string, config: Config) {
+    try {
+      const conversationsEndpoint = `https://slack.com/api/conversations.history?channel=${channelID}`;
+      const response = await axios.get(conversationsEndpoint, config);
+      const conversationsArray = response.data.messages || [];
+      const conversations = conversationsArray.map((conversations) => ({
         id: conversations.ts,
-        text:conversations.text,
-        user: conversations.user
-      }))
-      return conversations
-    }catch(error){
+        text: conversations.text,
+        user: conversations.user,
+      }));
+      return conversations;
+    } catch (error) {
       throw new Error("Failed to fetch channel conversation.");
     }
   }
 
-  async fetchThreadForConversation(channelID:string, tsID:string, config:Config){
-    try{
-      const threadsEndpoint = `https://slack.com/api/conversations.replies?channel_id=${channelID}&ts=${tsID}`
-      const response = await axios.get(threadsEndpoint,config)
-      return response.data.messages
-    }catch(error){
+  async fetchThreadForConversation(
+    channelID: string,
+    tsID: string,
+    config: Config
+  ) {
+    try {
+      const threadsEndpoint = `https://slack.com/api/conversations.replies?channel_id=${channelID}&ts=${tsID}`;
+      const response = await axios.get(threadsEndpoint, config);
+      return response.data.messages;
+    } catch (error) {
       throw new Error("Failed to fetch channel conversation.");
     }
   }

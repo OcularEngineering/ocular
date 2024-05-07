@@ -1,10 +1,15 @@
-import fs from 'fs';
-import axios from 'axios';
-import { Readable } from 'stream';
+import fs from "fs";
+import axios from "axios";
+import { Readable } from "stream";
 import { OAuthService, Organisation } from "@ocular/ocular";
-import { IndexableDocument, DocType, TransactionBaseService, Logger, AppNameDefinitions  } from "@ocular/types";
+import {
+  IndexableDocument,
+  DocType,
+  TransactionBaseService,
+  Logger,
+  AppNameDefinitions,
+} from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
-
 
 export default class AsanaService extends TransactionBaseService {
   protected oauthService_: OAuthService;
@@ -18,116 +23,133 @@ export default class AsanaService extends TransactionBaseService {
     this.container_ = container;
   }
 
-
   async getAsanaData(org: Organisation) {
     return Readable.from(this.getAsanaTasksAndProjects(org));
   }
 
-  async *getAsanaTasksAndProjects(org: Organisation): AsyncGenerator<IndexableDocument[]> {
+  async *getAsanaTasksAndProjects(
+    org: Organisation
+  ): AsyncGenerator<IndexableDocument[]> {
     this.logger_.info(`Starting oculation of Asana for ${org.id} organisation`);
 
     // Get Asana OAuth for the organisation
-    const oauth = await this.oauthService_.retrieve({id: org.id, app_name: AppNameDefinitions.ASANA});
+    const oauth = await this.oauthService_.retrieve({
+      id: org.id,
+      app_name: AppNameDefinitions.ASANA,
+    });
     if (!oauth) {
       this.logger_.error(`No Asana OAuth found for ${org.id} organisation`);
       return;
     }
 
     // Get the last sync date - this is the time the latest document that was synced from Google Drive.
-    let last_sync = ''
-    if(oauth.last_sync !== null){
-      last_sync =  oauth.last_sync.toISOString();
+    let last_sync = "";
+    if (oauth.last_sync !== null) {
+      last_sync = oauth.last_sync.toISOString();
     }
 
     let documents: IndexableDocument[] = [];
-      try {
-        const projects = await this.getAsanaProjects(oauth.token, last_sync);
-        for (const project of projects) {
-          const tasks = await this.getAsanaTasks(oauth.token, project.gid, last_sync);
-          for (const task of tasks) {
-            const doc: IndexableDocument = {
-              id: task.gid,
-              organisationId: org.id,
-              title: task.name,
-              source: AppNameDefinitions.ASANA,
-              sections: [{
-                link : `https://app.asana.com/0/${project.gid}/${task.gid}`,
-                offset:task.notes.length,
+    try {
+      const projects = await this.getAsanaProjects(oauth.token, last_sync);
+      for (const project of projects) {
+        const tasks = await this.getAsanaTasks(
+          oauth.token,
+          project.gid,
+          last_sync
+        );
+        for (const task of tasks) {
+          const doc: IndexableDocument = {
+            id: task.gid,
+            organisationId: org.id,
+            title: task.name,
+            source: AppNameDefinitions.ASANA,
+            sections: [
+              {
+                link: `https://app.asana.com/0/${project.gid}/${task.gid}`,
                 content: task.notes,
-              }],
-              type: DocType.TEXT ,
-              updatedAt: new Date(task.modified_at),
-              metadata: { completed: task.completed }
-            };
-            documents.push(doc);
-            if (documents.length >= 100) {
-              yield documents;
-              documents = [];
-            }
+              },
+            ],
+            type: DocType.TEXT,
+            updatedAt: new Date(task.modified_at),
+            metadata: { completed: task.completed },
+          };
+          documents.push(doc);
+          if (documents.length >= 100) {
+            yield documents;
+            documents = [];
+          }
         }
 
-
-        
-          // Add Project To Documents
-          const projectDoc:IndexableDocument = {
+        // Add Project To Documents
+        const projectDoc: IndexableDocument = {
           id: project.gid,
           organisationId: org.id,
           title: project.name,
           source: AppNameDefinitions.ASANA,
-          sections: [{
-            link : `https://app.asana.com/0/${project.gid}`,
-            offset: project.notes.length,
-            content: project.notes,
-          }],
+          sections: [
+            {
+              link: `https://app.asana.com/0/${project.gid}`,
+              content: project.notes,
+            },
+          ],
           type: DocType.TEXT,
           updatedAt: new Date(project.modified_at),
-          metadata: { completed: project.completed }
-        }
+          metadata: { completed: project.completed },
+        };
         documents.push(projectDoc);
       }
       yield documents;
-      await this.oauthService_.update(oauth.id, {last_sync: new Date()});
-      } catch (error) {
-        if (error.response && error.response.status === 401) { // Check if it's an unauthorized error
-          this.logger_.info(`Refreshing Asana token for ${org.id} organisation`);
+      await this.oauthService_.update(oauth.id, { last_sync: new Date() });
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        // Check if it's an unauthorized error
+        this.logger_.info(`Refreshing Asana token for ${org.id} organisation`);
 
-          // Refresh the token
-          const oauthToken = await this.container_["asanaOauth"].refreshToken(oauth.refresh_token);
-    
-          // Update the OAuth record with the new token
-          await this.oauthService_.update(oauth.id, oauthToken);
-    
-          // Retry the request
-          return this.getAsanaTasksAndProjects(org);
-        } else {
-          console.error(error);
-        }
+        // Refresh the token
+        const oauthToken = await this.container_["asanaOauth"].refreshToken(
+          oauth.refresh_token
+        );
+
+        // Update the OAuth record with the new token
+        await this.oauthService_.update(oauth.id, oauthToken);
+
+        // Retry the request
+        return this.getAsanaTasksAndProjects(org);
+      } else {
+        console.error(error);
       }
-      this.logger_.info(`Finished oculation of Asana for ${org.id} organisation`);
+    }
+    this.logger_.info(`Finished oculation of Asana for ${org.id} organisation`);
   }
 
   // Get Asana Projects
-  async getAsanaProjects (accessToken: string, datetime: string) {
-    const response = await axios.get(`https://app.asana.com/api/1.0/projects?opt_expand=name,description,notes,completed,created_at`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
+  async getAsanaProjects(accessToken: string, datetime: string) {
+    const response = await axios.get(
+      `https://app.asana.com/api/1.0/projects?opt_expand=name,description,notes,completed,created_at`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
       }
-    });
+    );
     return response.data.data;
-  };
+  }
 
   // Get Asana Tasks
-  async getAsanaTasks(accessToken: string, projectId: string, datetime: string){
+  async getAsanaTasks(
+    accessToken: string,
+    projectId: string,
+    datetime: string
+  ) {
     let url = `https://app.asana.com/api/1.0/projects/${projectId}/tasks?opt_expand=name,description,notes,completed,created_at`;
-    if(datetime){
+    if (datetime) {
       url += `&modified_since=${datetime}`;
     }
     const response = await axios.get(url, {
       headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
     return response.data.data;
-  };
-
+  }
 }
