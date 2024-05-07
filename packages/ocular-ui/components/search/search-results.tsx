@@ -107,10 +107,9 @@ const Results = ({ results, isLoadingResults }) => (
 const ResultsFilter = ({ results, num_results, isLoadingResults }) => (
   <div className="mt-5 flex w-2/5 flex-col items-start justify-start">
     <div className="flex flex-col items-center">
-      {isLoadingResults ? 
-        <SearchByAppFilterSkeleton /> :
+      {
         results && num_results &&
-        <AppFilterOptions results={results.searchInformation?.formattedTotalResults} num_results={num_results} />
+        <AppFilterOptions results={results.searchInformation?.formattedTotalResults} />
       }
     </div>
   </div>

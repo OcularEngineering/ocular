@@ -36,6 +36,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   // const [assistants, setAssistants] = useState<Tables<"assistants">[]>([])
   // const [collections, setCollections] = useState<Tables<"collections">[]>([])
   const [chats, setChats] = useState<Chat[]>([])
+
+  const [resultSources, setResultSources] = useState<string[]>([])
   // const [files, setFiles] = useState<Tables<"files">[]>([])
   // const [folders, setFolders] = useState<Tables<"folders">[]>([])
   // const [models, setModels] = useState<Tables<"models">[]>([])
@@ -79,6 +81,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   //   includeWorkspaceInstructions: true,
   //   embeddingsProvider: "openai"
   // })
+
+
   const [selectedChat, setSelectedChat] = useState<Chat| null>(null)
   // const [chatFileItems, setChatFileItems] = useState<Tables<"file_items">[]>([])
 
@@ -206,6 +210,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         // setCollections,
         chats,
         setChats,
+        resultSources,
+        setResultSources,
         // files,
         // setFiles,
         // folders,
