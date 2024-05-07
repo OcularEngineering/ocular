@@ -37,7 +37,12 @@ export default class IndexerService implements IIndexerInterface {
   async indexDocuments(indexName: string, documents: IndexableDocument[]): Promise<void> {
     try {
       // Batch CreateOrUpdate DocumentMetadata in Database for the Docs
-      // this.documentMetadataService_.batchCreateOrUpdateDocumentMetadata(documents)
+      // Create a DocumentMetadata if it does not exist else update the document metadata.
+      const createdDocs = this.documentMetadataService_.batchCreateOrUpdate(documents)
+
+
+
+      // Chunk Documents and Embed them
       this.logger_.info(`Indexing ${documents.length} documents to index ${indexName}`)
       const chunks = await this.documentProcessorService_.chunkIndexableDocumentsBatch(documents)
       console.log("Chunked Docs",chunks)

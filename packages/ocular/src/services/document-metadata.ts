@@ -1,4 +1,4 @@
-import { Logger, TransactionBaseService, CreateDocumentMetadataInput  } from "@ocular/types";
+import { Logger, TransactionBaseService, CreateDocumentMetadataInput, IndexableDocument  } from "@ocular/types";
 import { DocumentMetadata } from "../models/document-metadata";
 import { EntityManager } from "typeorm";
 import { DocumentMetadataRepository } from "../repositories";
@@ -6,6 +6,7 @@ import { User } from "../models";
 import { Selector } from "../types/common";
 import { AutoflowAiError, AutoflowAiErrorTypes } from "@ocular/utils";
 import { buildQuery } from "../utils/build-query";
+import { In } from 'typeorm';
 
 type InjectedDependencies = {
   logger: Logger,
@@ -37,6 +38,29 @@ class DocumentService extends TransactionBaseService {
         const createdDocument = this.documentRepository_.create({...document, organisation_id: this.loggedInUser_.organisation_id})
         const newDocument = await documentRepository.save(createdDocument)
         return newDocument
+      }
+    )
+  }
+
+  async batchCreateOrUpdate(documents: IndexableDocument[]): Promise<DocumentMetadata[]> {
+    return await this.atomicPhase_(
+      async (transactionManager: EntityManager) => {
+        const documentRepository = transactionManager.withRepository(
+          this.documentRepository_
+        )
+        // Documents That Already Exist in the Database
+        const links = documents.map((doc) => doc.link)
+        const existingDocuments = await documentRepository.find({
+          where: { link: In(links), organisation_id: this.loggedInUser_.organisation_id}
+        })
+
+        // TODO: Update Existing Documents If Updated At Is Greater Than The Existing Document
+
+        // New Documents Metadata To Be Created In The Database
+        const newDocuments = documents.filter((doc) => !existingDocuments.map((doc) => doc.link).includes(doc.link))
+        const createdDocuments = newDocuments.map((doc) => documentRepository.create({...doc, organisation_id: this.loggedInUser_.organisation_id}))
+        const newCreatedDocuments = await documentRepository.save(createdDocuments)
+        return newCreatedDocuments
       }
     )
   }
