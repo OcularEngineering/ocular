@@ -1,3 +1,4 @@
+const { PluginNameDefinitions } = require('@ocular/types');
 const dotenv = require("dotenv");
 
 let ENV_FILE_NAME = "";
@@ -35,6 +36,7 @@ module.exports = {
     database_database: process.env.DATABASE_NAME,
     database_type: "postgres",
     redis_url: process.env.REDIS_URL,
+    kafka_url: process.env.KAFKA_URL,
     ui_cors: UI_CORS,
     azure_open_ai_options: {
       apiKey: process.env.AZURE_OPENAI_API_KEY,
@@ -52,6 +54,10 @@ module.exports = {
         client_secret: process.env.ASANA_CLIENT_SECRET,
         scope: "openid email profile",
         redirect_uri: `${UI_CORS}/dashboard/marketplace/asana`,
+        rate_limiter_opts: {
+          requests: 1500, // Number of Requests
+          interval: 60, // Interval in Seconds
+        },
       },
     },
     {
@@ -60,6 +66,10 @@ module.exports = {
         client_id: process.env.CONFLUENCE_CLIENT_ID,
         client_secret: process.env.CONFLUENCE_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/confluence`,
+        rate_limiter_opts: {
+          requests: 10, // Number of Requests
+          interval: 1, // Interval in Seconds
+        },
       },
     },
     {
@@ -68,6 +78,10 @@ module.exports = {
         client_id: process.env.JIRA_CLIENT_ID,
         client_secret: process.env.JIRA_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/jira`,
+        rate_limiter_opts: {
+          requests: 10, // Number of Requests
+          interval: 1, // Interval in Seconds
+        },
       },
     },
     {
@@ -84,7 +98,30 @@ module.exports = {
         client_id: process.env.SLACK_CLIENT_ID,
         client_secret: process.env.SLACK_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/slack`,
+        rate_limiter_opts: {
+          requests: 60, // Number of Requests
+          interval: 60, // Interval in Seconds
+        },
       },
+    },
+    {
+      resolve: "bitbucket",
+      options: {
+        client_id: process.env.BITBUCKET_CLIENT_ID,
+        client_secret: process.env.BITBUCKET_CLIENT_SECRET,
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/bitbucket`,
+      },
+    },
+    {
+      resolve: `github`,
+      options: {
+        client_id: process.env.GITHUB_CLIENT_ID,
+        client_secret: process.env.GITHUB_CLIENT_SECRET,
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/github`,
+        app_id: process.env.GITHUB_APP_ID,
+        private_key: process.env.GITHUB_PRIVATE_KEY_PATH,
+        scope: "repo"
+      }
     },
     {
       resolve: `google-drive`,
@@ -92,6 +129,10 @@ module.exports = {
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/google-drive`,
+        rate_limiter_opts: {
+          requests: 60, // Number of Requests
+          interval: 60, // Interval in Seconds
+        },
       },
     },
     {
@@ -100,6 +141,10 @@ module.exports = {
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/gmail`,
+        rate_limiter_opts: {
+          requests: 60, // Number of Requests
+          interval: 60, // Interval in Seconds
+        },
       },
     },
     {
@@ -126,13 +171,13 @@ module.exports = {
     {
       resolve: `document-processor`,
       options: {
-        max_chunk_length: 1000,
+        max_chunk_length: 500,
         sentence_search_limit: 100,
-        chunk_over_lap: 100,
+        chunk_over_lap: 0,
       },
     },
     {
-      resolve: `azure-open-ai`,
+      resolve: PluginNameDefinitions.AZUREOPENAI,
       options: {
         open_ai_key: process.env.AZURE_OPEN_AI_KEY,
         open_ai_version: "2023-05-15",
@@ -142,20 +187,30 @@ module.exports = {
         embedding_model: process.env.AZURE_OPEN_AI_EMBEDDING_MODEL,
         chat_deployment_name: process.env.AZURE_OPEN_AI_CHAT_DEPLOYMENT_NAME,
         chat_model: process.env.AZURE_OPEN_AI_CHAT_MODEL,
+        rate_limiter_opts: {
+          requests: 120000, // Number of Tokens
+          interval: 60, // Interval in Seconds
+        },
       },
     },
+    // {
+    //   resolve: PluginNameDefinitions.OPENAI,
+    //   options: {
+    //     open_ai_key: process.env.OPEN_AI_KEY,
+    //     embedding_model: process.env.OPEN_AI_EMBEDDING_MODEL,
+    //     chat_model: process.env.OPEN_AI_CHAT_MODEL,
+    //     rate_limiter_opts: {
+    //       requests: 1000000, // Number of Tokens
+    //       interval: 60, // Interval in Seconds
+    //     },
+    //   },
+    // },
     {
       resolve: `qdrant-vector-search-service`,
       options: {
         quadrant_db_url: process.env.QDRANT_DB_URL || "http://localhost:6333",
         embedding_size: 1536,
       },
-    },
-    // {
-    //   resolve: "typesense-text-search-service",
-    //   options:{
-    //      typesense_host: process.env.TYPESENSE_HOST || "localhost"
-    //   }
-    // }
+    }
   ],
 };

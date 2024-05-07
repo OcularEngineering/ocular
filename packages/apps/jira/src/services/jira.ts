@@ -1,7 +1,7 @@
 import fs from "fs";
 import axios from "axios";
 import { Readable } from "stream";
-import { OAuthService, Organisation } from "@ocular/ocular";
+import { OAuthService, Organisation, RateLimiterService } from "@ocular/ocular";
 import {
   IndexableDocument,
   TransactionBaseService,
@@ -10,6 +10,7 @@ import {
   DocType,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
+import { RateLimiterQueue } from "rate-limiter-flexible"
 
 interface Config {
   headers: {
@@ -22,12 +23,16 @@ export default class JiraService extends TransactionBaseService {
   protected oauthService_: OAuthService;
   protected logger_: Logger;
   protected container_: ConfigModule;
+  protected rateLimiterService_: RateLimiterService;
+  protected requestQueue_: RateLimiterQueue
 
   constructor(container) {
     super(arguments[0]);
     this.oauthService_ = container.oauthService;
     this.logger_ = container.logger;
     this.container_ = container;
+    this.rateLimiterService_ = container.rateLimiterService;
+    this.requestQueue_ = this.rateLimiterService_.getRequestQueue(AppNameDefinitions.JIRA);
   }
 
   async getJiraData(org: Organisation) {
@@ -86,7 +91,12 @@ export default class JiraService extends TransactionBaseService {
             ],
             type: DocType.TEXT,
             updatedAt: new Date(updatedAt),
-            metadata: {},
+            metadata: {
+              project_id:project.id,
+              project_name: project.name,
+              project_link:project.link,
+              project_description: project.description
+            },
           };
           documents.push(issueDoc);
           if (documents.length >= 100) {
@@ -191,6 +201,8 @@ export default class JiraService extends TransactionBaseService {
    * @returns {Promise<Array>} A promise that resolves to an array of project objects.
    */
   async fetchJiraProjects(cloudID: string, config: Config) {
+    // Block Until Rate Limit Allows Request
+    await this.requestQueue_.removeTokens(1,AppNameDefinitions.JIRA)
     // Ensure the variable names are case-sensitive and consistent.
     const projectEndpoint = `https://api.atlassian.com/ex/jira/${cloudID}/rest/api/3/project/search`;
 
@@ -211,6 +223,8 @@ export default class JiraService extends TransactionBaseService {
         id: project.id,
         key: project.key,
         name: project.name,
+        description: project.description,
+        link: project.self
       }));
 
       return projects;
@@ -235,6 +249,8 @@ export default class JiraService extends TransactionBaseService {
    */
   async fetchProjectIssues(projectID, cloudID, config) {
     try {
+      // Block Until Rate Limit Allows Request
+      await this.requestQueue_.removeTokens(1,AppNameDefinitions.JIRA)
       // Construct base URL and issue endpoint
       const baseUrl = `https://api.atlassian.com/ex/jira/${cloudID}`;
       const issueEndpoint = `${baseUrl}/rest/api/3/search?jql=project=${projectID}&maxResults=1000`;
@@ -269,6 +285,8 @@ export default class JiraService extends TransactionBaseService {
    */
   async fetchIssueDetails(issueID: string, cloudID: string, config: Config) {
     try {
+      // Block Until Rate Limit Allows Request
+      await this.requestQueue_.removeTokens(1,AppNameDefinitions.JIRA)
       // Construct the issue endpoint URL
       const baseUrl = `https://api.atlassian.com/ex/jira/${cloudID}`;
       const issueEndpoint = `${baseUrl}/rest/api/3/issue/${issueID}`;
@@ -280,7 +298,7 @@ export default class JiraService extends TransactionBaseService {
       const { data } = response;
       const { fields } = data;
 
-      const description = this.extractDescription(fields);
+      const description = this.extractDescription(fields)+ this.extractComments(fields);
       const updatedAt = fields.updated;
       const title = fields.summary;
       const key = data.key;
@@ -324,6 +342,28 @@ export default class JiraService extends TransactionBaseService {
       return issueDescription.trim();
     } else {
       // If description field is missing or empty, return an empty string
+      return "";
+    }
+  }
+
+  extractComments(fields: any) {
+    if(fields.comments) {
+      const commentContent = fields.comments.body.content || [];
+
+      let commentDescription = "";
+      commentContent.forEach((element) => {
+        if (element.type === "paragraph") {
+          const paragraphContent = element.content || [];
+          paragraphContent.forEach((innerElement) => {
+            if (innerElement.type === "text" && innerElement.text) {
+              commentDescription += innerElement.text + " ";
+            }
+          });
+        }
+      })
+
+      return commentDescription.trim();
+    }else{
       return "";
     }
   }

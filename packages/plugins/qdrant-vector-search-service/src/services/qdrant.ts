@@ -143,6 +143,7 @@ export default class qdrantService extends AbstractVectorDBService  {
         title: doc.title,
         source: doc.source,
         content: doc.content,
+        chunkLinks: doc.chunkLinks,
         metadata: doc.metadata,
         updatedAt: doc.updatedAt,
       },

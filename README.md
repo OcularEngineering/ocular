@@ -30,10 +30,9 @@ We're help to you build you spin up customized internal search in days not month
 
 ## Open-source vs Paid
 
-Repo is under [Apache License](https://github.com/OcularEngineering/ocular?tab=Apache-2.0-1-ov-file), with the exception of the `ee` directory which will contain premium enterprise features requiring an Ocular License.
+Repo is under [Elastic License 2.0 (ELv2)](https://github.com/OcularEngineering/ocular/blob/main/LICENSE).
 
 If you are interested in managed Ocular Cloud of self-hosted Enterprise Offering [book a meeting with us](https://calendly.com/louis-murerwa):
-
 
 ## Getting started
 

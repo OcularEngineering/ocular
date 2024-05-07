@@ -1,6 +1,6 @@
 /**
  * @enum
- * 
+ *
  * Apps To Installed in the DB.
  */
 export enum AppNameDefinitions {
@@ -15,7 +15,8 @@ export enum AppNameDefinitions {
   JIRA = "jira",
   NOTION = "notion",
   SLACK= "slack",
-  WEBCONNECTOR="webConnector"
+  WEBCONNECTOR="webConnector",
+  BITBUCKET = "bitbucket",
 }
 
 export enum AppCategoryDefinitions {

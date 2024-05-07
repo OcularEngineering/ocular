@@ -1,20 +1,21 @@
-import { BatchJobService, Organisation, EventBusService } from "@ocular/ocular";
-import SlackService from "../services/slack";
-import { INDEX_DOCUMENT_EVENT } from "@ocular/types";
-import { AbstractBatchJobStrategy } from "@ocular/types";
+
+import { BatchJobService, Organisation, QueueService } from '@ocular/ocular';
+import SlackService from '../services/slack';
+import { INDEX_DOCUMENT_EVENT, SEARCH_INDEXING_TOPIC } from '@ocular/types';
+import { AbstractBatchJobStrategy } from '@ocular/types';
 
 export default class SlackStrategy extends AbstractBatchJobStrategy {
   static identifier = "slack-indexing-strategy";
   static batchType = "slack";
   protected batchJobService_: BatchJobService;
   protected slackService_: SlackService;
-  protected eventBusService_: EventBusService;
+  protected queueService_: QueueService;
 
   constructor(container) {
     super(arguments[0]);
     this.slackService_ = container.slackService;
     this.batchJobService_ = container.batchJobService;
-    this.eventBusService_ = container.eventBusService;
+    this.queueService_ = container.queueService;
   }
 
   async processJob(batchJobId: string): Promise<void> {
@@ -22,8 +23,9 @@ export default class SlackStrategy extends AbstractBatchJobStrategy {
     const stream = await this.slackService_.getSlackData(
       batchJob.context?.org as Organisation
     );
-    stream.on("data", (documents) => {
-      this.eventBusService_.emit(INDEX_DOCUMENT_EVENT, documents);
+
+    stream.on('data', (documents) => {
+      this.queueService_.sendBatch(SEARCH_INDEXING_TOPIC, documents)
     });
     stream.on("end", () => {
       console.log("No more data");

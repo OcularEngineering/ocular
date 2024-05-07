@@ -28,6 +28,7 @@ export default class documentProcessorService extends AbstractDocumentProcesserS
     document: IndexableDocument
   ): Promise<IndexableDocChunk[]> {
     let chunks: IndexableDocChunk[] = [];
+    console.log("Document Type",document.type)
     switch (document.type) {
       case DocType.TEXT:
         chunks = await processTxt(

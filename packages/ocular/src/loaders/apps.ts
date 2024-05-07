@@ -105,6 +105,7 @@ async function runLoaders(
 ): Promise<void> {
   const loaderFilesGlob = pathByOS(`${appDetails.resolve}/loaders/[!__]*.js`);
   const loaderFiles = glob.sync(loaderFilesGlob, {});
+
   await Promise.all(
     loaderFiles.map(async (loader) => {
       try {

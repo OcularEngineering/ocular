@@ -15,14 +15,12 @@ import { promiseAll } from "@ocular/utils";
 import { formatRegistrationName } from "../utils/format-registration-name";
 import { aliasTo, asValue, asFunction, Lifetime } from "awilix";
 import {
-  AbstractNotificationService,
-  AbstractSearchService,
-  OauthService,
-} from "@ocular/types";
-import {
-  AbstractDocumentProcesserService,
-  AbstractLLMService,
-} from "@ocular/types";
+
+  formatRegistrationName,
+} from "../utils/format-registration-name"
+import {  aliasTo, asValue, asFunction , Lifetime } from "awilix"
+import { AbstractNotificationService, AbstractSearchService, OauthService } from "@ocular/types"
+import { AbstractDocumentProcesserService, AbstractLLMService, AbstractFileService } from "@ocular/types";
 import { AbstractVectorDBService } from "@ocular/types";
 
 type Options = {
@@ -118,6 +116,7 @@ async function runLoaders(
 ): Promise<void> {
   const loaderFilesGlob = pathByOS(`${pluginDetails.resolve}/loaders/*.js`);
   const loaderFiles = glob.sync(loaderFilesGlob, {});
+
   await Promise.all(
     loaderFiles.map(async (loader) => {
       try {
@@ -281,7 +280,20 @@ export async function registerServices(
           ),
           // Register Service as vectorDBService for easy resolution.
           [`searchIndexService`]: aliasTo(name),
-        });
+
+        })
+      } else if (AbstractFileService.isFileService(loaded.prototype)) {
+        // Add the service directly to the container in order to make simple
+        // resolution if we already know which file storage provider we need to use
+        container.register({
+          [name]: asFunction(
+            (cradle) => new loaded(cradle, pluginDetails.options),
+            {
+              lifetime: loaded.LIFE_TIME || Lifetime.SINGLETON,
+            }
+          ),
+          [`fileService`]: aliasTo(name),
+        })
       } else {
         container.register({
           [name]: asFunction(
