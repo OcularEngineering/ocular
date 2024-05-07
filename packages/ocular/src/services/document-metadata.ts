@@ -42,10 +42,18 @@ class DocumentService extends TransactionBaseService {
   }
 
  
-  async retrieve(documentId: string): Promise<DocumentMetadata> {
+  async retrieveById(id: string): Promise<DocumentMetadata> {
     const documentRepo = this.activeManager_.withRepository(this.documentRepository_)
     const doc = await documentRepo.findOne({
-      where: { id: documentId, organisation_id: this.loggedInUser_.organisation_id}
+      where: { id: id, organisation_id: this.loggedInUser_.organisation_id}
+    })
+    return doc
+  }
+
+  async retrieveByLink(link: string): Promise<DocumentMetadata> {
+    const documentRepo = this.activeManager_.withRepository(this.documentRepository_)
+    const doc = await documentRepo.findOne({
+      where: { link: link, organisation_id: this.loggedInUser_.organisation_id}
     })
     return doc
   }
