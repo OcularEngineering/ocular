@@ -5,14 +5,20 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  OneToMany
+  OneToMany,
+  UpdateDateColumn,
+  CreateDateColumn,
+  PrimaryColumn
 } from 'typeorm';
-import { AppNameDefinitions, BaseEntity, DocType } from "@ocular/types"
+import { AppNameDefinitions, DocType } from "@ocular/types"
 import { Organisation } from './organisation';
-import { DbAwareColumn } from '@ocular/utils';
+import { DbAwareColumn, resolveDbType } from '@ocular/utils';
 
 @Entity()
-export class DocumentMetadata extends BaseEntity {
+export class DocumentMetadata {
+  @PrimaryColumn()
+  id: string;
+
   @Column({type: "varchar", nullable: false, unique: true})
   link: string;
 
@@ -35,4 +41,11 @@ export class DocumentMetadata extends BaseEntity {
 
   @Column({type: "varchar", nullable: false})
   organisation_id: string;
+
+  @CreateDateColumn({ type: resolveDbType("timestamptz") })
+  created_at: Date
+
+  // Note: This is manually updated whenever we index or reindex a document.
+  @Column({ type: resolveDbType("timestamptz"), nullable: false})
+  updated_at: Date
 }
