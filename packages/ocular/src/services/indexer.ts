@@ -36,6 +36,8 @@ export default class IndexerService implements IIndexerInterface {
 
   async indexDocuments(indexName: string, documents: IndexableDocument[]): Promise<void> {
     try {
+      // Batch CreateOrUpdate DocumentMetadata in Database for the Docs
+      // this.documentMetadataService_.batchCreateOrUpdateDocumentMetadata(documents)
       this.logger_.info(`Indexing ${documents.length} documents to index ${indexName}`)
       // Batch CreateOrUpdate DocumentMetadata in Database for the Docs
       // Create a DocumentMetadata if it does not exist else update the document metadata.
