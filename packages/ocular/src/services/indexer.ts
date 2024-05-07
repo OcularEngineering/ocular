@@ -5,7 +5,8 @@ import { Logger } from "@ocular/types";
 import { IndexableDocChunk } from "@ocular/types";
 import { IVectorDB } from "@ocular/types";
 import { ISearchService } from "@ocular/types";
-import { Index } from "typeorm";
+import { Document, Index } from "typeorm";
+import { DocumentMetadataService } from "../services";
 
 export default class IndexerService implements IIndexerInterface {
   private config_: ConfigModule
@@ -13,6 +14,7 @@ export default class IndexerService implements IIndexerInterface {
   protected readonly documentProcessorService_:  IDocumentProcessorInterface
   protected readonly openAiService_:  ILLMInterface
   protected readonly vectorDBService_ : IVectorDB
+  protected readonly documentMetadataService_: DocumentMetadataService
 
   constructor(container, config: ConfigModule) {
     this.config_ = config
@@ -20,6 +22,7 @@ export default class IndexerService implements IIndexerInterface {
     this.documentProcessorService_ = container.documentProcessorService
     this.openAiService_ = container.openAiService
     this.vectorDBService_ = container.vectorDBService
+    this.documentMetadataService_ = container.documentMetadataService
   }
 
   async createIndex(indexName:string){
@@ -33,6 +36,8 @@ export default class IndexerService implements IIndexerInterface {
 
   async indexDocuments(indexName: string, documents: IndexableDocument[]): Promise<void> {
     try {
+      // Batch CreateOrUpdate DocumentMetadata in Database for the Docs
+      // this.documentMetadataService_.batchCreateOrUpdateDocumentMetadata(documents)
       this.logger_.info(`Indexing ${documents.length} documents to index ${indexName}`)
       const chunks = await this.documentProcessorService_.chunkIndexableDocumentsBatch(documents)
       console.log("Chunked Docs",chunks)
