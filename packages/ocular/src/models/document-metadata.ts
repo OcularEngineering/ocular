@@ -12,7 +12,7 @@ import { Organisation } from './organisation';
 import { DbAwareColumn } from '@ocular/utils';
 
 @Entity()
-export class Document extends BaseEntity {
+export class DocumentMetadata extends BaseEntity {
   @Column({type: "varchar", nullable: false, unique: true})
   link: string;
 
@@ -35,7 +35,4 @@ export class Document extends BaseEntity {
 
   @Column({type: "varchar", nullable: false})
   organisation_id: string;
-
-  @DbAwareColumn({ type: "jsonb", nullable: true })
-  metadata?: Record<string, unknown> | null
 }

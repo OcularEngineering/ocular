@@ -1,18 +1,21 @@
-import { Logger, TransactionBaseService, CreateDocumentInput  } from "@ocular/types";
-import { Document } from "../models/document";
+import { Logger, TransactionBaseService, CreateDocumentMetadataInput  } from "@ocular/types";
+import { DocumentMetadata } from "../models/document-metadata";
 import { EntityManager } from "typeorm";
-import { DocumentRepository } from "../repositories";
+import { DocumentMetadataRepository } from "../repositories";
 import { User } from "../models";
+import { Selector } from "../types/common";
+import { AutoflowAiError, AutoflowAiErrorTypes } from "@ocular/utils";
+import { buildQuery } from "../utils/build-query";
 
 type InjectedDependencies = {
   logger: Logger,
-  documentRepository: typeof DocumentRepository
+  documentRepository: typeof DocumentMetadataRepository
   loggedInUser: User
 }
 
 class DocumentService extends TransactionBaseService {
 
-  protected readonly documentRepository_: typeof DocumentRepository
+  protected readonly documentRepository_: typeof DocumentMetadataRepository
   protected readonly loggedInUser_: User
 
   constructor(
@@ -25,7 +28,7 @@ class DocumentService extends TransactionBaseService {
     this.loggedInUser_ = loggedInUser
   }
 
-  async create(document: CreateDocumentInput): Promise<Document> {
+  async create(document: CreateDocumentMetadataInput): Promise<DocumentMetadata> {
     return await this.atomicPhase_(
       async (transactionManager: EntityManager) => {
         const documentRepository = transactionManager.withRepository(
@@ -38,7 +41,8 @@ class DocumentService extends TransactionBaseService {
     )
   }
 
-  async retrieve(documentId: string): Promise<Document> {
+ 
+  async retrieve(documentId: string): Promise<DocumentMetadata> {
     const documentRepo = this.activeManager_.withRepository(this.documentRepository_)
     const doc = await documentRepo.findOne({
       where: { id: documentId, organisation_id: this.loggedInUser_.organisation_id}
@@ -46,12 +50,17 @@ class DocumentService extends TransactionBaseService {
     return doc
   }
 
-  async update(documentId: string, document: Document): Promise<Document> {
-    return  null
-  }
-
-  async list(): Promise<Document[]> {
-    return []
+  async list(selector: Selector<DocumentMetadata>): Promise<DocumentMetadata[]> {
+    if(!this.loggedInUser_ || !this.loggedInUser_.organisation){
+      throw new AutoflowAiError(
+        AutoflowAiErrorTypes.NOT_FOUND,
+        `User must belong to an "organisation" so as to get components`
+      )
+    }
+    const metadataRepo = this.activeManager_.withRepository(this.documentRepository_)
+    selector["organisation_id"] = this.loggedInUser_.organisation_id
+    const query = buildQuery(selector, {})
+    return await metadataRepo.find(query)
   }
 }
 
