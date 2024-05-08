@@ -1,222 +1,288 @@
-import { AppNameDefinitions, IVectorDB } from '@ocular/types';
-import qdrantService from '../services/qdrant';
-import { QdrantClient } from '@qdrant/js-client-rest';
+import { AppNameDefinitions, IVectorDB } from "@ocular/types";
+import qdrantService from "../services/qdrant";
+import { QdrantClient } from "@qdrant/js-client-rest";
 
 // This test assumes that a Qdrant service is running in Docker localhost:6333.
 // To run the service, check the instructions in the Developer.md file.
 
-describe('qdrantService', () => {
+describe("qdrantService", () => {
   let service: IVectorDB;
-  beforeEach( async () => {
-    service = new qdrantService({}, { quadrant_db_url: 'http://localhost:6333', embedding_size: 3 });
-       // Create a Search Index
-       await service.createIndex("OcularTestIndex")
+  beforeEach(async () => {
+    service = new qdrantService(
+      {},
+      { quadrant_db_url: "http://localhost:6333", embedding_size: 3 }
+    );
+    // Create a Search Index
+    await service.createIndex("OcularTestIndex");
 
-       // Create Mock Testing Documens
-       const mockDocuments = [
-         {
-         chunkId: 0,
-         organisationId: '3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971a',
-         documentId: 'document1',
-         title: 'Asana Indexed Document',
-         titleEmbeddings:  [1, 2, 3],
-         source: AppNameDefinitions.ASANA,
-         content: 'Asana Content',
-         contentEmbeddings:  [1, 2, 3],
-         tokens: 33,
-         metadata: {},
-         offsets:{},
-         updatedAt: new Date("2024-03-27T09:37:44.474Z"),
-       },
-       {
-         chunkId: 1,
-         organisationId: '3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971c',
-         documentId: 'document1',
-         title: 'Confluence Indexed Document',
-         titleEmbeddings:  [1, 2, 3],
-         source: AppNameDefinitions.CONFLUENCE,
-         content: 'Confluence Content',
-         contentEmbeddings:  [1, 2, 3],
-         tokens: 33,
-         metadata: {},
-         offsets:{},
-         updatedAt: new Date("2024-03-27T09:37:44.474Z"),
-       },
-       {
-         chunkId: 2,
-         organisationId: '3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971gg',
-         documentId: 'document1',
-         title: 'Github Indexed Document',
-         titleEmbeddings:  [1, 2, 3],
-         source: AppNameDefinitions.GITHUB,
-         content: 'Github Content',
-         tokens: 33,
-         contentEmbeddings:  [1, 2, 3],
-         metadata: {},
-         offsets:{},
-         updatedAt: new Date("2024-03-27T09:37:44.474Z"),
-       },
-       {
-         chunkId: 1,
-         organisationId: '3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971g',
-         documentId: 'document2',
-         title: 'Google Drive Indexed Document',
-         titleEmbeddings:  [1, 2, 3],
-         source: AppNameDefinitions.GOOGLEDRIVE,
-         content: 'Google Drive Content',
-         tokens: 33,
-         contentEmbeddings:  [1, 2, 3],
-         metadata: {},
-         updatedAt: new Date("2024-03-27T09:37:44.474Z"),
-       },
-       {
-         chunkId: 2,
-         organisationId: '3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971j',
-         documentId: 'document2',
-         title: 'Jira Indexed Document',
-         titleEmbeddings:  [1, 2, 3],
-         source: AppNameDefinitions.JIRA,
-         content: 'Jira Content',
-         tokens: 33,
-         contentEmbeddings:  [1, 2, 3],
-         metadata: {},
-         updatedAt: new Date("2024-03-27T09:37:44.474Z"),
-       },
-       {
-         chunkId: 3,
-         organisationId: '3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971n',
-         documentId: 'document3',
-         title: 'Notion Indexed Document',
-         titleEmbeddings:  [1, 2, 3],
-         source: AppNameDefinitions.NOTION,
-         content: 'Notion Content',
-         tokens: 33,
-         contentEmbeddings:  [1, 2, 3],
-         metadata: {},
-         updatedAt: new Date("2024-03-27T09:37:44.474Z"),
-       },
-     ];
-  
-     await service.addDocuments("OcularTestIndex",mockDocuments);
+    // Create Mock Testing Documens
+    const mockDocuments = [
+      {
+        chunkId: 0,
+        organisationId: "3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971c",
+        documentId: "document1",
+        title: "Confluence Indexed Document",
+        titleEmbeddings: [1, 2, 3],
+        source: AppNameDefinitions.CONFLUENCE,
+        content: "Confluence Chunk 0 Content",
+        contentEmbeddings: [1, 2, 3],
+        tokens: 33,
+        metadata: {},
+        offsets: {},
+        updatedAt: new Date("2024-03-27T09:37:44.474Z"),
+      },
+      {
+        chunkId: 1,
+        organisationId: "3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971c",
+        documentId: "document1",
+        title: "Confluence Indexed Document",
+        titleEmbeddings: [1, 2, 3],
+        source: AppNameDefinitions.CONFLUENCE,
+        content: "Confluence Chunk 1 Content",
+        contentEmbeddings: [1, 2, 3],
+        tokens: 33,
+        metadata: {},
+        offsets: {},
+        updatedAt: new Date("2024-03-27T09:37:44.474Z"),
+      },
+      {
+        chunkId: 0,
+        organisationId: "3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971g",
+        documentId: "document2",
+        title: "Google Drive Indexed Document",
+        titleEmbeddings: [1, 2, 3],
+        source: AppNameDefinitions.GOOGLEDRIVE,
+        content: "Google Drive Chunk 1 Content",
+        tokens: 33,
+        contentEmbeddings: [1, 2, 3],
+        metadata: {},
+        updatedAt: new Date("2024-03-27T09:37:44.474Z"),
+      },
+      {
+        chunkId: 1,
+        organisationId: "3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971g",
+        documentId: "document2",
+        title: "Google Drive Indexed Document",
+        titleEmbeddings: [1, 2, 3],
+        source: AppNameDefinitions.GOOGLEDRIVE,
+        content: "Google Drive Chunk 2 Content",
+        tokens: 33,
+        contentEmbeddings: [1, 2, 3],
+        metadata: {},
+        updatedAt: new Date("2024-03-27T09:37:44.474Z"),
+      },
+      {
+        chunkId: 0,
+        organisationId: "3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971j",
+        documentId: "document3",
+        title: "Notion Chunk 0 Indexed Document",
+        titleEmbeddings: [1, 2, 3],
+        source: AppNameDefinitions.NOTION,
+        content: "Notion Content",
+        tokens: 33,
+        contentEmbeddings: [1, 2, 3],
+        metadata: {},
+        updatedAt: new Date("2024-03-27T09:37:44.474Z"),
+      },
+      {
+        chunkId: 1,
+        organisationId: "3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971j",
+        documentId: "document3",
+        title: "Notion Chunk 1 Indexed Document",
+        titleEmbeddings: [1, 2, 3],
+        source: AppNameDefinitions.NOTION,
+        content: "Notion Content",
+        tokens: 33,
+        contentEmbeddings: [1, 2, 3],
+        metadata: {},
+        updatedAt: new Date("2024-03-27T09:37:44.474Z"),
+      },
+    ];
+
+    await service.addDocuments("OcularTestIndex", mockDocuments);
   });
 
-  it('Should Search Index And Return All Results', async () => {
-    // Create Mock Testing Documens
-    const searchResultDocuments = [
-      // {
-      //   chunkId: 2,
-      //   organisationId: '3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971gg',
-      //   documentId: '3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971f',
-      //   title: 'Github Indexed Document',
-      //   titleEmbeddings:  [1, 2, 3],
-      //   source: AppNameDefinitions.GITHUB,
-      //   content: 'Github Content',
-      //   tokens: 33,
-      //   contentEmbeddings:  [1, 2, 3],
-      //   metadata: {},
-      //   offsets:{},
-      //   updatedAt: new Date("2024-03-27T09:37:44.474Z"),
-      // },
-      // {
-      //   chunkId: 3,
-      //   organisationId: '3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971g',
-      //   documentId: '3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971f',
-      //   title: 'Google Drive Indexed Document',
-      //   titleEmbeddings:  [1, 2, 3],
-      //   source: AppNameDefinitions.GOOGLEDRIVE,
-      //   content: 'Google Drive Content',
-      //   tokens: 33,
-      //   contentEmbeddings:  [1, 2, 3],
-      //   metadata: {},
-      //   updatedAt: new Date("2024-03-27T09:37:44.474Z"),
-      // },
-      // {
-      //   chunkId: 5,
-      //   organisationId: '3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971n',
-      //   documentId: '3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971f',
-      //   title: 'Notion Indexed Document',
-      //   titleEmbeddings:  [1, 2, 3],
-      //   source: AppNameDefinitions.NOTION,
-      //   content: 'Notion Content',
-      //   tokens: 33,
-      //   contentEmbeddings:  [1, 2, 3],
-      //   metadata: {},
-      //   updatedAt: new Date("2024-03-27T09:37:44.474Z"),
-      // },
-  ];
+  it("Should Search Index And Return All Results", async () => {
+    const searchResults = {
+      hits: [
+        {
+          documentId: "document3",
+          snippets: [
+            { content: "Notion Content", score: 0.9999999 },
+            { content: "Notion Content", score: 0.9999999 },
+          ],
+        },
+        {
+          documentId: "document1",
+          snippets: [
+            { content: "Confluence Chunk 1 Content", score: 0.9999999 },
+            { content: "Confluence Chunk 0 Content", score: 0.9999999 },
+          ],
+        },
+        {
+          documentId: "document2",
+          snippets: [
+            { content: "Google Drive Chunk 2 Content", score: 0.9999999 },
+            { content: "Google Drive Chunk 1 Content", score: 0.9999999 },
+          ],
+        },
+      ],
+    };
     const mockVector = [1, 2, 3];
-    const result = await service.searchDocuments('OcularTestIndex', mockVector);
-    expect(result).toEqual(searchResultDocuments.length);
-    await service.deleteIndex("OcularTestIndex")
-  })
+    const result = await service.searchDocuments("OcularTestIndex", mockVector);
 
-  // it('Filter By Number Of Results', async () => {
-  //   const mockVector = [1, 2, 3];
-  //   const result1 = await service.searchDocuments('OcularTestIndex', mockVector,{top: 1});
-  //   expect(result1.length).toEqual(1);
-  //   const result2 = await service.searchDocuments('OcularTestIndex', mockVector,{top: 2});
-  //   expect(result2.length).toEqual(2);
-  //   const result3 = await service.searchDocuments('OcularTestIndex', mockVector,{top: 3});
-  //   expect(result3.length).toEqual(3);
-  // })
+    // Sort the results by content for comparison
+    expect(sortHitsByContent(searchResults.hits)).toEqual(
+      sortHitsByContent(result.hits)
+    );
 
+    await service.deleteIndex("OcularTestIndex");
+  });
 
-  // it('Filter By One Source', async () => {
-  //   const GitHubSourceDoc = [
-  //     {
-  //       chunkId: 2,
-  //       organisationId: '3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971gg',
-  //       documentId: '3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971f',
-  //       title: 'Github Indexed Document',
-  //       source: AppNameDefinitions.GITHUB,
-  //       content: 'Github Content',
-  //       metadata: {},
-  //       updatedAt: new Date("2024-03-27T09:37:44.474Z"),
-  //     },
-  //   ]
-  //   const mockVector = [1, 2, 3];
-  //   // One GitHub Source
-  //   const result = await service.searchDocuments('OcularTestIndex', mockVector, {sources: [AppNameDefinitions.GITHUB]});
-  //   expect(result).toEqual(GitHubSourceDoc);
-  //   await service.deleteIndex("OcularTestIndex")
-  // })
+  it("Filter By Number Of Results", async () => {
+    const mockVector = [1, 2, 3];
+    const result1 = await service.searchDocuments(
+      "OcularTestIndex",
+      mockVector,
+      { top: 1 }
+    );
+    expect(result1.hits.length).toEqual(1);
+    const result2 = await service.searchDocuments(
+      "OcularTestIndex",
+      mockVector,
+      { top: 2 }
+    );
+    expect(result2.hits.length).toEqual(2);
+    const result3 = await service.searchDocuments(
+      "OcularTestIndex",
+      mockVector,
+      { top: 3 }
+    );
+    expect(result3.hits.length).toEqual(3);
+  });
 
-  // it('Filter By Two Sources', async () => {
-  //   const DocsFromSources = [
-  //     {
-  //       chunkId: 5,
-  //       organisationId: '3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971n',
-  //       documentId: '3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971f',
-  //       title: 'Notion Indexed Document',
-  //       source: AppNameDefinitions.NOTION,
-  //       content: 'Notion Content',
-  //       metadata: {},
-  //       updatedAt: new Date("2024-03-27T09:37:44.474Z"),
-  //     },
-  //     {
-  //       chunkId: 0,
-  //       organisationId: '3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971a',
-  //       documentId: '3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971f',
-  //       title: 'Asana Indexed Document',
-  //       source: AppNameDefinitions.ASANA,
-  //       content: 'Asana Content',
-  //       metadata: {},
-  //       updatedAt: new Date("2024-03-27T09:37:44.474Z"),
-  //     },
-  //   ]
-  //   const mockVector = [1, 2, 3];
-  //   // One GitHub Source
-  //   const result = await service.searchDocuments('OcularTestIndex', mockVector, {sources: new Set([AppNameDefinitions.ASANA, AppNameDefinitions.NOTION])});
-  //   expect(result).toHaveLength(DocsFromSources.length);
-  //   result.forEach(item => {
-  //     expect(DocsFromSources).toEqual(
-  //       expect.arrayContaining([
-  //         expect.objectContaining(item)
-  //       ])
-  //     );
-  //   });
-  //   await service.deleteIndex("OcularTestIndex")
-  // })
-  })
+  it("Filter By One Source", async () => {
+    const searchResults = [
+      {
+        documentId: "document2",
+        snippets: [
+          {
+            content: "Google Drive Chunk 1 Content",
+            score: 0.9999999,
+          },
+          {
+            content: "Google Drive Chunk 2 Content",
+            score: 0.9999999,
+          },
+        ],
+      },
+    ];
+    const mockVector = [1, 2, 3];
+    // One GitHub Source
+    const result = await service.searchDocuments(
+      "OcularTestIndex",
+      mockVector,
+      { sources: [AppNameDefinitions.GOOGLEDRIVE] }
+    );
+    console.log(result);
+    expect(result.hits).toEqual(searchResults);
+    await service.deleteIndex("OcularTestIndex");
+  });
 
-  
+  it("Filter By Two Sources", async () => {
+    const searchResults = [
+      {
+        documentId: "document3",
+        snippets: [
+          {
+            content: "Notion Content",
+            score: 0.9999999,
+          },
+          {
+            content: "Notion Content",
+            score: 0.9999999,
+          },
+        ],
+      },
+      {
+        documentId: "document1",
+        snippets: [
+          {
+            content: "Confluence Chunk 0 Content",
+            score: 0.9999999,
+          },
+          {
+            content: "Confluence Chunk 1 Content",
+            score: 0.9999999,
+          },
+        ],
+      },
+    ];
+    const mockVector = [1, 2, 3];
+    // One GitHub Source
+    const result = await service.searchDocuments(
+      "OcularTestIndex",
+      mockVector,
+      {
+        sources: [AppNameDefinitions.CONFLUENCE, AppNameDefinitions.NOTION],
+      }
+    );
+
+    // Sort the results by content for comparison
+    expect(sortHitsByContent(searchResults)).toEqual(
+      sortHitsByContent(result.hits)
+    );
+
+    await service.deleteIndex("OcularTestIndex");
+  });
+
+  it("Should Filter By Organisation", async () => {
+    const searchResults = {
+      hits: [
+        {
+          documentId: "document3",
+          snippets: [
+            { content: "Notion Content", score: 0.9999999 },
+            { content: "Notion Content", score: 0.9999999 },
+          ],
+        },
+      ],
+    };
+    const mockVector = [1, 2, 3];
+    const result = await service.searchDocuments(
+      "OcularTestIndex",
+      mockVector,
+      { top: 2, organisation_id: "3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971j" }
+    );
+
+    // Sort the results by content for comparison
+    expect(sortHitsByContent(searchResults.hits)).toEqual(
+      sortHitsByContent(result.hits)
+    );
+
+    await service.deleteIndex("OcularTestIndex");
+  });
+
+  it("Should Return Result For Empty Sources Array", async () => {
+    const mockVector = [1, 2, 3];
+    const result = await service.searchDocuments(
+      "OcularTestIndex",
+      mockVector,
+      { sources: [] }
+    );
+
+    // Sort the results by content for comparison
+    expect(result.hits.length).toEqual(3);
+
+    await service.deleteIndex("OcularTestIndex");
+  });
+});
+
+// Sort the results by content for comparison
+function sortHitsByContent(hits) {
+  const sortFunction = (a, b) => a.content.localeCompare(b.content);
+  return hits.map((hit) => ({
+    ...hit,
+    snippets: hit.snippets.sort(sortFunction),
+  }));
+}
