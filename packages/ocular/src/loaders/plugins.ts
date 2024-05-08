@@ -15,12 +15,15 @@ import { promiseAll } from "@ocular/utils";
 import { formatRegistrationName } from "../utils/format-registration-name";
 import { aliasTo, asValue, asFunction, Lifetime } from "awilix";
 import {
-
-  formatRegistrationName,
-} from "../utils/format-registration-name"
-import {  aliasTo, asValue, asFunction , Lifetime } from "awilix"
-import { AbstractNotificationService, AbstractSearchService, OauthService } from "@ocular/types"
-import { AbstractDocumentProcesserService, AbstractLLMService, AbstractFileService } from "@ocular/types";
+  AbstractNotificationService,
+  AbstractSearchService,
+  OauthService,
+} from "@ocular/types";
+import {
+  AbstractDocumentProcesserService,
+  AbstractLLMService,
+  AbstractFileService,
+} from "@ocular/types";
 import { AbstractVectorDBService } from "@ocular/types";
 
 type Options = {
@@ -280,8 +283,7 @@ export async function registerServices(
           ),
           // Register Service as vectorDBService for easy resolution.
           [`searchIndexService`]: aliasTo(name),
-
-        })
+        });
       } else if (AbstractFileService.isFileService(loaded.prototype)) {
         // Add the service directly to the container in order to make simple
         // resolution if we already know which file storage provider we need to use
@@ -293,7 +295,7 @@ export async function registerServices(
             }
           ),
           [`fileService`]: aliasTo(name),
-        })
+        });
       } else {
         container.register({
           [name]: asFunction(

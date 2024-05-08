@@ -11,7 +11,6 @@ import {
   DocType,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
-import { DocType } from "@ocular/types";
 import { RateLimiterQueue } from "rate-limiter-flexible"
 
 interface Config {

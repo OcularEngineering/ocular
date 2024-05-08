@@ -1,4 +1,4 @@
-import { TransactionBaseService } from "./transaction-base-service"
+import { TransactionBaseService } from "./transaction-base-service";
 import {
   DeleteFileType,
   FileServiceGetUploadStreamResult,
@@ -6,20 +6,21 @@ import {
   GetUploadedFileType,
   MedusaContainer,
   UploadStreamDescriptorType,
-} from "@medusajs/types"
+} from "@medusajs/types";
+import { Express } from "express";
 
 export interface IFileService extends TransactionBaseService {
-  upload(file: Express.Multer.File): Promise<FileServiceUploadResult>
-  uploadProtected(file: Express.Multer.File): Promise<FileServiceUploadResult>
-  delete(fileData: DeleteFileType): Promise<void>
+  upload(file: Express.Multer.File): Promise<FileServiceUploadResult>;
+  uploadProtected(file: Express.Multer.File): Promise<FileServiceUploadResult>;
+  delete(fileData: DeleteFileType): Promise<void>;
   getUploadStreamDescriptor(
     fileData: UploadStreamDescriptorType
-  ): Promise<FileServiceGetUploadStreamResult>
+  ): Promise<FileServiceGetUploadStreamResult>;
 
   getDownloadStream(
     fileData: GetUploadedFileType
-  ): Promise<NodeJS.ReadableStream>
-  getPresignedDownloadUrl(fileData: GetUploadedFileType): Promise<string>
+  ): Promise<NodeJS.ReadableStream>;
+  getPresignedDownloadUrl(fileData: GetUploadedFileType): Promise<string>;
 }
 
 export abstract class AbstractFileService
@@ -29,41 +30,41 @@ export abstract class AbstractFileService
   /**
    * @ignore
    */
-  static _isFileService = true
+  static _isFileService = true;
 
   /**
    * @ignore
    */
   static isFileService(object): object is AbstractFileService {
-    return object?.constructor?._isFileService
+    return object?.constructor?._isFileService;
   }
 
   protected constructor(
     protected readonly container: Record<string, unknown>,
     protected readonly config?: Record<string, unknown> // eslint-disable-next-line @typescript-eslint/no-empty-function
   ) {
-    super(container, config)
+    super(container, config);
   }
 
   abstract upload(
     fileData: Express.Multer.File
-  ): Promise<FileServiceUploadResult>
+  ): Promise<FileServiceUploadResult>;
 
   abstract uploadProtected(
     fileData: Express.Multer.File
-  ): Promise<FileServiceUploadResult>
+  ): Promise<FileServiceUploadResult>;
 
-  abstract delete(fileData: DeleteFileType): Promise<void>
+  abstract delete(fileData: DeleteFileType): Promise<void>;
 
   abstract getUploadStreamDescriptor(
     fileData: UploadStreamDescriptorType
-  ): Promise<FileServiceGetUploadStreamResult>
+  ): Promise<FileServiceGetUploadStreamResult>;
 
   abstract getDownloadStream(
     fileData: GetUploadedFileType
-  ): Promise<NodeJS.ReadableStream>
+  ): Promise<NodeJS.ReadableStream>;
 
   abstract getPresignedDownloadUrl(
     fileData: GetUploadedFileType
-  ): Promise<string>
+  ): Promise<string>;
 }

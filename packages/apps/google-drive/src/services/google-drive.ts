@@ -1,19 +1,30 @@
 import { Readable } from "stream";
 import { EntityManager } from "typeorm";
-import { App, OAuthService, Organisation, RateLimiterService } from "@ocular/ocular";
-import { IndexableDocument, TransactionBaseService, Logger, AppNameDefinitions, DocType  } from "@ocular/types";
-import {OAuth2Client} from 'google-auth-library';
-import { ConfigModule } from '@ocular/ocular/src/types';
-import fs from 'fs';
-import { google, drive_v3 } from 'googleapis';
-import { RateLimiterQueue } from "rate-limiter-flexible"
+import {
+  App,
+  OAuthService,
+  Organisation,
+  RateLimiterService,
+} from "@ocular/ocular";
+import {
+  IndexableDocument,
+  TransactionBaseService,
+  Logger,
+  AppNameDefinitions,
+  DocType,
+} from "@ocular/types";
+import { OAuth2Client } from "google-auth-library";
+import { ConfigModule } from "@ocular/ocular/src/types";
+import fs from "fs";
+import { google, drive_v3 } from "googleapis";
+import { RateLimiterQueue } from "rate-limiter-flexible";
 
 export default class GoogleDriveService extends TransactionBaseService {
   protected oauthService_: OAuthService;
   protected rateLimiterService_: RateLimiterService;
   protected logger_: Logger;
   protected container_: ConfigModule;
-  protected requestQueue_: RateLimiterQueue
+  protected requestQueue_: RateLimiterQueue;
 
   constructor(container) {
     super(arguments[0]);
@@ -21,23 +32,21 @@ export default class GoogleDriveService extends TransactionBaseService {
     this.rateLimiterService_ = container.rateLimiterService;
     this.logger_ = container.logger;
     this.container_ = container;
-    this.requestQueue_ = this.rateLimiterService_.getRequestQueue(AppNameDefinitions.GOOGLEDRIVE);
+    this.requestQueue_ = this.rateLimiterService_.getRequestQueue(
+      AppNameDefinitions.GOOGLEDRIVE
+    );
   }
 
   async getGoogleDriveData(org: Organisation) {
     return Readable.from(this.getGoogleDriveFiles(org));
   }
 
-  async *getGoogleDriveFiles(org: Organisation): AsyncGenerator<IndexableDocument[]> {
-      this.logger_.info(`Starting oculation of Google Drive for ${org.id} organisation`);
-
-     
-      // Check if the OAuth record exists for this App in this Organisation.
-      const oauth = await this.oauthService_.retrieve({id: org.id, app_name: AppNameDefinitions.GOOGLEDRIVE});
-      if (!oauth) {
-        this.logger_.error(`No Google Drive OAuth Cred found for ${org.id} organisation`);
-        return;
-      }
+  async *getGoogleDriveFiles(
+    org: Organisation
+  ): AsyncGenerator<IndexableDocument[]> {
+    this.logger_.info(
+      `Starting oculation of Google Drive for ${org.id} organisation`
+    );
 
     // Check if the OAuth record exists for this App in this Organisation.
     const oauth = await this.oauthService_.retrieve({
@@ -73,54 +82,21 @@ export default class GoogleDriveService extends TransactionBaseService {
     // Array storing the processed documents
     let documents: IndexableDocument[] = [];
 
-        // Paginate To Get All Files From Google Drive
-        let pageToken = null;
-        do {
-          // Block Until Rate Limit Allows Request
-          await this.requestQueue_.removeTokens(1,AppNameDefinitions.GOOGLEDRIVE)
-          const { data } = await drive.files.list({
-            q: query,
-            fields: 'files(id,name,modifiedTime,webViewLink)',
-            pageToken: pageToken
-          });
-          // Get the content of each file
-          for(const file of data.files){
-            // Get Each Files Content As Plain Text
-            const content = await this.getGoogleDriveFileContent(file.id, drive);
-            const doc: IndexableDocument = {
-              id: file.id,
-              organisationId: org.id,
-              title: file.name,
-              source: AppNameDefinitions.GOOGLEDRIVE,
-              sections: [{
-                link :file.webViewLink,
-                content: content
-              }],
-              type: DocType.TEXT,
-              metadata:{},
-              updatedAt: new Date(file.modifiedTime),
-            };
-            // Batch Documents To Be Yielded To Max 100 At A Time
-            if(documents.length == 100){
-              yield documents;
-              documents = [];
-            }
-            documents.push(doc);
-          }
-          pageToken = data.nextPageToken;
-        } while (pageToken);
-        // Yield The Remaining Documents
-        yield documents;
-        // Update the last sync date  for the connector
-        await this.oauthService_.update(oauth.id, {last_sync: new Date()});
-      } catch (error) {
-        // If the error is an unauthorized error, refresh the token and retry the request
-        if (error.response && error.response.status === 401) { // Check if it's an unauthorized error
-          this.logger_.info(`Refreshing Asana token for ${org.id} organisation`);
+    try {
+      // Only Sync Files Modified After Last Sync.
+      let query = "mimeType='application/vnd.google-apps.document'";
+      if (last_sync !== "") {
+        query += ` and modifiedTime > '${last_sync}'`;
+      }
 
       // Paginate To Get All Files From Google Drive
       let pageToken = null;
       do {
+        // Block Until Rate Limit Allows Request
+        await this.requestQueue_.removeTokens(
+          1,
+          AppNameDefinitions.GOOGLEDRIVE
+        );
         const { data } = await drive.files.list({
           q: query,
           fields: "files(id,name,modifiedTime,webViewLink)",
@@ -178,12 +154,18 @@ export default class GoogleDriveService extends TransactionBaseService {
         console.error(error);
       }
 
-      this.logger_.info(`Finished oculation of Google Drive for ${org.id} organisation`);
+      console.log(error);
+      console.error("The API returned an error: " + error);
+      return null;
+    }
+    this.logger_.info(
+      `Finished oculation of Google Drive for ${org.id} organisation`
+    );
   }
 
   // Get The Content Of A Google Drive File
   async getGoogleDriveFileContent(fileId: string, drive: drive_v3.Drive) {
-    await this.requestQueue_.removeTokens(1,AppNameDefinitions.GOOGLEDRIVE)
+    await this.requestQueue_.removeTokens(1, AppNameDefinitions.GOOGLEDRIVE);
     return await new Promise<string>((resolve, reject) => {
       let data = "";
       drive.files

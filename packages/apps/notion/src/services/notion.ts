@@ -1,7 +1,7 @@
 import fs from "fs";
 import axios from "axios";
 import { Readable } from "stream";
-import { OAuthService, Organisation } from "@ocular/ocular";
+import { OAuthService, Organisation, RateLimiterService } from "@ocular/ocular";
 import {
   IndexableDocument,
   TransactionBaseService,
@@ -11,17 +11,24 @@ import {
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 import { RateLimit } from "async-sema";
+import { RateLimiterQueue } from "rate-limiter-flexible";
 
 export default class NotionService extends TransactionBaseService {
   protected oauthService_: OAuthService;
   protected logger_: Logger;
   protected container_: ConfigModule;
+  protected rateLimiterService_: RateLimiterService;
+  protected requestQueue_: RateLimiterQueue;
 
   constructor(container) {
     super(arguments[0]);
     this.oauthService_ = container.oauthService;
     this.logger_ = container.logger;
     this.container_ = container;
+    this.rateLimiterService_ = container.rateLimiterService;
+    this.requestQueue_ = this.rateLimiterService_.getRequestQueue(
+      AppNameDefinitions.NOTION
+    );
   }
 
   async getNotionPagesData(org: Organisation) {
@@ -48,15 +55,10 @@ export default class NotionService extends TransactionBaseService {
 
     let documents: IndexableDocument[] = [];
 
-    const rateLimiter = RateLimit(1, {
-      timeUnit: 2000,
-      uniformDistribution: true,
-    });
-
     try {
-      const notionPages = await this.getNotionPages(oauth.token, rateLimiter);
+      const notionPages = await this.getNotionPages(oauth.token);
       for (const page of notionPages) {
-        const text = await this.processBlock(oauth.token, page.id, rateLimiter);
+        const text = await this.processBlock(oauth.token, page.id);
         const title = this.generateTitleFromParagraph(text);
         // Add Project To Documents
         const pageDoc: IndexableDocument = {
@@ -107,7 +109,7 @@ export default class NotionService extends TransactionBaseService {
     });
   }
 
-  async getNotionPages(accessToken: string, limit) {
+  async getNotionPages(accessToken: string) {
     const resultPages = [];
 
     const requestData = {
@@ -127,6 +129,7 @@ export default class NotionService extends TransactionBaseService {
     };
 
     try {
+      await this.requestQueue_.removeTokens(1, AppNameDefinitions.NOTION);
       // First request to fetch initial pages
       let response = await axios.post(
         `https://api.notion.com/v1/search`,
@@ -142,8 +145,7 @@ export default class NotionService extends TransactionBaseService {
 
       // Loop until there are no more pages to fetch
       while (hasMore) {
-        await limit(); // Rate limiting to respect Notion's API limits
-
+        await this.requestQueue_.removeTokens(1, AppNameDefinitions.NOTION);
         // Subsequent requests with pagination
         response = await axios.post(
           `https://api.notion.com/v1/search`,
@@ -173,8 +175,7 @@ export default class NotionService extends TransactionBaseService {
     return richText.map((element) => element.plain_text).join("");
   };
 
-  async retrieveBlockChildren(accessToken: string, blockID: string, limit) {
-    console.log("Retrieving blocks (async)...");
+  async retrieveBlockChildren(accessToken: string, blockID: string) {
     const blocks = [];
 
     const headers = {
@@ -183,6 +184,7 @@ export default class NotionService extends TransactionBaseService {
     };
 
     try {
+      await this.requestQueue_.removeTokens(1, AppNameDefinitions.NOTION);
       // First request to fetch initial pages
       let response = await axios.get(
         `https://api.notion.com/v1/blocks/${blockID}/children`,
@@ -197,7 +199,7 @@ export default class NotionService extends TransactionBaseService {
 
       // Loop until there are no more pages to fetch
       while (hasMore) {
-        await limit(); // Rate limiting to respect Notion's API limits
+        await this.requestQueue_.removeTokens(1, AppNameDefinitions.NOTION);
 
         const queryParams = {
           start_cursor: nextCursor,
@@ -224,12 +226,11 @@ export default class NotionService extends TransactionBaseService {
     }
   }
 
-  async processBlock(accessToken: string, blockID: string, limit) {
+  async processBlock(accessToken: string, blockID: string) {
     console.log("Handling Block with ID :", blockID);
     const childrenBlocks = await this.retrieveBlockChildren(
       accessToken,
-      blockID,
-      limit
+      blockID
     );
 
     let text = "";
@@ -240,7 +241,7 @@ export default class NotionService extends TransactionBaseService {
         }
 
         if (block.has_children) {
-          text += await this.processBlock(accessToken, block.id, limit);
+          text += await this.processBlock(accessToken, block.id);
         }
       }
     }
