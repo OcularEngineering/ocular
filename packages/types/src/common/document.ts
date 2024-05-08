@@ -50,7 +50,10 @@ export interface SearchDocument {
   organisationId: string;
   source: AppNameDefinitions;
   title: string;
-  content: string;
-  metadata: Record<string, unknown>;
+  snippets: SearchSnippet[];
   updatedAt: Date;
+}
+
+export interface SearchSnippet{
+  content: string;
 }

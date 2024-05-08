@@ -2,7 +2,7 @@ import { IndexableDocChunk,SearchContext,SearchResult } from "../common"
 export interface IVectorDB {
   createIndex(indexName:string): Promise<void>
   addDocuments(indexName:string, doc: IndexableDocChunk[]): Promise<void>
-  searchDocuments(org_id: string, vector: number[], context?: SearchContext): Promise<IndexableDocChunk[]>
+  searchDocuments(org_id: string, vector: number[], context?: SearchContext): Promise<SearchResult>
   deleteIndex(indexName: string): Promise<void>
 }
 
@@ -23,6 +23,6 @@ export abstract class AbstractVectorDBService
 
   abstract createIndex(indexName: string): Promise<void>;
   abstract addDocuments(indexName:string, doc: IndexableDocChunk[]): Promise<void>
-  abstract searchDocuments(org_id: string, vector: number[], context?: SearchContext): Promise<IndexableDocChunk[]>
+  abstract searchDocuments(org_id: string, vector: number[], context?: SearchContext): Promise<SearchResult>
   abstract deleteIndex(indexName: string): Promise<void>
 }

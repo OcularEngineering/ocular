@@ -29,8 +29,9 @@ export type SearchContext = {
   //
   // 
 
+
 export interface SearchResult {
-  message: SearchResultMessage;
+  query?: SearchResultMessage;
   hits: SearchDocument[];
 }
 
