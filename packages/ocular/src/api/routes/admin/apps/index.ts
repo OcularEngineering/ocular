@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import "reflect-metadata"
-import { Router } from "express"
-import middlewares, { transformQuery } from "../../../middlewares"
-import { App } from "../../../../models"
+import "reflect-metadata";
+import { Router } from "express";
+import middlewares, { transformQuery } from "../../../middlewares";
+import { App } from "../../../../models";
 // import { GetAppParams } from "./get-app"
 
-const route = Router()
+const route = Router();
 export default (app) => {
-  app.use("/apps", route)
+  app.use("/apps", route);
   // route.get(
-  //   "/:id", 
+  //   "/:id",
   //   transformQuery(GetAppParams, {
   //     defaultRelations: defaultAppRelations,
   //     defaultFields: defaultAppFields,
@@ -17,24 +17,26 @@ export default (app) => {
   //   }),
   //   middlewares.wrap(require("./get-app").default)
   //   )
-  
 
   // route.post(
   //   "/authorize",
   //   middlewares.wrap(require("./authorize-app").default)
   // )
-  route.get("/",middlewares.wrap(require("./list-apps").default))
+
+  route.get("/", middlewares.wrap(require("./list-apps").default));
   route.post(
     "/authorize",
     middlewares.wrap(require("./authorize-app").default)
-  )
+  );
   route.get(
     "/installed",
     middlewares.wrap(require("./list-installed-apps").default)
-  )
-  return app
-}
+  );
 
-export * from "./authorize-app"
+  route.post("/savelink", middlewares.wrap(require("./webConnector").default));
+  return app;
+};
+
+export * from "./authorize-app";
 // export * from "../organisation/install-app"
-export * from "./list-apps"
+export * from "./list-apps";

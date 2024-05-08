@@ -1,3 +1,4 @@
+
 import { IndexableDocument,AppNameDefinitions, IEventBusService, INDEX_DOCUMENT_EVENT, BatchJobCreateProps, SEARCH_INDEXING_TOPIC   } from "@ocular/types"
 import { defaultSearchIndexingProductRelations, indexTypes } from "../utils/search"
 import OrganisationService from "../services/organisation"
@@ -33,8 +34,8 @@ class SearchIndexingSubscriber {
   private readonly jobSchedulerService_: JobSchedulerService
   private readonly queueService_: QueueService
   private readonly configModule_: ConfigModule;
-  private readonly logger_: Logger
-  private readonly indexName_: string
+  private readonly logger_: Logger;
+  private readonly indexName_: string;
 
   constructor({
     indexerService,
@@ -47,6 +48,7 @@ class SearchIndexingSubscriber {
     logger,
     indexName,
   }: InjectedDependencies) {
+
     this.indexerService_ = indexerService
     this.batchJobService_ = batchJobService
     this.organisationService_ = organisationService
@@ -56,6 +58,10 @@ class SearchIndexingSubscriber {
     this.logger_ = logger
     this.eventBusService_.subscribe(SEARCH_INDEX_EVENT, this.buildSearchIndex)
     this.eventBusService_.subscribe(OAuthService.Events.TOKEN_GENERATED, this.addSearchIndexingJob)
+    this.eventBusService_.subscribe(
+      "webConnectorInstalled",
+      this.addSearchIndexingJobWebConnector
+    );
     this.indexName_ = indexName
   }
 
@@ -90,22 +96,47 @@ class SearchIndexingSubscriber {
       })
     })
   }
+  
+   addSearchIndexingJobWebConnector = async (data): Promise<void> => {
+    const { organisation, app_name, link, link_id } = data;
+    const jobProps: BatchJobCreateProps = {
+      type: app_name,
+      context: {
+        org: organisation,
+        link: link,
+        link_id,
+      },
+      // created_by: "system",
+      dry_run: false,
+    };
+    this.batchJobService_.create(jobProps);
+  };
 
   // Schedules An Indexing Job when an App is installed by an Organization.
   addSearchIndexingJob = async (data): Promise<void> => {
-    const {organisation,app_name} = data
-    this.jobSchedulerService_.create(`Sync Apps Data for ${organisation.name}`, {org: organisation}, "* * * * *", async () => {
+    const { organisation, app_name } = data;
+
+    if (app_name === AppNameDefinitions.WEBCONNECTOR) {
+      return;
+    }
+
+    this.jobSchedulerService_.create(
+      `Sync Apps Data for ${organisation.name}`,
+      { org: organisation },
+      "* * * * *",
+      async () => {
         const jobProps: BatchJobCreateProps = {
-            type: app_name,
-            context: {
-                org: organisation
-            },
-            // created_by: "system",
-            dry_run: false,
-        }
-        this.batchJobService_.create(jobProps)
-      })
-  }
+          type: app_name,
+          context: {
+            org: organisation,
+          },
+          // created_by: "system",
+          dry_run: false,
+        };
+        this.batchJobService_.create(jobProps);
+      }
+    );
+  };
 }
 
-export default SearchIndexingSubscriber
+export default SearchIndexingSubscriber;

@@ -104,6 +104,29 @@ export default class JiraService extends TransactionBaseService {
             documents = [];
           }
         }
+
+        const jqlQuery = `project = "OT" ORDER BY created DESC`;
+
+        // Add Project To Documents
+        const projectDoc: IndexableDocument = {
+          id: project.id,
+          organisationId: org.id,
+          title: project.name,
+          source: AppNameDefinitions.JIRA,
+          sections: [
+            {
+              content: project.description,
+              link: `${url}/jira/software/projects/${
+                project.key
+              }/issues?jql=${encodeURIComponent(jqlQuery)}`,
+            },
+          ],
+          type: DocType.TEXT,
+          updatedAt: new Date(),
+
+          metadata: {},
+        };
+        documents.push(projectDoc);
       }
 
       yield documents;

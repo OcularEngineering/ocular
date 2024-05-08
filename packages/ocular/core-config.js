@@ -1,4 +1,4 @@
-const { PluginNameDefinitions } = require('@ocular/types');
+const { PluginNameDefinitions } = require("@ocular/types");
 const dotenv = require("dotenv");
 
 let ENV_FILE_NAME = "";
@@ -91,6 +91,10 @@ module.exports = {
         client_secret: process.env.NOTION_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/notion`,
       },
+      rate_limiter_opts: {
+        requests: 3, // Number of Requests
+        interval: 1, // Interval in Seconds
+      },
     },
     {
       resolve: `slack`,
@@ -120,8 +124,8 @@ module.exports = {
         redirect_uri: `${UI_CORS}/dashboard/marketplace/github`,
         app_id: process.env.GITHUB_APP_ID,
         private_key: process.env.GITHUB_PRIVATE_KEY_PATH,
-        scope: "repo"
-      }
+        scope: "repo",
+      },
     },
     {
       resolve: `google-drive`,
@@ -147,6 +151,25 @@ module.exports = {
         },
       },
     },
+    {
+      resolve: `webConnector`,
+      options: {
+        client_id: "FAKE_ID",
+        client_secret: "FAKE_SECRET",
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/webConnector`,
+      },
+    },
+    // {
+    //   resolve: `github`,
+    //   options: {
+    //     client_id: process.env.GITHUB_CLIENT_ID,
+    //     client_secret: process.env.GITHUB_CLIENT_SECRET,
+    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/github`,
+    //     app_id: process.env.GITHUB_APP_ID,
+    //     private_key: process.env.GITHUB_PRIVATE_KEY_PATH,
+    //     scope: "repo"
+    //   }
+    // },
   ],
   plugins: [
     {
@@ -192,6 +215,6 @@ module.exports = {
         quadrant_db_url: process.env.QDRANT_DB_URL || "http://localhost:6333",
         embedding_size: 1536,
       },
-    }
+    },
   ],
 };

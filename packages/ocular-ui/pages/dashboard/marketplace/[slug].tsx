@@ -12,11 +12,18 @@ import { Integration } from '@/types/types';
 import { Button } from "@/components/ui/button";
 import api from "@/services/admin-api";
 import { IconChevronLeft, IconExternalLink } from '@supabase/ui';
+import  WebConnector  from '@/components/marketplace/webConnector';
+
+interface Link {
+  location: string;
+  status: 'processing' | 'success' | 'failed';
+};
 
 function Integration() {
 
   const [integration, setIntegration] = useState<Integration | null>(null);
   const [authorized, setAuthorized] = useState(false);
+  const [links,setLinks]=useState<Link[]| null>(null);
   const router = useRouter();
   let { slug, code, installation_id } = router.query;
 
@@ -49,13 +56,22 @@ function Integration() {
            
             const installed = response.data.apps.some(app => app.name === slug);
             setAuthorized(installed);
+
+            if(slug==="webConnector"&&authorized){
+              const webConnector=response.data.apps.find((app)=>app.name===slug);
+              if (webConnector && webConnector.links && webConnector.links.length > 0) {
+              setLinks(webConnector.links);
+            }else{
+              setLinks([]);
+            }
+            }
           }
         } catch (error) {
-          console.error("Failed to get installe apps", error);
+          console.error("Failed to get installed apps", error);
         }
       }
       listInstalled()
-    }, [slug]);
+    }, [slug,authorized]);
 
   useEffect(() => {
     const authorizeApp = async () => {
@@ -77,7 +93,33 @@ function Integration() {
     authorizeApp()
   }, [code,installation_id]);
 
+  const addWebConnector=async ()=>{
+    try {
+        const response = await api.apps.authorizeApp({
+          code: "Fake Code" as string,
+          name: slug as string,
+          installationId: installation_id
+        }); // Adjust this to match your actual API call
+        if (response) {
+          setAuthorized(true);
+          router.push(`/dashboard/marketplace/${slug}`); // Redirect to the integration page
+        }
+      } catch (error) {
+        console.error("Failed to authorize integration", error);
+      }
+    };
+
   if (!integration) return <div>Loading...</div>;
+
+  if(slug==="webConnector"&& authorized){
+
+    if(!links){
+      console.log("REACHED HERE",links);
+      return <div>Loading...</div>; 
+    }
+    
+    return <WebConnector links={links}/>
+  }
 
   return (
     <>
@@ -113,10 +155,16 @@ function Integration() {
             
               {authorized? (
                 <Button disabled>Installed</Button>
-              ) : (
-                <Link href={integration.oauth_url}>
-                  <Button>Add {integration.name} for Ocular</Button>
-                </Link>
+              ) : (  
+                
+                slug === 'webConnector' ? (
+                <Button onClick={addWebConnector}> Add {integration.name} for Ocular</Button>
+                ) : 
+                  (
+                    <Link href={integration.oauth_url}>
+                    <Button>Add {integration.name} for Ocular</Button>
+                    </Link>
+                  )
               )
               }
             </div>

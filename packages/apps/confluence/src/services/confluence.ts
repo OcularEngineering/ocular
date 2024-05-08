@@ -113,11 +113,13 @@ export default class ConfluenceService extends TransactionBaseService {
       await this.oauthService_.update(oauth.id, { last_sync: new Date() });
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        this.logger_.info(`Refreshing Asana token for ${org.id} organisation`);
-
-        const oauthToken = await this.container_["asanaOauth"].refreshToken(
-          oauth.refresh_token
+        this.logger_.info(
+          `Refreshing Confluence token for ${org.id} organisation`
         );
+
+        const oauthToken = await this.container_[
+          "confluenceOauth"
+        ].refreshToken(oauth.refresh_token);
 
         await this.oauthService_.update(oauth.id, oauthToken);
 

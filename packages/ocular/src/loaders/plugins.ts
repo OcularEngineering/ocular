@@ -1,43 +1,50 @@
 const glob = require("glob");
-const fg = require('fast-glob');
-import { Express } from "express"
-import fs from "fs"
-import { sync as existsSync } from "fs-exists-cached"
-import _ from "lodash"
-import createRequireFromPath from "../utils/create-require-from-path"
+const fg = require("fast-glob");
+import { Express } from "express";
+import fs from "fs";
+import { sync as existsSync } from "fs-exists-cached";
+import _ from "lodash";
+import createRequireFromPath from "../utils/create-require-from-path";
 
-import { EOL } from "os"
-import path from "path"
-import { AutoflowContainer } from "@ocular/utils"
-import { ConfigModule, Logger } from "../types"
-import { promiseAll } from "@ocular/utils"
+import { EOL } from "os";
+import path from "path";
+import { pathByOS } from "@ocular/utils";
+import { AutoflowContainer } from "@ocular/utils";
+import { ConfigModule, Logger } from "../types";
+import { promiseAll } from "@ocular/utils";
+import { formatRegistrationName } from "../utils/format-registration-name";
+import { aliasTo, asValue, asFunction, Lifetime } from "awilix";
 import {
-  formatRegistrationName,
-} from "../utils/format-registration-name"
-import {  aliasTo, asValue, asFunction , Lifetime } from "awilix"
-import { AbstractNotificationService, AbstractSearchService, OauthService } from "@ocular/types"
-import { AbstractDocumentProcesserService, AbstractLLMService, AbstractFileService } from "@ocular/types";
+  AbstractNotificationService,
+  AbstractSearchService,
+  OauthService,
+} from "@ocular/types";
+import {
+  AbstractDocumentProcesserService,
+  AbstractLLMService,
+  AbstractFileService,
+} from "@ocular/types";
 import { AbstractVectorDBService } from "@ocular/types";
 
 type Options = {
-  rootDirectory: string
-  container: AutoflowContainer
-  configModule: ConfigModule
-  app: Express
-  activityId: string
-}
+  rootDirectory: string;
+  container: AutoflowContainer;
+  configModule: ConfigModule;
+  app: Express;
+  activityId: string;
+};
 
 type PluginDetails = {
-  resolve: string
-  name: string
-  id: string
-  options: Record<string, unknown>
-  version: string
-}
+  resolve: string;
+  name: string;
+  id: string;
+  options: Record<string, unknown>;
+  version: string;
+};
 
-export const isSearchEngineInstalledResolutionKey = "isSearchEngineInstalled"
+export const isSearchEngineInstalledResolutionKey = "isSearchEngineInstalled";
 
-export const OCULAR_PROJECT_NAME = "ocular-core-app"
+export const OCULAR_PROJECT_NAME = "ocular-core-app";
 
 /**
  * Registers all services in the services directory
@@ -49,52 +56,49 @@ export default async ({
   configModule,
   activityId,
 }: Options): Promise<void> => {
-  const resolved = getResolvedPlugins(rootDirectory, configModule) || []
-  
+  const resolved = getResolvedPlugins(rootDirectory, configModule) || [];
+
   await promiseAll(
     resolved.map(
       async (pluginDetails) => await runSetupFunctions(pluginDetails)
     )
-  )
+  );
 
   await promiseAll(
     resolved.map(async (pluginDetails) => {
-      registerRepositories(pluginDetails, container)
-      await registerServices(pluginDetails, container)
+      registerRepositories(pluginDetails, container);
+      await registerServices(pluginDetails, container);
       // await registerMedusaApi(pluginDetails, container)
       // registerApi(pluginDetails, plugin, rootDirectory, container, activityId)
       // registerCoreRouters(pluginDetails, container)
-      registerSubscribers(pluginDetails, container)
+      registerSubscribers(pluginDetails, container);
     })
-  )
+  );
 
   await Promise.all(
     resolved.map(async (pluginDetails) => runLoaders(pluginDetails, container))
-  )
-
+  );
 
   // resolved.forEach((plugin) => trackInstallation(plugin.name, "plugin"))
-  
-
-}
+};
 
 function getResolvedPlugins(
   rootDirectory: string,
   configModule: ConfigModule,
   extensionDirectoryPath = "dist/core-backend/src"
 ): undefined | PluginDetails[] {
-  const { plugins } = configModule
+  const { plugins } = configModule;
 
-  const resolved = plugins.map((plugin:PluginDetails) => {
+  const resolved = plugins.map((plugin: PluginDetails) => {
     if (_.isString(plugin)) {
-      return resolvePlugin(plugin.resolve)
+      return resolvePlugin(plugin.resolve);
     }
 
-    const details = resolvePlugin(plugin.resolve)
-    details.options = plugin.options
+    const details = resolvePlugin(plugin.resolve);
+    details.options = plugin.options;
 
-    return details
-  })
+    return details;
+  });
 
   // const extensionDirectory = path.join(rootDirectory, extensionDirectoryPath)
   // // Resolve user's project as a plugin for loading purposes
@@ -106,36 +110,31 @@ function getResolvedPlugins(
   //   version: createFileContentHash(process.cwd(), `**`),
   // })
 
-  return resolved
+  return resolved;
 }
 
 async function runLoaders(
   pluginDetails: PluginDetails,
   container: AutoflowContainer
 ): Promise<void> {
-  const loaderFiles = glob.sync(
-    `${pluginDetails.resolve}/dist/loaders/[!__]*.js`,
-    {}
-  )
+  const loaderFilesGlob = pathByOS(`${pluginDetails.resolve}/loaders/*.js`);
+  const loaderFiles = glob.sync(loaderFilesGlob, {});
+
   await Promise.all(
     loaderFiles.map(async (loader) => {
       try {
-        const module = require(loader).default
+        const module = require(loader).default;
         if (typeof module === "function") {
-          await module(container, pluginDetails.options)
+          await module(container, pluginDetails.options);
         }
       } catch (err) {
-        const logger = container.resolve<Logger>("logger")
-        logger.warn(`Running loader failed: ${err.message}`)
-        return Promise.resolve()
+        const logger = container.resolve<Logger>("logger");
+        logger.warn(`Running loader failed: ${err.message}`);
+        return Promise.resolve();
       }
     })
-  )
+  );
 }
-
-
-
-
 
 /**
  * Registers an plugins's repositories at the right location in our container.
@@ -150,19 +149,22 @@ function registerRepositories(
   pluginDetails: PluginDetails,
   container: AutoflowContainer
 ): void {
-  const files = glob.sync(`${pluginDetails.resolve}/repositories/*.js`, {})
+  const registerRepositoriesGlob = pathByOS(
+    `${pluginDetails.resolve}/repositories/*.js`
+  );
+  const files = glob.sync(registerRepositoriesGlob, {});
   files.forEach((fn) => {
-    const loaded = require(fn)
+    const loaded = require(fn);
 
     Object.entries(loaded).map(([, val]: [string, any]) => {
       if (typeof loaded === "object") {
-        const name = formatRegistrationName(fn)
+        const name = formatRegistrationName(fn);
         container.register({
           [name]: asValue(val),
-        })
+        });
       }
-    })
-  })
+    });
+  });
 }
 
 /**
@@ -179,28 +181,31 @@ export async function registerServices(
   pluginDetails: PluginDetails,
   container: AutoflowContainer
 ): Promise<void> {
-  const files = glob.sync(`${pluginDetails.resolve}/dist/services/[!__]*.js`, {})
-  
+  const registerServicesGlob = pathByOS(
+    `${pluginDetails.resolve}/dist/services/*.js`
+  );
+  const files = glob.sync(registerServicesGlob, {});
+
   await promiseAll(
     files.map(async (fn) => {
-      const loaded = require(fn).default
-      const name = formatRegistrationName(fn)
+      const loaded = require(fn).default;
+      const name = formatRegistrationName(fn);
       if (typeof loaded !== "function") {
         throw new Error(
           `Cannot register ${name}. Make sure to default export a service class in ${fn}`
-        )
+        );
       }
 
       if (OauthService.isOauthService(loaded.prototype)) {
-        const registerPluginDetails = loaded.getPluginDetails(pluginDetails.options)
-
+        const registerPluginDetails = loaded.getPluginDetails(
+          pluginDetails.options
+        );
 
         // Self register the plugin on startup
-        const pluginService =
-           container.resolve("pluginService")
-        await pluginService.registerPluginOnStartUp(registerPluginDetails)
+        const pluginService = container.resolve("pluginService");
+        await pluginService.registerPluginOnStartUp(registerPluginDetails);
 
-        const name = registerPluginDetails.name
+        const name = registerPluginDetails.name;
         container.register({
           [`${name}Oauth`]: asFunction(
             (cradle) => new loaded(cradle, pluginDetails.options),
@@ -208,7 +213,7 @@ export async function registerServices(
               lifetime: Lifetime.SCOPED,
             }
           ),
-        })
+        });
       } else if (
         AbstractNotificationService.isNotificationService(loaded.prototype)
       ) {
@@ -217,7 +222,7 @@ export async function registerServices(
           asFunction((cradle) => new loaded(cradle, pluginDetails.options), {
             lifetime: loaded.LIFE_TIME || Lifetime.SINGLETON,
           })
-        )
+        );
 
         // Add the service directly to the container in order to make simple
         // resolution if we already know which notification provider we need to use
@@ -229,8 +234,12 @@ export async function registerServices(
             }
           ),
           [`noti_${loaded.identifier}`]: aliasTo(name),
-        })
-      } else if (AbstractDocumentProcesserService.isDocumentProcessorService(loaded.prototype)) {
+        });
+      } else if (
+        AbstractDocumentProcesserService.isDocumentProcessorService(
+          loaded.prototype
+        )
+      ) {
         container.register({
           [name]: asFunction(
             (cradle) => new loaded(cradle, pluginDetails.options),
@@ -238,8 +247,8 @@ export async function registerServices(
               lifetime: loaded.LIFE_TIME || Lifetime.SINGLETON,
             }
           ),
-        })
-      } else if (AbstractLLMService.isLLMService(loaded.prototype)){
+        });
+      } else if (AbstractLLMService.isLLMService(loaded.prototype)) {
         container.register({
           [name]: asFunction(
             (cradle) => new loaded(cradle, pluginDetails.options),
@@ -247,8 +256,8 @@ export async function registerServices(
               lifetime: loaded.LIFE_TIME || Lifetime.SINGLETON,
             }
           ),
-        })
-      } else if (AbstractVectorDBService.isVectorDBService(loaded.prototype)){
+        });
+      } else if (AbstractVectorDBService.isVectorDBService(loaded.prototype)) {
         // Register A Vector DB Service To Our Backend As The Defacto VectorDB
         // for Ocular
         container.register({
@@ -260,8 +269,8 @@ export async function registerServices(
           ),
           // Register Service as vectorDBService for easy resolution.
           [`vectorDBService`]: aliasTo(name),
-        })
-        container.register(isSearchEngineInstalledResolutionKey, asValue(true))
+        });
+        container.register(isSearchEngineInstalledResolutionKey, asValue(true));
       } else if (AbstractSearchService.isSearchService(loaded.prototype)) {
         // Register A SeaService To Our Backend As The Defacto VectorDB
         // for Ocular
@@ -274,7 +283,7 @@ export async function registerServices(
           ),
           // Register Service as vectorDBService for easy resolution.
           [`searchIndexService`]: aliasTo(name),
-        })
+        });
       } else if (AbstractFileService.isFileService(loaded.prototype)) {
         // Add the service directly to the container in order to make simple
         // resolution if we already know which file storage provider we need to use
@@ -286,7 +295,7 @@ export async function registerServices(
             }
           ),
           [`fileService`]: aliasTo(name),
-        })
+        });
       } else {
         container.register({
           [name]: asFunction(
@@ -295,10 +304,10 @@ export async function registerServices(
               lifetime: loaded.LIFE_TIME || Lifetime.SCOPED,
             }
           ),
-        })
+        });
       }
     })
-  )
+  );
 }
 
 /**
@@ -314,16 +323,19 @@ function registerSubscribers(
   pluginDetails: PluginDetails,
   container: AutoflowContainer
 ): void {
-  const files = glob.sync(`${pluginDetails.resolve}/dist/subscribers/*.js`, {})
+  const registerSubscribersGlob = pathByOS(
+    `${pluginDetails.resolve}/dist/subscribers/*.js`
+  );
+  const files = glob.sync(registerSubscribersGlob, {});
   files.forEach((fn) => {
-    const loaded = require(fn).default
+    const loaded = require(fn).default;
 
     container.build(
       asFunction(
         (cradle) => new loaded(cradle, pluginDetails.options)
       ).singleton()
-    )
-  })
+    );
+  });
 }
 
 /**
@@ -333,24 +345,25 @@ function registerSubscribers(
  * @param pluginDetails The plugin details including plugin options, version, id, resolved path, etc.
  */
 async function runSetupFunctions(pluginDetails: PluginDetails): Promise<void> {
-  const files = glob.sync(`${pluginDetails.resolve}/setup/*.js`, {})
+  const runSetupFunctionsGlob = pathByOS(`${pluginDetails.resolve}/setup/*.js`);
+  const files = glob.sync(runSetupFunctionsGlob, {});
   await promiseAll(
     files.map(async (fn) => {
-      const loaded = require(fn).default
+      const loaded = require(fn).default;
       try {
-        await loaded()
+        await loaded();
       } catch (err) {
         throw new Error(
           `A setup function from ${pluginDetails.name} failed. ${err}`
-        )
+        );
       }
     })
-  )
+  );
 }
 
 // TODO: Create unique id for each plugin
 function createPluginId(name: string): string {
-  return name
+  return name;
 }
 
 /**
@@ -362,23 +375,23 @@ function createPluginId(name: string): string {
  * @return {object} the plugin details
  */
 function resolvePlugin(pluginName: string): {
-  resolve: string
-  id: string
-  name: string
-  options: Record<string, unknown>
-  version: string
+  resolve: string;
+  id: string;
+  name: string;
+  options: Record<string, unknown>;
+  version: string;
 } {
   // Only find plugins when we're not given an absolute path
   if (!existsSync(pluginName)) {
     // Find the plugin in the local plugins folder
-    const resolvedPath = path.resolve(`../plugins/${pluginName}`)
+    const resolvedPath = path.resolve(`../plugins/${pluginName}`);
 
     if (existsSync(resolvedPath)) {
       if (existsSync(`${resolvedPath}/package.json`)) {
         const packageJSON = JSON.parse(
           fs.readFileSync(`${resolvedPath}/package.json`, `utf-8`)
-        )
-        const name = packageJSON.name || pluginName
+        );
+        const name = packageJSON.name || pluginName;
         // warnOnIncompatiblePeerDependency(name, packageJSON)
 
         return {
@@ -388,15 +401,15 @@ function resolvePlugin(pluginName: string): {
           options: {},
           version:
             packageJSON.version || createFileContentHash(resolvedPath, `**`),
-        }
+        };
       } else {
         // Make package.json a requirement for local plugins too
-        throw new Error(`Plugin ${pluginName} requires a package.json file`)
+        throw new Error(`Plugin ${pluginName} requires a package.json file`);
       }
     }
   }
 
-  const rootDir = path.resolve(".")
+  const rootDir = path.resolve(".");
 
   /**
    *  Here we have an absolute path to an internal plugin, or a name of a module
@@ -406,30 +419,28 @@ function resolvePlugin(pluginName: string): {
     const requireSource =
       rootDir !== null
         ? createRequireFromPath(`${rootDir}/:internal:`)
-        : require
-        // console.error("resolvedPath", re)
+        : require;
+    // console.error("resolvedPath", re)
     // If the path is absolute, resolve the directory of the internal plugin,
     // otherwise resolve the directory containing the package.json
     const resolvedPath = path.dirname(
       requireSource.resolve(`${pluginName}/package.json`)
-    )
-
-   
+    );
 
     const packageJSON = JSON.parse(
       fs.readFileSync(`${resolvedPath}/package.json`, `utf-8`)
-    )
+    );
     // warnOnIncompatiblePeerDependency(packageJSON.name, packageJSON)
 
     const computedResolvedPath =
-      resolvedPath + (process.env.DEV_MODE ? "/src" : "")
+      resolvedPath + (process.env.DEV_MODE ? "/src" : "");
 
     // Add support for a plugin to output the build into a dist directory
-    const resolvedPathToDist = resolvedPath + "/dist"
+    const resolvedPathToDist = resolvedPath + "/dist";
     const isDistExist =
       resolvedPathToDist &&
       !process.env.DEV_MODE &&
-      existsSync(resolvedPath + "/dist")
+      existsSync(resolvedPath + "/dist");
 
     return {
       resolve: isDistExist ? resolvedPathToDist : computedResolvedPath,
@@ -437,15 +448,15 @@ function resolvePlugin(pluginName: string): {
       name: packageJSON.name,
       options: {},
       version: packageJSON.version,
-    }
+    };
   } catch (err) {
-    console.log("err", err)
+    console.log("err", err);
     throw new Error(
       `Unable to find plugin "${pluginName}". Perhaps you need to install its package?`
-    )
+    );
   }
 }
 
 function createFileContentHash(path, files): string {
-  return path + files
+  return path + files;
 }
