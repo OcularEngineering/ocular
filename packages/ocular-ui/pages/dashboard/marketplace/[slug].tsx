@@ -61,6 +61,8 @@ function Integration() {
               const webConnector=response.data.apps.find((app)=>app.name===slug);
               if (webConnector && webConnector.links && webConnector.links.length > 0) {
               setLinks(webConnector.links);
+            }else{
+              setLinks([]);
             }
             }
           }
@@ -112,6 +114,7 @@ function Integration() {
   if(slug==="webConnector"&& authorized){
 
     if(!links){
+      console.log("REACHED HERE",links);
       return <div>Loading...</div>; 
     }
     

@@ -8,8 +8,6 @@ const { v4: uuidv4 } = require("uuid");
 const link_id = uuidv4();
 
 export default async (req, res) => {
-  // return res.status(200).json({ Message: " endpoint activated!" });
-
   const validated = await validator(PostAppsReq, req.body);
   const eventBus_: EventBusService = req.scope.resolve("eventBusService");
   const loggedInUser = req.scope.resolve("loggedInUser");
@@ -34,13 +32,9 @@ export default async (req, res) => {
         status: "processing",
       });
 
-      const temp = await organisationService.update(
-        loggedInUser.organisation_id,
-        {
-          installed_apps,
-        }
-      );
-      console.log("TESMP", temp);
+      await organisationService.update(loggedInUser.organisation_id, {
+        installed_apps,
+      });
       await eventBus_.emit("webConnectorInstalled", {
         organisation: loggedInUser.organisation,
         app_name: validated.name,
@@ -57,7 +51,6 @@ export default async (req, res) => {
       error: `Error saving ${validated.link} for ${validated.name}: ${error.message}`,
     });
   }
-
 };
 
 export class PostAppsReq {

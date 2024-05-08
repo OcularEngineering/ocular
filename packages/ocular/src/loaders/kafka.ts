@@ -18,7 +18,6 @@ async function kafkaLoader({
   logger,
 }: Options): Promise<void> {
   if (configModule.projectConfig.kafka_url) {
-    console.log("KAFKA URL", configModule.projectConfig.kafka_url);
     const kafkaClient = new Kafka({
       clientId: "ocular",
       brokers: [configModule.projectConfig.kafka_url],

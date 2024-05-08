@@ -1,25 +1,11 @@
-# 📝 Confluence Integration
+# 📝 WebConnector Integration
 
-Integrate Ocular with Confluence to enable fetching Confluence spaces and pages within Ocular.
+Integrate Ocular with WebConnector to enable enable extracting data from any URL into Ocular.
 
 ## 🚀 Features
 
-- Retrieve Confluence spaces and pages directly within Ocular.
+- Extract all the information within any web URL to store it into database.
 
-## 🛠️ Installation Steps
+```
 
-1. Open `ocular/core-config.js` and add the following configuration at the end of the `apps` array:
-
-```javascript
-const apps = [
-  // ...other configurations
-  {
-    resolve: "confluence",
-    options: {
-      client_id: process.env.CONFLUENCE_CLIENT_ID,
-      client_secret: process.env.CONFLUENCE_CLIENT_SECRET,
-      redirect_uri: `${UI_CORS}/dashboard/marketplace/confluence`,
-    },
-  },
-];
 ```
