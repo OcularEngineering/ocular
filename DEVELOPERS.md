@@ -23,7 +23,7 @@ To contribute code to Ocular, you must fork the [Ocular repo](https://github.com
 
    ```sh
    git clone your-forked-repo-ocular-repo
-   
+
    ```
 
 2. Go to the Ocular directory:
@@ -110,14 +110,61 @@ To contribute code to Ocular, you must fork the [Ocular repo](https://github.com
 3. After that you can start the front end with the following.
 
    ```sh
-      npm run dev 
+      npm run dev
    ```
 
 Then visit the following sites:
 
-| Site                                                     | Directory      | Scope name | Description                                   | Local development server   |
-| -------------------------------------------------------- | -------------- | ---------- | --------------------------------------------- | -------------------------- |
-| [useocular.com](https://useocular.com) | `/packages/ocular-ui` | front-end    | Ocular UI | http://localhost:3001/create-account      |
+| Site                                   | Directory             | Scope name | Description | Local development server             |
+| -------------------------------------- | --------------------- | ---------- | ----------- | ------------------------------------ |
+| [useocular.com](https://useocular.com) | `/packages/ocular-ui` | front-end  | Ocular UI   | http://localhost:3001/create-account |
+
+# Start Web UI for Docker Postgres Container 🐳
+
+Follow these steps to get the web UI up and running for your Dockerized Postgres container.
+
+## 1. Start the Docker Container
+
+Use the command below to start your Docker container:
+
+```bash
+docker compose -f docker-compose.dev.yml up
+```
+
+## 2. Access the Web UI
+
+Visit the following URL in your web browser to access the web UI:
+
+🌐 http://localhost:5050/login?next=/browser/
+
+## Here's the login page you should see:
+
+![Login Page](/img/pg_signin.png)
+
+## 3. Login Credentials
+
+Use the following credentials to log in:
+
+- Email: ocularpostgres@useocular.com
+- Password: ocular
+
+Get container ID for postgres
+
+```sh
+docker ps
+```
+
+Get container IP address using `postgres_container_id` which something looks like `17x.xx.x.x` at the bottom of the response
+
+```sh
+docker inspect <postgres_container_id>
+```
+
+## 4. Create a new server and connect to container
+
+![server connection](/img/pg_connection.png)
+
+🚀 Click save ! You should now be able to access the PostgreSQL management interface and manage your databases directly from your browser! |
 
 #### Shared components
 
@@ -160,6 +207,5 @@ We don't have a process for assigning issues to contributors yet.
 ---
 
 ## Community channels
-
 
 If you get stuck somewhere or have any questions, join our [Slack Workspace](https://join.slack.com/t/ocular-ai/shared_invite/zt-2g7ka0j1c-Tx~Q46MjplNma2Sk2Ruplw)!
