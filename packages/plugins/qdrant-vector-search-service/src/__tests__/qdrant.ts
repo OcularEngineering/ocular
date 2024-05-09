@@ -276,6 +276,51 @@ describe("qdrantService", () => {
 
     await service.deleteIndex("OcularTestIndex");
   });
+
+  it("Search Document Chunks", async () => {
+    const searchResults = [
+      {
+        score: 0.9999999,
+        content: "Google Drive Chunk 2 Content",
+        documentId: "document2",
+        organisationId: "3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971g",
+        chunkId: 1,
+        source: "google-drive",
+        title: "Google Drive Indexed Document",
+        metadata: {},
+      },
+      {
+        score: 0.9999999,
+        content: "Confluence Chunk 0 Content",
+        documentId: "document1",
+        organisationId: "3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971c",
+        chunkId: 0,
+        source: "confluence",
+        title: "Confluence Indexed Document",
+        metadata: {},
+      },
+      {
+        score: 0.9999999,
+        content: "Google Drive Chunk 1 Content",
+        documentId: "document2",
+        organisationId: "3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971g",
+        chunkId: 0,
+        source: "google-drive",
+        title: "Google Drive Indexed Document",
+        metadata: {},
+      },
+    ];
+    const mockVector = [1, 2, 3];
+    const result = await service.searchDocumentChunks(
+      "OcularTestIndex",
+      mockVector
+    );
+
+    // Sort the results by content for comparison
+    expect(result).toEqual(searchResults);
+
+    await service.deleteIndex("OcularTestIndex");
+  });
 });
 
 // Sort the results by content for comparison

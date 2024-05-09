@@ -6,6 +6,8 @@ import {
   DocType,
   SearchDocument,
   SearchResults,
+  SearchChunk,
+  AppNameDefinitions,
 } from "@ocular/types";
 import { QdrantClient, Schemas } from "@qdrant/js-client-rest";
 import { v5 as uuidv5 } from "uuid";
@@ -108,57 +110,52 @@ export default class qdrantService extends AbstractVectorDBService {
   // can be multiple chunks from the same document. This is effiecient for chunk level search in case of the CoPilot which cares about the
   // chunk level search results.
   // searchChunks
+  async searchDocumentChunks(
+    indexName: string,
+    vector: number[],
+    context?: SearchContext
+  ): Promise<SearchChunk[]> {
+    try {
+      console.log("Search Chunks Called");
+      // Construct Search Filters
+      // Hack Limit Results To 5
+      context.top = 3;
+      const filter = this.buildQdrantSearchFilter(context);
 
-  // This function returns a list of documents that match the search query. This is useful for the search service which cares about the document level search results.
-  // async searchChunks(indexName: string, vector: number[], context?: SearchContext): Promise<IndexableDocChunk[]>{
-  //   try {
-  //     // Construct Search Filters
-  //     const filter = this.buildQdrantSearchFilter(context);
+      // Build a Search Query
+      const searchQuery = {
+        vector: {
+          name: "content",
+          vector: vector,
+        },
+        limit: context?.top ? Number(context?.top) : 3,
+        filter: filter,
+        with_payload: true,
+      };
 
-  //     // Build a Batch Search Query to Search for bot the Content and Title Vectors.
-  //     const searches = [
-  //       {
-  //         vector: {
-  //           name: "title",
-  //           vector: vector
-  //         },
-  //         limit: context?.top ? Number(context?.top) : 3,
-  //         filter: filter,
-  //         with_payload: true,
-  //       },
-  //       {
-  //         vector: {
-  //           name: "content",
-  //           vector: vector
-  //         },
-  //         limit: context?.top ? Number(context?.top) : 3,
-  //         filter: filter,
-  //         with_payload: true,
-  //       }
-  //     ]
+      const qdrantSearchResults = await this.qdrantClient_.search(
+        indexName,
+        searchQuery
+      );
 
-  //     // This is a batch search, so we get 2 arrays of results for both title and content vectors which will be combined below.
-  //     const searchResults: SearchResults[][] = await this.qdrantClient_.searchBatch(indexName, {searches})
-
-  //     const flattenedSearches = searchResults.flat();
-  //     const uniqueSearchResults = flattenedSearches.reduce((acc, current) => {
-  //       const x = acc.find(item => item.payload.documentId === current.payload.documentId && item.payload.chunkId === current.payload.chunkId);
-  //       if (!x) {
-  //         return acc.concat([current]);
-  //       } else {
-  //         return acc;
-  //       }
-  //     }, []).map(doc => {
-  //       const payload = doc.payload as IndexableDocChunk;
-  //       payload.updatedAt = new Date(payload.updatedAt);
-  //       return payload;
-  //     });
-
-  //   return uniqueSearchResults
-  //   }catch(error){
-  //     console.log("Qdrant: Error Searching Docs From Quadrant",error)
-  //   }
-  // }
+      const chunks: SearchChunk[] = qdrantSearchResults.map((result) => {
+        return {
+          score: result.score,
+          content: String(result.payload.content),
+          documentId: String(result.payload.documentId),
+          organisationId: String(result.payload.organisationId),
+          chunkId: Number(result.payload.chunkId),
+          source: String(result.payload.source) as AppNameDefinitions,
+          title: String(result.payload.title),
+          metadata: result.payload.metadata as Record<string, unknown>, // assuming result.payload.metadata is an object
+        };
+      });
+      console.log("Search Chunks", chunks);
+      return chunks;
+    } catch (error) {
+      console.log("Qdrant: Error Searching Docs From Quadrant", error);
+    }
+  }
 
   async deleteIndex(indexName: string) {
     try {
