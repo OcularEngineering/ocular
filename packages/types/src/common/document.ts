@@ -64,6 +64,7 @@ export interface SearchDocChunk {
 
 export interface SearchSnippet {
   content: string;
+  updatedAt: Date;
 }
 
 export interface SearchChunk {

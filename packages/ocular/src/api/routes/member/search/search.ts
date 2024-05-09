@@ -5,6 +5,7 @@ import {
   IsBoolean,
   IsEnum,
   IsNumber,
+  IsDateString,
 } from "class-validator";
 import { SearchService } from "../../../../services";
 import { validator } from "@ocular/utils";
@@ -62,4 +63,18 @@ class SearchContextReq {
   @IsOptional()
   @IsEnum(AppNameDefinitions, { each: true })
   sources?: Set<AppNameDefinitions>;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => DateRange)
+  date: DateRange;
+}
+class DateRange {
+  @IsOptional()
+  @IsDateString()
+  from: string;
+
+  @IsOptional()
+  @IsDateString()
+  to: string;
 }

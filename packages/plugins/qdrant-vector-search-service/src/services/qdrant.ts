@@ -148,6 +148,7 @@ export default class qdrantService extends AbstractVectorDBService {
           source: String(result.payload.source) as AppNameDefinitions,
           title: String(result.payload.title),
           metadata: result.payload.metadata as Record<string, unknown>, // assuming result.payload.metadata is an object
+          updatedAt: String(result.payload.updatedAt),
         };
       });
       console.log("Search Chunks", chunks);
@@ -223,8 +224,8 @@ export default class qdrantService extends AbstractVectorDBService {
       filter.must.push({
         key: "updatedAt",
         range: {
-          gte: context.date.gte,
-          lte: context.date.lte,
+          gte: context.date.from,
+          lte: context.date.to,
         },
       });
     }
@@ -244,6 +245,7 @@ export default class qdrantService extends AbstractVectorDBService {
         searchHit.snippets.push({
           score: hit.score,
           content: hit.payload.content,
+          updatedAt: hit.payload.updatedAt,
         });
       }
       hits.push(searchHit);

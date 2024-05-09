@@ -24,8 +24,8 @@ export type SearchContext = {
   organisation_id?: string;
   retrieve_chunks?: boolean;
   date?: {
-    gte?: string;
-    lte?: string;
+    from?: string;
+    to?: string;
   };
 };
 
