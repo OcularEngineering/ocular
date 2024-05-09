@@ -23,6 +23,10 @@ export type SearchContext = {
   top?: number;
   organisation_id?: string;
   retrieve_chunks?: boolean;
+  date?: {
+    gte?: string;
+    lte?: string;
+  };
 };
 
 // Vector Filter

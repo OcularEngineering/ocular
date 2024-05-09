@@ -198,6 +198,7 @@ export default class qdrantService extends AbstractVectorDBService {
       must: [],
     };
 
+    // Filter By Sources
     if (context?.sources && context.sources.length > 0) {
       filter.must.push({
         key: "source",
@@ -207,11 +208,23 @@ export default class qdrantService extends AbstractVectorDBService {
       });
     }
 
+    // Filter By Organisation ID
     if (context?.organisation_id) {
       filter.must.push({
         key: "organisationId",
         match: {
           any: [context.organisation_id],
+        },
+      });
+    }
+
+    // Filter By Date
+    if (context?.date) {
+      filter.must.push({
+        key: "updatedAt",
+        range: {
+          gte: context.date.gte,
+          lte: context.date.lte,
         },
       });
     }
