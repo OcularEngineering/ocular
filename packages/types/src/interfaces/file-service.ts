@@ -4,10 +4,8 @@ import {
   FileServiceGetUploadStreamResult,
   FileServiceUploadResult,
   GetUploadedFileType,
-  MedusaContainer,
   UploadStreamDescriptorType,
 } from "@medusajs/types";
-import { Express } from "express";
 
 export interface IFileService extends TransactionBaseService {
   upload(file: Express.Multer.File): Promise<FileServiceUploadResult>;

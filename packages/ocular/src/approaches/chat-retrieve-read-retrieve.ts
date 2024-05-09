@@ -1,5 +1,17 @@
 import { EntityManager } from "typeorm";
-import { AutoflowContainer , ApproachDefinitions, SearchResultChunk, ISearchService, ILLMInterface, SearchResult, SearchContext, Message, IChatApproach, ChatContext, ChatResponse } from "@ocular/types";
+import {
+  AutoflowContainer,
+  ApproachDefinitions,
+  SearchResultChunk,
+  ISearchService,
+  ILLMInterface,
+  SearchResults,
+  SearchContext,
+  Message,
+  IChatApproach,
+  ChatContext,
+  ChatResponse,
+} from "@ocular/types";
 import { MessageBuilder } from "../utils/message";
 import { IndexableDocChunk } from "@ocular/types";
 
@@ -31,16 +43,16 @@ If you cannot generate a search query, return just the number 0.
 `;
 
 const QUERY_PROMPT_FEW_SHOTS: Message[] = [
-  { role: 'user', content: 'What happens if a payment error occurs?' },
-  { role: 'assistant', content: 'Show support for payment errors' },
-  { role: 'user', content: 'can I get refunded if cannot travel?' },
-  { role: 'assistant', content: 'Refund policy' },
+  { role: "user", content: "What happens if a payment error occurs?" },
+  { role: "assistant", content: "Show support for payment errors" },
+  { role: "user", content: "can I get refunded if cannot travel?" },
+  { role: "assistant", content: "Refund policy" },
 ];
 
 type InjectedDependencies = AutoflowContainer & {
-  openAiService: ILLMInterface,
-  searchService: ISearchService,
-}
+  openAiService: ILLMInterface;
+  searchService: ISearchService;
+};
 
 /**
  * Simple retrieve-then-read implementation, using the AI Search and OpenAI APIs directly.
@@ -53,10 +65,9 @@ export default class ChatReadRetrieveRead implements IChatApproach {
   private searchService_: ISearchService;
 
   constructor(container: InjectedDependencies) {
-    this.openaiService_= container.openAiService;
+    this.openaiService_ = container.openAiService;
     this.searchService_ = container.searchService;
   }
-
 
   // export interface SearchResult {
   //   choices?: Array<{
@@ -68,8 +79,14 @@ export default class ChatReadRetrieveRead implements IChatApproach {
   // }
 
   async run(messages: Message[], context?: ChatContext): Promise<ChatResponse> {
-    const { completionRequest, thoughts, hits } = await this.baseRun(messages, context);
-    const chatCompletion = await this.openaiService_.completeChat(completionRequest.messages);
+    const { completionRequest, thoughts } = await this.baseRun(
+      messages,
+      context
+    );
+    let hits = [];
+    const chatCompletion = await this.openaiService_.completeChat(
+      completionRequest.messages
+    );
     return {
       // choices: [
       //   {
@@ -85,14 +102,17 @@ export default class ChatReadRetrieveRead implements IChatApproach {
       //   },
       // ],
       message: {
-        role: 'assistant',
+        role: "assistant",
         content: chatCompletion,
       },
       data_points: hits,
     };
   }
 
-  async *runWithStreaming(messages: Message[], context?: SearchContext): AsyncGenerator<SearchResultChunk, void> {
+  async *runWithStreaming(
+    messages: Message[],
+    context?: SearchContext
+  ): AsyncGenerator<SearchResultChunk, void> {
     // const { completionRequest, dataPoints, thoughts } = await this.baseRun(messages, context);
     // const openAiChat = await this.openai.calculateTokens();
     // const chatCompletion = await openAiChat.completions.create({
@@ -124,7 +144,8 @@ export default class ChatReadRetrieveRead implements IChatApproach {
   }
 
   private async baseRun(messages: Message[], context?: SearchContext) {
-    const userQuery = 'Generate a search query for: ' + messages[messages.length - 1].content;
+    const userQuery =
+      "Generate a search query for: " + messages[messages.length - 1].content;
 
     // STEP 1: Generate an optimized keyword search query based on the chat history and the last question
     const initialMessages: Message[] = this.getMessagesFromHistory(
@@ -132,13 +153,15 @@ export default class ChatReadRetrieveRead implements IChatApproach {
       messages,
       userQuery,
       QUERY_PROMPT_FEW_SHOTS,
-      this.openaiService_.getTokenLimit() - userQuery.length,
+      this.openaiService_.getTokenLimit() - userQuery.length
     );
-   
-    const chatCompletion = await this.openaiService_.completeChat(initialMessages);
+
+    const chatCompletion = await this.openaiService_.completeChat(
+      initialMessages
+    );
 
     let queryText = chatCompletion.trim();
-    if (queryText === '0') {
+    if (queryText === "0") {
       // Use the last user input if we failed to generate a better query
       queryText = messages[messages.length - 1].content;
     }
@@ -146,14 +169,17 @@ export default class ChatReadRetrieveRead implements IChatApproach {
     // STEP 2: Retrieve relevant documents from the search index with the GPT optimized query
     // -----------------------------------------------------------------------
 
-
     let hits = await this.searchService_.search(null, queryText, context);
 
-    hits = hits.filter(doc => doc !== null);
-    console.log("Found Docs", hits)
-    const sources = hits.map((c) => c.content).join(', ');
+    // hits = hits.filter((doc) => doc !== null);
+    // hits
+    console.log("Found Docs", hits);
+    const sources = [];
+    // const sources = hits.map((c) => c.content).join(", ");
 
-    const followUpQuestionsPrompt = context?.suggest_followup_questions ? FOLLOW_UP_QUESTIONS_PROMPT_CONTENT : '';
+    const followUpQuestionsPrompt = context?.suggest_followup_questions
+      ? FOLLOW_UP_QUESTIONS_PROMPT_CONTENT
+      : "";
 
     // STEP 3: Generate a contextual and content specific answer using the search results and chat history
     // -----------------------------------------------------------------------
@@ -161,21 +187,21 @@ export default class ChatReadRetrieveRead implements IChatApproach {
     // Allow client to replace the entire prompt, or to inject into the exiting prompt using >>>
     const promptOverride = context?.prompt_template;
     let systemMessage: string;
-    if (promptOverride?.startsWith('>>>')) {
+    if (promptOverride?.startsWith(">>>")) {
       systemMessage = SYSTEM_MESSAGE_CHAT_CONVERSATION.replace(
-        '{follow_up_questions_prompt}',
-        followUpQuestionsPrompt,
-      ).replace('{injected_prompt}', promptOverride.slice(3) + '\n');
+        "{follow_up_questions_prompt}",
+        followUpQuestionsPrompt
+      ).replace("{injected_prompt}", promptOverride.slice(3) + "\n");
     } else if (promptOverride) {
       systemMessage = SYSTEM_MESSAGE_CHAT_CONVERSATION.replace(
-        '{follow_up_questions_prompt}',
-        followUpQuestionsPrompt,
-      ).replace('{injected_prompt}', promptOverride);
+        "{follow_up_questions_prompt}",
+        followUpQuestionsPrompt
+      ).replace("{injected_prompt}", promptOverride);
     } else {
       systemMessage = SYSTEM_MESSAGE_CHAT_CONVERSATION.replace(
-        '{follow_up_questions_prompt}',
-        followUpQuestionsPrompt,
-      ).replace('{injected_prompt}', '');
+        "{follow_up_questions_prompt}",
+        followUpQuestionsPrompt
+      ).replace("{injected_prompt}", "");
     }
 
     const finalMessages = this.getMessagesFromHistory(
@@ -190,18 +216,22 @@ export default class ChatReadRetrieveRead implements IChatApproach {
 
     const firstQuery = MessageBuilder.messagesToString(initialMessages);
     const secondQuery = MessageBuilder.messagesToString(finalMessages);
-    const thoughts = `Search query:${queryText} Conversations: ${firstQuery} ${secondQuery}`.replace(/\n/g, '<br>');
-    
+    const thoughts =
+      `Search query:${queryText} Conversations: ${firstQuery} ${secondQuery}`.replace(
+        /\n/g,
+        "<br>"
+      );
+
     // temperature: Number(context?.temperature ?? 0.7),
     return {
       completionRequest: {
         messages: finalMessages,
-        temperature:0.7,
+        temperature: 0.7,
         max_tokens: 1024,
         n: 1,
       },
       thoughts,
-      hits: hits as IndexableDocChunk[],
+      // hits: hits as IndexableDocChunk[],
     };
   }
 
@@ -210,26 +240,46 @@ export default class ChatReadRetrieveRead implements IChatApproach {
     history: Message[],
     userContent: string,
     fewShots: Message[] = [],
-    maxTokens = 4096,
+    maxTokens = 4096
   ): Message[] {
- 
-    const messageBuilder = new MessageBuilder(systemPrompt, this.openaiService_.getChatModelTokenCount(systemPrompt));
+    const messageBuilder = new MessageBuilder(
+      systemPrompt,
+      this.openaiService_.getChatModelTokenCount(systemPrompt)
+    );
 
     // Add examples to show the chat what responses we want.
     // It will try to mimic any responses and make sure they match the rules laid out in the system message.
     for (const shot of fewShots.reverse()) {
-      messageBuilder.appendMessage(shot.role, shot.content, 1, this.openaiService_.getChatModelTokenCount(shot.content));
+      messageBuilder.appendMessage(
+        shot.role,
+        shot.content,
+        1,
+        this.openaiService_.getChatModelTokenCount(shot.content)
+      );
     }
 
     const appendIndex = fewShots.length + 1;
-    messageBuilder.appendMessage('user', userContent, appendIndex, this.openaiService_.getChatModelTokenCount(userContent));
+    messageBuilder.appendMessage(
+      "user",
+      userContent,
+      appendIndex,
+      this.openaiService_.getChatModelTokenCount(userContent)
+    );
 
     for (const historyMessage of history.slice(0, -1).reverse()) {
       if (messageBuilder.tokens > maxTokens) {
         break;
       }
-      if (historyMessage.role === 'assistant' || historyMessage.role === 'user') {
-        messageBuilder.appendMessage(historyMessage.role, historyMessage.content, appendIndex, this.openaiService_.getChatModelTokenCount(historyMessage.content));
+      if (
+        historyMessage.role === "assistant" ||
+        historyMessage.role === "user"
+      ) {
+        messageBuilder.appendMessage(
+          historyMessage.role,
+          historyMessage.content,
+          appendIndex,
+          this.openaiService_.getChatModelTokenCount(historyMessage.content)
+        );
       }
     }
 

@@ -1,5 +1,5 @@
 import { AppNameDefinitions } from "../apps";
-import { IndexableDocChunk, SearchDocument } from "./document";
+import { IndexableDocChunk, SearchChunk, SearchDocument } from "./document";
 import { Message } from "./message";
 
 // export type SearchContext = {
@@ -21,17 +21,27 @@ export type SearchContext = {
   suggest_followup_questions?: boolean;
   sources?: AppNameDefinitions[];
   top?: number;
+  organisation_id?: string;
+  retrieve_chunks?: boolean;
+  date?: {
+    from?: string;
+    to?: string;
+  };
 };
 
-  // Vector Filter
-  // Top/Limit (Amount of Search Results to Return)
-  // Sources: Set<sources> -> example <"gmail", "drive">
-  //
-  // 
+// Vector Filter
+// Top/Limit (Amount of Search Results to Return)
+// Sources: Set<sources> -> example <"gmail", "drive">
+//
+//
 
-export interface SearchResult {
-  message: SearchResultMessage;
+export interface SearchResults {
+  chat_completion?: {
+    content?: string;
+    citations?: SearchChunk[];
+  };
   hits: SearchDocument[];
+  sources?: AppNameDefinitions[];
 }
 
 export interface SearchResultChunk {
@@ -40,12 +50,12 @@ export interface SearchResultChunk {
     delta: Partial<SearchResultMessage>;
     finish_reason: string | null;
   }>;
-  object: 'chat.completion.chunk';
+  object: "chat.completion.chunk";
 }
 
 export type SearchResultMessage = Message & {
   context?: Record<string, any> & {
-    data_points?: IndexableDocChunk[]
+    data_points?: IndexableDocChunk[];
     thoughts?: string;
   };
 };
