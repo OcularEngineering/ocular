@@ -8,8 +8,11 @@ import {
   ILLMInterface,
   SearchResults,
   SearchContext,
+  AppNameDefinitions,
 } from "@ocular/types";
 import { MessageBuilder } from "../utils/message";
+import { Organisation } from "../models";
+import { OrganisationService } from "../services";
 
 const SYSTEM_CHAT_TEMPLATE = `You are an intelligent assistant who can helps Engineers at Ocular with a variety of tasks. Use 'you' to refer to the individual asking the questions even if they ask with 'I'.
 Answer the following question using only the data provided in the sources below. How can I assist you today?`;
@@ -29,6 +32,7 @@ Answer the following question using only the data provided in the sources below.
 type InjectedDependencies = AutoflowContainer & {
   openAiService: ILLMInterface;
   searchService: ISearchService;
+  organisationService: OrganisationService;
 };
 
 /**
@@ -40,10 +44,12 @@ export default class AskRetrieveThenRead implements ISearchApproach {
   identifier = ApproachDefinitions.ASK_RETRIEVE_READ;
   private openai_: ILLMInterface;
   private searchService_: ISearchService;
+  private organisationService_: OrganisationService;
 
   constructor(container: InjectedDependencies) {
     this.openai_ = container.openAiService;
     this.searchService_ = container.searchService;
+    this.organisationService_ = container.organisationService;
   }
 
   async run(
@@ -71,7 +77,9 @@ export default class AskRetrieveThenRead implements ISearchApproach {
 
       // Use Top 3 Sources To Generate AI Completion.
       // TODO: Use More Sophisticated Logic To Select Sources.
-      const sources = searchResults.chunks.map((c) => c.content).join("");
+      const sources = searchResults.chat_completion.citations
+        .map((c) => c.content)
+        .join("");
       const userContent = `${userQuery}\nSources:\n${sources}`;
 
       const roleTokens: number = this.openai_.getChatModelTokenCount("user");
@@ -86,24 +94,18 @@ export default class AskRetrieveThenRead implements ISearchApproach {
 
       // Add shots/samples. This helps model to mimic response and make sure they match rules laid out in system message.
       // messageBuilder.appendMessage('assistant', QUESTION);
-      // messageBuilder.appendMessage('user', ANSWER);
+      // messageBuilder.appendMessage('user', ANSWER)
       const messages = messageBuilder.messages;
       const chatCompletion = await this.openai_.completeChat(messages);
-      const messageToDisplay = MessageBuilder.messagesToString(messages);
-      message = {
-        role: "assistant" as const,
-        content: chatCompletion,
-        context: {
-          data_points: searchResults.chunks,
-          thoughts: `Question:<br>${userQuery}<br><br>Prompt:<br>${messageToDisplay.replace(
-            "\n",
-            "<br>"
-          )}`,
-        },
-      };
-      searchResults.message = message;
+      searchResults.chat_completion.content = chatCompletion;
     }
 
+    // Add Sources To The Search Results
+    const org = await this.organisationService_.listInstalledApps();
+    const sources: AppNameDefinitions[] = org.installed_apps.map(
+      (app) => app.name as AppNameDefinitions
+    );
+    searchResults.sources = sources;
     return searchResults;
   }
 

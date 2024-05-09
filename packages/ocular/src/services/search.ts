@@ -76,11 +76,13 @@ class SearchService extends AbstractSearchService {
 
     // Retrieve Chunks Top Indipendent Chunks Irrespective of the Document
     if (context.retrieve_chunks) {
-      searchResults.chunks = await this.vectorDBService_.searchDocumentChunks(
-        indexName,
-        queryVector,
-        context
-      );
+      searchResults.chat_completion = {};
+      searchResults.chat_completion.citations =
+        await this.vectorDBService_.searchDocumentChunks(
+          indexName,
+          queryVector,
+          context
+        );
     }
 
     console.log("Search Results", searchResults);

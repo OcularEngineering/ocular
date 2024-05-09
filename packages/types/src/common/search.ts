@@ -32,9 +32,12 @@ export type SearchContext = {
 //
 
 export interface SearchResults {
-  message?: SearchResultMessage;
+  chat_completion?: {
+    content?: string;
+    citations?: SearchChunk[];
+  };
   hits: SearchDocument[];
-  chunks?: SearchChunk[];
+  sources?: AppNameDefinitions[];
 }
 
 export interface SearchResultChunk {
