@@ -1,11 +1,12 @@
+
 import { BatchJobService, Organisation, QueueService } from '@ocular/ocular';
 import SlackService from '../services/slack';
 import { INDEX_DOCUMENT_EVENT, SEARCH_INDEXING_TOPIC } from '@ocular/types';
 import { AbstractBatchJobStrategy } from '@ocular/types';
 
 export default class SlackStrategy extends AbstractBatchJobStrategy {
-  static identifier = 'slack-indexing-strategy';
-  static batchType = 'slack';
+  static identifier = "slack-indexing-strategy";
+  static batchType = "slack";
   protected batchJobService_: BatchJobService;
   protected slackService_: SlackService;
   protected queueService_: QueueService;
@@ -22,15 +23,16 @@ export default class SlackStrategy extends AbstractBatchJobStrategy {
     const stream = await this.slackService_.getSlackData(
       batchJob.context?.org as Organisation
     );
+
     stream.on('data', (documents) => {
       this.queueService_.sendBatch(SEARCH_INDEXING_TOPIC, documents)
     });
-    stream.on('end', () => {
-      console.log('No more data');
+    stream.on("end", () => {
+      console.log("No more data");
     });
   }
 
   buildTemplate(): Promise<string> {
-    throw new Error('Method not implemented.');
+    throw new Error("Method not implemented.");
   }
 }

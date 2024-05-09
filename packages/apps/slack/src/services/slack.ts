@@ -8,9 +8,9 @@ import {
   Logger,
   AppNameDefinitions,
   Section,
+  DocType,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
-import { DocType } from "@ocular/types";
 import { RateLimiterQueue } from "rate-limiter-flexible"
 
 interface Config {
@@ -66,14 +66,13 @@ export default class SlackService extends TransactionBaseService {
     let documents: IndexableDocument[] = [];
 
     try {
-      const slackChannels = await this.fetchSlackChannels(config)
+      const slackChannels = await this.fetchSlackChannels(config);
       for (const channel of slackChannels) {
         const conversations = await this.fetchChannelConversations(channel.id,config);
         for(const conversation of conversations){
           const thread = await this.fetchThreadForConversation(channel.id,conversation.id,config)
 
           const sections: Section[] = thread.map((message, index) => ({
-            offset: index,
             content: message.text,
             link: `https://slack.com/api/conversations.replies?channel_id=${channel.id}&ts=${conversation.id}`
 
@@ -89,8 +88,8 @@ export default class SlackService extends TransactionBaseService {
             }, // passing channel id just for top down reference
             sections:sections, // an array of messages in the specific conversation
             type: DocType.TEXT,
-            updatedAt: new Date(Date.now())
-          }
+            updatedAt: new Date(Date.now()),
+          };
           documents.push(threadDoc);
           if (documents.length >= 100) {
             yield documents;
@@ -132,15 +131,15 @@ export default class SlackService extends TransactionBaseService {
       const response = await axios.get(
         "https://slack.com/api/conversations.list",
         config
-      )
+      );
 
-      if (!response.data)  {
+      if (!response.data) {
         return [];
       }
 
-      const channels = response.data.channels
-      return channels
-    }catch(error){
+      const channels = response.data.channels;
+      return channels;
+    } catch (error) {
       this.logger_.error(
         "Error fetching Slack Channels in fetchSlackChannels:",
         error
@@ -158,11 +157,11 @@ export default class SlackService extends TransactionBaseService {
       const conversationsArray = response.data.messages || []
       const conversations = conversationsArray.map((conversations)=>({
         id: conversations.ts,
-        text:conversations.text,
-        user: conversations.user
-      }))
-      return conversations
-    }catch(error){
+        text: conversations.text,
+        user: conversations.user,
+      }));
+      return conversations;
+    } catch (error) {
       throw new Error("Failed to fetch channel conversation.");
     }
   }

@@ -22,7 +22,7 @@
     "watch": "tsc --build --watch",
     "prepublishOnly": "cross-env NODE_ENV=production tsc --build",
     "build": "rimraf dist && tsc --build",
-    "dev": "npm run build && NODE_ENV=development nodemon dist/ocular/src/main.js",
+    "dev": "npm run build && nodemon dist/ocular/src/main.js",
     "start": "npm run build && nodemon dist/ocular/src/main.js",
     "clean": "rimraf dist node_modules",
     "test": "jest src --detectOpenHandles",
@@ -51,7 +51,10 @@
     "passport-custom": "^1.1.1",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
-    "rate-limiter-flexible": "^5.0.3",
-    "typeorm": "^0.3.20"
+    "path": "^0.12.7",
+    "puppeteer": "^22.8.0",
+    "typeorm": "^0.3.20",
+    "uuid": "^9.0.1",
+    "rate-limiter-flexible": "^5.0.3"
   }
 }

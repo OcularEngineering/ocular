@@ -1,13 +1,18 @@
-import {  Logger } from "../types"
-import { AbstractEventBusModuleService } from "@ocular/types"
-import { BulkJobOptions, JobsOptions, Queue, Worker } from "bullmq"
-import { Redis } from "ioredis"
-import { BullJob, EmitData, EmitOptions, EventBusRedisModuleOptions } from "@ocular/types"
+import { Logger } from "../types";
+import { AbstractEventBusModuleService } from "@ocular/types";
+import { BulkJobOptions, JobsOptions, Queue, Worker } from "bullmq";
+import { Redis } from "ioredis";
+import {
+  BullJob,
+  EmitData,
+  EmitOptions,
+  EventBusRedisModuleOptions,
+} from "@ocular/types";
 
 type InjectedDependencies = {
-  logger: Logger
-  redisClient: Redis
-}
+  logger: Logger;
+  redisClient: Redis;
+};
 
 /**
  * Can keep track of multiple subscribers to different events and run the
@@ -15,27 +20,27 @@ type InjectedDependencies = {
  */
 // eslint-disable-next-line max-len
 export default class EventBusModule extends AbstractEventBusModuleService {
-  protected readonly logger_: Logger
+  protected readonly logger_: Logger;
 
-  protected queue_: Queue
+  protected queue_: Queue;
 
   constructor({ logger, redisClient }: InjectedDependencies) {
     // @ts-ignore
     // eslint-disable-next-line prefer-rest-params
-    super(...arguments)
+    super(...arguments);
 
-    this.logger_ = logger
+    this.logger_ = logger;
 
     this.queue_ = new Queue(`events-queue`, {
       prefix: `${this.constructor.name}`,
       connection: redisClient,
-    })
+    });
 
     // Register our worker to handle emit calls
     new Worker("events-queue", this.worker_, {
       prefix: `${this.constructor.name}`,
       connection: redisClient,
-    })
+    });
   }
 
   /**
@@ -48,22 +53,22 @@ export default class EventBusModule extends AbstractEventBusModuleService {
     eventName: string,
     data: T,
     options: Record<string, unknown>
-  ): Promise<void>
+  ): Promise<void>;
 
   /**
    * Emit a number of events
    * @param {EmitData} data - the data to send to the subscriber.
    */
-  async emit<T>(data: EmitData<T>[]): Promise<void>
+  async emit<T>(data: EmitData<T>[]): Promise<void>;
 
   async emit<T, TInput extends string | EmitData<T>[] = string>(
     eventNameOrData: TInput,
     data?: T,
     options: BulkJobOptions | JobsOptions = {}
   ): Promise<void> {
-    const globalJobOptions = {}
+    const globalJobOptions = {};
 
-    const isBulkEmit = Array.isArray(eventNameOrData)
+    const isBulkEmit = Array.isArray(eventNameOrData);
 
     const opts = {
       // default options
@@ -71,7 +76,7 @@ export default class EventBusModule extends AbstractEventBusModuleService {
       attempts: 1,
       // global options
       ...globalJobOptions,
-    } as EmitOptions
+    } as EmitOptions;
 
     const events = isBulkEmit
       ? eventNameOrData.map((event) => ({
@@ -93,9 +98,9 @@ export default class EventBusModule extends AbstractEventBusModuleService {
               ...options,
             },
           },
-        ]
-   
-    await this.queue_.addBulk(events)
+        ];
+
+    await this.queue_.addBulk(events);
   }
 
   /**
@@ -104,95 +109,95 @@ export default class EventBusModule extends AbstractEventBusModuleService {
    * @return resolves to the results of the subscriber calls.
    */
   worker_ = async <T>(job: BullJob<T>): Promise<unknown> => {
-    const { eventName, data } = job.data
-    const eventSubscribers = this.eventToSubscribersMap.get(eventName) || []
-    const wildcardSubscribers = this.eventToSubscribersMap.get("*") || []
+    const { eventName, data } = job.data;
+    const eventSubscribers = this.eventToSubscribersMap.get(eventName) || [];
+    const wildcardSubscribers = this.eventToSubscribersMap.get("*") || [];
 
-    const allSubscribers = eventSubscribers.concat(wildcardSubscribers)
+    const allSubscribers = eventSubscribers.concat(wildcardSubscribers);
 
     // Pull already completed subscribers from the job data
-    const completedSubscribers = job.data.completedSubscriberIds || []
+    const completedSubscribers = job.data.completedSubscriberIds || [];
 
     // Filter out already completed subscribers from the all subscribers
     const subscribersInCurrentAttempt = allSubscribers.filter(
       (subscriber) =>
         subscriber.id && !completedSubscribers.includes(subscriber.id)
-    )
+    );
 
-    const currentAttempt = job.attemptsMade
-    const isRetry = currentAttempt > 1
-    const configuredAttempts = job.opts.attempts
+    const currentAttempt = job.attemptsMade;
+    const isRetry = currentAttempt > 1;
+    const configuredAttempts = job.opts.attempts;
 
-    const isFinalAttempt = currentAttempt === configuredAttempts
+    const isFinalAttempt = currentAttempt === configuredAttempts;
 
     if (isRetry) {
       if (isFinalAttempt) {
-        this.logger_.info(`Final retry attempt for ${eventName}`)
+        this.logger_.info(`Final retry attempt for ${eventName}`);
       }
 
       this.logger_.info(
         `Retrying ${eventName} which has ${eventSubscribers.length} subscribers (${subscribersInCurrentAttempt.length} of them failed)`
-      )
+      );
     } else {
       this.logger_.info(
         `Processing ${eventName} which has ${eventSubscribers.length} subscribers`
-      )
+      );
     }
 
-    const completedSubscribersInCurrentAttempt: string[] = []
-
+    const completedSubscribersInCurrentAttempt: string[] = [];
+    console.log("CHECKING SOMETHING", subscribersInCurrentAttempt);
     const subscribersResult = await Promise.all(
       subscribersInCurrentAttempt.map(async ({ id, subscriber }) => {
         return await subscriber(data, eventName)
           .then(async (data) => {
             // For every subscriber that completes successfully, add their id to the list of completed subscribers
-            completedSubscribersInCurrentAttempt.push(id)
-            return data
+            completedSubscribersInCurrentAttempt.push(id);
+            return data;
           })
           .catch((err) => {
             this.logger_.warn(
               `An error occurred while processing ${eventName}: ${err}`
-            )
-            return err
-          })
+            );
+            return err;
+          });
       })
-    )
+    );
 
     // If the number of completed subscribers is different from the number of subcribers to process in current attempt, some of them failed
     const didSubscribersFail =
       completedSubscribersInCurrentAttempt.length !==
-      subscribersInCurrentAttempt.length
+      subscribersInCurrentAttempt.length;
 
-    const isRetriesConfigured = configuredAttempts! > 1
+    const isRetriesConfigured = configuredAttempts! > 1;
 
     // Therefore, if retrying is configured, we try again
     const shouldRetry =
-      didSubscribersFail && isRetriesConfigured && !isFinalAttempt
+      didSubscribersFail && isRetriesConfigured && !isFinalAttempt;
 
     if (shouldRetry) {
       const updatedCompletedSubscribers = [
         ...completedSubscribers,
         ...completedSubscribersInCurrentAttempt,
-      ]
+      ];
 
-      job.data.completedSubscriberIds = updatedCompletedSubscribers
+      job.data.completedSubscriberIds = updatedCompletedSubscribers;
 
-      await job.updateData(job.data)
+      await job.updateData(job.data);
 
-      const errorMessage = `One or more subscribers of ${eventName} failed. Retrying...`
+      const errorMessage = `One or more subscribers of ${eventName} failed. Retrying...`;
 
-      this.logger_.warn(errorMessage)
+      this.logger_.warn(errorMessage);
 
-      return Promise.reject(Error(errorMessage))
+      return Promise.reject(Error(errorMessage));
     }
 
     if (didSubscribersFail && !isFinalAttempt) {
       // If retrying is not configured, we log a warning to allow server admins to recover manually
       this.logger_.warn(
         `One or more subscribers of ${eventName} failed. Retrying is not configured. Use 'attempts' option when emitting events.`
-      )
+      );
     }
 
-    return Promise.resolve(subscribersResult)
-  }
+    return Promise.resolve(subscribersResult);
+  };
 }
