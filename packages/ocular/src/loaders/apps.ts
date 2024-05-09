@@ -260,7 +260,6 @@ function registerStrategies(
     `${appDetails.resolve}/dist/strategies/*.js`
   );
   const files = glob.sync(registerSubscribersGlob, {});
-  console.log("FILES", files);
   files.forEach((fn) => {
     const loaded = require(fn).default;
     const name = formatRegistrationName(fn);
