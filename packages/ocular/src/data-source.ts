@@ -43,7 +43,6 @@ const getDataSource = async (directory) => {
   const container = createAutoflowContainer();
   modelsLoader({ container });
   const coreMigrations: string[] = getMigrations(directory) as string[];
-  console.log("CORE_MIGRATION", coreMigrations);
 
   return await databaseLoader({
     container,

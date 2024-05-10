@@ -14,7 +14,6 @@ export default class documentProcessorService extends AbstractDocumentProcesserS
   protected chunk_over_lap_: number;
 
   constructor(container, options) {
-    console.log("CHECK PLUGIN LOADED");
     super(container, options);
     const { max_chunk_length, sentence_search_limit, chunk_over_lap } = options;
     this.max_chunk_length_ = max_chunk_length ? max_chunk_length : 1000;
@@ -28,7 +27,6 @@ export default class documentProcessorService extends AbstractDocumentProcesserS
     document: IndexableDocument
   ): Promise<IndexableDocChunk[]> {
     let chunks: IndexableDocChunk[] = [];
-    console.log("Document Type",document.type)
     switch (document.type) {
       case DocType.TEXT:
         chunks = await processTxt(

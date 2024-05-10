@@ -1,50 +1,57 @@
-import { IndexableDocument, AbstractLLMService, IndexableDocChunk, Message, PluginNameDefinitions  } from "@ocular/types";
-import { OpenAI } from 'openai';
-import { encoding_for_model, type TiktokenModel } from 'tiktoken';
+import {
+  IndexableDocument,
+  AbstractLLMService,
+  IndexableDocChunk,
+  Message,
+  PluginNameDefinitions,
+} from "@ocular/types";
+import { OpenAI } from "openai";
+import { encoding_for_model, type TiktokenModel } from "tiktoken";
 import { RateLimiterService } from "@ocular/ocular";
-import { RateLimiterQueue } from "rate-limiter-flexible"
+import { RateLimiterQueue } from "rate-limiter-flexible";
 
 export default class AzureOpenAIService extends AbstractLLMService {
+  static identifier = PluginNameDefinitions.AZUREOPENAI;
 
-  static identifier = PluginNameDefinitions.AZUREOPENAI
-
-  protected openAIKey_: string
-  protected embeddingsClient_: OpenAI
-  protected chatClient_: OpenAI
-  protected azureOpenAiApiVersion_: string
-  protected endpoint_: string
-  protected embeddingDeploymentName_: string
-  protected chatDeploymentName_: string
-  protected embeddingModel_: string
-  protected chatModel_: string
-  protected tokenLimit_:number = 4096
+  protected openAIKey_: string;
+  protected embeddingsClient_: OpenAI;
+  protected chatClient_: OpenAI;
+  protected azureOpenAiApiVersion_: string;
+  protected endpoint_: string;
+  protected embeddingDeploymentName_: string;
+  protected chatDeploymentName_: string;
+  protected embeddingModel_: string;
+  protected chatModel_: string;
+  protected tokenLimit_: number = 4096;
   protected rateLimiterService_: RateLimiterService;
-  protected requestQueue_: RateLimiterQueue
+  protected requestQueue_: RateLimiterQueue;
 
   constructor(container, options) {
-    super(arguments[0],options)
+    super(arguments[0], options);
 
-    // Rate Limiter Service 
+    // Rate Limiter Service
     this.rateLimiterService_ = container.rateLimiterService;
-    this.requestQueue_ = this.rateLimiterService_.getRequestQueue(PluginNameDefinitions.AZUREOPENAI);
+    this.requestQueue_ = this.rateLimiterService_.getRequestQueue(
+      PluginNameDefinitions.AZUREOPENAI
+    );
 
-    this.azureOpenAiApiVersion_ = options.open_ai_version,
-    this.endpoint_= options.endpoint
+    (this.azureOpenAiApiVersion_ = options.open_ai_version),
+      (this.endpoint_ = options.endpoint);
 
     // Deployment Names
-    this.embeddingDeploymentName_ = options.embedding_deployment_name
-    this.chatDeploymentName_ = options.chat_deployment_name
+    this.embeddingDeploymentName_ = options.embedding_deployment_name;
+    this.chatDeploymentName_ = options.chat_deployment_name;
 
     // Models
-    this.embeddingModel_ = options.embedding_model
-    this.chatModel_ = options.chat_model
+    this.embeddingModel_ = options.embedding_model;
+    this.chatModel_ = options.chat_model;
 
-    this.openAIKey_ = options.open_ai_key
+    this.openAIKey_ = options.open_ai_key;
 
     const commonOptions = {
       apiKey: this.openAIKey_,
-      defaultQuery: { 'api-version': this.azureOpenAiApiVersion_ },
-      defaultHeaders: { 'api-key': this.openAIKey_},
+      defaultQuery: { "api-version": this.azureOpenAiApiVersion_ },
+      defaultHeaders: { "api-key": this.openAIKey_ },
     };
 
     // Embedding Deployment
@@ -60,37 +67,40 @@ export default class AzureOpenAIService extends AbstractLLMService {
     });
   }
 
-  async createEmbeddings(text:string): Promise<number[]> {
-    try{
-      const tokenCount = this.getChatModelTokenCount(text)
-      await this.requestQueue_.removeTokens(tokenCount,PluginNameDefinitions.AZUREOPENAI)
-      const result = await this.embeddingsClient_.embeddings.create({ 
-        input: text, 
+  async createEmbeddings(text: string): Promise<number[]> {
+    try {
+      const tokenCount = this.getChatModelTokenCount(text);
+      await this.requestQueue_.removeTokens(
+        tokenCount,
+        PluginNameDefinitions.AZUREOPENAI
+      );
+      const result = await this.embeddingsClient_.embeddings.create({
+        input: text,
         model: this.embeddingModel_,
       });
       return result.data[0].embedding;
-    } catch(error){
-      console.log("Azure Open AI: Error",error)
+    } catch (error) {
+      console.log("Azure Open AI: Error", error);
     }
   }
 
   async completeChat(messages: Message[]): Promise<string> {
-    try{
+    try {
       const result = await this.chatClient_.chat.completions.create({
         model: this.chatModel_,
         messages,
-        temperature:  0.3,
+        temperature: 0.3,
         max_tokens: 1024,
         n: 1,
       });
-      console.log("Result",result.choices[0].message.content)
+      console.log("Result", result.choices[0].message.content);
       return result.choices[0].message.content;
-    }catch(error){
-      console.log("Azure Open AI: Error",error)
+    } catch (error) {
+      console.log("Azure Open AI: Error", error);
     }
   }
 
-  getChatModelTokenCount(content : string): number {
+  getChatModelTokenCount(content: string): number {
     const encoder = encoding_for_model(this.chatModel_ as TiktokenModel);
     let tokens = 2;
     for (const value of Object.values(content)) {
