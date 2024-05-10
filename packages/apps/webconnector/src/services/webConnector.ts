@@ -65,7 +65,6 @@ export default class webConnectorService extends TransactionBaseService {
 
     try {
       const pageArray = await this.crawl(base_url);
-      console.log("Oage_array", pageArray);
       let documents: IndexableDocument[] = [];
       for (const page of pageArray) {
         if (page.text) {

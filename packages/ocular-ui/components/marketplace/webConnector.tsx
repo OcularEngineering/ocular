@@ -83,7 +83,6 @@ export default function WebConnector({ links }: { links: Link[] }) {
         link: data as string,
         name: 'webConnector' as string,
       });
-      console.log('LINK RESPONSE', response.status);
       if (response.status === 200) {
         const updatedLinkData: Link[] = [
           ...linkData,
