@@ -75,22 +75,28 @@ const Results = ({ results, isLoadingResults }) => (
                 key={index}
                 className="group mb-4 flex max-w-4xl px-3 py-4 text-xs sm:text-base"
               >
-                <Image src={result && result.source === 'pagerduty' ? '/PagerDuty.png' : result && result.source ? `/${result.source}.svg` : '/default.png'} alt={result.title} className="mr-4 size-[40px]" width={10} height={10} />
+                <Image src={result && result.documentMetadata.source === 'pagerduty' ? '/PagerDuty.png' : result && result.documentMetadata.source ? `/${result.documentMetadata.source}.svg` : '/default.png'} alt={result.documentMetadata.title} className="mr-4 size-[40px]" width={10} height={10} />
                 <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                   <div className='space-y-1'>
-                    <a href={result.location} target="_blank" rel="noopener noreferrer">
+                    <a href={result.documentMetadata.link} target="_blank" rel="noopener noreferrer">
                       <h3 className="text-l mb-2 truncate font-semibold text-blue-800 group-hover:underline dark:text-blue-400">
-                        {result.title.charAt(0).toUpperCase() + result.title.slice(1)}
+                        {result.documentMetadata.title.charAt(0).toUpperCase() + result.documentMetadata.title.slice(1)}
                       </h3>
                     </a>
-                    <p className="font-regular line-clamp-3 text-sm text-gray-500">
+                    <p className="font-regular line-clamp-3 text-sm" dangerouslySetInnerHTML={{ __html: result.snippets.map(snippet => snippet.content).join(" ... ") }}></p>
+                    <div className='flex flex-row gap-2'>
+                      <p className="font-regular line-clamp-3 text-sm text-gray-500">
                       {
-                        !isNaN(new Date(result.updated_at).getTime()) ?
-                        new Date(result.updated_at).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' }) 
+                        !isNaN(new Date(result.documentMetadata.updated_at).getTime()) ?
+                        new Date(result.documentMetadata.updated_at).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) 
                         : null
                       }
-                    </p>
-                    <p className="font-regular line-clamp-3 text-sm" dangerouslySetInnerHTML={{ __html: result.content }}></p>
+                      </p>
+                      <span className="font-regular text-sm text-gray-500">·</span>
+                      <p className="font-regular line-clamp-3 text-sm text-gray-500">
+                        {result.documentMetadata.type.charAt(0).toUpperCase() + result.documentMetadata.type.slice(1)}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -108,7 +114,7 @@ const ResultsFilter = ({ results, num_results }) => (
   <div className="mt-5 flex w-2/5 flex-col items-start justify-start">
     <div className="flex flex-col items-center">
       {results && num_results &&
-          <AppFilterOptions results={results.searchInformation?.formattedTotalResults} num_results={num_results} />
+        <AppFilterOptions results={results.searchInformation?.formattedTotalResults} num_results={num_results} />
       }
     </div>
   </div>
@@ -117,12 +123,12 @@ const ResultsFilter = ({ results, num_results }) => (
 // Main Component
 export default function SearchResults({ search_results, ai_content, isLoadingResults, isLoadingCopilot }) {
   // style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.015) 1%, transparent)'}}
-  console.log("Search Results:", search_results)
+  console.log("Search Results hereeeeeee:", search_results)
   return (
     <div className="font-open-sans dark:bg-background mx-auto flex min-h-screen w-full flex-col  dark:text-white" >
-      <div className='sm:pl-[5%] md:pl-[14%] lg:pl-52' style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.015) 1%, transparent)'}}>
+      {/* <div className='sm:pl-[5%] md:pl-[14%] lg:pl-52' style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.015) 1%, transparent)'}}>
         <AIResults content={ai_content} search_results={search_results} isLoadingCopilot={isLoadingCopilot}/>
-      </div>
+      </div> */}
       <div className='flex flex-row sm:pl-[5%] md:pl-[14%] lg:pl-52'>
         {search_results && 
           <>

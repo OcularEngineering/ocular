@@ -22,8 +22,10 @@ export default function Search() {
     setIsLoadingCopilot(true);
     api.search.search(router.query.q)
       .then(data => {
-        setAiResults(data.data.message.content);
-        setIsLoadingCopilot(false);
+        console.log("Search Results:", data)
+        // setAiResults(data.data.message.content);
+        // setIsLoadingCopilot(false);
+        console.log("Search Results hits:", data.data.hits)
         setSearchResults(data.data.hits); 
         setIsLoadingResults(false); 
       })
