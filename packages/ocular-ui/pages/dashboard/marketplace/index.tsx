@@ -29,9 +29,6 @@ export const metadata: Metadata = {
   },
 };
 
-interface Props {
-  integrations: Integration[];
-}
 
 interface IntegrationsByCategory {
   [key: string]: Integration[];

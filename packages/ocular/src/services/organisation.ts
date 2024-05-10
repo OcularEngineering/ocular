@@ -13,13 +13,18 @@ import { isDefined } from "../utils/is-defined";
 import { AutoflowAiError, AutoflowAiErrorTypes } from "@ocular/utils";
 import { AppNameDefinitions } from "@ocular/types";
 import { AppRepository } from "../repositories";
+import EventBusService from "./event-bus";
+import { Locator } from "puppeteer";
 
 type InjectedDependencies = {
   manager: EntityManager;
   appRepository: typeof AppRepository;
   loggedInUser: User;
   organisationRepository: typeof OrganisationRepository;
+  eventBusService: EventBusService;
 };
+
+type AppsArray = any;
 
 /**
  * Provides layer to manipulate store settings.
@@ -28,12 +33,14 @@ class OrganisationService extends TransactionBaseService {
   protected readonly appRepository_: typeof AppRepository;
   protected readonly loggedInUser_: User | null;
   protected readonly organisationRepository_: typeof OrganisationRepository;
+  protected readonly eventBusService_: EventBusService;
 
   constructor(container: InjectedDependencies) {
     // eslint-disable-next-line prefer-rest-params
     super(arguments[0]);
     this.appRepository_ = container.appRepository;
     this.organisationRepository_ = container.organisationRepository;
+    this.eventBusService_ = container.eventBusService;
 
     try {
       this.loggedInUser_ = container.loggedInUser;
@@ -144,6 +151,66 @@ class OrganisationService extends TransactionBaseService {
     });
   }
 
+  async updateInstalledApp(
+    app_name: string,
+    data: any
+  ): Promise<AppsArray[] | null> {
+    return await this.atomicPhase_(
+      async (transactionManager: EntityManager) => {
+        switch (app_name) {
+          case AppNameDefinitions.WEBCONNECTOR:
+            const { link_id, link, eventBus_ } = data;
+            const org = await this.listInstalledApps();
+            const installed_apps: any = org.installed_apps;
+            const webConnector_index = installed_apps.findIndex(
+              (app) => app.name === AppNameDefinitions.WEBCONNECTOR
+            );
+
+            if (webConnector_index !== -1) {
+              if (!installed_apps[webConnector_index].links) {
+                installed_apps[webConnector_index].links = [];
+              }
+
+              const linkExist = installed_apps[webConnector_index].links.find(
+                (ele) => ele.id === link_id
+              );
+              if (linkExist !== -1) {
+                installed_apps[webConnector_index].links[linkExist] = {
+                  id: link_id,
+                  location: link,
+                  status: data.status,
+                };
+              } else {
+                installed_apps[webConnector_index].links.push({
+                  id: link_id,
+                  location: link,
+                  status: data.status,
+                });
+              }
+
+              await this.update(this.loggedInUser_.organisation_id, {
+                installed_apps,
+              });
+            }
+            if (data.emit_event) {
+              await this.eventBusService_.emit("webConnectorInstalled", {
+                organisation: this.loggedInUser_.organisation,
+                app_name: AppNameDefinitions.WEBCONNECTOR,
+                link,
+                link_id,
+              });
+            }
+
+            return installed_apps[webConnector_index].links;
+
+          default:
+            return null;
+            break;
+        }
+      }
+    );
+  }
+
   async update(
     org_id: string,
     data: UpdateOrganisationInput
@@ -157,8 +224,7 @@ class OrganisationService extends TransactionBaseService {
         const { installed_apps } = data;
 
         const organisation = await this.retrieve(org_id);
-        console.log("ORGANISATION", organisation.installed_apps);
-        console.log("UPDATED ISNTALLED APPS", installed_apps[0]);
+
         if (!organisation) {
           throw new AutoflowAiError(
             AutoflowAiError.Types.NOT_FOUND,
@@ -173,7 +239,6 @@ class OrganisationService extends TransactionBaseService {
               const installedAppUpdate = installed_apps.find(
                 (installedApp) => installedApp.name === app.name
               );
-              console.log("UPDATED_APP", installedAppUpdate);
               app = installedAppUpdate;
               app.installation_id = installedAppUpdate?.installation_id;
               app.permissions = installedAppUpdate?.permissions;
