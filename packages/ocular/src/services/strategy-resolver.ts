@@ -14,9 +14,7 @@ export default class StrategyResolver extends TransactionBaseService {
   resolveBatchJobByType(type: string): IBatchJobStrategy {
     let resolved: IBatchJobStrategy;
     try {
-      console.log(this.container_);
       resolved = this.container_[`${type}Strategy`];
-      console.log("RESOLVED STRATEGY!!", resolved);
     } catch (e) {
       throw new AutoflowAiError(
         AutoflowAiError.Types.NOT_FOUND,

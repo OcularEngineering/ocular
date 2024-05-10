@@ -145,7 +145,6 @@ export default class EventBusModule extends AbstractEventBusModuleService {
     }
 
     const completedSubscribersInCurrentAttempt: string[] = [];
-    console.log("CHECKING SOMETHING", subscribersInCurrentAttempt);
     const subscribersResult = await Promise.all(
       subscribersInCurrentAttempt.map(async ({ id, subscriber }) => {
         return await subscriber(data, eventName)

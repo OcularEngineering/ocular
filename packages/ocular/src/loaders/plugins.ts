@@ -117,7 +117,9 @@ async function runLoaders(
   pluginDetails: PluginDetails,
   container: AutoflowContainer
 ): Promise<void> {
-  const loaderFilesGlob = pathByOS(`${pluginDetails.resolve}/loaders/*.js`);
+  const loaderFilesGlob = pathByOS(
+    `${pluginDetails.resolve}/dist/loaders/*.js`
+  );
   const loaderFiles = glob.sync(loaderFilesGlob, {});
 
   await Promise.all(
