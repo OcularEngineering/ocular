@@ -103,7 +103,7 @@ async function runLoaders(
   appDetails: AppDetails,
   container: AutoflowContainer
 ): Promise<void> {
-  const loaderFilesGlob = pathByOS(`${appDetails.resolve}/loaders/[!__]*.js`);
+  const loaderFilesGlob = pathByOS(`${appDetails.resolve}/dist/loaders/*.js`);
   const loaderFiles = glob.sync(loaderFilesGlob, {});
 
   await Promise.all(
