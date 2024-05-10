@@ -4,7 +4,7 @@ import { useState } from 'react';
 import AppFilterOption from "./app-filter-option";
 import Image from 'next/image';
 
-const iconsArray = ['Jira.svg', 'Github.png', 'PagerDuty.png', 'stackoverflow.svg', 'Notion.png' ];
+const iconsArray = ['asana.svg', 'google-drive.svg'];
 
 type AppFilterOptionsProps = {
     results: any; 
@@ -17,7 +17,7 @@ export default function AppFilterOptions({results}: AppFilterOptionsProps) {
             <div className="flex w-full flex-col justify-start space-y-2 sm:w-auto">
                 {/* <AppFilterOption src="/All.svg"  title="All apps" key="All" results={"3k"}/> */}
                 <div
-                    className={`hover:dark:bg-muted box-border flex h-10 w-64 min-w-10 cursor-pointer items-center justify-start rounded-full px-5 hover:bg-gray-100 ${isSelected ? 'bg-blue-100 dark:dark:bg-muted border border-input' : 'bg-blue-100 dark:dark:bg-muted border border-input'}`}
+                    className={`hover:dark:bg-muted box-border flex h-10 w-64 min-w-10 cursor-pointer items-center justify-start rounded-full px-5 hover:bg-gray-100 ${isSelected ? 'bg-blue-100 dark:bg-muted border border-input' : 'bg-blue-100 dark:bg-muted border border-input'}`}
                     onClick={() => setIsSelected(!isSelected)}
                     >
                     <div className='flex grow gap-2'>

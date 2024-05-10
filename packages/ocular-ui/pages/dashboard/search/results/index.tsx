@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Head from "next/head";
 import Header from "@/components/search/header";
 import { useRouter } from "next/router";
 import SearchResults from "@/components/search/search-results";
+import { ChatbotUIContext } from "@/context/context"
+
 
 // Importing API End Points
 import api from "@/services/api"
@@ -17,10 +19,12 @@ export default function Search() {
   const [isLoadingCopilot, setIsLoadingCopilot] = useState(false);
   const router = useRouter();
 
+  const { resultSources } = useContext(ChatbotUIContext)
+
   useEffect(() => {
     setIsLoadingResults(true); 
     setIsLoadingCopilot(true);
-    api.search.search(router.query.q)
+    api.search.search(router.query.q, resultSources)
       .then(data => {
         console.log("Search Results:", data)
         // setAiResults(data.data.message.content);
@@ -34,7 +38,7 @@ export default function Search() {
         setIsLoadingCopilot(false);
 
       });
-  }, [router.query.q]); 
+  }, [router.query.q, resultSources]); 
 
   return (
     <div className="dark:bg-background w-full bg-white text-black">

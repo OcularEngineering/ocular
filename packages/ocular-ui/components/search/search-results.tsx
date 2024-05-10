@@ -8,7 +8,7 @@ import {
   ChevronDownIcon,
 } from "@heroicons/react/outline";
 
-import { SearchCopilotSkeleton, SearchResultsSkeleton } from '@/components/ui/skeletons';
+import { SearchCopilotSkeleton, SearchResultsSkeleton, SearchByAppFilterSkeleton } from '@/components/ui/skeletons';
 
 // AI Results Component
 export const AIResults = ({ content, search_results, isLoadingCopilot }) => {
@@ -110,11 +110,12 @@ const Results = ({ results, isLoadingResults }) => (
 );
 
 // Results Filter Component
-const ResultsFilter = ({ results, num_results }) => (
+const ResultsFilter = ({ results, num_results, isLoadingResults }) => (
   <div className="mt-5 flex w-2/5 flex-col items-start justify-start">
     <div className="flex flex-col items-center">
-      {results && num_results &&
-        <AppFilterOptions results={results.searchInformation?.formattedTotalResults} num_results={num_results} />
+      {
+        results && num_results &&
+        <AppFilterOptions results={results.searchInformation?.formattedTotalResults} />
       }
     </div>
   </div>
@@ -134,7 +135,7 @@ export default function SearchResults({ search_results, ai_content, isLoadingRes
           <>
             <Results results={search_results} isLoadingResults={isLoadingResults} />
             {!isLoadingResults && (
-              <ResultsFilter results={search_results} num_results={search_results.length} />
+              <ResultsFilter results={search_results} num_results={search_results.length} isLoadingResults={isLoadingResults} />
             )}
           </>
         }

@@ -117,6 +117,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   // const [selectedTools, setSelectedTools] = useState<Tables<"tools">[]>([])
   // const [toolInUse, setToolInUse] = useState<string>("none")
 
+  // Search Results Sources Store
+  const [resultSources, setResultSources] = useState<string[]>([])
+
   useEffect(() => {
     ;(async () => {
       // const profile = await fetchStartingChatData()
@@ -206,6 +209,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         // setCollections,
         chats,
         setChats,
+        resultSources,
+        setResultSources,
         // files,
         // setFiles,
         // folders,

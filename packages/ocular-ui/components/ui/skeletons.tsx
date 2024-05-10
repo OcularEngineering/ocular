@@ -55,3 +55,18 @@ export function SearchCopilotSkeleton() {
         </div>
     )
 }
+
+
+export function SearchByAppFilterSkeleton() {
+    return (
+        <div className="mt-3 flex w-full lg:justify-start">
+            <div className="flex w-full flex-col justify-start space-y-2 sm:w-auto">
+                <div className={`${shimmer} relative overflow-hidden dark:bg-muted bg-gray-200 box-border flex h-10 w-64 min-w-10 items-center justify-start rounded-full px-5`} />
+                <div className={`${shimmer} relative overflow-hidden dark:bg-muted bg-gray-200 box-border flex h-10 w-64 min-w-10 items-center justify-start rounded-full px-5`} />
+                <div className={`${shimmer} relative overflow-hidden dark:bg-muted bg-gray-200 box-border flex h-10 w-64 min-w-10 items-center justify-start rounded-full px-5`} />
+                <div className={`${shimmer} relative overflow-hidden dark:bg-muted bg-gray-200 box-border flex h-10 w-64 min-w-10 items-center justify-start rounded-full px-5`} />
+                <div className={`${shimmer} relative overflow-hidden dark:bg-muted bg-gray-200 box-border flex h-10 w-64 min-w-10 items-center justify-start rounded-full px-5`} />
+            </div>
+        </div>
+    )
+}
