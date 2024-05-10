@@ -18,7 +18,6 @@ export default async (req, res) => {
   const data = {
     link: validated.link,
     link_id,
-    eventBus_,
     status: "processing",
     emit_event: true,
   };

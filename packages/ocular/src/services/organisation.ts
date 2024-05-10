@@ -21,6 +21,7 @@ type InjectedDependencies = {
   appRepository: typeof AppRepository;
   loggedInUser: User;
   organisationRepository: typeof OrganisationRepository;
+  eventBusService: EventBusService;
 };
 
 type AppsArray = any;
@@ -32,12 +33,14 @@ class OrganisationService extends TransactionBaseService {
   protected readonly appRepository_: typeof AppRepository;
   protected readonly loggedInUser_: User | null;
   protected readonly organisationRepository_: typeof OrganisationRepository;
+  protected readonly eventBusService_: EventBusService;
 
   constructor(container: InjectedDependencies) {
     // eslint-disable-next-line prefer-rest-params
     super(arguments[0]);
     this.appRepository_ = container.appRepository;
     this.organisationRepository_ = container.organisationRepository;
+    this.eventBusService_ = container.eventBusService;
 
     try {
       this.loggedInUser_ = container.loggedInUser;
@@ -190,7 +193,7 @@ class OrganisationService extends TransactionBaseService {
               });
             }
             if (data.emit_event) {
-              await eventBus_.emit("webConnectorInstalled", {
+              await this.eventBusService_.emit("webConnectorInstalled", {
                 organisation: this.loggedInUser_.organisation,
                 app_name: AppNameDefinitions.WEBCONNECTOR,
                 link,
