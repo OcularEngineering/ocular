@@ -23,8 +23,8 @@ export default {
       const path = `/admin/apps/${id}`;
       return ocularRequest('GET', path);
     },
-    saveWebConnectorLink(data: any) {
-      const path = `/admin/apps/savelink`;
+    updateApp(data: any) {
+      const path = `/admin/apps/updateapp`;
       return ocularRequest('POST', path, data);
     },
   },

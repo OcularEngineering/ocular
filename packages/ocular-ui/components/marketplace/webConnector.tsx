@@ -79,19 +79,30 @@ export default function WebConnector({ links }: { links: Link[] }) {
     try {
       // const resp = await api.apps.saveWebConnectorLink();
       // console.log('response', resp.data);
-      const response = await api.apps.saveWebConnectorLink({
+      const response = await api.apps.updateApp({
         link: data as string,
         name: 'webConnector' as string,
       });
-      console.log('LINK RESPONSE', response.data);
-      const updatedLinkData: Link[] = [
-        ...linkData,
-        {
-          location: data,
-          status: 'processing',
-        },
-      ];
-      setLinkdata(updatedLinkData);
+      console.log('LINK RESPONSE', response.status);
+      if (response.status === 200) {
+        const updatedLinkData: Link[] = [
+          ...linkData,
+          {
+            location: data,
+            status: 'processing',
+          },
+        ];
+        setLinkdata(updatedLinkData);
+      } else {
+        const updatedLinkData: Link[] = [
+          ...linkData,
+          {
+            location: data,
+            status: 'failed',
+          },
+        ];
+        setLinkdata(updatedLinkData);
+      }
     } catch (error) {
       console.error('Error fetching integrations:', error);
     }

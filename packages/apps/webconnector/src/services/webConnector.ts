@@ -65,13 +65,14 @@ export default class webConnectorService extends TransactionBaseService {
 
     try {
       const pageArray = await this.crawl(base_url);
+      console.log("Oage_array", pageArray);
       let documents: IndexableDocument[] = [];
       for (const page of pageArray) {
         if (page.text) {
           const pageDocument: IndexableDocument = {
             id: page.location,
             organisationId: org.id,
-            title: page.text,
+            title: this.generateTitleFromParagraph(page.text),
             source: AppNameDefinitions.WEBCONNECTOR,
             sections: [
               {
@@ -97,69 +98,32 @@ export default class webConnectorService extends TransactionBaseService {
 
       await this.oauthService_.update(oauth.id, { last_sync: new Date() });
 
-      // const current_org = await this.organisationService.listInstalledApps();
-      // const installed_apps: any = current_org.installed_apps;
-      // const webConnector_index = installed_apps.findIndex(
-      //   (app) => app.name === AppNameDefinitions.WEBCONNECTOR
-      // );
-
-      // if (webConnector_index !== -1) {
-      //   const index = installed_apps[webConnector_index].links.findIndex(
-      //     (link) => link.id === link_id
-      //   );
-
-      //   const updatedLink = {
-      //     id: link_id,
-      //     location: base_url,
-      //     status: "success",
-      //   };
-
-      //   if (index !== -1) {
-      //     installed_apps[webConnector_index].links[index] = {
-      //       ...installed_apps[webConnector_index].links[index],
-      //       ...updatedLink,
-      //     };
-      //   }
-
-      //   await this.organisationService.update(org.id, {
-      //     installed_apps,
-      //   });
-      // }
+      const data = {
+        link: base_url,
+        link_id,
+        emit_event: false,
+        status: "success",
+      };
+      await this.organisationService.updateInstalledApp(
+        AppNameDefinitions.WEBCONNECTOR,
+        data
+      );
 
       this.logger_.info(
         `Finished oculation of Web Connector for ${org.id} organisation`
       );
     } catch (error) {
       console.error("Error fetching web commector content:", error);
-
-      // const current_org = await this.organisationService.listInstalledApps();
-      // const installed_apps: any = current_org.installed_apps;
-      // const webConnector_index = installed_apps.findIndex(
-      //   (app) => app.name === AppNameDefinitions.WEBCONNECTOR
-      // );
-
-      // if (webConnector_index !== -1) {
-      //   const index = installed_apps[webConnector_index].links.findIndex(
-      //     (link) => link.id === link_id
-      //   );
-
-      //   const updatedLink = {
-      //     id: link_id,
-      //     location: base_url,
-      //     status: "failed",
-      //   };
-
-      //   if (index !== -1) {
-      //     installed_apps[webConnector_index].links[index] = {
-      //       ...installed_apps[webConnector_index].links[index],
-      //       ...updatedLink,
-      //     };
-      //   }
-
-      //   await this.organisationService.update(org.id, {
-      //     installed_apps,
-      //   });
-      // }
+      const data = {
+        link: base_url,
+        link_id,
+        emit_event: false,
+        status: "failed",
+      };
+      await this.organisationService.updateInstalledApp(
+        AppNameDefinitions.WEBCONNECTOR,
+        data
+      );
     }
   }
 
@@ -265,5 +229,33 @@ export default class webConnectorService extends TransactionBaseService {
     }, hostname);
 
     return new Set(internalLinks);
+  }
+
+  generateTitleFromParagraph(paragraph: string) {
+    // Find the index of the first line break or full stop
+    const lineBreakIndex = paragraph.indexOf("\n");
+    const fullStopIndex = paragraph.indexOf(".");
+
+    // Determine the position of the title end (whichever comes first)
+    let titleEndIndex;
+    if (lineBreakIndex !== -1 && fullStopIndex !== -1) {
+      titleEndIndex = Math.min(lineBreakIndex, fullStopIndex);
+    } else if (lineBreakIndex !== -1) {
+      titleEndIndex = lineBreakIndex;
+    } else if (fullStopIndex !== -1) {
+      titleEndIndex = fullStopIndex;
+    } else {
+      // If no line break or full stop is found, use the entire paragraph as title
+      return paragraph.trim(); // Trim leading and trailing whitespace
+    }
+
+    // Extract the title from the beginning of the paragraph up to titleEndIndex
+    let title = paragraph.substring(0, titleEndIndex).trim();
+
+    if (title.length === 0) {
+      // Provide a default title or appropriate fallback
+      title = "Notion Page"; // Example default title
+    }
+    return title;
   }
 }
