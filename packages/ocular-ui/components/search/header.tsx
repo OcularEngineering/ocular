@@ -6,19 +6,6 @@ import HeaderFilterToolbar from "./header-filter-toolbar";
 export default function Header() {
   const router = useRouter();
   const [searchInput, setSearchInput] = useState(router.query.q);
-  const [showHeaderFilterToolbar, setShowHeaderFilterToolbar] = useState(true);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowHeaderFilterToolbar(window.scrollY === 0);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []); 
 
   // @ts-ignore
   const search = (e) => {
@@ -33,13 +20,10 @@ export default function Header() {
   }
 
   return (
-    <header className={`bg-background sticky top-0 font-sans dark:text-white shadow-sm dark:border-b z-1000`}>
-      <div className="flex w-full items-center justify-between p-6">
-        <div className="flex w-full flex-col items-center sm:flex-row ">
-          <form className={`bg-background mt-5 flex w-full max-w-3xl grow items-center rounded-full px-6 py-3 sm:ml-10 sm:mr-5 sm:mt-0 ${
-            showHeaderFilterToolbar ? 'border lg:max-w-5xl' : 'border lg:max-w-5xl'
-          } `}>
-          
+    <header className={`bg-background sticky flex flex-col justify-center items-center top-0 dark:text-white shadow-sm dark:border-b z-1000`}>
+      <div className="w-full max-w-7xl mx-auto px-6 pt-5">
+        <div className="flex flex-col items-start space-y-5">
+          <form className="bg-background flex w-full grow items-center rounded-full py-3 px-6 border">
             <input
               type="text"
               value={searchInput}
@@ -50,7 +34,7 @@ export default function Header() {
 
             {searchInput && (
               <XIcon
-                className="h-6 cursor-pointer text-gray-500 transition duration-100 hover:scale-110 sm:mr-3"
+                className="h-6 cursor-pointer text-gray-500 transition duration-100 hover:scale-110"
                 onClick={() => setSearchInput("")}
               />
             )}
@@ -59,10 +43,8 @@ export default function Header() {
               <SearchIcon className="h-6 cursor-pointer pl-2 text-blue-500" />
             </button>
           </form>
+          <HeaderFilterToolbar />
         </div>
-      </div>
-      <div>
-      {showHeaderFilterToolbar && <HeaderFilterToolbar />}
       </div>
     </header>
   );

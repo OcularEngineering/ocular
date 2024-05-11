@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useContext } from 'react';
+import { useContext } from 'react';
 import AppFilterOption from "./app-filter-option";
 import Image from 'next/image';
 import { ChatbotUIContext } from "@/context/context";

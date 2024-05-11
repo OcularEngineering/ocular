@@ -122,19 +122,16 @@ const ResultsFilter = ({ results, num_results, isLoadingResults }) => (
 // Main Component
 export default function SearchResults({ search_results, ai_content, isLoadingResults, isLoadingCopilot }) {
   return (
-    <div className="font-open-sans dark:bg-background mx-auto flex min-h-screen w-full flex-col  dark:text-white" >
+    <div className="font-open-sans dark:bg-background mx-auto flex min-h-screen w-full flex-col  dark:text-white justify-center" >
       {/* <div className='sm:pl-[5%] md:pl-[14%] lg:pl-52' style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.015) 1%, transparent)'}}>
         <AIResults content={ai_content} search_results={search_results} isLoadingCopilot={isLoadingCopilot}/>
       </div> */}
-      <div className='flex flex-row sm:pl-[5%] md:pl-[14%] lg:pl-52'>
+      <div className='flex flex-row w-full  justify-center'>
         {search_results && 
-          <>
+          <div className='flex flex-row'>
             <Results results={search_results} isLoadingResults={isLoadingResults} />
-            {/* {!isLoadingResults && (
-              <ResultsFilter results={search_results} num_results={search_results.length} isLoadingResults={isLoadingResults} />
-            )} */}
             <ResultsFilter results={search_results} num_results={search_results.length} isLoadingResults={isLoadingResults} />
-          </>
+          </div>
         }
       </div>
     </div>

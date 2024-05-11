@@ -30,9 +30,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         />
                     </div>
                     <div className="grow justify-center overflow-auto">
-                        {/* <div className="flex-row items-center justify-center"> */}
                         <div className="w-full-14">{children}</div> 
-                        {/* </div> */}
                     </div>
                 </div>
             </ThemeProvider>
