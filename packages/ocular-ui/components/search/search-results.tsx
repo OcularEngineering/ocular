@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 
-import PaginationButtons from "./pagination-buttons";
 import AppFilterOptions from "./app-filter-options";
 import ReactMarkdown from 'react-markdown';
 import {
   ChevronDownIcon,
 } from "@heroicons/react/outline";
 
-import { SearchCopilotSkeleton, SearchResultsSkeleton } from '@/components/ui/skeletons';
+import { SearchCopilotSkeleton, SearchResultsSkeleton, SearchByAppFilterSkeleton } from '@/components/ui/skeletons';
 
 // AI Results Component
 export const AIResults = ({ content, search_results, isLoadingCopilot }) => {
@@ -67,7 +66,7 @@ const Results = ({ results, isLoadingResults }) => (
     {isLoadingResults ? (
       <SearchResultsSkeleton />
     ) : (
-      <div className="mt-5 w-3/5 items-start justify-start">
+      <div className="w-3/5 max-w-5xl items-start justify-start">
         {
           results.map((result: any, index: any) => (
             <div key={index}>
@@ -83,7 +82,7 @@ const Results = ({ results, isLoadingResults }) => (
                         {result.documentMetadata.title.charAt(0).toUpperCase() + result.documentMetadata.title.slice(1)}
                       </h3>
                     </a>
-                    <p className="font-regular line-clamp-3 text-sm" dangerouslySetInnerHTML={{ __html: result.snippets.map(snippet => snippet.content).join(" ... ") }}></p>
+                    <p className="font-regular line-clamp-3 text-sm max-w-3xl" dangerouslySetInnerHTML={{ __html: result.snippets.map(snippet => snippet.content).join(" ... ") }}></p>
                     <div className='flex flex-row gap-2'>
                       <p className="font-regular line-clamp-3 text-sm text-gray-500">
                       {
@@ -103,18 +102,18 @@ const Results = ({ results, isLoadingResults }) => (
             </div>
           ))
         }
-        <PaginationButtons />
       </div>
     )}
   </>
 );
 
 // Results Filter Component
-const ResultsFilter = ({ results, num_results }) => (
-  <div className="mt-5 flex w-2/5 flex-col items-start justify-start">
-    <div className="flex flex-col items-center">
-      {results && num_results &&
-        <AppFilterOptions results={results.searchInformation?.formattedTotalResults} num_results={num_results} />
+const ResultsFilter = ({ results, num_results, isLoadingResults }) => (
+  <div className="flex w-2/5 flex-col items-end">
+    <div className="flex flex-col">
+      {
+        results && num_results &&
+        <AppFilterOptions results={results.searchInformation?.formattedTotalResults} />
       }
     </div>
   </div>
@@ -122,21 +121,17 @@ const ResultsFilter = ({ results, num_results }) => (
 
 // Main Component
 export default function SearchResults({ search_results, ai_content, isLoadingResults, isLoadingCopilot }) {
-  // style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.015) 1%, transparent)'}}
-  console.log("Search Results hereeeeeee:", search_results)
   return (
-    <div className="font-open-sans dark:bg-background mx-auto flex min-h-screen w-full flex-col  dark:text-white" >
+    <div className="font-open-sans dark:bg-background flex min-h-screen flex-col dark:text-white items-center justify-center" >
       {/* <div className='sm:pl-[5%] md:pl-[14%] lg:pl-52' style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.015) 1%, transparent)'}}>
         <AIResults content={ai_content} search_results={search_results} isLoadingCopilot={isLoadingCopilot}/>
       </div> */}
-      <div className='flex flex-row sm:pl-[5%] md:pl-[14%] lg:pl-52'>
+      <div className='flex flex-row items-center justify-center'>
         {search_results && 
-          <>
+          <div className='flex flex-row justify-center mt-5'>
             <Results results={search_results} isLoadingResults={isLoadingResults} />
-            {!isLoadingResults && (
-              <ResultsFilter results={search_results} num_results={search_results.length} />
-            )}
-          </>
+            <ResultsFilter results={search_results} num_results={search_results.length} isLoadingResults={isLoadingResults} />
+          </div>
         }
       </div>
     </div>

@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Head from "next/head";
 import Header from "@/components/search/header";
 import { useRouter } from "next/router";
 import SearchResults from "@/components/search/search-results";
+import { ChatbotUIContext } from "@/context/context"
 
 // Importing API End Points
 import api from "@/services/api"
-import { set } from 'nprogress';
 
 export default function Search() {
   const [ai_content, setAiResults] = useState(null);
@@ -17,16 +17,18 @@ export default function Search() {
   const [isLoadingCopilot, setIsLoadingCopilot] = useState(false);
   const router = useRouter();
 
+  const { selectedResultSources } = useContext(ChatbotUIContext)
+  const { setResultSources } = useContext(ChatbotUIContext)
+
   useEffect(() => {
     setIsLoadingResults(true); 
     setIsLoadingCopilot(true);
-    api.search.search(router.query.q)
+    api.search.search(router.query.q, selectedResultSources)
       .then(data => {
-        console.log("Search Results:", data)
         // setAiResults(data.data.message.content);
         // setIsLoadingCopilot(false);
-        console.log("Search Results hits:", data.data.hits)
         setSearchResults(data.data.hits); 
+        setResultSources(data.data.sources); 
         setIsLoadingResults(false); 
       })
       .catch(error => {
@@ -34,10 +36,10 @@ export default function Search() {
         setIsLoadingCopilot(false);
 
       });
-  }, [router.query.q]); 
+  }, [router.query.q, selectedResultSources, setResultSources]); 
 
   return (
-    <div className="dark:bg-background w-full bg-white text-black">
+    <div className="dark:bg-background w-full bg-white text-black items-center justify-center">
       <Head>
         <title>{router.query.q} - Ocular</title>
         <link rel="icon" href="/Ocular-Profile-Logo.png" />

@@ -125,6 +125,15 @@ interface ChatbotUIContext {
   // setSelectedTools: Dispatch<SetStateAction<Tables<"tools">[]>>
   // toolInUse: string
   // setToolInUse: Dispatch<SetStateAction<string>>
+
+    // RESULT SOURCES STORE
+    selectedResultSources: string[]
+    setselectedResultSources: Dispatch<SetStateAction<string[]>>
+    resultSources: string[]
+    setResultSources: Dispatch<SetStateAction<string[]>>
+
+    activeFilter: string
+    setActiveFilter: Dispatch<SetStateAction<string>>
 }
 
 export const ChatbotUIContext = createContext<ChatbotUIContext>({
@@ -251,4 +260,12 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
 //   setSelectedTools: () => {},
 //   toolInUse: "none",
 //   setToolInUse: () => {}
+
+  // RESULT SOURCES STORE
+  selectedResultSources: [],
+  setselectedResultSources: () => {},
+  resultSources: [],
+  setResultSources: () => {},
+  activeFilter: "",
+  setActiveFilter: () => {}
 })

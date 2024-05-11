@@ -4,16 +4,37 @@ const shimmer =
 
 export function SearchResultSkeleton() {
     return (
+        // <div
+        //     className={`group mb-4 flex px-3 py-4`}
+        // >
+        //     <div className={`${shimmer} relative overflow-hidden mr-4 w-12 h-12 bg-gray-200 rounded-full dark:bg-muted`} />
+        //     <div className={`space-y-5`}>
+        //         <div className={`${shimmer} relative overflow-hidden dark:bg-muted bg-gray-200 h-5 rounded-xl`}/>
+        //         <div className={`space-y-2 w-full`}>
+        //             <div className={`${shimmer} relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-2 w-4/5`}/>
+        //             <div className={`${shimmer} relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-2 w-3/5`}/>
+        //             <div className={`${shimmer} relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-2 w-2/5`}/>
+        //         </div>
+        //         <div className="flex flex-row gap-3">
+        //             <div className={`${shimmer} relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-3 w-[100px]`}/>
+        //             <div className={`${shimmer} relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-3 w-[50px]`}/>
+        //         </div>
+        //     </div>
+        // </div>
         <div
-            className={`group mb-4 flex px-3 py-4 text-xs sm:text-base mt-5 w-full max-w-5xl items-start justify-start`}
+            className={`group mb-4 flex px-3 py-4`}
         >
-            <div className={`${shimmer} relative overflow-hidden mr-4 w-12 h-12 bg-gray-200 rounded-full dark:bg-muted`} />
-            <div className={`space-y-5 w-4/5`}>
+            <div className={`${shimmer} relative overflow-hidden mr-4 w-16 h-12 bg-gray-200 rounded-full dark:bg-muted`} />
+            <div className={`space-y-5 w-[743px]`}>
                 <div className={`${shimmer} relative overflow-hidden dark:bg-muted bg-gray-200 h-5 rounded-xl`}/>
-                <div className={`space-y-3 w-full`}>
-                    <div className={`${shimmer} relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-3 w-4/5`}/>
-                    <div className={`${shimmer} relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-3 w-3/5`}/>
-                    <div className={`${shimmer} relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-3 w-2/5`}/>
+                <div className={`space-y-2`}>
+                    <div className={`${shimmer} relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-2 w-4/5`}/>
+                    <div className={`${shimmer} relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-2 w-3/5`}/>
+                    <div className={`${shimmer} relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-2 w-2/5`}/>
+                </div>
+                <div className="flex flex-row gap-3">
+                    <div className={`${shimmer} relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-3 w-[100px]`}/>
+                    <div className={`${shimmer} relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-3 w-[50px]`}/>
                 </div>
             </div>
         </div>
@@ -21,7 +42,7 @@ export function SearchResultSkeleton() {
 }
 export function SearchResultsSkeleton() {
     return (
-        <div className="flex flex-col w-full z-0">
+        <div className="flex flex-col max-w-5xl w-3/5">
             <SearchResultSkeleton />
             <SearchResultSkeleton />
             <SearchResultSkeleton />
@@ -51,6 +72,21 @@ export function SearchCopilotSkeleton() {
                 <div className={`${shimmer} relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-3 w-4/5`}/>
                 <div className={`${shimmer} relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-3 w-3/5`}/>
                 <div className={`${shimmer} relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-3 w-2/5`}/>
+            </div>
+        </div>
+    )
+}
+
+
+export function SearchByAppFilterSkeleton() {
+    return (
+        <div className="mt-3 flex w-full lg:justify-start">
+            <div className="flex w-full flex-col justify-start space-y-2 sm:w-auto">
+                <div className={`${shimmer} relative overflow-hidden dark:bg-muted bg-gray-200 box-border flex h-10 w-64 min-w-10 items-center justify-start rounded-full px-5`} />
+                <div className={`${shimmer} relative overflow-hidden dark:bg-muted bg-gray-200 box-border flex h-10 w-64 min-w-10 items-center justify-start rounded-full px-5`} />
+                <div className={`${shimmer} relative overflow-hidden dark:bg-muted bg-gray-200 box-border flex h-10 w-64 min-w-10 items-center justify-start rounded-full px-5`} />
+                <div className={`${shimmer} relative overflow-hidden dark:bg-muted bg-gray-200 box-border flex h-10 w-64 min-w-10 items-center justify-start rounded-full px-5`} />
+                <div className={`${shimmer} relative overflow-hidden dark:bg-muted bg-gray-200 box-border flex h-10 w-64 min-w-10 items-center justify-start rounded-full px-5`} />
             </div>
         </div>
     )
