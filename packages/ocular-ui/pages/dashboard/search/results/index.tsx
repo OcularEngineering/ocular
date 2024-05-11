@@ -39,7 +39,7 @@ export default function Search() {
   }, [router.query.q, selectedResultSources, setResultSources]); 
 
   return (
-    <div className="dark:bg-background w-full bg-white text-black">
+    <div className="dark:bg-background w-full bg-white text-black items-center justify-center">
       <Head>
         <title>{router.query.q} - Ocular</title>
         <link rel="icon" href="/Ocular-Profile-Logo.png" />

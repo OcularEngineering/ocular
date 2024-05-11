@@ -66,7 +66,7 @@ const Results = ({ results, isLoadingResults }) => (
     {isLoadingResults ? (
       <SearchResultsSkeleton />
     ) : (
-      <div className="mt-5 w-3/5 max-w-5xl items-start justify-start">
+      <div className="w-3/5 max-w-5xl items-start justify-start">
         {
           results.map((result: any, index: any) => (
             <div key={index}>
@@ -109,8 +109,8 @@ const Results = ({ results, isLoadingResults }) => (
 
 // Results Filter Component
 const ResultsFilter = ({ results, num_results, isLoadingResults }) => (
-  <div className="mt-5 flex w-2/5 flex-col items-start justify-start">
-    <div className="flex flex-col items-center">
+  <div className="flex w-2/5 flex-col items-end">
+    <div className="flex flex-col">
       {
         results && num_results &&
         <AppFilterOptions results={results.searchInformation?.formattedTotalResults} />
@@ -122,13 +122,13 @@ const ResultsFilter = ({ results, num_results, isLoadingResults }) => (
 // Main Component
 export default function SearchResults({ search_results, ai_content, isLoadingResults, isLoadingCopilot }) {
   return (
-    <div className="font-open-sans dark:bg-background mx-auto flex min-h-screen w-full flex-col  dark:text-white justify-center" >
+    <div className="font-open-sans dark:bg-background flex min-h-screen flex-col dark:text-white items-center justify-center" >
       {/* <div className='sm:pl-[5%] md:pl-[14%] lg:pl-52' style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.015) 1%, transparent)'}}>
         <AIResults content={ai_content} search_results={search_results} isLoadingCopilot={isLoadingCopilot}/>
       </div> */}
-      <div className='flex flex-row w-full  justify-center'>
+      <div className='flex flex-row items-center justify-center'>
         {search_results && 
-          <div className='flex flex-row'>
+          <div className='flex flex-row justify-center mt-5'>
             <Results results={search_results} isLoadingResults={isLoadingResults} />
             <ResultsFilter results={search_results} num_results={search_results.length} isLoadingResults={isLoadingResults} />
           </div>
