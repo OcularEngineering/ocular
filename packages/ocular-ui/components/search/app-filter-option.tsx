@@ -12,24 +12,19 @@ type AppFilterOptionProps = {
 };
 
 export default function AppFilterOption({ src, title, results }: AppFilterOptionProps) {
-  const [isSelected, setIsSelected] = useState(false);
-
-  // Access the context and ensure it's valid
-  const { setResultSources, resultSources } = useContext(ChatbotUIContext);
+  const { setselectedResultSources, activeFilter, setActiveFilter } = useContext(ChatbotUIContext);
 
   const handleClick = () => {
-    setIsSelected(!isSelected);
-
-    // Set `resultSources` to an array containing only the current title
-    setResultSources(["google-drive"]);
-
-    console.log("Source selected 2:", resultSources);
+    setselectedResultSources([title]);
+    setActiveFilter(title);
   };
+
+  const isSelected = activeFilter === title;
 
   return (
     <div
       className={`hover:dark:bg-muted box-border flex h-10 w-64 min-w-10 cursor-pointer items-center justify-start rounded-full px-5 hover:bg-gray-100 ${
-        isSelected ? 'bg-blue-100 dark:bg-muted border-input' : 'bg-transparent border-input'
+        isSelected ? 'bg-blue-100 dark:bg-muted border-input' : 'bg-blue-100 bg-transparent border-input'
       }`}
       onClick={handleClick}
     >

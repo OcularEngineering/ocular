@@ -33,7 +33,7 @@ export default function Header() {
   }
 
   return (
-    <header className={`bg-background sticky top-0 font-sans dark:text-white shadow-sm dark:border-b`}>
+    <header className={`bg-background sticky top-0 font-sans dark:text-white shadow-sm dark:border-b z-1000`}>
       <div className="flex w-full items-center justify-between p-6">
         <div className="flex w-full flex-col items-center sm:flex-row ">
           <form className={`bg-background mt-5 flex w-full max-w-3xl grow items-center rounded-full px-6 py-3 sm:ml-10 sm:mr-5 sm:mt-0 ${

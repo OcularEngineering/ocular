@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 
-import PaginationButtons from "./pagination-buttons";
 import AppFilterOptions from "./app-filter-options";
 import ReactMarkdown from 'react-markdown';
 import {
@@ -83,7 +82,7 @@ const Results = ({ results, isLoadingResults }) => (
                         {result.documentMetadata.title.charAt(0).toUpperCase() + result.documentMetadata.title.slice(1)}
                       </h3>
                     </a>
-                    <p className="font-regular line-clamp-3 text-sm" dangerouslySetInnerHTML={{ __html: result.snippets.map(snippet => snippet.content).join(" ... ") }}></p>
+                    <p className="font-regular line-clamp-3 text-sm max-w-3xl" dangerouslySetInnerHTML={{ __html: result.snippets.map(snippet => snippet.content).join(" ... ") }}></p>
                     <div className='flex flex-row gap-2'>
                       <p className="font-regular line-clamp-3 text-sm text-gray-500">
                       {
@@ -103,7 +102,6 @@ const Results = ({ results, isLoadingResults }) => (
             </div>
           ))
         }
-        <PaginationButtons />
       </div>
     )}
   </>

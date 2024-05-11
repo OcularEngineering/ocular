@@ -5,7 +5,7 @@ const shimmer =
 export function SearchResultSkeleton() {
     return (
         <div
-            className={`group mb-4 flex px-3 py-4 text-xs sm:text-base mt-5 w-full max-w-5xl items-start justify-start`}
+            className={`group mb-4 flex px-3 py-4 text-xs sm:text-base mt-5 w-full max-w-3xl items-start justify-start`}
         >
             <div className={`${shimmer} relative overflow-hidden mr-4 w-12 h-12 bg-gray-200 rounded-full dark:bg-muted`} />
             <div className={`space-y-5 w-4/5`}>

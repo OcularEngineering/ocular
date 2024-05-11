@@ -93,11 +93,11 @@ export default {
     search(q, sources) {
       const path = `/search`;
       const body = {
-          context: {
-            top: 10,
-            ai_completion: true,
-          },
-          q: q
+        context: {
+          top: 20,
+          ai_completion: true,
+        },
+        q: q
       };
       if (sources && sources.length > 0) {
         body.context.sources = sources;

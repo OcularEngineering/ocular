@@ -118,7 +118,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   // const [toolInUse, setToolInUse] = useState<string>("none")
 
   // Search Results Sources Store
+  const [selectedResultSources, setselectedResultSources] = useState<string[]>([])
   const [resultSources, setResultSources] = useState<string[]>([])
+
+  const [activeFilter, setActiveFilter] = useState('all');
 
   useEffect(() => {
     ;(async () => {
@@ -209,8 +212,12 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         // setCollections,
         chats,
         setChats,
+        selectedResultSources,
+        setselectedResultSources,
         resultSources,
         setResultSources,
+        activeFilter,
+        setActiveFilter,
         // files,
         // setFiles,
         // folders,
