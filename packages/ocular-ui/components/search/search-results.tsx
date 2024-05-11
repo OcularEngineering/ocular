@@ -66,7 +66,7 @@ const Results = ({ results, isLoadingResults }) => (
     {isLoadingResults ? (
       <SearchResultsSkeleton />
     ) : (
-      <div className="mt-5 w-3/5 items-start justify-start">
+      <div className="mt-5 w-3/5 max-w-5xl items-start justify-start">
         {
           results.map((result: any, index: any) => (
             <div key={index}>
@@ -121,8 +121,6 @@ const ResultsFilter = ({ results, num_results, isLoadingResults }) => (
 
 // Main Component
 export default function SearchResults({ search_results, ai_content, isLoadingResults, isLoadingCopilot }) {
-  // style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.015) 1%, transparent)'}}
-  console.log("Search Results hereeeeeee:", search_results)
   return (
     <div className="font-open-sans dark:bg-background mx-auto flex min-h-screen w-full flex-col  dark:text-white" >
       {/* <div className='sm:pl-[5%] md:pl-[14%] lg:pl-52' style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.015) 1%, transparent)'}}>
@@ -132,9 +130,10 @@ export default function SearchResults({ search_results, ai_content, isLoadingRes
         {search_results && 
           <>
             <Results results={search_results} isLoadingResults={isLoadingResults} />
-            {!isLoadingResults && (
+            {/* {!isLoadingResults && (
               <ResultsFilter results={search_results} num_results={search_results.length} isLoadingResults={isLoadingResults} />
-            )}
+            )} */}
+            <ResultsFilter results={search_results} num_results={search_results.length} isLoadingResults={isLoadingResults} />
           </>
         }
       </div>

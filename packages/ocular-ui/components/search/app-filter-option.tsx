@@ -30,7 +30,7 @@ export default function AppFilterOption({ src, title, results }: AppFilterOption
     >
       <div className='flex grow gap-2'>
         <Image src={src} alt={title} width={20} height={20} />
-        <p className="hidden text-sm sm:inline-flex dark:text-white">
+        <p className="hidden font-semibold text-sm sm:inline-flex dark:text-white">
           {title.split('.')[0].charAt(0).toUpperCase() + title.split('.')[0].slice(1)}
         </p>
       </div>

@@ -29,7 +29,7 @@ export default function AppFilterOptions({results}: AppFilterOptionsProps) {
                 >
                     <div className='flex grow gap-2'>
                         <Image src="/All.svg" alt="All" width={20} height={20} />
-                        <p className="hidden text-sm sm:inline-flex dark:text-white">All</p>
+                        <p className="hidden font-semibold text-sm sm:inline-flex dark:text-white">All</p>
                     </div>
                     <p className="hidden text-sm text-gray-500 sm:inline-flex">{results ? results : Math.floor(Math.random() * 1000) + 1}</p>
                 </div>
