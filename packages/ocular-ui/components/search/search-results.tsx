@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
-
 import AppFilterOptions from "./app-filter-options";
 import ReactMarkdown from 'react-markdown';
 import {
@@ -68,6 +67,7 @@ const Results = ({ results, isLoadingResults }) => (
     ) : (
       <div className="w-3/5 max-w-5xl items-start justify-start">
         {
+          results ? 
           results.map((result: any, index: any) => (
             <div key={index}>
               <div
@@ -101,6 +101,7 @@ const Results = ({ results, isLoadingResults }) => (
               </div>
             </div>
           ))
+          : <p>No results found</p>
         }
       </div>
     )}
@@ -108,12 +109,13 @@ const Results = ({ results, isLoadingResults }) => (
 );
 
 // Results Filter Component
-const ResultsFilter = ({ results, num_results, isLoadingResults }) => (
+const ResultsFilter = ({ results, isLoadingResults }) => (
   <div className="flex w-2/5 flex-col items-end">
     <div className="flex flex-col">
       {
-        results && num_results &&
-        <AppFilterOptions results={results.searchInformation?.formattedTotalResults} />
+        results ? 
+          <AppFilterOptions results={results.searchInformation?.formattedTotalResults} />
+        : <SearchByAppFilterSkeleton />
       }
     </div>
   </div>
@@ -122,17 +124,15 @@ const ResultsFilter = ({ results, num_results, isLoadingResults }) => (
 // Main Component
 export default function SearchResults({ search_results, ai_content, isLoadingResults, isLoadingCopilot }) {
   return (
-    <div className="font-open-sans dark:bg-background flex min-h-screen flex-col dark:text-white items-center justify-center" >
+    <div className="font-open-sans dark:bg-background flex min-h-screen flex-col dark:text-white items-center justify-start" >
       {/* <div className='sm:pl-[5%] md:pl-[14%] lg:pl-52' style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.015) 1%, transparent)'}}>
         <AIResults content={ai_content} search_results={search_results} isLoadingCopilot={isLoadingCopilot}/>
       </div> */}
       <div className='flex flex-row items-center justify-center'>
-        {search_results && 
-          <div className='flex flex-row justify-center mt-5'>
-            <Results results={search_results} isLoadingResults={isLoadingResults} />
-            <ResultsFilter results={search_results} num_results={search_results.length} isLoadingResults={isLoadingResults} />
-          </div>
-        }
+        <div className='flex flex-row justify-center mt-5'>
+          <Results results={search_results} isLoadingResults={isLoadingResults} />
+          <ResultsFilter results={search_results} isLoadingResults={isLoadingResults} />
+        </div>
       </div>
     </div>
   );

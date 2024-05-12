@@ -1,9 +1,7 @@
 import * as React from "react"
 import { useState, useContext } from 'react';
 import { CalendarIcon } from "@radix-ui/react-icons"
-import { addDays, format as formatDateFns } from "date-fns"
-import { DateRange } from "react-day-picker"
-
+import { format as formatDateFns } from "date-fns"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -23,11 +21,6 @@ export function DatePickerWithRange({
 }: React.HTMLAttributes<HTMLDivElement>) {
 
   const { resultFilterDate, setResultFilterDate } = useContext(ChatbotUIContext);
-
-  // const [date, setDate] = React.useState<DateRange | undefined>({
-  //   from: new Date(2024, 3, 20),
-  //   to: addDays(new Date(2024, 3, 20), 20),
-  // })
   const [isSelected, setIsSelected] = useState(false);
 
   // Serialize the date to JSON format when logging
@@ -42,8 +35,6 @@ export function DatePickerWithRange({
       "to": null
     }
   };
-
-  console.log("Date Selected JSON 1:", logDate.date);
 
   return (
     <div className={cn("grid gap-2", className)}>

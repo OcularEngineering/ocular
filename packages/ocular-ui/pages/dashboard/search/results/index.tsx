@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
 import Head from "next/head";
 import Header from "@/components/search/header";
 import { useRouter } from "next/router";
@@ -21,24 +21,20 @@ export default function Search() {
   const { setResultSources } = useContext(ChatbotUIContext)
 
   // Serialize the date to JSON format when logging
-  const logDate = resultFilterDate ? {
-    "date": {
-      "from": resultFilterDate.from?.toISOString(),
-      "to": resultFilterDate.to?.toISOString()
-    }
+const selectedDate = useMemo(() => {
+  return resultFilterDate ? {
+    "from": resultFilterDate.from?.toISOString(),
+    "to": resultFilterDate.to?.toISOString()
   } : {
-    "date": {
-      "from": null,
-      "to": null
-    }
+    "from": null,
+    "to": null
   };
-
-  console.log("Date Selected JSON 2:", logDate.date);
+}, [resultFilterDate]);
 
   useEffect(() => {
     setIsLoadingResults(true); 
     setIsLoadingCopilot(true);
-    api.search.search(router.query.q, selectedResultSources, logDate.date)
+    api.search.search(router.query.q, selectedResultSources, selectedDate)
       .then(data => {
         // setAiResults(data.data.message.content);
         // setIsLoadingCopilot(false);
@@ -50,10 +46,10 @@ export default function Search() {
         setIsLoadingResults(false); 
         setIsLoadingCopilot(false);
       });
-  }, [router.query.q, selectedResultSources, setResultSources,logDate.date]); 
+  }, [router.query.q, selectedResultSources, setResultSources, selectedDate]); 
 
   return (
-    <div className="dark:bg-background w-full bg-white text-black items-center justify-center">
+    <div className="dark:bg-background w-full bg-white text-black ">
       <Head>
         <title>{router.query.q} - Ocular</title>
         <link rel="icon" href="/Ocular-Profile-Logo.png" />
