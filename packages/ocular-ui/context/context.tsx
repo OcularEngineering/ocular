@@ -10,6 +10,7 @@ import { da } from "date-fns/locale"
 // import { AssistantImage } from "@/types/images/assistant-image"
 // import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { Dispatch, SetStateAction, createContext } from "react"
+import { DateRange } from "react-day-picker"
 
 interface ChatbotUIContext {
   // PROFILE STORE
@@ -127,8 +128,17 @@ interface ChatbotUIContext {
   // setToolInUse: Dispatch<SetStateAction<string>>
 
     // RESULT SOURCES STORE
+    selectedResultSources: string[]
+    setselectedResultSources: Dispatch<SetStateAction<string[]>>
+
     resultSources: string[]
     setResultSources: Dispatch<SetStateAction<string[]>>
+
+    activeFilter: string
+    setActiveFilter: Dispatch<SetStateAction<string>>
+
+    resultFilterDate: DateRange | undefined;
+    setResultFilterDate: Dispatch<SetStateAction<DateRange | undefined>>;
 }
 
 export const ChatbotUIContext = createContext<ChatbotUIContext>({
@@ -257,6 +267,12 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
 //   setToolInUse: () => {}
 
   // RESULT SOURCES STORE
+  selectedResultSources: [],
+  setselectedResultSources: () => {},
   resultSources: [],
   setResultSources: () => {},
+  activeFilter: "",
+  setActiveFilter: () => {},
+  resultFilterDate: undefined,
+  setResultFilterDate: () => {}
 })

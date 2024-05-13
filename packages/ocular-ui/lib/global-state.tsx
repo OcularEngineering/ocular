@@ -4,6 +4,8 @@
 
 import { ChatbotUIContext } from "@/context/context"
 import  api  from "@/services/api"
+import { DateRange } from "react-day-picker";
+import { addDays, format as formatDateFns } from "date-fns"
 
 import {
   Chat,
@@ -118,7 +120,20 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   // const [toolInUse, setToolInUse] = useState<string>("none")
 
   // Search Results Sources Store
+  const [selectedResultSources, setselectedResultSources] = useState<string[]>([])
   const [resultSources, setResultSources] = useState<string[]>([])
+
+  const [activeFilter, setActiveFilter] = useState('all');
+
+  // const [resultFilterDate, setResultFilterDate] = useState<DateRange | undefined>({
+  //   from: new Date(), // You can set initial values here
+  //   to: new Date(),
+  // });
+
+  const [resultFilterDate, setResultFilterDate] = useState<DateRange | undefined>({
+    from: new Date(2024, 3, 20),
+    to: addDays(new Date(2024, 3, 20), 20),
+  })
 
   useEffect(() => {
     ;(async () => {
@@ -209,8 +224,14 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         // setCollections,
         chats,
         setChats,
+        selectedResultSources,
+        setselectedResultSources,
         resultSources,
         setResultSources,
+        activeFilter,
+        setActiveFilter,
+        resultFilterDate,
+        setResultFilterDate,
         // files,
         // setFiles,
         // folders,

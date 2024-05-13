@@ -120,10 +120,24 @@ class SearchIndexingSubscriber {
       return;
     }
 
+    // Immediate job
+    (async () => {
+      const jobProps: BatchJobCreateProps = {
+        type: app_name,
+        context: {
+          org: organisation,
+        },
+        // created_by: "system",
+        dry_run: false,
+      };
+      await this.batchJobService_.create(jobProps);
+    })();
+
+      // Scheduled job
     this.jobSchedulerService_.create(
       `Sync Apps Data for ${organisation.name}`,
       { org: organisation },
-      "* * * * *",
+      "0 0 * * *", // This will run the job every 24 hours at midnight
       async () => {
         const jobProps: BatchJobCreateProps = {
           type: app_name,
@@ -136,7 +150,7 @@ class SearchIndexingSubscriber {
         this.batchJobService_.create(jobProps);
       }
     );
-  };
+    };
 }
 
 export default SearchIndexingSubscriber;

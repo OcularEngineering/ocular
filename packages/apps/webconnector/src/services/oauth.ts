@@ -29,13 +29,15 @@ class webConnectorOauth extends OauthService {
     return {
       name: AppNameDefinitions.WEBCONNECTOR,
       logo: "/asana.svg",
-      description: "Web Connector",
+      description:
+        "🌐 WebConnector is an innovative app designed to streamline the process of data extraction from websites. Simply enter a URL and 🚀 quickly gather all relevant data from the webpage. This tool makes it easier to access and analyze online information efficiently",
       oauth_url: ``,
       slug: AppNameDefinitions.WEBCONNECTOR,
       category: AppCategoryDefinitions.SOTWARE_DEVELOPMENT,
       developer: "Ocular AI",
       images: ["/asana.svg"],
-      overview: "Web Connector",
+      overview:
+        "WebConnector: Your Gateway to Efficient Web Data Extraction 🌍✨",
       docs: "https://developer.atlassian.com/",
       website: "https://www.atlassian.com/software/confluence",
     };

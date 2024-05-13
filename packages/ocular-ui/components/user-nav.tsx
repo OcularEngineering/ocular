@@ -73,7 +73,7 @@ export function UserNav()  {
             </Avatar>
         </Button>
       </DropdownMenuTrigger>
-    <DropdownMenuContent className="mb-5 ml-3 w-56 items-center" side="right">
+    <DropdownMenuContent className="mb-5 ml-3 w-56 items-center rounded-xl" side="right">
       <DropdownMenuLabel className="font-normal">
         <div className="flex flex-col space-y-1">
           <p className="text-sm font-medium leading-none">{firstName} {lastName}</p>
