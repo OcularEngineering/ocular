@@ -9,16 +9,18 @@ import { AutoflowAiError, AutoflowAiErrorTypes } from "@ocular/utils";
 import path from "path";
 import fs from "fs/promises";
 
-export class FileService extends AbstractFileService {
+export default class FileService extends AbstractFileService {
   static identifier = "localfs";
   protected uploadDir_: string;
   protected backendUrl_: string;
 
-  protected constructor(
+  constructor(
     protected readonly container: Record<string, unknown>,
     protected readonly config?: Record<string, unknown> // eslint-disable-next-line @typescript-eslint/no-empty-function
   ) {
     super(container, config);
+    (this.uploadDir_ = "/uploads"),
+      (this.backendUrl_ = "http://localhost:9000");
   }
 
   async upload(file: FileUploadData): Promise<FileUploadResult> {
