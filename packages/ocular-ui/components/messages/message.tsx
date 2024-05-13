@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useTheme } from 'next-themes';
 
-import { ChatbotUIContext } from "@/context/context"
+import { ApplicationContext } from "@/context/context"
 import { cn } from "@/lib/utils"
 import {
   IconBolt,
@@ -54,7 +54,7 @@ export const Message: FC<MessageProps> = ({
     setIsGenerating,
     firstTokenReceived,
     chatMessages,
-  } = useContext(ChatbotUIContext)
+  } = useContext(ApplicationContext)
 
   const editInputRef = useRef<HTMLTextAreaElement>(null)
 

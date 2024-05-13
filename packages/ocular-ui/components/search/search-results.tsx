@@ -64,55 +64,55 @@ const Results = ({ results, isLoadingResults }) => (
   <>
     <div className="w-3/5 max-w-5xl items-start justify-start">
       {
-        results && results.length > 0 ? 
-        results.map((result: any, index: any) => (
-          <div key={index}>
-            <div
-              key={index}
-              className="group mb-4 flex max-w-4xl px-3 py-4 text-xs sm:text-base"
-            >
-              <Image src={result && result.documentMetadata.source === 'pagerduty' ? '/PagerDuty.png' : result && result.documentMetadata.source ? `/${result.documentMetadata.source}.svg` : '/default.png'} alt={result.documentMetadata.title} className="mr-4 size-[40px]" width={10} height={10} />
-              <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                <div className='space-y-1'>
-                  <a href={result.documentMetadata.link} target="_blank" rel="noopener noreferrer">
-                    <h3 className="text-l mb-2 truncate font-semibold text-blue-800 group-hover:underline dark:text-blue-400">
-                      {result.documentMetadata.title.charAt(0).toUpperCase() + result.documentMetadata.title.slice(1)}
-                    </h3>
-                  </a>
-                  <p className="font-regular line-clamp-3 text-sm max-w-3xl w-[770px]" dangerouslySetInnerHTML={{ __html: result.snippets.map(snippet => snippet.content).join(" ... ") }}></p>
-                  <div className='flex flex-row gap-2'>
-                    <p className="font-regular line-clamp-3 text-sm text-gray-500">
-                    {
-                      !isNaN(new Date(result.documentMetadata.updated_at).getTime()) ?
-                      new Date(result.documentMetadata.updated_at).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) 
-                      : null
-                    }
-                    </p>
-                    <span className="font-regular text-sm text-gray-500">·</span>
-                    <p className="font-regular line-clamp-3 text-sm text-gray-500">
-                      {result.documentMetadata.type.charAt(0).toUpperCase() + result.documentMetadata.type.slice(1)}
-                    </p>
+        (results && results.length > 0) ? 
+          results.map((result: any, index: any) => (
+            <div key={index}>
+              <div
+                key={index}
+                className="group mb-4 flex max-w-4xl px-3 py-4 text-xs sm:text-base"
+              >
+                <Image src={result && result.documentMetadata.source === 'pagerduty' ? '/PagerDuty.png' : result && result.documentMetadata.source ? `/${result.documentMetadata.source}.svg` : '/default.png'} alt={result.documentMetadata.title} className="mr-4 size-[40px]" width={10} height={10} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                  <div className='space-y-1'>
+                    <a href={result.documentMetadata.link} target="_blank" rel="noopener noreferrer">
+                      <h3 className="text-l mb-2 truncate font-semibold text-blue-800 group-hover:underline dark:text-blue-400">
+                        {result.documentMetadata.title.charAt(0).toUpperCase() + result.documentMetadata.title.slice(1)}
+                      </h3>
+                    </a>
+                    <p className="font-regular line-clamp-3 text-sm max-w-3xl w-[770px]" dangerouslySetInnerHTML={{ __html: result.snippets.map(snippet => snippet.content).join(" ... ") }}></p>
+                    <div className='flex flex-row gap-2'>
+                      <p className="font-regular line-clamp-3 text-sm text-gray-500">
+                      {
+                        !isNaN(new Date(result.documentMetadata.updated_at).getTime()) ?
+                        new Date(result.documentMetadata.updated_at).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) 
+                        : null
+                      }
+                      </p>
+                      <span className="font-regular text-sm text-gray-500">·</span>
+                      <p className="font-regular line-clamp-3 text-sm text-gray-500">
+                        {result.documentMetadata.type.charAt(0).toUpperCase() + result.documentMetadata.type.slice(1)}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
             </div>
+          </div>
           ))
           : <div className="w-[850px]">
              <p>No results found for this query</p>
-          </div>
-        }
-      </div>
-    )}
+            </div>
+      }
+    </div>
   </>
 );
 
 // Results Filter Component
-const ResultsFilter = ({ results, isLoadingResults }) => (
+const ResultsFilter = ({ results, isLoadingResults, resultSources }) => (
   <div className="flex w-2/5 flex-col items-end">
     <div className="flex flex-col">
       {
         results ? 
-          <AppFilterOptions results={results.searchInformation?.formattedTotalResults} />
+          <AppFilterOptions results={results.searchInformation?.formattedTotalResults} resultSources={resultSources} />
         : <SearchByAppFilterSkeleton />
       }
     </div>
@@ -120,7 +120,7 @@ const ResultsFilter = ({ results, isLoadingResults }) => (
 );
 
 // Main Component
-export default function SearchResults({ search_results, ai_content, isLoadingResults, isLoadingCopilot }) {
+export default function SearchResults({ search_results, ai_content, isLoadingResults, isLoadingCopilot, resultSources }) {
   return (
     <div className="font-open-sans dark:bg-background flex min-h-screen flex-col dark:text-white items-center justify-start" >
       {/* <div className='sm:pl-[5%] md:pl-[14%] lg:pl-52' style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.015) 1%, transparent)'}}>
@@ -133,7 +133,7 @@ export default function SearchResults({ search_results, ai_content, isLoadingRes
             ) : (
               <Results results={search_results} isLoadingResults={isLoadingResults} />
           )}
-          <ResultsFilter results={search_results} isLoadingResults={isLoadingResults} />
+          <ResultsFilter results={search_results} isLoadingResults={isLoadingResults} resultSources={resultSources} />
         </div>
       </div>
     </div>

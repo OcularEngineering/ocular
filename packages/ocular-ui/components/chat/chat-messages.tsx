@@ -1,4 +1,4 @@
-import { ChatbotUIContext } from "@/context/context"
+import { ApplicationContext } from "@/context/context"
 import { FC, useContext, useState } from "react"
 import { Message } from "../messages/message"
 import { Message as MessageType } from "@/types/chat"
@@ -6,7 +6,7 @@ import { Message as MessageType } from "@/types/chat"
 interface ChatMessagesProps {}
 
 export const ChatMessages: FC<ChatMessagesProps> = ({}) => {
-  const { chatMessages } = useContext(ChatbotUIContext)
+  const { chatMessages } = useContext(ApplicationContext)
   const [editingMessage, setEditingMessage] = useState<MessageType>()
 
   return chatMessages

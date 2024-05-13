@@ -12,7 +12,7 @@ import { da } from "date-fns/locale"
 import { Dispatch, SetStateAction, createContext } from "react"
 import { DateRange } from "react-day-picker"
 
-interface ChatbotUIContext {
+interface ApplicationContext {
   // PROFILE STORE
   // profile: Profile | null
   // setProfile: Dispatch<SetStateAction<Profile | null>>
@@ -141,7 +141,7 @@ interface ChatbotUIContext {
     setResultFilterDate: Dispatch<SetStateAction<DateRange | undefined>>;
 }
 
-export const ChatbotUIContext = createContext<ChatbotUIContext>({
+export const ApplicationContext = createContext<ApplicationContext>({
 // PROFILE STORE
   // profile: null,
   // setProfile: () => {},

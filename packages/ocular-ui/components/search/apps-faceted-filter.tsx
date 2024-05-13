@@ -25,13 +25,17 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 
-import { ChatbotUIContext } from "@/context/context";
+import { ApplicationContext } from "@/context/context";
 
 interface AppsFacetedFilterProps<TData, TValue> {
   results?: TData; // Define appropriate type if needed
   title?: string;
   Icon: IconType;
-  options: string[];
+  options: {
+    label: string
+    value: string
+    icon: string
+  }[]
 }
 
 export function AppsFacetedFilter<TData, TValue>({
@@ -43,7 +47,7 @@ export function AppsFacetedFilter<TData, TValue>({
   const [selectedValues, setSelectedValues] = useState<Set<string>>(new Set()); // Track selected values with a Set
   const [selectedArray, setSelectedArray] = useState<string[]>([]); // Additional state for an array of selected values
 
-  const { setselectedResultSources, selectedResultSources } = useContext(ChatbotUIContext);
+  const { setselectedResultSources, selectedResultSources } = useContext(ApplicationContext);
 
   // Effect to print and handle selected values array whenever selectedValues changes
   useEffect(() => {
@@ -51,8 +55,6 @@ export function AppsFacetedFilter<TData, TValue>({
     
     setSelectedArray(newSelectedArray);
     setselectedResultSources(newSelectedArray); // Update the result sources whenever selection changes
-
-    console.log("Selected Values 1:", newSelectedArray); // Printing out the selected values
     
   }, [selectedValues, setselectedResultSources]);
 
@@ -87,14 +89,14 @@ export function AppsFacetedFilter<TData, TValue>({
                   </Badge>
                 ) : (
                   options
-                    .filter((option) => selectedValues.has(option))
+                    .filter((option) => selectedValues.has(option.value))
                     .map((option) => (
                       <Badge
                         variant="secondary"
-                        key={option}
+                        key={option.value}
                         className="rounded-sm px-1 gap-1 font-normal"
                       >
-                        <Image alt="icon" src={`/${option}.svg`} width={20} height={20} className="ml-2 mr-3"/> {option}
+                        <Image alt="icon" src={option.icon} width={20} height={20} className="ml-2 mr-3"/> {option.label}
                       </Badge>
                     ))
                 )}
@@ -111,16 +113,16 @@ export function AppsFacetedFilter<TData, TValue>({
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
               {options.map((option) => {
-                const isSelected = selectedValues.has(option);
+                const isSelected = selectedValues.has(option.value);
                 return (
                   <CommandItem
-                    key={option}
+                    key={option.value}
                     onSelect={() => {
                       const newSelectedValues = new Set(selectedValues);
                       if (isSelected) {
-                        newSelectedValues.delete(option);
+                        newSelectedValues.delete(option.value);
                       } else {
-                        newSelectedValues.add(option);
+                        newSelectedValues.add(option.value);
                       }
                       setSelectedValues(newSelectedValues); // Update state
                     }}
@@ -136,9 +138,10 @@ export function AppsFacetedFilter<TData, TValue>({
                       <CheckIcon className={cn("h-4 w-4")} />
                     </div>
                     {option && (
-                      <Image alt="icon" src={`/${option}.svg`} width={20} height={20} className="ml-2 mr-3"/>
+                      <Image alt="icon" src={option.icon} width={20} height={20} className="ml-2 mr-3"/>
+                      
                     )}
-                    <span>{option}</span>
+                    <span>{option.label}</span>
                   </CommandItem>
                 );
               })}

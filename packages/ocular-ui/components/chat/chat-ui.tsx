@@ -1,5 +1,5 @@
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
-import { ChatbotUIContext } from "@/context/context"
+import { ApplicationContext } from "@/context/context"
 import { useParams } from "next/navigation"
 import { FC, useContext, useEffect, useState } from "react"
 import { useScroll } from "./chat-hooks/use-scroll"
@@ -20,7 +20,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     setChatMessages,
     selectedChat,
     setSelectedChat,
-  } = useContext(ChatbotUIContext)
+  } = useContext(ApplicationContext)
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler()
 

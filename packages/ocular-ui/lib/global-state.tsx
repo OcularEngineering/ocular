@@ -2,7 +2,7 @@
 
 "use client"
 
-import { ChatbotUIContext } from "@/context/context"
+import { ApplicationContext } from "@/context/context"
 import  api  from "@/services/api"
 import { DateRange } from "react-day-picker";
 import { addDays, format as formatDateFns } from "date-fns"
@@ -211,7 +211,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   }
 
   return (
-    <ChatbotUIContext.Provider
+    <ApplicationContext.Provider
       value={{
         // // PROFILE STORE
         // profile,
@@ -348,6 +348,6 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       }}
     >
       {children}
-    </ChatbotUIContext.Provider>
+    </ApplicationContext.Provider>
   )
 }

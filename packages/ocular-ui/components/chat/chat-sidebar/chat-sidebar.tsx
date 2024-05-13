@@ -1,4 +1,4 @@
-import { ChatbotUIContext } from "@/context/context"
+import { ApplicationContext } from "@/context/context"
 import { ContentType } from "@/types"
 import { FC, useContext } from "react"
 import { SIDEBAR_WIDTH } from "../../ui/dashboard"
@@ -13,7 +13,7 @@ interface SidebarProps {
 export const ChatSideBar: FC<SidebarProps> = ({contentType, showSidebar }) => {
   const {
     chats,
-  } = useContext(ChatbotUIContext)
+  } = useContext(ApplicationContext)
 
 
   const renderSidebarContent = (

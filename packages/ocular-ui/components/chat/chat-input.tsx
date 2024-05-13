@@ -3,7 +3,7 @@ import {
   IconSend
 } from "@tabler/icons-react"
 
-import { ChatbotUIContext } from "@/context/context"
+import { ApplicationContext } from "@/context/context"
 import { cn } from "@/lib/utils"
 import { FC, useContext, useState } from "react"
 import { TextareaAutosize } from "../ui/textarea-autosize"
@@ -22,7 +22,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
     setFocusPrompt,
     isPromptPickerOpen,
     setIsPromptPickerOpen,
-  } = useContext(ChatbotUIContext)
+  } = useContext(ApplicationContext)
 
   const {
     chatInputRef,

@@ -1,4 +1,4 @@
-import { ChatbotUIContext } from "@/context/context"
+import { ApplicationContext } from "@/context/context"
 import { cn } from "@/lib/utils"
 import { Chat } from "@/types/chat"
 import { useParams, useRouter } from "next/navigation"
@@ -14,7 +14,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
   const {
     selectedChat,
     setSelectedChat,
-  } = useContext(ChatbotUIContext)
+  } = useContext(ApplicationContext)
 
   const router = useRouter()
   const params = useParams()

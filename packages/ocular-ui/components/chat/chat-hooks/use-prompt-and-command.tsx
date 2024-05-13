@@ -1,4 +1,4 @@
-import { ChatbotUIContext } from "@/context/context"
+import { ApplicationContext } from "@/context/context"
 // import { getAssistantCollectionsByAssistantId } from "@/db/assistant-collections"
 // import { getAssistantFilesByAssistantId } from "@/db/assistant-files"
 // import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
@@ -12,7 +12,7 @@ export const usePromptAndCommand = () => {
     userInput,
     setUserInput,
     setIsPromptPickerOpen,
-  } = useContext(ChatbotUIContext)
+  } = useContext(ApplicationContext)
 
   const handleInputChange = (value: string) => {
     const atTextRegex = /@([^ ]*)$/
