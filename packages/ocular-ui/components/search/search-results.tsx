@@ -67,7 +67,7 @@ const Results = ({ results, isLoadingResults }) => (
     ) : (
       <div className="w-3/5 max-w-5xl items-start justify-start">
         {
-          results ? 
+          results && results.length > 0 ? 
           results.map((result: any, index: any) => (
             <div key={index}>
               <div
@@ -82,7 +82,7 @@ const Results = ({ results, isLoadingResults }) => (
                         {result.documentMetadata.title.charAt(0).toUpperCase() + result.documentMetadata.title.slice(1)}
                       </h3>
                     </a>
-                    <p className="font-regular line-clamp-3 text-sm max-w-3xl" dangerouslySetInnerHTML={{ __html: result.snippets.map(snippet => snippet.content).join(" ... ") }}></p>
+                    <p className="font-regular line-clamp-3 text-sm max-w-3xl w-[770px]" dangerouslySetInnerHTML={{ __html: result.snippets.map(snippet => snippet.content).join(" ... ") }}></p>
                     <div className='flex flex-row gap-2'>
                       <p className="font-regular line-clamp-3 text-sm text-gray-500">
                       {
@@ -101,7 +101,9 @@ const Results = ({ results, isLoadingResults }) => (
               </div>
             </div>
           ))
-          : <p>No results found</p>
+          : <div className="w-[850px]">
+             <p>No results found for this query</p>
+          </div>
         }
       </div>
     )}
