@@ -33,7 +33,7 @@ export default (app) => {
     middlewares.wrap(require("./list-installed-apps").default)
   );
 
-  route.post("/savelink", middlewares.wrap(require("./webConnector").default));
+  route.post("/updateapp", middlewares.wrap(require("./updateApp").default));
   return app;
 };
 

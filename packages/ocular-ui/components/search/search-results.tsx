@@ -96,13 +96,13 @@ const Results = ({ results, isLoadingResults }) => (
                 </div>
               </div>
             </div>
+          ))
+          : <div className="w-[850px]">
+             <p>No results found for this query</p>
           </div>
-        ))
-        : <div className="w-[850px]">
-            <p>No results found for this query</p>
-        </div>
-      }
-    </div>
+        }
+      </div>
+    )}
   </>
 );
 
