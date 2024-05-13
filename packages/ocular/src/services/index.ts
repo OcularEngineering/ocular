@@ -13,3 +13,4 @@ export { default as ChatService } from "./chat";
 export { default as QueueService } from "./queue";
 export { default as RateLimiterService } from "./rate-limiter";
 export { default as DocumentMetadataService } from "./document-metadata";
+export { default as FileService } from "./file";
