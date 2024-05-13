@@ -3,3 +3,5 @@ env.local
 .env.local
 .env
 *.DS_Store
+local-uploads
+uploads

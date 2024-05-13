@@ -1,8 +1,10 @@
 import { TransactionBaseService } from "./transaction-base-service";
 
 export type FileUploadResult = {
+  name: string;
   url: string;
   key: string;
+  extension: string;
 };
 
 export type FileGetData = {

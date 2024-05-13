@@ -7,16 +7,17 @@ export enum AppNameDefinitions {
   /**
    * GitHub
    */
-  ASANA="asana",
+  ASANA = "asana",
   CONFLUENCE = "confluence",
   GITHUB = "github",
   GMAIL = "gmail",
   GOOGLEDRIVE = "google-drive",
   JIRA = "jira",
   NOTION = "notion",
-  SLACK= "slack",
-  WEBCONNECTOR="webConnector",
+  SLACK = "slack",
+  WEBCONNECTOR = "webConnector",
   BITBUCKET = "bitbucket",
+  OCULAR_API = "ocular-api",
 }
 
 export enum AppCategoryDefinitions {
@@ -27,13 +28,12 @@ export enum AppCategoryDefinitions {
   FILE_STORAGE = "File Storage",
   PRODUCTIVITY = "Productivity",
   DOCUMENTATION = "Documentation",
-  MESSAGING = "Messaging"
+  MESSAGING = "Messaging",
 }
-
 
 export type InstalledApp = {
   id?: string;
   name?: string;
   installation_id?: string;
   permissions?: Record<string, string>;
-}
+};

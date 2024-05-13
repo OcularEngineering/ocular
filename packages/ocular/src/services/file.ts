@@ -46,7 +46,12 @@ export default class FileService extends AbstractFileService {
 
         const fileUrl = `${this.backendUrl_}/${this.uploadDir_}/${fileKey}`;
 
-        resolve({ url: fileUrl, key: fileKey });
+        resolve({
+          name: file.originalname,
+          url: fileUrl,
+          key: fileKey,
+          extension: parsedFilename.ext.slice(1),
+        });
       });
     });
   }
