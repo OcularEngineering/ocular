@@ -34,6 +34,7 @@ const selectedDate = useMemo(() => {
   useEffect(() => {
     setIsLoadingResults(true); 
     setIsLoadingCopilot(true);
+    console.log("Selected Values 3:", selectedResultSources);
     api.search.search(router.query.q, selectedResultSources, selectedDate)
       .then(data => {
         // setAiResults(data.data.message.content);

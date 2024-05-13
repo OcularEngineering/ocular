@@ -70,36 +70,21 @@ export type Link = (typeof links)[number]
 export type BottomLinks = (typeof links)[number]
 
 export const apps = [
-{
-  value: "confluence",
-  label: "Confluence",
-  icon: "/Confluence.svg",
-},
-{
-  value: "github",
-  label: "GitHub",
-  icon: "/GitHub.png",
-},
-{
-  value: "jira",
-  label: "Jira",
-  icon: "/Jira.svg",
-},
-{
-  value: "zendesk",
-  label: "Zendesk",
-  icon: "/Zendesk.svg",
-},
-{
-  value: "linear",
-  label: "Linear",
-  icon: "/Linear.png",
-},
-{
-  value: "slack",
-  label: "Slack",
-  icon: "/Slack.png",
-},
+  {
+    value: "asana",
+    label: "Asana",
+    icon: "/asana.svg",
+  },
+  {
+    value: "google-drive",
+    label: "Google Drive",
+    icon: "/google-drive.svg",
+  },
+  {
+    value: "gmail",
+    label: "Gmail",
+    icon: "/gmail.svg",
+  },
 ]
 
 export const resultTypes = [

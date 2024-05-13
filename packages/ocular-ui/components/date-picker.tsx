@@ -65,7 +65,7 @@ export function DatePickerWithRange({
             <ChevronDownIcon className={`h-4 ${isSelected ? 'rotate-180' : ''}`} />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent className="w-auto p-0 rounded-2xl" align="start">
           <Calendar
             initialFocus
             mode="range"
