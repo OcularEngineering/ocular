@@ -49,7 +49,7 @@ export function Search() {
                 alt=""
               />
 
-            <div className="dark:bg-gray-700md:dark:hover:border-gray-100 mt-5 flex w-full max-w-md bg-background items-center rounded-full border px-5 py-2 focus-within:shadow hover:shadow sm:max-w-xl sm:py-3 md:hover:border-white lg:max-w-4xl">
+            <div className="dark:bg-gray-700 md:dark:hover:border-gray-100 mt-5 flex w-full max-w-md bg-background items-center rounded-full border px-5 py-2 focus-within:shadow hover:shadow sm:max-w-xl sm:py-3 md:hover:border-white lg:max-w-4xl">
                 <SearchIcon className="mr-3 h-5 text-gray-500 " />
                 <input
                   ref={searchInputRef}
