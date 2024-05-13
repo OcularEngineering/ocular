@@ -1,0 +1,52 @@
+import { AbstractFileService } from "@ocular/types";
+
+export class FileService extends AbstractFileService {
+  static identifier = "localfs";
+  protected uploadDir_: string;
+  protected backendUrl_: string;
+
+  upload(file: Express.Multer.File): Promise<FileServiceUploadResult> {
+    if (!file) {
+      throw new MedusaError(MedusaError.Types.INVALID_DATA, `No file provided`);
+    }
+
+    if (!file.filename) {
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        `No filename provided`
+      );
+    }
+
+    const parsedFilename = path.parse(file.filename);
+
+    if (parsedFilename.dir) {
+      this.ensureDirExists(parsedFilename.dir);
+    }
+
+    const fileKey = path.join(
+      parsedFilename.dir,
+      `${Date.now()}-${parsedFilename.base}`
+    );
+
+    const filePath = this.getUploadFilePath(fileKey);
+    const fileUrl = this.getUploadFileUrl(fileKey);
+
+    const content = Buffer.from(file.content, "binary");
+    await fs.writeFile(filePath, content);
+
+    return {
+      key: fileKey,
+      url: fileUrl,
+    };
+  }
+  // uploadProtected(file: Express.Multer.File): Promise<FileServiceUploadResult>;
+  // delete(fileData: DeleteFileType): Promise<void>;
+  // getUploadStreamDescriptor(
+  //   fileData: UploadStreamDescriptorType
+  // ): Promise<FileServiceGetUploadStreamResult>;
+
+  // getDownloadStream(
+  //   fileData: GetUploadedFileType
+  // ): Promise<NodeJS.ReadableStream>;
+  // getPresignedDownloadUrl(fileData: GetUploadedFileType): Promise<string>;
+}
