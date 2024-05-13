@@ -17,14 +17,15 @@ export type FileDeleteData = {
 };
 
 export type FileUploadData = {
+  originalname: string;
   filename: string;
   mimeType: string;
-  content: string;
+  path: string;
 };
+
 export interface IFileProvider {
-  upload(file: FileUploadData): Promise<FileUploadResult>;
+  upload(file: Express.Multer.File): Promise<FileUploadResult>;
   delete(fileData: FileDeleteData): Promise<void>;
-  getPresignedDownloadUrl(fileData: FileGetData): Promise<string>;
 }
 
 export interface FileServiceOptions {
@@ -52,16 +53,10 @@ export class AbstractFileService
     return (this.constructor as any).identifier;
   }
 
-  async upload(file: FileUploadData): Promise<FileUploadResult> {
+  async upload(file: Express.Multer.File): Promise<FileUploadResult> {
     throw Error("upload must be overridden by the child class");
   }
   async delete(file: FileDeleteData): Promise<void> {
     throw Error("delete must be overridden by the child class");
-  }
-
-  async getPresignedDownloadUrl(fileData: FileGetData): Promise<string> {
-    throw Error(
-      "getPresignedDownloadUrl must be overridden by the child class"
-    );
   }
 }

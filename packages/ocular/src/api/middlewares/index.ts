@@ -1,14 +1,14 @@
-import { default as authenticateAdmin } from "./authenticate-admin"
-import { default as authenticate} from "./authenticate"
-import { default as wrap } from "./await-middleware"
-import { default as registeredLoggedinUser } from "./logged-in-user"
+import { default as authenticateAdmin } from "./authenticate-admin";
+import { default as authenticate } from "./authenticate";
+import { default as wrap } from "./await-middleware";
+import { default as registeredLoggedinUser } from "./logged-in-user";
 
-
-export { transformQuery } from "./transform-query"
+export { transformQuery } from "./transform-query";
+export { transformBody } from "./transform-body";
 
 export default {
   authenticateAdmin,
   authenticate,
   registeredLoggedinUser,
-  wrap
-}
+  wrap,
+};
