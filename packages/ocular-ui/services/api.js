@@ -90,12 +90,13 @@ export default {
     },
   },
   search: {
-    search(q, sources) {
+    search(q, sources, date) {
       const path = `/search`;
       const body = {
         context: {
           top: 20,
           ai_completion: true,
+          date: date,
         },
         q: q
       };

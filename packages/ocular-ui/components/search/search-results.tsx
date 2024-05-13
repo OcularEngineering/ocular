@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
-
 import AppFilterOptions from "./app-filter-options";
 import ReactMarkdown from 'react-markdown';
 import {
@@ -68,6 +67,7 @@ const Results = ({ results, isLoadingResults }) => (
     ) : (
       <div className="w-3/5 max-w-5xl items-start justify-start">
         {
+          results && results.length > 0 ? 
           results.map((result: any, index: any) => (
             <div key={index}>
               <div
@@ -82,7 +82,7 @@ const Results = ({ results, isLoadingResults }) => (
                         {result.documentMetadata.title.charAt(0).toUpperCase() + result.documentMetadata.title.slice(1)}
                       </h3>
                     </a>
-                    <p className="font-regular line-clamp-3 text-sm max-w-3xl" dangerouslySetInnerHTML={{ __html: result.snippets.map(snippet => snippet.content).join(" ... ") }}></p>
+                    <p className="font-regular line-clamp-3 text-sm max-w-3xl w-[770px]" dangerouslySetInnerHTML={{ __html: result.snippets.map(snippet => snippet.content).join(" ... ") }}></p>
                     <div className='flex flex-row gap-2'>
                       <p className="font-regular line-clamp-3 text-sm text-gray-500">
                       {
@@ -101,6 +101,9 @@ const Results = ({ results, isLoadingResults }) => (
               </div>
             </div>
           ))
+          : <div className="w-[850px]">
+             <p>No results found for this query</p>
+          </div>
         }
       </div>
     )}
@@ -108,12 +111,13 @@ const Results = ({ results, isLoadingResults }) => (
 );
 
 // Results Filter Component
-const ResultsFilter = ({ results, num_results, isLoadingResults }) => (
+const ResultsFilter = ({ results, isLoadingResults }) => (
   <div className="flex w-2/5 flex-col items-end">
     <div className="flex flex-col">
       {
-        results && num_results &&
-        <AppFilterOptions results={results.searchInformation?.formattedTotalResults} />
+        results ? 
+          <AppFilterOptions results={results.searchInformation?.formattedTotalResults} />
+        : <SearchByAppFilterSkeleton />
       }
     </div>
   </div>
@@ -122,17 +126,15 @@ const ResultsFilter = ({ results, num_results, isLoadingResults }) => (
 // Main Component
 export default function SearchResults({ search_results, ai_content, isLoadingResults, isLoadingCopilot }) {
   return (
-    <div className="font-open-sans dark:bg-background flex min-h-screen flex-col dark:text-white items-center justify-center" >
+    <div className="font-open-sans dark:bg-background flex min-h-screen flex-col dark:text-white items-center justify-start" >
       {/* <div className='sm:pl-[5%] md:pl-[14%] lg:pl-52' style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.015) 1%, transparent)'}}>
         <AIResults content={ai_content} search_results={search_results} isLoadingCopilot={isLoadingCopilot}/>
       </div> */}
       <div className='flex flex-row items-center justify-center'>
-        {search_results && 
-          <div className='flex flex-row justify-center mt-5'>
-            <Results results={search_results} isLoadingResults={isLoadingResults} />
-            <ResultsFilter results={search_results} num_results={search_results.length} isLoadingResults={isLoadingResults} />
-          </div>
-        }
+        <div className='flex flex-row justify-center mt-5'>
+          <Results results={search_results} isLoadingResults={isLoadingResults} />
+          <ResultsFilter results={search_results} isLoadingResults={isLoadingResults} />
+        </div>
       </div>
     </div>
   );
