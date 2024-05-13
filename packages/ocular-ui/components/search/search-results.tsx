@@ -7,6 +7,7 @@ import {
 } from "@heroicons/react/outline";
 
 import { SearchCopilotSkeleton, SearchResultsSkeleton, SearchByAppFilterSkeleton } from '@/components/ui/skeletons';
+import { Skeleton } from "@/components/ui/skeleton"
 
 // AI Results Component
 export const AIResults = ({ content, search_results, isLoadingCopilot }) => {
@@ -122,7 +123,7 @@ const ResultsFilter = ({ results, isLoadingResults, resultSources }) => (
 // Main Component
 export default function SearchResults({ search_results, ai_content, isLoadingResults, isLoadingCopilot, resultSources }) {
   return (
-    <div className="font-open-sans dark:bg-background flex min-h-screen flex-col dark:text-white items-center justify-start" >
+    <div className="font-open-sans dark:bg-background flex flex-col dark:text-white items-center justify-start" >
       {/* <div className='sm:pl-[5%] md:pl-[14%] lg:pl-52' style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.015) 1%, transparent)'}}>
         <AIResults content={ai_content} search_results={search_results} isLoadingCopilot={isLoadingCopilot}/>
       </div> */}
