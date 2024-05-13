@@ -8,12 +8,12 @@ import {
 
 import { useRef, useContext } from "react";
 import { useRouter } from "next/router";
-import { ChatbotUIContext } from "@/context/context";
+import { ApplicationContext } from "@/context/context";
 
 export function Search() {
   const router = useRouter();
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const { resultSources } = useContext(ChatbotUIContext);
+  const { resultSources } = useContext(ApplicationContext);
 
   function search(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

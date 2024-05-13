@@ -3,15 +3,16 @@
 import { useContext } from 'react';
 import AppFilterOption from "./app-filter-option";
 import Image from 'next/image';
-import { ChatbotUIContext } from "@/context/context";
+import { ApplicationContext } from "@/context/context";
+import { formatLabel } from '@/lib/utils';
 
 type AppFilterOptionsProps = {
     results: any; 
+    resultSources: string[];
 };
 
-export default function AppFilterOptions({results}: AppFilterOptionsProps) {
-    const { resultSources } = useContext(ChatbotUIContext);
-    const { activeFilter, setActiveFilter, setselectedResultSources } = useContext(ChatbotUIContext);
+export default function AppFilterOptions({results, resultSources}: AppFilterOptionsProps) {
+    const { activeFilter, setActiveFilter, setselectedResultSources } = useContext(ApplicationContext);
 
     const handleClick = () => {
         setselectedResultSources(resultSources);
@@ -19,6 +20,12 @@ export default function AppFilterOptions({results}: AppFilterOptionsProps) {
     };
 
     const isSelected = activeFilter === 'All';
+
+    const mappedResultSources = resultSources.map(source => ({
+        label: formatLabel(source),
+        value: source,
+        icon: `/${source}.svg`,
+      }));
 
     return (
         <div className="mt-3 flex w-full text-sm text-gray-700 lg:justify-start lg:text-base dark:text-gray-400">
@@ -33,8 +40,8 @@ export default function AppFilterOptions({results}: AppFilterOptionsProps) {
                     </div>
                     <p className="hidden text-sm text-gray-500 sm:inline-flex">{results ? results : Math.floor(Math.random() * 1000) + 1}</p>
                 </div>
-                {resultSources.map((iconName) => (
-                    <AppFilterOption src={`/${iconName}.svg`} title={iconName} key={iconName} />
+                {mappedResultSources.map((iconName) => (
+                    <AppFilterOption src={iconName.icon} label={iconName.label} key={iconName.value} value={iconName.value} />
                 ))}
             </div>
         </div>

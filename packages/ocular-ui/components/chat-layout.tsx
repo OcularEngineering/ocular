@@ -2,7 +2,7 @@
 
 import React, { ReactNode } from 'react';
 
-import { ChatbotUIContext } from "@/context/context"
+import { ApplicationContext } from "@/context/context"
 import { ChatSideBar } from "@/components/chat/chat-sidebar/chat-sidebar"
 import { GlobalState } from "@/lib/global-state"
 import { useTheme } from "next-themes"
@@ -29,7 +29,7 @@ export default function ChatLayout({ children }: ChatLayoutProps) {
   const pathname = usePathname()
   const router = useRouter()
   const [chatsLoaded, setChatsLoaded] = useState(false)
-  const { chatMessages, setChats } = useContext(ChatbotUIContext)
+  const { chatMessages, setChats } = useContext(ApplicationContext)
   const searchParams = useSearchParams()
   const tabValue = searchParams.get("tab") || "chats"
 

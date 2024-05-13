@@ -1,4 +1,4 @@
-import { ChatbotUIContext } from "@/context/context"
+import { ApplicationContext } from "@/context/context"
 import { buildFinalMessages } from "@/lib/build-prompt"
 import { useRouter } from "next/navigation"
 import { useContext, useEffect, useRef } from "react"
@@ -25,7 +25,7 @@ export const useChatHandler = () => {
     chatMessages,
     setIsPromptPickerOpen,
     isPromptPickerOpen,
-  } = useContext(ChatbotUIContext)
+  } = useContext(ApplicationContext)
 
   const chatInputRef = useRef<HTMLTextAreaElement>(null)
   useEffect(() => {

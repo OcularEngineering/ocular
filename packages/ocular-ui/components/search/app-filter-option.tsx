@@ -3,23 +3,24 @@
 import { useState, useContext } from 'react';
 import Image from 'next/image';
 
-import { ChatbotUIContext } from "@/context/context";
+import { ApplicationContext } from "@/context/context";
 
 type AppFilterOptionProps = {
   src: string;
-  title: string;
+  label: string;
+  value: string;
   results?: any;
 };
 
-export default function AppFilterOption({ src, title, results }: AppFilterOptionProps) {
-  const { setselectedResultSources, activeFilter, setActiveFilter } = useContext(ChatbotUIContext);
-
+export default function AppFilterOption({ src, label, value, results }: AppFilterOptionProps) {
+  const { setselectedResultSources, activeFilter, setActiveFilter } = useContext(ApplicationContext);
+  
   const handleClick = () => {
-    setselectedResultSources([title]);
-    setActiveFilter(title);
+    setselectedResultSources([value]);
+    setActiveFilter(value);
   };
 
-  const isSelected = activeFilter === title;
+  const isSelected = activeFilter === value;
 
   return (
     <div
@@ -29,9 +30,9 @@ export default function AppFilterOption({ src, title, results }: AppFilterOption
       onClick={handleClick}
     >
       <div className='flex grow gap-2'>
-        <Image src={src} alt={title} width={20} height={20} />
+        <Image src={src} alt={label} width={20} height={20} />
         <p className="hidden font-semibold text-sm sm:inline-flex dark:text-white">
-          {title.split('.')[0].charAt(0).toUpperCase() + title.split('.')[0].slice(1)}
+          {label}
         </p>
       </div>
       <p className="hidden text-sm text-gray-500 sm:inline-flex">

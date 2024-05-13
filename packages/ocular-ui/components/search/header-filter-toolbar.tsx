@@ -1,10 +1,10 @@
 "use client";
 
 import { useContext } from 'react';
-import { ChatbotUIContext } from "@/context/context";
+import { ApplicationContext } from "@/context/context";
 import { DatePickerWithRange } from "@/components/date-picker";
 import { AppsFacetedFilter } from "./apps-faceted-filter";
-import { apps, resultTypes } from "@/data/data"
+import { formatLabel } from '@/lib/utils';
 
 import {
   CollectionIcon
@@ -12,7 +12,13 @@ import {
 import { LayoutGrid } from 'lucide-react';
 
 export default function HeaderFilterToolbar() {
-  const { resultSources } = useContext(ChatbotUIContext);
+  const { resultSources } = useContext(ApplicationContext);
+
+  const mappedResultSources = resultSources.map(source => ({
+    label: formatLabel(source),
+    value: source,
+    icon: `/${source}.svg`,
+  }));
 
   return (
      <div className="flex flex-row gap-3">
@@ -20,7 +26,7 @@ export default function HeaderFilterToolbar() {
       <AppsFacetedFilter
         // results=""
         title="Apps"
-        options={resultSources}
+        options={mappedResultSources}
         Icon={LayoutGrid}
       />
       {/* <AppsFacetedFilter

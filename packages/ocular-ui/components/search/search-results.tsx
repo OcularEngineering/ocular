@@ -107,12 +107,12 @@ const Results = ({ results, isLoadingResults }) => (
 );
 
 // Results Filter Component
-const ResultsFilter = ({ results, isLoadingResults }) => (
+const ResultsFilter = ({ results, isLoadingResults, resultSources }) => (
   <div className="flex w-2/5 flex-col items-end">
     <div className="flex flex-col">
       {
         results ? 
-          <AppFilterOptions results={results.searchInformation?.formattedTotalResults} />
+          <AppFilterOptions results={results.searchInformation?.formattedTotalResults} resultSources={resultSources} />
         : <SearchByAppFilterSkeleton />
       }
     </div>
@@ -120,7 +120,7 @@ const ResultsFilter = ({ results, isLoadingResults }) => (
 );
 
 // Main Component
-export default function SearchResults({ search_results, ai_content, isLoadingResults, isLoadingCopilot }) {
+export default function SearchResults({ search_results, ai_content, isLoadingResults, isLoadingCopilot, resultSources }) {
   return (
     <div className="font-open-sans dark:bg-background flex min-h-screen flex-col dark:text-white items-center justify-start" >
       {/* <div className='sm:pl-[5%] md:pl-[14%] lg:pl-52' style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.015) 1%, transparent)'}}>
@@ -133,7 +133,7 @@ export default function SearchResults({ search_results, ai_content, isLoadingRes
             ) : (
               <Results results={search_results} isLoadingResults={isLoadingResults} />
           )}
-          <ResultsFilter results={search_results} isLoadingResults={isLoadingResults} />
+          <ResultsFilter results={search_results} isLoadingResults={isLoadingResults} resultSources={resultSources} />
         </div>
       </div>
     </div>

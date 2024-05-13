@@ -5,7 +5,7 @@ import { format as formatDateFns } from "date-fns"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
-import { ChatbotUIContext } from "@/context/context";
+import { ApplicationContext } from "@/context/context";
 import {
   Popover,
   PopoverContent,
@@ -20,7 +20,7 @@ export function DatePickerWithRange({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
 
-  const { resultFilterDate, setResultFilterDate } = useContext(ChatbotUIContext);
+  const { resultFilterDate, setResultFilterDate } = useContext(ApplicationContext);
   const [isSelected, setIsSelected] = useState(false);
 
   // Serialize the date to JSON format when logging

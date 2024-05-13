@@ -1,4 +1,4 @@
-import { ChatbotUIContext } from "@/context/context"
+import { ApplicationContext } from "@/context/context"
 import { cn } from "@/lib/utils"
 import { ContentType, DataItemType, DataListType } from "@/types"
 import { FC, useContext, useEffect, useRef, useState } from "react"
@@ -35,7 +35,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     // setAssistants,
     // setTools,
     // setModels
-  } = useContext(ChatbotUIContext)
+  } = useContext(ApplicationContext)
 
   const divRef = useRef<HTMLDivElement>(null)
 

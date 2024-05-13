@@ -6,7 +6,7 @@ import { ChatHelp } from "@/components/chat/chat-help"
 import { ChatUI } from "@/components/chat/chat-ui"
 // import { QuickSettings } from "@/components/chat/quick-settings"
 // import { Brand } from "@/components/ui/brand"
-import { ChatbotUIContext } from "@/context/context"
+import { ApplicationContext } from "@/context/context"
 import { ChatSideBar } from "@/components/chat/chat-sidebar/chat-sidebar"
 import { GlobalState } from "@/lib/global-state"
 // import useHotkey from "@/lib/hooks/use-hotkey"
@@ -30,7 +30,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ children }) => {
 
   const [chatsLoaded, setChatsLoaded] = useState(false);
 
-  const { chatMessages, setChats } = useContext(ChatbotUIContext)
+  const { chatMessages, setChats } = useContext(ApplicationContext)
   const searchParams = useSearchParams()
   const tabValue = searchParams.get("tab") || "chats"
   const [contentType, setContentType] = useState<ContentType>(
