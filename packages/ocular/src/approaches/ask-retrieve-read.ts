@@ -11,7 +11,7 @@ import {
   AppNameDefinitions,
 } from "@ocular/types";
 import { MessageBuilder } from "../utils/message";
-import { Organisation } from "../models";
+import { App, Organisation } from "../models";
 import { OrganisationService } from "../services";
 
 const SYSTEM_CHAT_TEMPLATE = `You are an intelligent assistant who can helps Engineers at Ocular with a variety of tasks. Use 'you' to refer to the individual asking the questions even if they ask with 'I'.
@@ -101,11 +101,12 @@ export default class AskRetrieveThenRead implements ISearchApproach {
     }
 
     // Add Sources To The Search Results
-    const org = await this.organisationService_.listInstalledApps();
-    const sources: AppNameDefinitions[] = org.installed_apps.map(
-      (app) => app.name as AppNameDefinitions
+    const sources = new Set(
+      searchResults.hits.map(
+        (hit) => hit.documentMetadata?.source as AppNameDefinitions
+      )
     );
-    searchResults.sources = sources;
+    searchResults.sources = [...sources];
     return searchResults;
   }
 
