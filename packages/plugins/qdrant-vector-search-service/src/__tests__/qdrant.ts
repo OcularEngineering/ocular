@@ -1,4 +1,4 @@
-import { AppNameDefinitions, IVectorDB } from "@ocular/types";
+import { AppNameDefinitions, DocType, IVectorDB } from "@ocular/types";
 import qdrantService from "../services/qdrant";
 import { QdrantClient } from "@qdrant/js-client-rest";
 
@@ -24,6 +24,7 @@ describe("qdrantService", () => {
         title: "Confluence Indexed Document",
         titleEmbeddings: [1, 2, 3],
         source: AppNameDefinitions.CONFLUENCE,
+        type: DocType.MD,
         content: "Confluence Chunk 0 Content",
         contentEmbeddings: [1, 2, 3],
         tokens: 33,
@@ -38,6 +39,7 @@ describe("qdrantService", () => {
         title: "Confluence Indexed Document",
         titleEmbeddings: [1, 2, 3],
         source: AppNameDefinitions.CONFLUENCE,
+        type: DocType.MD,
         content: "Confluence Chunk 1 Content",
         contentEmbeddings: [1, 2, 3],
         tokens: 33,
@@ -52,6 +54,7 @@ describe("qdrantService", () => {
         title: "Google Drive Indexed Document",
         titleEmbeddings: [1, 2, 3],
         source: AppNameDefinitions.GOOGLEDRIVE,
+        type: DocType.DOCX,
         content: "Google Drive Chunk 1 Content",
         tokens: 33,
         contentEmbeddings: [1, 2, 3],
@@ -65,6 +68,7 @@ describe("qdrantService", () => {
         title: "Google Drive Indexed Document",
         titleEmbeddings: [1, 2, 3],
         source: AppNameDefinitions.GOOGLEDRIVE,
+        type: DocType.DOCX,
         content: "Google Drive Chunk 2 Content",
         tokens: 33,
         contentEmbeddings: [1, 2, 3],
@@ -78,6 +82,7 @@ describe("qdrantService", () => {
         title: "Notion Chunk 0 Indexed Document",
         titleEmbeddings: [1, 2, 3],
         source: AppNameDefinitions.NOTION,
+        type: DocType.PDF,
         content: "Notion Content",
         tokens: 33,
         contentEmbeddings: [1, 2, 3],
@@ -91,6 +96,7 @@ describe("qdrantService", () => {
         title: "Notion Chunk 1 Indexed Document",
         titleEmbeddings: [1, 2, 3],
         source: AppNameDefinitions.NOTION,
+        type: DocType.PDF,
         content: "Notion Content",
         tokens: 33,
         contentEmbeddings: [1, 2, 3],
@@ -388,6 +394,48 @@ describe("qdrantService", () => {
 
     await service.deleteIndex("OcularTestIndex");
   });
+
+  it("Filter Chunks Content Type", async () => {
+    const searchResults = [
+      {
+        chunkId: 1,
+        score: 0.9999999,
+        organisationId: "3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971j",
+        documentId: "document3",
+        title: "Notion Chunk 1 Indexed Document",
+        source: AppNameDefinitions.NOTION,
+        type: DocType.PDF,
+        content: "Notion Content",
+        metadata: {},
+        updatedAt: "2020-01-01T00:00:00.000Z",
+      },
+      {
+        chunkId: 0,
+        score: 0.9999999,
+        organisationId: "3e6c4e66-7b8a-4b2c-9e4f-4f4e6def971j",
+        documentId: "document3",
+        title: "Notion Chunk 0 Indexed Document",
+        source: AppNameDefinitions.NOTION,
+        type: DocType.PDF,
+        content: "Notion Content",
+        metadata: {},
+        updatedAt: "2010-01-01T00:00:00.000Z",
+      },
+    ];
+    const mockVector = [1, 2, 3];
+    const result = await service.searchDocumentChunks(
+      "OcularTestIndex",
+      mockVector,
+      {
+        types: [DocType.PDF],
+      }
+    );
+
+    // Sort the results by content for comparison
+    expect(sortChunksByID(searchResults)).toEqual(sortChunksByID(result));
+
+    await service.deleteIndex("OcularTestIndex");
+  });
 });
 // Sort the results by content for comparison
 function sortHitsByContent(hits) {
@@ -396,4 +444,9 @@ function sortHitsByContent(hits) {
     ...hit,
     snippets: hit.snippets.sort(sortFunction),
   }));
+}
+
+function sortChunksByID(chunks) {
+  const sortFunction = (a, b) => a.chunkID - b.chunkID;
+  return chunks.sort(sortFunction);
 }
