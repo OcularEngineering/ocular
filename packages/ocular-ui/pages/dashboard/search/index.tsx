@@ -6,14 +6,15 @@ import {
   SearchIcon,
 } from "@heroicons/react/solid";
 
-import { useRef, useContext } from "react";
+import { useRef, useContext, useEffect } from "react";
 import { useRouter } from "next/router";
 import { ApplicationContext } from "@/context/context";
+import withAuth from '@/components/with-auth';
 
 export function Search() {
   const router = useRouter();
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const { resultSources } = useContext(ApplicationContext);
+  const { resultSources, userProfile } = useContext(ApplicationContext);
 
   function search(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -23,6 +24,7 @@ export function Search() {
       router.push(`/dashboard/search/results?q=${q}`);
     }
   }
+
   return (
     <>
       <div className="dark:bg-dark group flex min-h-screen flex-col items-center dark:text-white" style={{background: 'linear-gradient(to bottom, rgba(0, 0, 255, 0.01) 10%, transparent)'}}>
@@ -86,4 +88,4 @@ export function Search() {
   );
 }
 
-export default Search;
+export default withAuth(Search);

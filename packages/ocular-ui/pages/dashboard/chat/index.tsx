@@ -2,12 +2,15 @@
 
 import { ChatUI } from '@/components/chat/chat-ui'
 import ChatLayout from '@/components/chat-layout'
+import withAuth from '@/components/with-auth';
 
-export default function Chat() {
+function Chat() {
   return (
     <ChatLayout>
       <ChatUI/>
     </ChatLayout>
   );
 }
+
+export default withAuth(Chat);
 

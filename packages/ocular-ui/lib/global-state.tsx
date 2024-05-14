@@ -6,6 +6,7 @@ import { ApplicationContext } from "@/context/context"
 import  api  from "@/services/api"
 import { DateRange } from "react-day-picker";
 import { addDays, format as formatDateFns } from "date-fns"
+import { userProfileInfo } from "@/types/types"
 
 import {
   Chat,
@@ -23,6 +24,7 @@ import { CancelTokenSource } from "axios"
 // import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { useRouter } from "next/navigation"
 import { FC, useEffect, useState } from "react"
+import { el } from "date-fns/locale";
 
 interface GlobalStateProps {
   children: React.ReactNode
@@ -135,6 +137,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     to: addDays(new Date(2024, 3, 20), 20),
   })
 
+  const [userProfile, setuserProfile] = useState<userProfileInfo | null>(null);
+
+  const [ userSignedIn, setUserSignedIn ] = useState<boolean>(false)
+
   useEffect(() => {
     ;(async () => {
       // const profile = await fetchStartingChatData()
@@ -165,8 +171,27 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   }, [])
 
   const fetchStartingChatData = async () => {
-    const user = await (await api.auth.loggedInUserDetails()).data.user
-    console.log("user",user)
+    // const user = await (await api.auth.loggedInUserDetails()).data.user
+
+    // if (user) {
+
+    //   setuserProfile(
+    //     {
+    //       id: user.id,
+    //       first_name: user.first_name,
+    //       last_name: user.last_name,
+    //       email: user.email,
+    //       role: user.role,
+    //       avatar: user.avatar,
+    //       created_at: user.created_at,
+    //       updated_at: user.updated_at,
+    //       organisation_id: user.organisation_id
+    //     }
+    //   )
+    // }
+    // else {
+    //   setuserProfile(null)
+    // }
 
     // if (user) {
     //   const user = session.user
@@ -345,6 +370,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         // setSelectedTools,
         // toolInUse,
         // setToolInUse
+        userProfile,
+        setuserProfile,
+        userSignedIn,
+        setUserSignedIn
       }}
     >
       {children}

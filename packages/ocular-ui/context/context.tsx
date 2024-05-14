@@ -11,6 +11,7 @@ import { da } from "date-fns/locale"
 // import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { Dispatch, SetStateAction, createContext } from "react"
 import { DateRange } from "react-day-picker"
+import { userProfileInfo } from "@/types/types"
 
 interface ApplicationContext {
   // PROFILE STORE
@@ -139,6 +140,13 @@ interface ApplicationContext {
 
     resultFilterDate: DateRange | undefined;
     setResultFilterDate: Dispatch<SetStateAction<DateRange | undefined>>;
+
+    userProfile: userProfileInfo | null;
+    setuserProfile: Dispatch<SetStateAction<userProfileInfo | null>>;
+
+    userSignedIn: boolean;
+    setUserSignedIn: Dispatch<SetStateAction<boolean>>;
+
 }
 
 export const ApplicationContext = createContext<ApplicationContext>({
@@ -274,5 +282,9 @@ export const ApplicationContext = createContext<ApplicationContext>({
   activeFilter: "",
   setActiveFilter: () => {},
   resultFilterDate: undefined,
-  setResultFilterDate: () => {}
+  setResultFilterDate: () => {},
+  userProfile: null,
+  setuserProfile: () => {},
+  userSignedIn: false,
+  setUserSignedIn: () => {}
 })

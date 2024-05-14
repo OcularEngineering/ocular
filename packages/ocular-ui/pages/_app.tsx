@@ -17,6 +17,7 @@ import Layout from '@/components/layout';
 import DashboardLayout from '@/components/dashboard-layout';
 import AuthLayout from '@/components/auth-layout';
 import ChatLayout from '@/components/chat-layout';
+import { AuthProvider } from '@/context/auth-context';
 
 function MyApp({ Component, pageProps }: AppProps) {
 
@@ -65,7 +66,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     return (page: ReactNode) => page;
   };
 
-  return getLayout()(<Component {...pageProps} />);
+  return getLayout()(
+    <AuthProvider>
+      <Component {...pageProps} />
+    </AuthProvider>
+  );
 }
 
 export default MyApp;

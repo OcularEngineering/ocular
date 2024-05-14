@@ -1,15 +1,17 @@
 "use client"
 
-import * as React from "react"
+import React, { useState, useEffect, useContext } from 'react';
 import { useRouter } from "next/navigation";
 
 // Importing API End Points
 import api from "@/services/api"
-
 import { cn } from "@/lib/utils"
 import { Icons } from "@/components/ui/icons"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useAuth } from '@/context/auth-context';
+
+import { ApplicationContext } from "@/context/context"
 
 interface SignInFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -18,6 +20,13 @@ export function SignInForm({ className, ...props }: SignInFormProps) {
   const router = useRouter()
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
+  const auth = useAuth();
+
+  if (!auth) {
+    throw new Error("Auth context is not available");
+  }
+
+  const { login } = auth;
 
   async function onSubmit(event: React.SyntheticEvent) {
     event.preventDefault()
@@ -29,13 +38,16 @@ export function SignInForm({ className, ...props }: SignInFormProps) {
     }
 
     try {
-      await api.auth.authenticate(formData)
+      const user = await api.auth.authenticate(formData)
+      login(user);
+      console.log("User logged in successfully: ", user)
       router.push(`/dashboard/search`)
     } catch (error) {
       console.error(error)
     }
-
-    setIsLoading(false)
+    finally {
+      setIsLoading(false);
+    }
 
     setTimeout(() => {
       setIsLoading(false)
