@@ -13,7 +13,7 @@ export type FileGetData = {
   [x: string]: unknown;
 };
 
-export type FileDeleteData = {
+export type FileData = {
   fileKey: string;
   [x: string]: unknown;
 };
@@ -27,7 +27,9 @@ export type FileUploadData = {
 
 export interface IFileProvider {
   upload(file: Express.Multer.File): Promise<FileUploadResult>;
-  delete(fileData: FileDeleteData): Promise<void>;
+  delete(fileData: FileData): Promise<void>;
+  getDownloadStream(fileData: FileData): Promise<NodeJS.ReadableStream>;
+  getFileDataAsTxt(fileData: FileData): Promise<string>;
 }
 
 export interface FileServiceOptions {
@@ -58,7 +60,15 @@ export class AbstractFileService
   async upload(file: Express.Multer.File): Promise<FileUploadResult> {
     throw Error("upload must be overridden by the child class");
   }
-  async delete(file: FileDeleteData): Promise<void> {
+  async delete(file: FileData): Promise<void> {
     throw Error("delete must be overridden by the child class");
+  }
+
+  async getDownloadStream(fileData: FileData): Promise<NodeJS.ReadableStream> {
+    throw Error("getDownloadStream must be overridden by the child class");
+  }
+
+  async getFileDataAsTxt(fileData: FileData): Promise<string> {
+    throw Error("getFileData must be overridden by the child class");
   }
 }

@@ -8,7 +8,15 @@ import {
   OCULAR_API_INDEXING_TOPIC,
 } from "@ocular/types";
 import { DocumentMetadata } from "../../../../models";
-// import { DocType } from "../../../../types";
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsInt,
+  ValidateNested,
+} from "class-validator";
+import { Type } from "class-transformer";
 
 export default async (req, res) => {
   try {
@@ -31,10 +39,6 @@ export default async (req, res) => {
           })
         );
 
-        files.map((file) => {
-          console.log("File", file);
-        });
-
         // Create Indexable Documents For The Uploaded Files
         const documents: IndexableDocument[] = files.map((file) => {
           return {
@@ -44,25 +48,82 @@ export default async (req, res) => {
             title: file.name,
             type: file.extension as DocType,
             updatedAt: new Date(),
-            metadata: {},
+            metadata: {
+              key: file.key,
+              url: file.url,
+            },
           };
         });
         // Create Document Metadata For The Uploaded Files
         const metadatas: DocumentMetadata =
           await documentMetadataService.batchCreateOrUpdate(documents);
-        // Index The Uploaded Files
-        queueService.sendBatch(OCULAR_API_INDEXING_TOPIC, documents);
+        // Add Uploader Files To Queue Fore Indexing
+        await queueService.sendBatch(OCULAR_API_INDEXING_TOPIC, documents);
         return metadatas;
       }
     );
     res.status(200).json({ uploads: docMetadatas });
-  } catch (err) {
-    console.log(err);
-    throw err;
+  } catch (err: any) {
+    // Delete Files Uploaded By Multer To Temp Folder Before Returning Error
+    req.files.map((f) => {
+      if (fs.existsSync(f.path)) {
+        fs.unlinkSync(f.path);
+      }
+    });
+    return res
+      .status(500)
+      .send(
+        `Error: Failed Upload Files: err ${err.message}. Check if Document Type is Supported.`
+      );
   }
 };
 
 export class IAdminPostUploadsFileReq {
   originalName: string;
   path: string;
+}
+
+enum Mimetype {
+  PDF = "application/pdf",
+}
+
+export class UploadReq {
+  @IsNotEmpty()
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => FileDefinition)
+  files: FileDefinition[];
+}
+
+export class FileDefinition {
+  @IsString()
+  @IsNotEmpty()
+  fieldname: string;
+
+  @IsString()
+  @IsNotEmpty()
+  originalname: string;
+
+  @IsString()
+  @IsNotEmpty()
+  encoding: string;
+
+  @IsOptional()
+  @IsEnum(Mimetype)
+  mimetype: Mimetype;
+
+  @IsString()
+  @IsNotEmpty()
+  destination: string;
+
+  @IsString()
+  @IsNotEmpty()
+  filename: string;
+
+  @IsString()
+  @IsNotEmpty()
+  path: string;
+
+  @IsInt()
+  size: number;
 }

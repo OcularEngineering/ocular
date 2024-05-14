@@ -14,7 +14,7 @@ import { AutoflowAiError, AutoflowAiErrorTypes } from "@ocular/utils";
 import { AppNameDefinitions } from "@ocular/types";
 import { AppRepository } from "../repositories";
 import EventBusService from "./event-bus";
-import { Locator } from "puppeteer";
+import Locator from "puppeteer";
 
 type InjectedDependencies = {
   manager: EntityManager;
