@@ -6,7 +6,7 @@ import {
 } from "@ocular/ocular";
 import webConnectorService from "../services/webConnector";
 import { INDEX_DOCUMENT_EVENT } from "@ocular/types";
-import { AbstractBatchJobStrategy, SEARCH_INDEXING_TOPIC } from "@ocular/types";
+import { AbstractBatchJobStrategy, APPS_INDEXING_TOPIC } from "@ocular/types";
 
 class webConnectorStrategy extends AbstractBatchJobStrategy {
   static identifier = "webConnector-indexing-strategy";
@@ -30,7 +30,7 @@ class webConnectorStrategy extends AbstractBatchJobStrategy {
       batchJob.context?.link_id as string
     );
     stream.on("data", (documents) => {
-      this.queueService_.sendBatch(INDEX_DOCUMENT_EVENT, documents);
+      this.queueService_.sendBatch(APPS_INDEXING_TOPIC, documents);
     });
     stream.on("end", () => {
       console.log("No more data");

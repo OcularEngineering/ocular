@@ -1,14 +1,14 @@
-import { BatchJobService, Organisation, QueueService } from '@ocular/ocular';
-import ConfluenceService from '../services/confluence';
-import { INDEX_DOCUMENT_EVENT, SEARCH_INDEXING_TOPIC } from '@ocular/types';
-import { AbstractBatchJobStrategy } from '@ocular/types';
+import { BatchJobService, Organisation, QueueService } from "@ocular/ocular";
+import ConfluenceService from "../services/confluence";
+import { INDEX_DOCUMENT_EVENT, APPS_INDEXING_TOPIC } from "@ocular/types";
+import { AbstractBatchJobStrategy } from "@ocular/types";
 
 export default class ConfluenceStrategy extends AbstractBatchJobStrategy {
-  static identifier = 'confluence-indexing-strategy';
-  static batchType = 'confluence';
+  static identifier = "confluence-indexing-strategy";
+  static batchType = "confluence";
   protected batchJobService_: BatchJobService;
   protected confluenceService_: ConfluenceService;
-  protected queueService_: QueueService
+  protected queueService_: QueueService;
 
   constructor(container) {
     super(arguments[0]);
@@ -22,15 +22,15 @@ export default class ConfluenceStrategy extends AbstractBatchJobStrategy {
     const stream = await this.confluenceService_.getConfluenceData(
       batchJob.context?.org as Organisation
     );
-    stream.on('data', (documents) => {
-      this.queueService_.sendBatch(SEARCH_INDEXING_TOPIC, documents)
+    stream.on("data", (documents) => {
+      this.queueService_.sendBatch(APPS_INDEXING_TOPIC, documents);
     });
-    stream.on('end', () => {
-      console.log('No more data');
+    stream.on("end", () => {
+      console.log("No more data");
     });
   }
 
   buildTemplate(): Promise<string> {
-    throw new Error('Method not implemented.');
+    throw new Error("Method not implemented.");
   }
 }

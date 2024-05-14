@@ -45,16 +45,19 @@
     "ioredis-mock": "^8.9.0",
     "kafka-js": "^0.0.0",
     "kafkajs": "^2.2.4",
+    "langchain": "^0.1.37",
     "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
     "ora": "^3.4.0",
     "passport": "^0.7.0",
     "passport-custom": "^1.1.1",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "path": "^0.12.7",
-    "puppeteer": "^22.8.0",
+    "pdf-parse": "^1.1.1",
+    "puppeteer": "^19.7.2",
+    "rate-limiter-flexible": "^5.0.3",
     "typeorm": "^0.3.20",
-    "uuid": "^9.0.1",
-    "rate-limiter-flexible": "^5.0.3"
+    "uuid": "^9.0.1"
   }
 }
