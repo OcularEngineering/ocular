@@ -145,6 +145,7 @@ export default class qdrantService extends AbstractVectorDBService {
           documentId: String(result.payload.documentId),
           organisationId: String(result.payload.organisationId),
           chunkId: Number(result.payload.chunkId),
+          type: result.payload.type as DocType,
           source: String(result.payload.source) as AppNameDefinitions,
           title: String(result.payload.title),
           metadata: result.payload.metadata as Record<string, unknown>, // assuming result.payload.metadata is an object
@@ -180,6 +181,7 @@ export default class qdrantService extends AbstractVectorDBService {
         documentId: doc.documentId,
         title: doc.title,
         source: doc.source,
+        type: doc.type,
         content: doc.content,
         chunkLinks: doc.chunkLinks,
         metadata: doc.metadata,
@@ -226,6 +228,16 @@ export default class qdrantService extends AbstractVectorDBService {
         range: {
           gte: context.date.from,
           lte: context.date.to,
+        },
+      });
+    }
+
+    // Filter By Document Type
+    if (context?.types && context.types.length > 0) {
+      filter.must.push({
+        key: "type",
+        match: {
+          any: [...context.types],
         },
       });
     }

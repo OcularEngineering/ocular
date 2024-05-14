@@ -1,5 +1,10 @@
 import { AppNameDefinitions } from "../apps";
-import { IndexableDocChunk, SearchChunk, SearchDocument } from "./document";
+import {
+  DocType,
+  IndexableDocChunk,
+  SearchChunk,
+  SearchDocument,
+} from "./document";
 import { Message } from "./message";
 
 // export type SearchContext = {
@@ -23,6 +28,7 @@ export type SearchContext = {
   top?: number;
   organisation_id?: string;
   retrieve_chunks?: boolean;
+  types?: DocType[];
   date?: {
     from?: string;
     to?: string;
