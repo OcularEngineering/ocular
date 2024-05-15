@@ -3,31 +3,30 @@ import {
   AutoflowContainer,
   IIndexerInterface,
   IDocumentProcessorInterface,
-  ILLMInterface,
+  IVectorDB,
+  IndexableDocChunk,
+  Logger,
+  ISearchService,
 } from "@ocular/types";
 import { SearchIndexClient, SearchIndex } from "@azure/search-documents";
 import { ConfigModule } from "../types/config-module";
-import { Logger } from "@ocular/types";
-import { IndexableDocChunk } from "@ocular/types";
-import { IVectorDB } from "@ocular/types";
-import { ISearchService } from "@ocular/types";
 import { Document, Index } from "typeorm";
 import { DocumentMetadataService, FileService } from "../services";
+import { generateEmbedding } from "../utils";
 
 export default class IndexerService implements IIndexerInterface {
   private config_: ConfigModule;
   protected readonly logger_: Logger;
   protected readonly documentProcessorService_: IDocumentProcessorInterface;
-  protected readonly openAiService_: ILLMInterface;
   protected readonly vectorDBService_: IVectorDB;
   protected readonly documentMetadataService_: DocumentMetadataService;
   protected readonly fileService_: FileService;
+  protected readonly embedder_: any;
 
   constructor(container, config: ConfigModule) {
     this.config_ = config;
     this.logger_ = container.logger;
     this.documentProcessorService_ = container.documentProcessorService;
-    this.openAiService_ = container.openAiService;
     this.vectorDBService_ = container.vectorDBService;
     this.documentMetadataService_ = container.documentMetadataService;
     this.fileService_ = container.fileService;
@@ -60,10 +59,8 @@ export default class IndexerService implements IIndexerInterface {
         await this.documentProcessorService_.chunkIndexableDocumentsBatch(
           documents
         );
-      const embeddedChunksPromises = await chunks.map((chunk) =>
-        this.embedChunk(chunk)
-      );
-      const embeddedChunks = await Promise.all(embeddedChunksPromises);
+      const embeddedChunks = await this.embedChunks(chunks);
+      console.log("Embedded Chunks Completed", embeddedChunks);
       await this.vectorDBService_.addDocuments(indexName, embeddedChunks);
     } catch (error) {
       this.logger_.error(`Error Indexing ${indexName}, error ${error.message}`);
@@ -79,6 +76,7 @@ export default class IndexerService implements IIndexerInterface {
       this.logger_.info(
         `Indexing Ocular API Documents ${documents.length} documents to index ${indexName}`
       );
+      console.log("Documents", documents.length);
       // Hydrate the api uploaded documents with the data from file service
       await Promise.all(
         documents.map(async (doc) => {
@@ -100,30 +98,23 @@ export default class IndexerService implements IIndexerInterface {
         await this.documentProcessorService_.chunkIndexableDocumentsBatch(
           documents
         );
-      const embeddedChunksPromises = await chunks.map((chunk) =>
-        this.embedChunk(chunk)
-      );
-      const embeddedChunks = await Promise.all(embeddedChunksPromises);
-
+      console.log("Chunks", chunks.length);
+      const embeddedChunks = await this.embedChunks(chunks);
+      console.log("Embedded Chunks Completed", embeddedChunks.length);
       await this.vectorDBService_.addDocuments(indexName, embeddedChunks);
     } catch (error) {
       this.logger_.error(`Error Indexing ${indexName}, error ${error.message}`);
     }
   }
 
-  private async embedChunk(chunk: IndexableDocChunk) {
-    if (chunk?.title) {
-      const titleEmbeddings = await this.openAiService_.createEmbeddings(
-        chunk.title
-      );
-      chunk.titleEmbeddings = titleEmbeddings;
-    }
-
-    if (chunk?.content) {
-      chunk.contentEmbeddings = await this.openAiService_.createEmbeddings(
-        chunk.content
-      );
-    }
-    return chunk;
+  private async embedChunks(chunks: IndexableDocChunk[]) {
+    const embeddedChunksPromises = chunks.map(async (chunk) => {
+      if (chunk?.content) {
+        chunk.contentEmbeddings = await generateEmbedding(chunk.content);
+      }
+      return chunk;
+    });
+    const embeddedChunks = await Promise.all(embeddedChunksPromises);
+    return embeddedChunks;
   }
 }

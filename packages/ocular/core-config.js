@@ -192,8 +192,8 @@ module.exports = {
         chat_deployment_name: process.env.AZURE_OPEN_AI_CHAT_DEPLOYMENT_NAME,
         chat_model: process.env.AZURE_OPEN_AI_CHAT_MODEL,
         rate_limiter_opts: {
-          requests: 120000, // Number of Tokens
-          interval: 60, // Interval in Seconds
+          requests: 1, // Number of Tokens
+          interval: 1, // Interval in Seconds
         },
       },
     },
@@ -213,7 +213,7 @@ module.exports = {
       resolve: `qdrant-vector-search-service`,
       options: {
         quadrant_db_url: process.env.QDRANT_DB_URL || "http://localhost:6333",
-        embedding_size: 1536,
+        embedding_size: 384,
       },
     },
   ],
