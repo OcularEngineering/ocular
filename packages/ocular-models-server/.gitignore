@@ -2,3 +2,4 @@ env.local
 .env.dev
 .env.local
 .env.prod
+__pycache__/
