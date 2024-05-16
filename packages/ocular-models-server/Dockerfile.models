@@ -1,12 +1,12 @@
 # Use Ubunt 22.04 as base image
-FROM ubuntu:jammy-20240427
+FROM ubuntu:22.04
 
 # Install Python 3
 # Make sure to not install recommends and to clean the 
 # install to minimize the size of the container as much as possible.
 RUN apt-get update && \
   apt-get install --no-install-recommends -y python3=3.10.6-1~22.04 && \
-  apt-get install --no-install-recommends -y python3-pip=22.0.2+dfsg-1ubuntu0.3 && \
+  apt-get install --no-install-recommends -y python3-pip && \
   apt-get install --no-install-recommends -y python3-venv=3.10.6-1~22.04 && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*
@@ -25,6 +25,7 @@ WORKDIR /app
 # Copy necessary files to the container
 COPY requirements.txt .
 COPY download_models.py .
+COPY server.py .
 
 # Create a virtual environment in the container
 RUN python3 -m venv .venv
@@ -37,18 +38,7 @@ RUN pip install --no-cache-dir -r requirements.txt && \
   # Get the models from Hugging Face to bake into the container
   python3 download_models.py
 
-
-# Install The Node.js Server
-# Make port 6000 available to the world outside this container
-# Copy necessary files to the container
-COPY package.json .
-COPY package-lock.json .
-
-# Install Node.js dependencies from the package.json file
-RUN npm install
-
-EXPOSE 6000
+EXPOSE 8000
 
 # Run Node Server For The Models
-CMD ["node", "your-server-file.js"]
-
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--reload"]

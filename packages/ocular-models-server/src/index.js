@@ -1,24 +1,23 @@
-import { AutoTokenizer, AutoModelForSeq2SeqLM } from "@xenova/transformers";
-import {express} from  "express";
+import { AutoTokenizer} from "@xenova/transformers";
+import express from  "express";
+import bodyParser from "body-parser";
 
 async function loadModel(modelName) {
-  const tokenizer = await AutoTokenizer.fromPretrained(modelName);
+  const tokenizer = await AutoTokenizer.from_pretrained(modelName);
   return tokenizer
 }
 
 // Load the models and tokenizers for each supported language
-const embedding_model = loadModel('models/intfloat/e5-base-v2')
-
-const bodyParser = require("body-parser");
+const embedding_model = await loadModel('intfloat/e5-base-v2')
 
 const app = express();
 app.use(bodyParser.json());
 
-const supportedTranslations = ["en_fr", "fr_en"];
-
 app.post("/embed", async (req, res) => {
-  embeddings = model.encode(req.text)
-  return embeddings
+  console.log("Received request to embed text: ", req.body.text);
+  const embeddings = await embedding_model.encode(req.body.text)
+  console.log("Embeddings: ", embeddings);
+  res.send({embeddings:embeddings}) 
 });
 
 app.listen(6000, "0.0.0.0", () => {
