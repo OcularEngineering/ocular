@@ -1,5 +1,13 @@
 version: "3"
 services:
+  ocular-models-server:
+    container_name: ocular-models-server
+    build:
+      context: .
+      dockerfile: packages/ocular-models-server/Dockerfile.models
+    ports:
+      - 6000:6000
+
   qdrant:
     image: qdrant/qdrant:latest
     restart: always
@@ -68,7 +76,7 @@ services:
       - DATABASE_URL=postgresql://ocular:ocular@ocular-db:5432/ocular
       - DATABASE_NAME=ocular
     command: npm run typeorm migration:run
-  
+
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4_container
