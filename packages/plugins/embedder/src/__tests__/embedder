@@ -1,0 +1,20 @@
+import EmbeddingService from "../services/embedder";
+
+describe("EmbeddingService", () => {
+  let service;
+
+  beforeEach(() => {
+    service = new EmbeddingService(
+      {},
+      {
+        models_server_url: "http://localhost:8000",
+      }
+    );
+  });
+
+  it("should create embeddings", async () => {
+    const texts = ["test content"];
+    const embeddings = await service.createEmbeddings(texts);
+    expect(embeddings).toEqual([1, 2, 3]);
+  });
+});
