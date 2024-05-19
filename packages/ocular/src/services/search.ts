@@ -18,6 +18,7 @@ import { ConfigModule, Logger } from "../types";
 import { SearchIndexClient } from "@azure/search-documents";
 import { parseBoolean, removeNewlines } from "@ocular/utils";
 import DocumentMetadataService from "./document-metadata";
+import { generateEmbedding } from "../utils";
 
 type InjectedDependencies = {
   searchIndexClient: SearchIndexClient;
@@ -52,7 +53,8 @@ class SearchService extends AbstractSearchService {
     indexName = indexName ? indexName : this.defaultIndexName_;
 
     // Compute Embeddings For The Query
-    const queryVector = await this.openAiService_.createEmbeddings(query!);
+    // const queryVector = await this.openAiService_.createEmbeddings(query!);
+    const queryVector = await generateEmbedding(query!);
     // Search the index for the query vector
     // Add Organisation ID to the context
     const searchResults: SearchResults =

@@ -11,9 +11,9 @@ const withAuth = (WrappedComponent: any) => {
         console.log("Auth: ", auth)
 
         useEffect(() => {
-            if (!auth?.user) {
-                router.replace('/sign-in');
-            }
+            // if (!auth?.user) {
+            //     router.replace('/sign-in');
+            // }
         }, [router, auth]);
 
         return auth?.user ? <WrappedComponent {...props} /> : null;

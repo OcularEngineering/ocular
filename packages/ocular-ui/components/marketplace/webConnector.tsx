@@ -1,3 +1,5 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable react/jsx-no-undef */
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -25,6 +27,7 @@ import {
 } from '@tanstack/react-table';
 import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus } from 'lucide-react';
 import * as React from 'react';
+import SectionContainer from '@/components/section-container';
 
 export type Link = {
   location: string;
@@ -40,7 +43,7 @@ export const columns: ColumnDef<Link>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Link
+          URL
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -48,6 +51,9 @@ export const columns: ColumnDef<Link>[] = [
     cell: ({ row }) => (
       <div className="lowercase">{row.getValue('location')}</div>
     ),
+    meta: {
+      showImage: true,
+    },
   },
   {
     accessorKey: 'status',
@@ -127,24 +133,24 @@ export default function WebConnector({ links }: { links: Link[] }) {
   });
 
   return (
-    <>
+    <SectionContainer className="items-center justify-center space-y-16">
       <div className="w-full p-4">
         <div className="flex items-center py-4 gap-2">
           <Input
-            placeholder="Paste the Base URL link..."
+            placeholder="Paste URL here..."
             onChange={handleInputChange}
-            className="max-w-sm"
+            className="max-w-sm rounded-full p-4 h-10"
           />
           <Button
             variant="default"
-            className="h-10"
+            className="h-10 rounded-full"
             onClick={() => saveLink(inputValue)}
           >
-            Save
+            Add URL
             <Plus className="ml-2 h-4 w-4" />
           </Button>
         </div>
-        <div className="rounded-md border">
+        <div className="rounded-xl border">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -172,12 +178,17 @@ export default function WebConnector({ links }: { links: Link[] }) {
                     data-state={row.getIsSelected() && 'selected'}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
+                    <TableCell key={cell.id}>
+                      <div className='flex flex-row gap-3 items-center'>
+                        {cell.column.columnDef.meta?.showImage && (
+                          <img src="/web-connector.svg" alt="Web Connector" />
+                        )}
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
                         )}
-                      </TableCell>
+                      </div>
+                    </TableCell>
                     ))}
                   </TableRow>
                 ))
@@ -187,7 +198,7 @@ export default function WebConnector({ links }: { links: Link[] }) {
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    No results.
+                    No URLs added
                   </TableCell>
                 </TableRow>
               )}
@@ -195,6 +206,6 @@ export default function WebConnector({ links }: { links: Link[] }) {
           </Table>
         </div>
       </div>
-    </>
+    </SectionContainer>
   );
 }

@@ -1,38 +1,47 @@
 import { TransactionBaseService } from "./transaction-base-service";
-import {
-  DeleteFileType,
-  FileServiceGetUploadStreamResult,
-  FileServiceUploadResult,
-  GetUploadedFileType,
-  UploadStreamDescriptorType,
-} from "@medusajs/types";
 
-export interface IFileService extends TransactionBaseService {
-  upload(file: Express.Multer.File): Promise<FileServiceUploadResult>;
-  uploadProtected(file: Express.Multer.File): Promise<FileServiceUploadResult>;
-  delete(fileData: DeleteFileType): Promise<void>;
-  getUploadStreamDescriptor(
-    fileData: UploadStreamDescriptorType
-  ): Promise<FileServiceGetUploadStreamResult>;
+export type FileUploadResult = {
+  name: string;
+  url: string;
+  key: string;
+  extension: string;
+};
 
-  getDownloadStream(
-    fileData: GetUploadedFileType
-  ): Promise<NodeJS.ReadableStream>;
-  getPresignedDownloadUrl(fileData: GetUploadedFileType): Promise<string>;
+export type FileGetData = {
+  fileKey: string;
+  isPrivate?: boolean;
+  [x: string]: unknown;
+};
+
+export type FileData = {
+  fileKey: string;
+  [x: string]: unknown;
+};
+
+export type FileUploadData = {
+  originalname: string;
+  filename: string;
+  mimeType: string;
+  path: string;
+};
+
+export interface IFileProvider {
+  upload(file: Express.Multer.File): Promise<FileUploadResult>;
+  delete(fileData: FileData): Promise<void>;
+  getDownloadStream(fileData: FileData): Promise<NodeJS.ReadableStream>;
+  getFileDataAsTxt(fileData: FileData): Promise<string>;
 }
 
-export abstract class AbstractFileService
-  extends TransactionBaseService
-  implements IFileService
-{
-  /**
-   * @ignore
-   */
-  static _isFileService = true;
+export interface FileServiceOptions {
+  upload_dir?: string;
+  backend_url?: string;
+}
 
-  /**
-   * @ignore
-   */
+export class AbstractFileService
+  extends TransactionBaseService
+  implements IFileProvider
+{
+  static _isFileService = true;
   static isFileService(object): object is AbstractFileService {
     return object?.constructor?._isFileService;
   }
@@ -44,25 +53,22 @@ export abstract class AbstractFileService
     super(container, config);
   }
 
-  abstract upload(
-    fileData: Express.Multer.File
-  ): Promise<FileServiceUploadResult>;
+  getIdentifier() {
+    return (this.constructor as any).identifier;
+  }
 
-  abstract uploadProtected(
-    fileData: Express.Multer.File
-  ): Promise<FileServiceUploadResult>;
+  async upload(file: Express.Multer.File): Promise<FileUploadResult> {
+    throw Error("upload must be overridden by the child class");
+  }
+  async delete(file: FileData): Promise<void> {
+    throw Error("delete must be overridden by the child class");
+  }
 
-  abstract delete(fileData: DeleteFileType): Promise<void>;
+  async getDownloadStream(fileData: FileData): Promise<NodeJS.ReadableStream> {
+    throw Error("getDownloadStream must be overridden by the child class");
+  }
 
-  abstract getUploadStreamDescriptor(
-    fileData: UploadStreamDescriptorType
-  ): Promise<FileServiceGetUploadStreamResult>;
-
-  abstract getDownloadStream(
-    fileData: GetUploadedFileType
-  ): Promise<NodeJS.ReadableStream>;
-
-  abstract getPresignedDownloadUrl(
-    fileData: GetUploadedFileType
-  ): Promise<string>;
+  async getFileDataAsTxt(fileData: FileData): Promise<string> {
+    throw Error("getFileData must be overridden by the child class");
+  }
 }

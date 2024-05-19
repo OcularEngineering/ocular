@@ -9,7 +9,7 @@ import {
 } from "class-validator";
 import { SearchService } from "../../../../services";
 import { validator } from "@ocular/utils";
-import { AppNameDefinitions } from "@ocular/types";
+import { AppNameDefinitions, DocType } from "@ocular/types";
 import { Type } from "class-transformer";
 
 // TODO: The SearchApproach used currently is hardcoded to be AskRetrieveReadApproach.
@@ -21,6 +21,8 @@ export default async (req, res) => {
     const { q, context } = validated;
     const loggedInUser = req.scope.resolve("loggedInUser");
     const searchApproach = req.scope.resolve("askRetrieveReadApproache");
+    // Add Organization Id And User ID As Required Fields
+    console.log("context", context);
     const results = await searchApproach.run(
       loggedInUser.organisation_id.toLowerCase().substring(4),
       q,
@@ -63,6 +65,10 @@ class SearchContextReq {
   @IsOptional()
   @IsEnum(AppNameDefinitions, { each: true })
   sources?: Set<AppNameDefinitions>;
+
+  @IsOptional()
+  @IsEnum(DocType, { each: true })
+  types?: Set<DocType>;
 
   @IsOptional()
   @ValidateNested()

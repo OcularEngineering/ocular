@@ -9,7 +9,7 @@ import {
 import { useRef, useContext, useEffect } from "react";
 import { useRouter } from "next/router";
 import { ApplicationContext } from "@/context/context";
-import withAuth from '@/components/with-auth';
+// import withAuth from '@/components/with-auth';
 
 export function Search() {
   const router = useRouter();
@@ -88,4 +88,4 @@ export function Search() {
   );
 }
 
-export default withAuth(Search);
+export default Search;

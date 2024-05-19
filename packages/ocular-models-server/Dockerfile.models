@@ -1,0 +1,46 @@
+# Use Ubunt 22.04 as base image
+FROM ubuntu:22.04
+
+# Install Python 3
+# Make sure to not install recommends and to clean the 
+# install to minimize the size of the container as much as possible.
+RUN apt-get update && \
+  apt-get install --no-install-recommends -y python3=3.10.6-1~22.04 && \
+  apt-get install --no-install-recommends -y python3-pip && \
+  apt-get install --no-install-recommends -y python3-venv=3.10.6-1~22.04 && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
+
+
+# Install Node.js
+RUN apt-get update && \
+  apt-get install --no-install-recommends -y nodejs npm && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
+
+
+
+# Set the working directory within the container
+WORKDIR /app
+
+# Download and Install The Hugging Face Models
+# Copy necessary files to the container
+COPY packages/ocular-models-server/requirements.txt .
+COPY packages/ocular-models-server/download_models.py .
+COPY packages/ocular-models-server/server.py .
+
+# Create a virtual environment in the container
+RUN python3 -m venv .venv
+
+# Activate the virtual environment
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Install Python dependencies from the requirements file
+RUN pip install --no-cache-dir -r requirements.txt && \
+  # Get the models from Hugging Face to bake into the container
+  python3 download_models.py
+
+EXPOSE 8000
+
+# Run Node Server For The Models
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--reload"]

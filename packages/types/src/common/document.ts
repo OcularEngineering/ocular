@@ -33,6 +33,7 @@ export type IndexableDocChunk = {
   organisationId: string;
   documentId: string;
   source: AppNameDefinitions;
+  type: DocType;
   title: string;
   titleEmbeddings?: number[] | null;
   content?: string;

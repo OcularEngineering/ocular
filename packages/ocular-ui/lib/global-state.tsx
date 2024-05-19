@@ -133,8 +133,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   // });
 
   const [resultFilterDate, setResultFilterDate] = useState<DateRange | undefined>({
-    from: new Date(2024, 3, 20),
-    to: addDays(new Date(2024, 3, 20), 20),
+    from: undefined,
+    to: undefined,
   })
 
   const [userProfile, setuserProfile] = useState<userProfileInfo | null>(null);

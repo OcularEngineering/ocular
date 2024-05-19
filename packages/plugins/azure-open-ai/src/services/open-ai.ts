@@ -25,6 +25,7 @@ export default class AzureOpenAIService extends AbstractLLMService {
   protected tokenLimit_: number = 4096;
   protected rateLimiterService_: RateLimiterService;
   protected requestQueue_: RateLimiterQueue;
+  protected count_: number;
 
   constructor(container, options) {
     super(arguments[0], options);
@@ -48,6 +49,8 @@ export default class AzureOpenAIService extends AbstractLLMService {
 
     this.openAIKey_ = options.open_ai_key;
 
+    this.count_ = 0;
+
     const commonOptions = {
       apiKey: this.openAIKey_,
       defaultQuery: { "api-version": this.azureOpenAiApiVersion_ },
@@ -69,15 +72,24 @@ export default class AzureOpenAIService extends AbstractLLMService {
 
   async createEmbeddings(text: string): Promise<number[]> {
     try {
-      const tokenCount = this.getChatModelTokenCount(text);
-      await this.requestQueue_.removeTokens(
-        tokenCount,
+      // const tokenCount = this.getChatModelTokenCount(text);
+
+      const remainingCount = await this.requestQueue_.removeTokens(
+        1,
         PluginNameDefinitions.AZUREOPENAI
+      );
+      this.count_++;
+      console.log(
+        "Requests To Open AI",
+        this.count_,
+        "Request Time",
+        new Date()
       );
       const result = await this.embeddingsClient_.embeddings.create({
         input: text,
         model: this.embeddingModel_,
       });
+
       return result.data[0].embedding;
     } catch (error) {
       console.log("Azure Open AI: Error", error);

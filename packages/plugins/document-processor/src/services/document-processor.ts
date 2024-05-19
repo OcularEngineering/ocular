@@ -27,7 +27,8 @@ export default class documentProcessorService extends AbstractDocumentProcesserS
     document: IndexableDocument
   ): Promise<IndexableDocChunk[]> {
     let chunks: IndexableDocChunk[] = [];
-    switch (document.type) {
+    switch (document.type as DocType) {
+      case DocType.PDF:
       case DocType.TEXT:
         chunks = await processTxt(
           document,
@@ -36,10 +37,9 @@ export default class documentProcessorService extends AbstractDocumentProcesserS
         );
         break;
       default:
-        console.log("Document Type Not Supported");
+        console.log("Document Type Not Supported", document.type);
         return [];
     }
-    console.log("Chunks 1", chunks[0]);
     return chunks;
   }
 
