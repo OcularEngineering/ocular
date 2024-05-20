@@ -93,6 +93,8 @@ enum Mimetype {
   PDF = "application/pdf",
   DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   TXT = "text/plain",
+  MD = "text/markdown",
+  CSV = "text/csv",
 }
 
 export class UploadReq {
