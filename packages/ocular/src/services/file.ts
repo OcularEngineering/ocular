@@ -116,7 +116,6 @@ export default class FileService extends AbstractFileService {
         const jsonData = await jsonLoader.load();
         completeText = await docs.map((doc) => doc.pageContent).join(" ");
         break;
-
       default:
         throw new Error(`Failed to File With: ${extension} `);
     }
