@@ -12,6 +12,7 @@ import {
   INDEX_DOCUMENT_EVENT,
   AbstractBatchJobStrategy,
   APPS_INDEXING_TOPIC,
+  Logger,
 } from "@ocular/types";
 
 class GoogleDriveStrategy extends AbstractBatchJobStrategy {

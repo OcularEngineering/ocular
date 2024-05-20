@@ -1,5 +1,9 @@
 import { EntityManager } from "typeorm";
-import { AppNameDefinitions, TransactionBaseService } from "@ocular/types";
+import {
+  AppNameDefinitions,
+  Logger,
+  TransactionBaseService,
+} from "@ocular/types";
 import EventBusService from "./event-bus";
 import { AutoflowContainer } from "@ocular/types";
 import { AutoflowAiError, AutoflowAiErrorTypes } from "@ocular/utils";
@@ -22,6 +26,7 @@ type InjectedDependencies = AutoflowContainer & {
   appService: AppService;
   oauthRepository: typeof OAuthRepository;
   loggedInUser: User;
+  logger: Logger;
 };
 
 class OAuthService extends TransactionBaseService {
@@ -35,6 +40,7 @@ class OAuthService extends TransactionBaseService {
   protected oauthRepository_: typeof OAuthRepository;
   protected eventBus_: EventBusService;
   protected readonly loggedInUser_: User;
+  protected readonly logger_: Logger;
 
   constructor(container: InjectedDependencies) {
     super(container);
@@ -43,6 +49,7 @@ class OAuthService extends TransactionBaseService {
     this.appService_ = container.appService;
     this.eventBus_ = container.eventBusService;
     this.oauthRepository_ = container.oauthRepository;
+    this.logger_ = container.logger;
 
     try {
       this.loggedInUser_ = container.loggedInUser;
@@ -99,6 +106,7 @@ class OAuthService extends TransactionBaseService {
     code: string,
     installationId?: string
   ): Promise<OAuth> {
+    this.logger_.info(`generateToken: Generating Token for App ${name}`);
     // Check If The User Generating the Token Belongs To An Organisation
     if (!this.loggedInUser_ || !this.loggedInUser_.organisation) {
       throw new AutoflowAiError(
@@ -139,7 +147,7 @@ class OAuthService extends TransactionBaseService {
         app_name: app.name,
       });
     }
-
+    this.logger_.info(`generateToken: Done Generating Token for App ${name}`);
     // Create An OAuth For This App And Organisation
     return await this.create({
       type: token.type,

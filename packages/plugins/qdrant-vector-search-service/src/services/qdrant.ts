@@ -8,22 +8,15 @@ import {
   SearchResults,
   SearchChunk,
   AppNameDefinitions,
+  Logger,
 } from "@ocular/types";
 import { QdrantClient, Schemas } from "@qdrant/js-client-rest";
 import { v5 as uuidv5 } from "uuid";
 
-// interface SearchResults {
-//   id: string | number;
-//   version: number;
-//   score: number;
-//   payload?: Record<string, unknown> | { [key: string]: unknown; };
-//   vector?: Record<string, unknown> | number[] | { [key: string]: number[] | { indices: number[]; values: number[]; }; };
-//   shard_key?: number| string | Record<string, unknown>;
-// }
-
 export default class qdrantService extends AbstractVectorDBService {
   protected qdrantClient_: QdrantClient;
   protected embeddingSize_: number;
+  protected logger_: Logger;
   protected UUIDHASH = "1b671a64-40d5-491e-99b0-da01ff1f3341";
 
   constructor(container, options) {
@@ -39,6 +32,7 @@ export default class qdrantService extends AbstractVectorDBService {
     }
     this.embeddingSize_ = embedding_size;
     this.qdrantClient_ = new QdrantClient({ url: quadrant_db_url });
+    this.logger_ = container.logger;
   }
 
   async createIndex(indexName: string) {
@@ -64,10 +58,23 @@ export default class qdrantService extends AbstractVectorDBService {
 
   async addDocuments(indexName: string, docs: IndexableDocChunk[]) {
     try {
-      const points = docs.map(this.translateIndexableDocToQuadrantPoint);
-      await this.qdrantClient_.upsert(indexName, { points });
+      this.logger_.info(`addDocuments: Adding Docs To Quadrant ${docs.length}`);
+      // Split the docs into batches of 100
+      const docBatches = [];
+      for (let i = 0; i < docs.length; i += 100) {
+        docBatches.push(docs.slice(i, i + 100));
+      }
+      // Process each batch
+
+      for (const docBatch of docBatches) {
+        const points = docBatch.map(this.translateIndexableDocToQuadrantPoint);
+        await this.qdrantClient_.upsert(indexName, { points });
+      }
+      this.logger_.info(
+        `addDocuments: Done Adding Docs To Quadrant ${docs.length}`
+      );
     } catch (error) {
-      console.log("QDrant: Error Adding Docs", error);
+      this.logger_.error(`Error Adding Docs To Quadrant ${error.message}`);
     }
   }
 
