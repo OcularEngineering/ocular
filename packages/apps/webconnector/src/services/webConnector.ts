@@ -79,7 +79,7 @@ export default class webConnectorService extends TransactionBaseService {
                 link: page.location,
               },
             ],
-            type: DocType.TEXT,
+            type: DocType.TXT,
             updatedAt: new Date(),
             metadata: {},
           };

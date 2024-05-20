@@ -17,9 +17,11 @@ import {
   ValidateNested,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { validator } from "@ocular/utils";
 
 export default async (req, res) => {
   try {
+    const { files } = await validator(UploadReq, { files: req.files });
     const fileService = req.scope.resolve("fileService");
     const documentMetadataService = req.scope.resolve(
       "documentMetadataService"
@@ -27,11 +29,12 @@ export default async (req, res) => {
     const queueService = req.scope.resolve("queueService");
     const loggedInUser = req.scope.resolve("loggedInUser");
     const manager: EntityManager = req.scope.resolve("manager");
+
     const docMetadatas = await manager.transaction(
       async (transactionManager) => {
         // Upload Files To File Service
-        const files = await Promise.all(
-          req.files.map(async (f) => {
+        const uploaded_files = await Promise.all(
+          files.map(async (f) => {
             return fileService.upload(f).then((result) => {
               fs.unlinkSync(f.path);
               return result;
@@ -40,7 +43,7 @@ export default async (req, res) => {
         );
 
         // Create Indexable Documents For The Uploaded Files
-        const documents: IndexableDocument[] = files.map((file) => {
+        const documents: IndexableDocument[] = uploaded_files.map((file) => {
           return {
             id: file.key,
             organisationId: loggedInUser.organisation_id,
@@ -65,11 +68,14 @@ export default async (req, res) => {
     res.status(200).json({ uploads: docMetadatas });
   } catch (err: any) {
     // Delete Files Uploaded By Multer To Temp Folder Before Returning Error
-    req.files.map((f) => {
-      if (fs.existsSync(f.path)) {
-        fs.unlinkSync(f.path);
-      }
-    });
+    console.error(err);
+    if (Array.isArray(files)) {
+      files.map((f) => {
+        if (fs.existsSync(f.path)) {
+          fs.unlinkSync(f.path);
+        }
+      });
+    }
     return res
       .status(500)
       .send(
@@ -85,12 +91,14 @@ export class IAdminPostUploadsFileReq {
 
 enum Mimetype {
   PDF = "application/pdf",
+  DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  TXT = "text/plain",
 }
 
 export class UploadReq {
   @IsNotEmpty()
   @IsOptional()
-  @ValidateNested()
+  @ValidateNested({ each: true })
   @Type(() => FileDefinition)
   files: FileDefinition[];
 }

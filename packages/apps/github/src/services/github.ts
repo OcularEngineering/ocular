@@ -108,7 +108,7 @@ export default class GitHubService extends TransactionBaseService {
                 content: pr.body,
               },
             ],
-            type: DocType.TEXT,
+            type: DocType.TXT,
             updatedAt: new Date(pr.updated_at),
             metadata: { state: pr.state },
           };
@@ -142,7 +142,7 @@ export default class GitHubService extends TransactionBaseService {
                 content: issue.body,
               },
             ],
-            type: DocType.TEXT,
+            type: DocType.TXT,
             updatedAt: new Date(issue.updated_at),
             metadata: { state: issue.state },
           };
@@ -163,7 +163,7 @@ export default class GitHubService extends TransactionBaseService {
               content: repo.description,
             },
           ],
-          type: DocType.TEXT,
+          type: DocType.TXT,
           source: AppNameDefinitions.GITHUB,
           updatedAt: new Date(repo.updated_at),
           metadata: {},

@@ -76,7 +76,7 @@ export default class AsanaService extends TransactionBaseService {
                 content: task.notes,
               },
             ],
-            type: DocType.TEXT,
+            type: DocType.TXT,
             updatedAt: new Date(task.modified_at),
             metadata: {
               completed: task.completed,

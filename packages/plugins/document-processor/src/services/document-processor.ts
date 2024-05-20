@@ -29,7 +29,7 @@ export default class documentProcessorService extends AbstractDocumentProcesserS
     let chunks: IndexableDocChunk[] = [];
     switch (document.type as DocType) {
       case DocType.PDF:
-      case DocType.TEXT:
+      case DocType.TXT:
         chunks = await processTxt(
           document,
           this.max_chunk_length_,
@@ -37,7 +37,10 @@ export default class documentProcessorService extends AbstractDocumentProcesserS
         );
         break;
       default:
-        console.log("Document Type Not Supported", document.type);
+        console.log(
+          "chunkIndexableDocument:Document Type Not Supported",
+          document.type
+        );
         return [];
     }
     return chunks;

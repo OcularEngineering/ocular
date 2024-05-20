@@ -87,9 +87,11 @@ class SearchIndexingSubscriber {
     this.queueService_.subscribeBatch(
       APPS_INDEXING_TOPIC,
       async (docs: IndexableDocument[], topic) => {
-        this.logger_.info(`Indexing Apps Document ${docs.length}`);
+        this.logger_.info(
+          `buildSearchIndex:Indexing Apps Document ${docs.length}`
+        );
         await this.indexerService_.indexDocuments(this.indexName_, docs);
-        this.logger_.info(`Indexing Apps Document Done`);
+        this.logger_.info(`buildSearchIndex:Indexing Apps Document Done`);
       },
       { groupId: "ocular-apps-group" }
     );

@@ -10,7 +10,7 @@ import {
   DocType,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
-import { RateLimiterQueue } from "rate-limiter-flexible"
+import { RateLimiterQueue } from "rate-limiter-flexible";
 
 interface Config {
   headers: {
@@ -24,7 +24,7 @@ export default class JiraService extends TransactionBaseService {
   protected logger_: Logger;
   protected container_: ConfigModule;
   protected rateLimiterService_: RateLimiterService;
-  protected requestQueue_: RateLimiterQueue
+  protected requestQueue_: RateLimiterQueue;
 
   constructor(container) {
     super(arguments[0]);
@@ -32,7 +32,9 @@ export default class JiraService extends TransactionBaseService {
     this.logger_ = container.logger;
     this.container_ = container;
     this.rateLimiterService_ = container.rateLimiterService;
-    this.requestQueue_ = this.rateLimiterService_.getRequestQueue(AppNameDefinitions.JIRA);
+    this.requestQueue_ = this.rateLimiterService_.getRequestQueue(
+      AppNameDefinitions.JIRA
+    );
   }
 
   async getJiraData(org: Organisation) {
@@ -89,13 +91,13 @@ export default class JiraService extends TransactionBaseService {
                 link: `${url}/browse/${key}`,
               },
             ],
-            type: DocType.TEXT,
+            type: DocType.TXT,
             updatedAt: new Date(updatedAt),
             metadata: {
-              project_id:project.id,
+              project_id: project.id,
               project_name: project.name,
-              project_link:project.link,
-              project_description: project.description
+              project_link: project.link,
+              project_description: project.description,
             },
           };
           documents.push(issueDoc);
@@ -121,7 +123,7 @@ export default class JiraService extends TransactionBaseService {
               }/issues?jql=${encodeURIComponent(jqlQuery)}`,
             },
           ],
-          type: DocType.TEXT,
+          type: DocType.TXT,
           updatedAt: new Date(),
 
           metadata: {},
@@ -202,7 +204,7 @@ export default class JiraService extends TransactionBaseService {
    */
   async fetchJiraProjects(cloudID: string, config: Config) {
     // Block Until Rate Limit Allows Request
-    await this.requestQueue_.removeTokens(1,AppNameDefinitions.JIRA)
+    await this.requestQueue_.removeTokens(1, AppNameDefinitions.JIRA);
     // Ensure the variable names are case-sensitive and consistent.
     const projectEndpoint = `https://api.atlassian.com/ex/jira/${cloudID}/rest/api/3/project/search`;
 
@@ -224,7 +226,7 @@ export default class JiraService extends TransactionBaseService {
         key: project.key,
         name: project.name,
         description: project.description,
-        link: project.self
+        link: project.self,
       }));
 
       return projects;
@@ -250,7 +252,7 @@ export default class JiraService extends TransactionBaseService {
   async fetchProjectIssues(projectID, cloudID, config) {
     try {
       // Block Until Rate Limit Allows Request
-      await this.requestQueue_.removeTokens(1,AppNameDefinitions.JIRA)
+      await this.requestQueue_.removeTokens(1, AppNameDefinitions.JIRA);
       // Construct base URL and issue endpoint
       const baseUrl = `https://api.atlassian.com/ex/jira/${cloudID}`;
       const issueEndpoint = `${baseUrl}/rest/api/3/search?jql=project=${projectID}&maxResults=1000`;
@@ -286,7 +288,7 @@ export default class JiraService extends TransactionBaseService {
   async fetchIssueDetails(issueID: string, cloudID: string, config: Config) {
     try {
       // Block Until Rate Limit Allows Request
-      await this.requestQueue_.removeTokens(1,AppNameDefinitions.JIRA)
+      await this.requestQueue_.removeTokens(1, AppNameDefinitions.JIRA);
       // Construct the issue endpoint URL
       const baseUrl = `https://api.atlassian.com/ex/jira/${cloudID}`;
       const issueEndpoint = `${baseUrl}/rest/api/3/issue/${issueID}`;
@@ -298,7 +300,8 @@ export default class JiraService extends TransactionBaseService {
       const { data } = response;
       const { fields } = data;
 
-      const description = this.extractDescription(fields)+ this.extractComments(fields);
+      const description =
+        this.extractDescription(fields) + this.extractComments(fields);
       const updatedAt = fields.updated;
       const title = fields.summary;
       const key = data.key;
@@ -347,7 +350,7 @@ export default class JiraService extends TransactionBaseService {
   }
 
   extractComments(fields: any) {
-    if(fields.comments) {
+    if (fields.comments) {
       const commentContent = fields.comments.body.content || [];
 
       let commentDescription = "";
@@ -360,10 +363,10 @@ export default class JiraService extends TransactionBaseService {
             }
           });
         }
-      })
+      });
 
       return commentDescription.trim();
-    }else{
+    } else {
       return "";
     }
   }
