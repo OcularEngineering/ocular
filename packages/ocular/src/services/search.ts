@@ -8,6 +8,7 @@ import {
   ISearchApproach,
   SearchResults,
   SearchChunk,
+  IEmbedderInterface,
 } from "@ocular/types";
 import {
   AzureOpenAIOptions,
@@ -18,31 +19,32 @@ import { ConfigModule, Logger } from "../types";
 import { SearchIndexClient } from "@azure/search-documents";
 import { parseBoolean, removeNewlines } from "@ocular/utils";
 import DocumentMetadataService from "./document-metadata";
-import { generateEmbedding } from "../utils";
 
 type InjectedDependencies = {
   searchIndexClient: SearchIndexClient;
   logger: Logger;
   indexName: string;
+  embedderService: IEmbedderInterface;
+  vectorDBService: IVectorDB;
+  documentMetadataService: DocumentMetadataService;
 };
 
 class SearchService extends AbstractSearchService {
   isDefault = false;
-
-  protected readonly openAiService_: ILLMInterface;
   protected readonly config_: ConfigModule;
   protected readonly logger_: Logger;
   protected readonly defaultIndexName_: string;
   protected readonly vectorDBService_: IVectorDB;
   protected readonly documentMetadataService_: DocumentMetadataService;
+  protected readonly embedderService_: IEmbedderInterface;
 
-  constructor(container, config) {
+  constructor(container: InjectedDependencies, config) {
     super(container, config);
     this.logger_ = container.logger;
-    this.openAiService_ = container.openAiService;
     this.vectorDBService_ = container.vectorDBService;
     this.defaultIndexName_ = container.indexName;
     this.documentMetadataService_ = container.documentMetadataService;
+    this.embedderService_ = container.embedderService;
   }
 
   async search(
@@ -53,14 +55,13 @@ class SearchService extends AbstractSearchService {
     indexName = indexName ? indexName : this.defaultIndexName_;
 
     // Compute Embeddings For The Query
-    // const queryVector = await this.openAiService_.createEmbeddings(query!);
-    const queryVector = await generateEmbedding(query!);
+    const queryVector = await this.embedderService_.createEmbeddings([query!]);
     // Search the index for the query vector
     // Add Organisation ID to the context
     const searchResults: SearchResults =
       await this.vectorDBService_.searchDocuments(
         indexName,
-        queryVector,
+        queryVector[0],
         context ? context : {}
       );
 
@@ -82,13 +83,11 @@ class SearchService extends AbstractSearchService {
       searchResults.chat_completion.citations =
         await this.vectorDBService_.searchDocumentChunks(
           indexName,
-          queryVector,
+          queryVector[0],
           context
         );
     }
-
     console.log("Search Results", searchResults);
-
     return searchResults;
   }
 }

@@ -7,29 +7,29 @@ import {
   IndexableDocChunk,
   Logger,
   ISearchService,
+  IEmbedderInterface,
 } from "@ocular/types";
-import { SearchIndexClient, SearchIndex } from "@azure/search-documents";
 import { ConfigModule } from "../types/config-module";
 import { Document, Index } from "typeorm";
 import { DocumentMetadataService, FileService } from "../services";
-import { generateEmbedding } from "../utils";
 
 export default class IndexerService implements IIndexerInterface {
   private config_: ConfigModule;
-  protected readonly logger_: Logger;
   protected readonly documentProcessorService_: IDocumentProcessorInterface;
   protected readonly vectorDBService_: IVectorDB;
   protected readonly documentMetadataService_: DocumentMetadataService;
   protected readonly fileService_: FileService;
-  protected readonly embedder_: any;
+  protected readonly embedderService_: IEmbedderInterface;
+  private logger_: Logger;
 
   constructor(container, config: ConfigModule) {
     this.config_ = config;
-    this.logger_ = container.logger;
     this.documentProcessorService_ = container.documentProcessorService;
     this.vectorDBService_ = container.vectorDBService;
     this.documentMetadataService_ = container.documentMetadataService;
     this.fileService_ = container.fileService;
+    this.embedderService_ = container.embeddingService;
+    this.logger_ = container.logger;
   }
 
   async createIndex(indexName: string) {
@@ -46,11 +46,11 @@ export default class IndexerService implements IIndexerInterface {
     documents: IndexableDocument[]
   ): Promise<void> {
     try {
+      this.logger_.info(
+        `indexDocuments: Indexing Apps Documents ${documents.length} documents in ${indexName}`
+      );
       // Batch CreateOrUpdate DocumentMetadata in Database for the Docs
       // this.documentMetadataService_.batchCreateOrUpdateDocumentMetadata(documents)
-      this.logger_.info(
-        `Indexing ${documents.length} documents to index ${indexName}`
-      );
       // Batch CreateOrUpdate DocumentMetadata in Database for the Docs
       // Create a DocumentMetadata if it does not exist else update the document metadata.
       const createdDocs =
@@ -60,8 +60,10 @@ export default class IndexerService implements IIndexerInterface {
           documents
         );
       const embeddedChunks = await this.embedChunks(chunks);
-      console.log("Embedded Chunks Completed", embeddedChunks);
       await this.vectorDBService_.addDocuments(indexName, embeddedChunks);
+      this.logger_.info(
+        `indexDocuments: Done Indexing Apps Documents ${documents.length} documents in ${indexName}`
+      );
     } catch (error) {
       this.logger_.error(`Error Indexing ${indexName}, error ${error.message}`);
     }
@@ -74,9 +76,8 @@ export default class IndexerService implements IIndexerInterface {
   ): Promise<void> {
     try {
       this.logger_.info(
-        `Indexing Ocular API Documents ${documents.length} documents to index ${indexName}`
+        `Indexing Api Documents ${documents.length} documents in ${indexName}`
       );
-      console.log("Documents", documents.length);
       // Hydrate the api uploaded documents with the data from file service
       await Promise.all(
         documents.map(async (doc) => {
@@ -98,23 +99,44 @@ export default class IndexerService implements IIndexerInterface {
         await this.documentProcessorService_.chunkIndexableDocumentsBatch(
           documents
         );
-      console.log("Chunks", chunks.length);
       const embeddedChunks = await this.embedChunks(chunks);
-      console.log("Embedded Chunks Completed", embeddedChunks.length);
       await this.vectorDBService_.addDocuments(indexName, embeddedChunks);
+      this.logger_.info(
+        ` Done Indexing Api Documents  ${documents.length} documents in ${indexName}`
+      );
     } catch (error) {
       this.logger_.error(`Error Indexing ${indexName}, error ${error.message}`);
     }
   }
 
   private async embedChunks(chunks: IndexableDocChunk[]) {
-    const embeddedChunksPromises = chunks.map(async (chunk) => {
-      if (chunk?.content) {
-        chunk.contentEmbeddings = await generateEmbedding(chunk.content);
+    // Split the chunks into batches of 100
+    const chunkBatches = [];
+    for (let i = 0; i < chunks.length; i += 25) {
+      chunkBatches.push(chunks.slice(i, i + 25));
+    }
+    // Process each batch
+    const embeddedChunksPromises = chunkBatches.map(async (chunkBatch) => {
+      // Filter out chunks without content and get the content for each chunk
+      const chunksWithContent = chunkBatch.filter((chunk) => chunk?.content);
+      const contents = chunksWithContent.map((chunk) => chunk.content);
+
+      // Create embeddings for all contents in the batch
+      const embeddings = await this.embedderService_.createEmbeddings(contents);
+      // Assign the embeddings back to the chunks
+      for (let i = 0; i < chunksWithContent.length; i++) {
+        chunksWithContent[i].contentEmbeddings = embeddings[i];
       }
-      return chunk;
+      // Return the processed batch
+      return chunksWithContent;
     });
-    const embeddedChunks = await Promise.all(embeddedChunksPromises);
+
+    // Wait for all batches to be processed
+    const embeddedChunksBatches = await Promise.all(embeddedChunksPromises);
+
+    // Flatten the batches into a single array
+    const embeddedChunks = [].concat(...embeddedChunksBatches);
+
     return embeddedChunks;
   }
 }

@@ -151,14 +151,14 @@ module.exports = {
         },
       },
     },
-    {
-      resolve: `webConnector`,
-      options: {
-        client_id: "FAKE_ID",
-        client_secret: "FAKE_SECRET",
-        redirect_uri: `${UI_CORS}/dashboard/marketplace/webConnector`,
-      },
-    },
+    // {
+    //   resolve: `webConnector`,
+    //   options: {
+    //     client_id: "FAKE_ID",
+    //     client_secret: "FAKE_SECRET",
+    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/webConnector`,
+    //   },
+    // },
     // {
     //   resolve: `github`,
     //   options: {
@@ -213,7 +213,13 @@ module.exports = {
       resolve: `qdrant-vector-search-service`,
       options: {
         quadrant_db_url: process.env.QDRANT_DB_URL || "http://localhost:6333",
-        embedding_size: 384,
+        embedding_size: 768,
+      },
+    },
+    {
+      resolve: `embedder`,
+      options: {
+        models_server_url: process.env.OCULAR_MODELS_SERVER_URL,
       },
     },
   ],

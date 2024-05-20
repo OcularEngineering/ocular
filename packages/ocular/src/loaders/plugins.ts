@@ -15,6 +15,7 @@ import { promiseAll } from "@ocular/utils";
 import { formatRegistrationName } from "../utils/format-registration-name";
 import { aliasTo, asValue, asFunction, Lifetime } from "awilix";
 import {
+  AbstractEmbedderService,
   AbstractNotificationService,
   AbstractSearchService,
   OauthService,
@@ -297,6 +298,16 @@ export async function registerServices(
             }
           ),
           [`fileService`]: aliasTo(name),
+        });
+      } else if (AbstractEmbedderService.isEmbeddingService(loaded.prototype)) {
+        container.register({
+          [name]: asFunction(
+            (cradle) => new loaded(cradle, pluginDetails.options),
+            {
+              lifetime: loaded.LIFE_TIME || Lifetime.SINGLETON,
+            }
+          ),
+          [`embeddingService`]: aliasTo(name),
         });
       } else {
         container.register({

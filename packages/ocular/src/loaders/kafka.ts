@@ -4,7 +4,7 @@ import FakeRedis from "ioredis-mock";
 import { EOL } from "os";
 import { Logger, AutoflowContainer } from "@ocular/types";
 import { ConfigModule } from "../types/config-module";
-import { Kafka } from "kafkajs";
+import { Kafka, logLevel } from "kafkajs";
 
 type Options = {
   container: AutoflowContainer;
@@ -21,6 +21,7 @@ async function kafkaLoader({
     const kafkaClient = new Kafka({
       clientId: "ocular",
       brokers: [configModule.projectConfig.kafka_url],
+      logLevel: logLevel.ERROR,
     });
 
     try {

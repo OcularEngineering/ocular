@@ -74,6 +74,7 @@ class SearchIndexingSubscriber {
       this.addSearchIndexingJobWebConnector
     );
     this.indexName_ = indexName;
+    this.logger_ = logger;
   }
 
   // Builds The Initial Search Index Based On the Installed Apps
@@ -83,10 +84,12 @@ class SearchIndexingSubscriber {
     await this.indexerService_.createIndex(this.indexName_);
 
     // Step 2: Register Search Index Consumers To Consume Indexable Documents From the SEARCH_INDEX_QUEUE Sent By Apps
-    this.queueService_.subscribe(
+    this.queueService_.subscribeBatch(
       APPS_INDEXING_TOPIC,
-      async (doc: IndexableDocument, topic) => {
-        await this.indexerService_.indexDocuments(this.indexName_, [doc]);
+      async (docs: IndexableDocument[], topic) => {
+        this.logger_.info(`Indexing Apps Document ${docs.length}`);
+        await this.indexerService_.indexDocuments(this.indexName_, docs);
+        this.logger_.info(`Indexing Apps Document Done`);
       },
       { groupId: "ocular-apps-group" }
     );
@@ -94,10 +97,13 @@ class SearchIndexingSubscriber {
     // Step 3: Register Search Index Consumers To Consume Indexable Documents From the SEARCH_INDEX_API Sent By Ocular API
     this.queueService_.subscribe(
       OCULAR_API_INDEXING_TOPIC,
-      async (doc: IndexableDocument, topic) => {
-        await this.indexerService_.indexOcularApiDocuments(this.indexName_, [
-          doc,
-        ]);
+      async (docs: IndexableDocument[], topic) => {
+        this.logger_.info(`Indexing API Document ${docs.length}`);
+        await this.indexerService_.indexOcularApiDocuments(
+          this.indexName_,
+          docs
+        );
+        this.logger_.info(`Indexing API Document Done`);
       },
       { groupId: "ocular-api-group" }
     );
