@@ -65,7 +65,9 @@ export default class IndexerService implements IIndexerInterface {
         `indexDocuments: Done Indexing Apps Documents ${documents.length} documents in ${indexName}`
       );
     } catch (error) {
-      this.logger_.error(`Error Indexing ${indexName}, error ${error.message}`);
+      this.logger_.error(
+        `indexDocuments: Error Indexing ${indexName}, error ${error.message}`
+      );
     }
   }
 
@@ -105,7 +107,9 @@ export default class IndexerService implements IIndexerInterface {
         ` Done Indexing Api Documents  ${documents.length} documents in ${indexName}`
       );
     } catch (error) {
-      this.logger_.error(`Error Indexing ${indexName}, error ${error.message}`);
+      this.logger_.error(
+        `indexOcularApiDocuments: Error Indexing ${indexName}, error ${error.message}`
+      );
     }
   }
 

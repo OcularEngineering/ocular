@@ -72,7 +72,7 @@ export default class NotionService extends TransactionBaseService {
               link: page.url,
             },
           ],
-          type: DocType.TEXT,
+          type: DocType.TXT,
           updatedAt: new Date(page.last_edited_time),
           metadata: {},
         };

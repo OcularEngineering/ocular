@@ -117,7 +117,7 @@ export default class GoogleDriveService extends TransactionBaseService {
                 content: content,
               },
             ],
-            type: DocType.TEXT,
+            type: DocType.TXT,
             metadata: {},
             updatedAt: new Date(file.modifiedTime),
           };

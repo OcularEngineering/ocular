@@ -92,6 +92,9 @@ export default class FileService extends AbstractFileService {
         const docs = await loader.load();
         completeText = await docs.map((doc) => doc.pageContent).join(" ");
         break;
+      case ".txt":
+        completeText = await fsPromise.readFile(filePath, "utf-8");
+        break;
       default:
         throw new Error(`Unsupported file extension: ${extension}`);
     }

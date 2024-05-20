@@ -9,7 +9,7 @@ export interface Section {
 
 export enum DocType {
   PDF = "pdf",
-  TEXT = "text",
+  TXT = "txt",
   DOCX = "docx",
   HTML = "html",
   MD = "md",

@@ -1,7 +1,7 @@
 import fs from "fs";
 import axios from "axios";
 import { Readable } from "stream";
-import { OAuthService, Organisation,RateLimiterService } from "@ocular/ocular";
+import { OAuthService, Organisation, RateLimiterService } from "@ocular/ocular";
 import {
   IndexableDocument,
   TransactionBaseService,
@@ -10,7 +10,7 @@ import {
   DocType,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
-import { RateLimiterQueue } from "rate-limiter-flexible"
+import { RateLimiterQueue } from "rate-limiter-flexible";
 
 interface Config {
   headers: {
@@ -24,7 +24,7 @@ export default class ConfluenceService extends TransactionBaseService {
   protected logger_: Logger;
   protected container_: ConfigModule;
   protected rateLimiterService_: RateLimiterService;
-  protected requestQueue_: RateLimiterQueue
+  protected requestQueue_: RateLimiterQueue;
 
   constructor(container) {
     super(arguments[0]);
@@ -32,7 +32,9 @@ export default class ConfluenceService extends TransactionBaseService {
     this.logger_ = container.logger;
     this.container_ = container;
     this.rateLimiterService_ = container.rateLimiterService;
-    this.requestQueue_ = this.rateLimiterService_.getRequestQueue(AppNameDefinitions.CONFLUENCE);
+    this.requestQueue_ = this.rateLimiterService_.getRequestQueue(
+      AppNameDefinitions.CONFLUENCE
+    );
   }
 
   async getConfluenceData(org: Organisation) {
@@ -95,7 +97,7 @@ export default class ConfluenceService extends TransactionBaseService {
                 link: pageInfo.location,
               },
             ],
-            type: DocType.TEXT,
+            type: DocType.TXT,
             updatedAt: new Date(),
             metadata: {},
           };
@@ -137,7 +139,7 @@ export default class ConfluenceService extends TransactionBaseService {
   async fetchPageContent(pageID: string, cloudID: string, config: Config) {
     try {
       // Block Until Rate Limit Allows Request
-      await this.requestQueue_.removeTokens(1,AppNameDefinitions.CONFLUENCE)
+      await this.requestQueue_.removeTokens(1, AppNameDefinitions.CONFLUENCE);
       const baseUrl = `https://api.atlassian.com/ex/confluence/${cloudID}/wiki/api/v2/pages`;
       const pageContentUrl = `${baseUrl}/${pageID}?body-format=atlas_doc_format`;
 
@@ -206,7 +208,7 @@ export default class ConfluenceService extends TransactionBaseService {
   async fetchConfluencePages(cloudID: string, config: Config) {
     try {
       // Block Until Rate Limit Allows Request
-      await this.requestQueue_.removeTokens(1,AppNameDefinitions.CONFLUENCE)
+      await this.requestQueue_.removeTokens(1, AppNameDefinitions.CONFLUENCE);
       const pagesEndpoint = `https://api.atlassian.com/ex/confluence/${cloudID}/wiki/rest/api/content`;
 
       const pagesResponse = await axios.get(pagesEndpoint, config);

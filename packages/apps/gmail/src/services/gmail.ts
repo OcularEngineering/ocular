@@ -121,7 +121,7 @@ export default class GmailService extends TransactionBaseService {
                     content: emailContent,
                   },
                 ],
-                type: DocType.TEXT,
+                type: DocType.TXT,
                 updatedAt: new Date(parseInt(emailData.internalDate)),
                 metadata: {},
               };
