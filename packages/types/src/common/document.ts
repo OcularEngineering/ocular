@@ -13,6 +13,8 @@ export enum DocType {
   DOCX = "docx",
   HTML = "html",
   MD = "md",
+  JSON = "json",
+  CSV = "csv",
 }
 
 // Document containing infomation from external intergrations to be indexed in the search engine
