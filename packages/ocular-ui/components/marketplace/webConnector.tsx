@@ -180,7 +180,7 @@ export default function WebConnector({ links }: { links: Link[] }) {
                     {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       <div className='flex flex-row gap-3 items-center'>
-                        {cell.column.columnDef.meta?.showImage && (
+                        {cell.column.columnDef.meta && (
                           <img src="/web-connector.svg" alt="Web Connector" />
                         )}
                         {flexRender(
