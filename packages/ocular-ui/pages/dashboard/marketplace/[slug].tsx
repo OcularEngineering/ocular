@@ -47,7 +47,7 @@ function Integration() {
 
     fetchIntegration();
   }, [slug]);
-
+ 
     useEffect(() => {
       const listInstalled = async () => {
         try {

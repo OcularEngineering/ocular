@@ -25,12 +25,13 @@ export default class webConnectorService extends TransactionBaseService {
   protected oauthService_: OAuthService;
   protected logger_: Logger;
   protected container_: ConfigModule;
-  protected organisationService: OrganisationService;
+  protected organisationService_: OrganisationService;
 
   constructor(container) {
     super(arguments[0]);
     this.oauthService_ = container.oauthService;
     this.logger_ = container.logger;
+    this.organisationService_ = container.organisationService;
     this.container_ = container;
   }
 
@@ -97,32 +98,35 @@ export default class webConnectorService extends TransactionBaseService {
 
       await this.oauthService_.update(oauth.id, { last_sync: new Date() });
 
-      const data = {
-        link: base_url,
-        link_id,
-        emit_event: false,
-        status: "success",
-      };
-      await this.organisationService.updateInstalledApp(
-        AppNameDefinitions.WEBCONNECTOR,
-        data
-      );
+      // const data = {
+      //   link: base_url,
+      //   link_id,
+      //   emit_event: false,
+      //   status: "success",
+      // };
+      // await this.organisationService_.updateInstalledApp(
+      //   AppNameDefinitions.WEBCONNECTOR,
+      //   data
+      // );
 
       this.logger_.info(
         `Finished oculation of Web Connector for ${org.id} organisation`
       );
     } catch (error) {
-      console.error("Error fetching web commector content:", error);
-      const data = {
-        link: base_url,
-        link_id,
-        emit_event: false,
-        status: "failed",
-      };
-      await this.organisationService.updateInstalledApp(
-        AppNameDefinitions.WEBCONNECTOR,
-        data
+      console.error(
+        "Error fetching web commector content error from webconnector file:",
+        error
       );
+      // const data = {
+      //   link: base_url,
+      //   link_id,
+      //   emit_event: false,
+      //   status: "failed",
+      // };
+      // await this.organisationService_.updateInstalledApp(
+      //   AppNameDefinitions.WEBCONNECTOR,
+      //   data
+      // );
     }
   }
 
@@ -151,9 +155,9 @@ export default class webConnectorService extends TransactionBaseService {
     const page: Page = await browser.newPage();
     const visited_links: Set<string> = new Set();
     const pageTextArray: Array<{ text: string; location: string }> = [];
-
+    console.log("BASE_URL", base_url);
     if (!this.isValidUrl(base_url)) {
-      this.logger_.info("Invalid URL: " + base_url);
+      this.logger_.error("Invalid URL: " + base_url);
       await browser.close();
       return [];
     }

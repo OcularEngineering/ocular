@@ -30,7 +30,7 @@ class webConnectorStrategy extends AbstractBatchJobStrategy {
       batchJob.context?.link_id as string
     );
     stream.on("data", (documents) => {
-      this.queueService_.sendBatch(INDEX_DOCUMENT_EVENT, documents);
+      this.queueService_.sendBatch(SEARCH_INDEXING_TOPIC, documents);
     });
     stream.on("end", () => {
       console.log("No more data");

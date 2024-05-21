@@ -26,7 +26,6 @@ export default async (req, res) => {
     validated.name,
     data
   );
-
   if (installed_apps) {
     res.status(200).json({ message: "Link saved successfully!" });
   } else {

@@ -143,7 +143,7 @@ class OrganisationService extends TransactionBaseService {
     if (!this.loggedInUser_ || !this.loggedInUser_.organisation) {
       throw new AutoflowAiError(
         AutoflowAiError.Types.NOT_FOUND,
-        `User must belong to an "organisation" so as to get components`
+        `User must belong to an "organisation" so as to get components error from organisation file`
       );
     }
     return await this.organisationRepository_.findOne({
@@ -159,21 +159,20 @@ class OrganisationService extends TransactionBaseService {
       async (transactionManager: EntityManager) => {
         switch (app_name) {
           case AppNameDefinitions.WEBCONNECTOR:
-            const { link_id, link, eventBus_ } = data;
+            const { link_id, link } = data;
             const org = await this.listInstalledApps();
             const installed_apps: any = org.installed_apps;
             const webConnector_index = installed_apps.findIndex(
               (app) => app.name === AppNameDefinitions.WEBCONNECTOR
             );
-
             if (webConnector_index !== -1) {
               if (!installed_apps[webConnector_index].links) {
                 installed_apps[webConnector_index].links = [];
               }
 
-              const linkExist = installed_apps[webConnector_index].links.find(
-                (ele) => ele.id === link_id
-              );
+              const linkExist = installed_apps[
+                webConnector_index
+              ].links.findIndex((ele) => ele.id === link_id);
               if (linkExist !== -1) {
                 installed_apps[webConnector_index].links[linkExist] = {
                   id: link_id,
