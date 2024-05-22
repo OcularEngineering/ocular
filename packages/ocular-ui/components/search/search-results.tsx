@@ -31,7 +31,7 @@ export const AIResults = ({ content, ai_citations }) => {
           </button>
         )}
         <div className={`flex flex-row space-x-5 mt-5 overflow-auto scrollbar-hide transition-all duration-300 ${showResults ? 'opacity-100 max-h-[1000px]' : 'opacity-0 max-h-0'} justify-start items-start w-full`}>
-          {ai_citations && ai_citations.slice(0, 13).map((citation, index) => (
+          {ai_citations && ai_citations.slice(0, 10).map((citation, index) => (
             <div
               className="bg-blue-100/50 dark:bg-muted border flex flex-row rounded-2xl p-4 text-xs sm:text-base w-[200px] flex-none justify-start items-start text-left"
               key={index}

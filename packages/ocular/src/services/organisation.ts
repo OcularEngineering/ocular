@@ -171,7 +171,7 @@ class OrganisationService extends TransactionBaseService {
                 installed_apps[webConnector_index].links = [];
               }
 
-              const linkExist = installed_apps[webConnector_index].links.find(
+              const linkExist = installed_apps[webConnector_index].links.findIndex(
                 (ele) => ele.id === link_id
               );
               if (linkExist !== -1) {
