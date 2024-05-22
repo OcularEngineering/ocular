@@ -14,6 +14,7 @@ import { Type } from "class-transformer";
 
 export default async (req, res) => {
   try {
+    console.log("Search API: Ask Request Received", req.body);
     const { q, context } = await validator(PostAskReq, req.body);
     const searchApproach = req.scope.resolve("askRetrieveReadApproache");
     const loggedInUser = req.scope.resolve("loggedInUser");
