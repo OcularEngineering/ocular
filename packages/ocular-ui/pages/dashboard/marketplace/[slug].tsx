@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import api from "@/services/admin-api";
 import { IconChevronLeft, IconExternalLink } from '@supabase/ui';
 import  WebConnector  from '@/components/marketplace/webConnector';
-import CardWithForm from '@/components/marketplace/temp'; 
 
 interface Link {
   location: string;

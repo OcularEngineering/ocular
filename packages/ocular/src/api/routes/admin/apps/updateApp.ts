@@ -19,7 +19,6 @@ export default async (req, res) => {
   );
 
   let data = {};
-  console.log("ORG_ID", loggedInUser);
   switch (validated.name) {
     case AppNameDefinitions.WEBCONNECTOR:
       data = {
@@ -37,13 +36,12 @@ export default async (req, res) => {
       };
       break;
   }
-  console.log("API REQUEST DATA", data);
   const installed_apps = await organisationService.updateInstalledApp(
     validated.name,
     data
   );
 
-  if (true) {
+  if (installed_apps) {
     res.status(200).json({ message: "Link saved successfully!" });
   } else {
     res.status(500).json({ error: "Internal Server Error" });
