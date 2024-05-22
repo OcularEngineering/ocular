@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Integration } from '@/types/types'
 import { Badge } from "@/components/ui/badge"
+import { formatLabel } from '@/lib/utils';
 
 export default function IntegrationTileGrid({
   integrationsByCategory,
@@ -34,17 +35,12 @@ export default function IntegrationTileGrid({
                           height={80}
                           className=""
                           src={p.logo}
-                          alt={p.name}
+                          alt={formatLabel(p.name)}
                         />
                       </div>
                       <div>
                         <h3 className="text-scale-1100 group-hover:text-scale-1200 font-semibold mb-2 text-lg transition-colors items-center justify-center">
-                          {
-                            p.name
-                              .split('-')
-                              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                              .join(' ')
-                          }
+                            {formatLabel(p.name)}
                         </h3>
                         <p className="text-scale-900 text-sm" style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: '3', overflow: 'hidden' }}>
                           {p.description}

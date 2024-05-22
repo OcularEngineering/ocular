@@ -95,11 +95,15 @@ export default {
       const body = {
         context: {
           top: 20,
-          ai_completion: true,
-          date: date,
+          ai_completion: true
+          // date: date,
         },
         q: q
       };
+      console.log('Date here', date);
+      if (date.from || date.to) {
+        body.context.date = date;
+      }
       if (sources && sources.length > 0) {
         body.context.sources = sources;
       }

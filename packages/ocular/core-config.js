@@ -151,14 +151,14 @@ module.exports = {
         },
       },
     },
-    // {
-    //   resolve: `webConnector`,
-    //   options: {
-    //     client_id: "FAKE_ID",
-    //     client_secret: "FAKE_SECRET",
-    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/webConnector`,
-    //   },
-    // },
+    {
+      resolve: `webConnector`,
+      options: {
+        client_id: "FAKE_ID",
+        client_secret: "FAKE_SECRET",
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/webConnector`,
+      },
+    },
     // {
     //   resolve: `github`,
     //   options: {

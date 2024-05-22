@@ -60,7 +60,7 @@ export function DatePickerWithRange({
                 formatDateFns(resultFilterDate.from, "LLL dd, y")
               )
             ) : (
-              <span>Pick a date</span>
+              <span>Anytime</span>
             )}
             <ChevronDownIcon className={`h-4 ${isSelected ? 'rotate-180' : ''}`} />
           </Button>
