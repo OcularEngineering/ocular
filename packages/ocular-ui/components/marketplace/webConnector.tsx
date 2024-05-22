@@ -1,7 +1,32 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -11,6 +36,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import api from '@/services/admin-api';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -25,6 +51,8 @@ import {
 } from '@tanstack/react-table';
 import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus } from 'lucide-react';
 import * as React from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 export type Link = {
   location: string;
@@ -34,31 +62,24 @@ export type Link = {
 export const columns: ColumnDef<Link>[] = [
   {
     accessorKey: 'location',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Link
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="lowercase">{row.getValue('location')}</div>
-    ),
+    header: 'Link',
+    cell: ({ row }) => <div>{row.getValue('location')}</div>,
   },
   {
     accessorKey: 'status',
     header: 'Status',
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue('status')}</div>
-    ),
+    cell: ({ row }) => <div>{row.getValue('status')}</div>,
   },
 ];
 
+const formSchema = z.object({
+  title: z.string().optional(),
+  description: z.string().optional(),
+  link: z.string().url(),
+});
+
 export default function WebConnector({ links }: { links: Link[] }) {
+  console.log('LINKS', links);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -68,26 +89,33 @@ export default function WebConnector({ links }: { links: Link[] }) {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const [inputValue, setInputValue] = React.useState('');
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: '',
+      description: '',
+      link: '',
+    },
+  });
 
-  const handleInputChange = (event: any) => {
-    setInputValue(event.target.value);
-  };
+  async function formSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values);
+    const { title, description, link } = values;
 
-  const saveLink = async (data: string) => {
-    console.log('Function called with input:', data);
     try {
-      // const resp = await api.apps.saveWebConnectorLink();
-      // console.log('response', resp.data);
       const response = await api.apps.updateApp({
-        link: data as string,
+        metadata: {
+          link,
+          title,
+          description,
+        },
         name: 'webConnector' as string,
       });
       if (response.status === 200) {
         const updatedLinkData: Link[] = [
           ...linkData,
           {
-            location: data,
+            location: link,
             status: 'processing',
           },
         ];
@@ -96,7 +124,7 @@ export default function WebConnector({ links }: { links: Link[] }) {
         const updatedLinkData: Link[] = [
           ...linkData,
           {
-            location: data,
+            location: link,
             status: 'failed',
           },
         ];
@@ -105,7 +133,7 @@ export default function WebConnector({ links }: { links: Link[] }) {
     } catch (error) {
       console.error('Error fetching integrations:', error);
     }
-  };
+  }
 
   const table = useReactTable({
     data: linkData,
@@ -127,24 +155,85 @@ export default function WebConnector({ links }: { links: Link[] }) {
   });
 
   return (
-    <>
-      <div className="w-full p-4">
-        <div className="flex items-center py-4 gap-2">
-          <Input
-            placeholder="Paste the Base URL link..."
-            onChange={handleInputChange}
-            className="max-w-sm"
-          />
-          <Button
-            variant="default"
-            className="h-10"
-            onClick={() => saveLink(inputValue)}
-          >
-            Save
-            <Plus className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
-        <div className="rounded-md border">
+    <div className="flex flex-col h-screen">
+      <div className="flex-1  pt-4 px-4">
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle>Web Connector</CardTitle>
+            <CardDescription>
+              Your Gateway to Efficient Web Data Extraction.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(formSubmit)}
+                className="space-y-8"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mx-auto">
+                  <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Title</FormLabel>
+                        <FormControl>
+                          <Input placeholder="title..." {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          This title will be displayed publically referencing
+                          the base URL
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Input placeholder="description..." {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          This is a short description about the data being
+                          extracted
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="link"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Base URL</FormLabel>
+                        <FormControl>
+                          <Input placeholder="base url..." {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          This is the base URL from where the data will be
+                          extracted and indexed.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" className="my-auto">
+                    Submit
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-4  flex flex-col">
+        <div className="rounded-md border hide-scrollbar flex flex-col">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -164,7 +253,7 @@ export default function WebConnector({ links }: { links: Link[] }) {
                 </TableRow>
               ))}
             </TableHeader>
-            <TableBody>
+            <TableBody className="overflow-y-auto">
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow
@@ -195,6 +284,6 @@ export default function WebConnector({ links }: { links: Link[] }) {
           </Table>
         </div>
       </div>
-    </>
+    </div>
   );
 }

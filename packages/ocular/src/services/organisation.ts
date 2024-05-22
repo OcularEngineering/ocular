@@ -159,7 +159,6 @@ class OrganisationService extends TransactionBaseService {
       async (transactionManager: EntityManager) => {
         switch (app_name) {
           case AppNameDefinitions.WEBCONNECTOR:
-            const { link_id, link, eventBus_ } = data;
             const org = await this.listInstalledApps();
             const installed_apps: any = org.installed_apps;
             const webConnector_index = installed_apps.findIndex(
@@ -171,24 +170,25 @@ class OrganisationService extends TransactionBaseService {
                 installed_apps[webConnector_index].links = [];
               }
 
-              const linkExist = installed_apps[webConnector_index].links.find(
-                (ele) => ele.id === link_id
-              );
+              const linkExist = installed_apps[
+                webConnector_index
+              ].links.findIndex((ele) => ele.id === data.link_id);
               if (linkExist !== -1) {
                 installed_apps[webConnector_index].links[linkExist] = {
-                  id: link_id,
-                  location: link,
+                  ...installed_apps[webConnector_index].links[linkExist],
                   status: data.status,
                 };
               } else {
                 installed_apps[webConnector_index].links.push({
-                  id: link_id,
-                  location: link,
+                  id: data.link_id,
+                  location: data.link,
                   status: data.status,
+                  title: data.title,
+                  description: data.title,
                 });
               }
 
-              await this.update(this.loggedInUser_.organisation_id, {
+              await this.update(data.org_id, {
                 installed_apps,
               });
             }
@@ -196,8 +196,9 @@ class OrganisationService extends TransactionBaseService {
               await this.eventBusService_.emit("webConnectorInstalled", {
                 organisation: this.loggedInUser_.organisation,
                 app_name: AppNameDefinitions.WEBCONNECTOR,
-                link,
-                link_id,
+                link: data.link,
+                link_id: data.link_id,
+                org_id: data.org_id,
               });
             }
 

@@ -139,13 +139,14 @@ class SearchIndexingSubscriber {
   };
 
   addSearchIndexingJobWebConnector = async (data): Promise<void> => {
-    const { organisation, app_name, link, link_id } = data;
+    const { organisation, app_name, link, link_id, org_id } = data;
     const jobProps: BatchJobCreateProps = {
       type: app_name,
       context: {
         org: organisation,
         link: link,
         link_id,
+        org_id,
       },
       // created_by: "system",
       dry_run: false,
