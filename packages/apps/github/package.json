@@ -20,10 +20,10 @@
   "dependencies": {
     "@octokit/app": "^14.0.2",
     "@octokit/auth-app": "^6.0.4",
-    "@octokit/rest": "^20.0.2",
+    "@octokit/rest": "^20.1.1",
     "@ocular/ocular": "*",
     "@ocular/types": "*",
     "@ocular/utils": "*",
-    "octokit": "^3.1.2"
+    "octokit": "^3.2.1"
   }
 }

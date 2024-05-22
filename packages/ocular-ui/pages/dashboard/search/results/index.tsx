@@ -12,6 +12,7 @@ import api from "@/services/api"
 
 export default function Search() {
   const [ai_content, setAiResults] = useState(null);
+  const [ai_citations, setai_citations] = useState(null);
   const [search_results, setSearchResults] = useState(null);
   const [isLoadingResults, setIsLoadingResults] = useState(false);
   const [isLoadingCopilot, setIsLoadingCopilot] = useState(false);
@@ -34,9 +35,10 @@ const selectedDate = useMemo(() => {
     setIsLoadingResults(true); 
     setIsLoadingCopilot(true);
     api.search.search(router.query.q, selectedResultSources, selectedDate)
-      .then(data => {
-        // setAiResults(data.data.message.content);
-        // setIsLoadingCopilot(false);
+      .then(data => { 
+        setAiResults(data.data.chat_completion.content);
+        setai_citations(data.data.chat_completion.citations);
+        setIsLoadingCopilot(false);
         setSearchResults(data.data.hits); 
         setResultSources(data.data.sources); 
         setIsLoadingResults(false); 
@@ -54,7 +56,7 @@ const selectedDate = useMemo(() => {
         <link rel="icon" href="/Ocular-Profile-Logo.png" />
       </Head>
       <Header />
-      <SearchResults search_results={search_results} ai_content={ai_content} isLoadingResults={isLoadingResults} isLoadingCopilot={isLoadingCopilot} resultSources={resultSources} />
+      <SearchResults search_results={search_results} ai_content={ai_content} ai_citations={ai_citations} isLoadingResults={isLoadingResults} isLoadingCopilot={isLoadingCopilot} resultSources={resultSources} />
     </div>
   );
 }

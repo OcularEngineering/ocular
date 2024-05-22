@@ -36,7 +36,7 @@ export default function AppFilterOption({ src, label, value, results }: AppFilte
         </p>
       </div>
       <p className="hidden text-sm text-gray-500 sm:inline-flex">
-        {results ? results : Math.floor(Math.random() * 1000) + 1}
+        3
       </p>
     </div>
   );

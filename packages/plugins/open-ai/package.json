@@ -21,6 +21,6 @@
       "@ocular/types": "*",
       "@ocular/utils": "*",
       "openai": "^4.29.2",
-      "tiktoken": "^1.0.13"
+      "tiktoken": "^1.0.15"
    }
 }

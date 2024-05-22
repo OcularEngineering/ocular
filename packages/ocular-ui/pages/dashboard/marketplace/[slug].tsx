@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import api from "@/services/admin-api";
 import { IconChevronLeft, IconExternalLink } from '@supabase/ui';
 import  WebConnector  from '@/components/marketplace/webConnector';
+import { formatLabel } from '@/lib/utils';
+
 
 interface Link {
   location: string;
@@ -150,7 +152,7 @@ function Integration() {
                   height={56}
                   className="bg-scale-400 size-14"
                 />
-                <h1 className="font-heading sm:text-2xl md:text-3xl">{integration.name}</h1>
+                <h1 className="font-heading sm:text-2xl md:text-3xl">{formatLabel(integration.name)}</h1>
               </div>
             
               {authorized? (
