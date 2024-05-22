@@ -1,9 +1,5 @@
 import { OpenAI } from "openai";
 import OpenAIService from "../services/open-ai";
-import dotenv from "dotenv";
-dotenv.config({ path: "../../ocular/.env.dev" });
-
-console.log(process.env.AZURE_OPEN_AI_KEY); // This should print your key
 
 describe("OpenAIService", () => {
   let service;

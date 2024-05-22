@@ -87,9 +87,10 @@ export default class OpenAIService extends AbstractLLMService {
         max_tokens: 1024,
         n: 1,
       });
-
+      let content = "";
       for await (const chunk of result) {
-        yield chunk.choices[0]?.delta.content ?? "";
+        content += chunk.choices[0]?.delta.content ?? "";
+        yield content;
       }
     } catch (error) {
       console.log("Azure Open AI: Error", error);

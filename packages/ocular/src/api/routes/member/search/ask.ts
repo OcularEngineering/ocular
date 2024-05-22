@@ -14,33 +14,49 @@ import { Type } from "class-transformer";
 
 export default async (req, res) => {
   try {
-    const { q, context } = await validator(PostSearchReq, req.body);
-    const searchService = req.scope.resolve("searchService");
+    const { q, context } = await validator(PostAskReq, req.body);
+    const searchApproach = req.scope.resolve("askRetrieveReadApproache");
     const loggedInUser = req.scope.resolve("loggedInUser");
-    const searchResults = await searchService.searchDocuments(null, q, context);
-    const sources = new Set(
-      searchResults.map(
-        (hit) => hit.documentMetadata?.source as AppNameDefinitions
-      )
-    );
-    return res.status(200).send({ hits: searchResults, sources: [...sources] });
+    if (context && context.stream) {
+      const chunks = await searchApproach.runWithStreaming(
+        q,
+        (context as any) ?? {}
+      );
+      // Stream the Search Results
+      for await (const chunk of chunks) {
+        res.write(JSON.stringify(chunk) + "\n");
+      }
+      res.status(200);
+      res.end();
+    } else {
+      const results = await searchApproach.run(
+        loggedInUser.organisation_id.toLowerCase().substring(4),
+        q,
+        (context as any) ?? {}
+      );
+      return res.status(200).send(results);
+    }
   } catch (_error: unknown) {
     console.log(_error);
-    return res.status(500).send(`Error: Failed to Search .`);
+    return res.status(500).send(`Error: Failed to execute SearchApproach.`);
   }
 };
 
-class PostSearchReq {
+class PostAskReq {
   @IsString()
   q: string;
 
   @IsOptional()
   @ValidateNested()
-  @Type(() => SearchContextReq)
-  context?: SearchContextReq;
+  @Type(() => AskContextReq)
+  context?: AskContextReq;
 }
 
-class SearchContextReq {
+class AskContextReq {
+  @IsOptional()
+  @IsBoolean()
+  suggest_followup_questions?: boolean;
+
   @IsOptional()
   @IsNumber()
   top?: number;
@@ -57,7 +73,12 @@ class SearchContextReq {
   @ValidateNested()
   @Type(() => DateRange)
   date: DateRange;
+
+  @IsOptional()
+  @IsBoolean()
+  stream?: boolean;
 }
+
 class DateRange {
   @IsOptional()
   @IsDateString()
