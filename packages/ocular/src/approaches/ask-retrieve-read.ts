@@ -111,9 +111,64 @@ export default class AskRetrieveThenRead implements ISearchApproach {
   }
 
   async *runWithStreaming(
-    query: string,
+    userQuery: string,
     context?: SearchContext
-  ): AsyncGenerator<SearchResultChunk, void> {
-    throw new Error("Streaming not supported for this approach.");
+  ): AsyncGenerator<SearchResults, void> {
+    if (context?.ai_completion) {
+      context.retrieve_chunks = true;
+    }
+    let searchResults: SearchResults = await this.searchService_.search(
+      null,
+      userQuery,
+      context
+    );
+
+    let message = null;
+    if (context && context.ai_completion) {
+      // Initial System Message
+      // const prompt = context?.prompt_template || SYSTEM_CHAT_TEMPLATE;
+
+      const prompt = SYSTEM_CHAT_TEMPLATE;
+      const tokens = this.openai_.getChatModelTokenCount(prompt);
+      const messageBuilder = new MessageBuilder(prompt, tokens);
+
+      // Use Top 3 Sources To Generate AI Completion.
+      // TODO: Use More Sophisticated Logic To Select Sources.
+      const sources = searchResults.chat_completion.citations
+        .map((c) => c.content)
+        .join("");
+      const userContent = `${userQuery}\nSources:\n${sources}`;
+
+      const roleTokens: number = this.openai_.getChatModelTokenCount("user");
+      const messageTokens: number =
+        this.openai_.getChatModelTokenCount(userContent);
+      messageBuilder.appendMessage(
+        "user",
+        userContent,
+        1,
+        roleTokens + messageTokens
+      );
+
+      // Add shots/samples. This helps model to mimic response and make sure they match rules laid out in system message.
+      // messageBuilder.appendMessage('assistant', QUESTION);
+      // messageBuilder.appendMessage('user', ANSWER)
+      const messages = messageBuilder.messages;
+      const chatCompletion = await this.openai_.completeChat(messages);
+      // Add Sources To The Search Results
+
+      for await (const chunk of chatCompletion) {
+        searchResults.chat_completion.content = chunk;
+
+        yield searchResults;
+      }
+      searchResults.chat_completion.content = chatCompletion;
+    }
+
+    // const sources = new Set(
+    //   searchResults.hits.map(
+    //     (hit) => hit.documentMetadata?.source as AppNameDefinitions
+    //   )
+    // );
+    // searchResults.sources = [...sources];
   }
 }

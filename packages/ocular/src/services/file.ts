@@ -11,6 +11,9 @@ import path from "path";
 import fs from "fs";
 import * as fsPromise from "fs/promises";
 import { parse } from "path";
+import mammoth from "mammoth";
+import { CSVLoader } from "langchain/document_loaders/fs/csv";
+import { JSONLoader } from "langchain/document_loaders/fs/json";
 
 export default class FileService extends AbstractFileService {
   static identifier = "localfs";
@@ -95,8 +98,26 @@ export default class FileService extends AbstractFileService {
       case ".txt":
         completeText = await fsPromise.readFile(filePath, "utf-8");
         break;
+      case ".docx":
+        const result = await mammoth.extractRawText({ path: filePath });
+        completeText = result.value;
+        break;
+      case ".md":
+        completeText = await fsPromise.readFile(filePath, "utf-8");
+        break;
+      case ".csv":
+        const csvLoader = new CSVLoader(filePath);
+        const csvData = await csvLoader.load();
+        completeText = await csvData.map((doc) => doc.pageContent).join(" ");
+        console.log("CSV Data", completeText);
+        break;
+      case ".json":
+        const jsonLoader = new JSONLoader(filePath);
+        const jsonData = await jsonLoader.load();
+        completeText = await docs.map((doc) => doc.pageContent).join(" ");
+        break;
       default:
-        throw new Error(`Unsupported file extension: ${extension}`);
+        throw new Error(`Failed to File With: ${extension} `);
     }
     return completeText;
   }

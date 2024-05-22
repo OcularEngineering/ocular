@@ -112,6 +112,30 @@ export default class AzureOpenAIService extends AbstractLLMService {
     }
   }
 
+  completeChatWithStreaming(
+    messages: Message[]
+  ): AsyncGenerator<string, any, unknown> {
+    const generator = async function* (messages: Message[]) {
+      try {
+        const result = await this.chatClient_.chat.completions.create({
+          stream: true,
+          model: this.chatModel_,
+          messages,
+          temperature: 0.3,
+          max_tokens: 1024,
+          n: 1,
+        });
+
+        for await (const chunk of result) {
+          yield chunk.choices[0]?.delta.content ?? "";
+        }
+      } catch (error) {
+        console.log("Azure Open AI: Error", error);
+      }
+    };
+    return generator(messages);
+  }
+
   getChatModelTokenCount(content: string): number {
     const encoder = encoding_for_model(this.chatModel_ as TiktokenModel);
     let tokens = 2;

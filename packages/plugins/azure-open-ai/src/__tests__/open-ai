@@ -1,49 +1,80 @@
-import { OpenAI } from 'openai';
-import OpenAIService from '../services/open-ai';
-describe('OpenAIService', () => {
+import { OpenAI } from "openai";
+import OpenAIService from "../services/open-ai";
+import dotenv from "dotenv";
+dotenv.config({ path: "../../ocular/.env.dev" });
+
+console.log(process.env.AZURE_OPEN_AI_KEY); // This should print your key
+
+describe("OpenAIService", () => {
   let service;
-
   beforeEach(() => {
-    service = new OpenAIService({}, {
-      open_ai_version: "2023-05-15",
-      endpoint: process.env.AZURE_OPEN_AI_ENDPOINT,
-      embedding_deployment_name: process.env.AZURE_OPEN_AI_EMBEDDER_DEPLOYMENT_NAME,
-      embedding_model: process.env.AZURE_OPEN_AI_EMBEDDING_MODEL,
-      open_ai_key: process.env.AZURE_OPEN_AI_KEY,
-      chat_deployment: process.env.AZURE_OPEN_AI_CHAT_DEPLOYMENT_NAME,
-      chat_model: process.env.AZURE_OPEN_AI_CHAT_MODEL
-    });
+    service = new OpenAIService(
+      {
+        rateLimiterService: {
+          getRequestQueue: jest.fn(),
+        },
+      },
+      {
+        open_ai_version: "2023-05-15",
+        endpoint: process.env.AZURE_OPEN_AI_ENDPOINT,
+        embedding_deployment_name:
+          process.env.AZURE_OPEN_AI_EMBEDDER_DEPLOYMENT_NAME,
+        embedding_model: process.env.AZURE_OPEN_AI_EMBEDDING_MODEL,
+        open_ai_key: process.env.AZURE_OPEN_AI_KEY,
+        chat_deployment: process.env.AZURE_OPEN_AI_CHAT_DEPLOYMENT_NAME,
+        chat_model: process.env.AZURE_OPEN_AI_CHAT_MODEL,
+      }
+    );
   });
-
-  // it('should create embeddings', async () => {
-  //   const doc = { content: 't' };
+  // it("should create embeddings", async () => {
+  //   const doc = { content: "t" };
   //   const embeddings = await service.createEmbeddings(doc);
   //   expect(embeddings).toEqual([1, 2, 3]);
   //   expect(OpenAI).toHaveBeenCalledWith({
-  //     apiKey: 'test-key',
-  //     defaultQuery: { 'api-version': 'test-version' },
-  //     defaultHeaders: { 'api-key': 'test-key' },
-  //     baseURL: 'test-endpoint/openai/deployments/test-deployment'
+  //     apiKey: "test-key",
+  //     defaultQuery: { "api-version": "test-version" },
+  //     defaultHeaders: { "api-key": "test-key" },
+  //     baseURL: "test-endpoint/openai/deployments/test-deployment",
   //   });
   //   expect(service.openai_.embeddings.create).toHaveBeenCalledWith({
-  //     input: 'test content',
-  //     model: 'test-model'
+  //     input: "test content",
+  //     model: "test-model",
   //   });
   // });
 
-  // it('should return empty array if doc content is not provided', async () => {
+  // it("should return empty array if doc content is not provided", async () => {
   //   const doc = {};
   //   const embeddings = await service.createEmbeddings(doc);
   //   expect(embeddings).toEqual([]);
   // });
 
-  it('should complete chat', async () => {
+  it("should complete chat", async () => {
     const messages = [
-      {role: 'system', content: 'You are a helpful assistant.'},
-      {role: 'user', content: 'Translate the following English text to French: "Hello, how are you?"'}
+      { role: "system", content: "You are a helpful assistant." },
+      {
+        role: "user",
+        content:
+          'Translate the following English text to French: "Hello, how are you?"',
+      },
     ];
     const result = await service.completeChat(messages);
-    expect(result).toEqual( "\"Bonjour, comment vas-tu ?\"");
+    expect(result).toEqual('"Bonjour, comment vas-tu ?"');
   });
 
+  // it("should complete chat with stream", async () => {
+  //   const messages = [
+  //     { role: "system", content: "You are a helpful assistant." },
+  //     {
+  //       role: "user",
+  //       content:
+  //         'Translate the following English text to French: "Hello, how are you?"',
+  //     },
+  //   ];
+  //   const stream = service.completeChatWithStream(messages);
+  //   stream.on("data", (data) => {
+  //     console.log(data);
+  //     expect("result").toEqual('"Bonjour, comment vas-tu ?"');
+  //   });
+  //   expect("result").toEqual('"Bonjour, comment vas-tu ?"');
+  // });
 });

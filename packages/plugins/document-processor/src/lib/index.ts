@@ -1,1 +1,1 @@
-export * from './txt';
+export * from "./txt";

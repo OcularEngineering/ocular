@@ -6,6 +6,7 @@ import {
   DocType,
 } from "@ocular/types";
 import { processTxt } from "../lib/txt";
+import { processMarkdown } from "../lib/md";
 export default class documentProcessorService extends AbstractDocumentProcesserService {
   static identifier = "document-processor";
 
@@ -30,7 +31,17 @@ export default class documentProcessorService extends AbstractDocumentProcesserS
     switch (document.type as DocType) {
       case DocType.PDF:
       case DocType.TXT:
+      case DocType.DOCX:
+      case DocType.JSON:
+      case DocType.CSV:
         chunks = await processTxt(
+          document,
+          this.max_chunk_length_,
+          this.chunk_over_lap_
+        );
+        break;
+      case DocType.MD:
+        chunks = await processMarkdown(
           document,
           this.max_chunk_length_,
           this.chunk_over_lap_
