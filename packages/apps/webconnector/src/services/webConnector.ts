@@ -25,27 +25,32 @@ export default class webConnectorService extends TransactionBaseService {
   protected oauthService_: OAuthService;
   protected logger_: Logger;
   protected container_: ConfigModule;
-  protected organisationService: OrganisationService;
+  protected organisationService_: OrganisationService;
 
   constructor(container) {
     super(arguments[0]);
     this.oauthService_ = container.oauthService;
     this.logger_ = container.logger;
+    this.organisationService_ = container.organisationService;
     this.container_ = container;
   }
 
   async getWebConnectorData(
     org: Organisation,
     base_url: string,
-    link_id: string
+    link_id: string,
+    org_id: string
   ) {
-    return Readable.from(this.crawlWebConnectorData(org, base_url, link_id));
+    return Readable.from(
+      this.crawlWebConnectorData(org, base_url, link_id, org_id)
+    );
   }
 
   async *crawlWebConnectorData(
     org: Organisation,
     base_url: string,
-    link_id: string
+    link_id: string,
+    org_id: string
   ): AsyncGenerator<IndexableDocument[]> {
     this.logger_.info(
       `Starting oculation of webConnector for ${org.id} organisation`
@@ -65,6 +70,7 @@ export default class webConnectorService extends TransactionBaseService {
 
     try {
       const pageArray = await this.crawl(base_url);
+      console.log(pageArray);
       let documents: IndexableDocument[] = [];
       for (const page of pageArray) {
         if (page.text) {
@@ -97,32 +103,32 @@ export default class webConnectorService extends TransactionBaseService {
 
       await this.oauthService_.update(oauth.id, { last_sync: new Date() });
 
-      const data = {
-        link: base_url,
-        link_id,
-        emit_event: false,
-        status: "success",
-      };
-      await this.organisationService.updateInstalledApp(
-        AppNameDefinitions.WEBCONNECTOR,
-        data
-      );
+      // const data = {
+      //   link_id,
+      //   emit_event: false,
+      //   status: "success",
+      //   org_id,
+      // };
+      // await this.organisationService_.updateInstalledApp(
+      //   AppNameDefinitions.WEBCONNECTOR,
+      //   data
+      // );
 
       this.logger_.info(
         `Finished oculation of Web Connector for ${org.id} organisation`
       );
     } catch (error) {
       console.error("Error fetching web commector content:", error);
-      const data = {
-        link: base_url,
-        link_id,
-        emit_event: false,
-        status: "failed",
-      };
-      await this.organisationService.updateInstalledApp(
-        AppNameDefinitions.WEBCONNECTOR,
-        data
-      );
+      // const data = {
+      //   link_id,
+      //   emit_event: false,
+      //   status: "failed",
+      //   org_id,
+      // };
+      // await this.organisationService_.updateInstalledApp(
+      //   AppNameDefinitions.WEBCONNECTOR,
+      //   data
+      // );
     }
   }
 
@@ -145,7 +151,7 @@ export default class webConnectorService extends TransactionBaseService {
     base_url: string
   ): Promise<Array<{ text: string; location: string }>> {
     const browser: Browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
     });
 
     const page: Page = await browser.newPage();
@@ -153,7 +159,7 @@ export default class webConnectorService extends TransactionBaseService {
     const pageTextArray: Array<{ text: string; location: string }> = [];
 
     if (!this.isValidUrl(base_url)) {
-      this.logger_.info("Invalid URL: " + base_url);
+      this.logger_.error("Invalid URL: " + base_url);
       await browser.close();
       return [];
     }
