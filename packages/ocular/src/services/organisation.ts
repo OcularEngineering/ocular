@@ -201,7 +201,6 @@ class OrganisationService extends TransactionBaseService {
                 org_id: data.org_id,
               });
             }
-
             return installed_apps[webConnector_index].links;
 
           default:

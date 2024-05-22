@@ -79,7 +79,6 @@ const formSchema = z.object({
 });
 
 export default function WebConnector({ links }: { links: Link[] }) {
-  console.log('LINKS', links);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []

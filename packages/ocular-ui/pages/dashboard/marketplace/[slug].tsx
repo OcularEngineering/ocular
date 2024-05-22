@@ -15,6 +15,7 @@ import { IconChevronLeft, IconExternalLink } from '@supabase/ui';
 import  WebConnector  from '@/components/marketplace/webConnector';
 import { formatLabel } from '@/lib/utils';
 
+
 interface Link {
   location: string;
   status: 'processing' | 'success' | 'failed';
