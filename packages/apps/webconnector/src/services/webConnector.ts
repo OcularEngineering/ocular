@@ -151,7 +151,7 @@ export default class webConnectorService extends TransactionBaseService {
     base_url: string
   ): Promise<Array<{ text: string; location: string }>> {
     const browser: Browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
     });
 
     const page: Page = await browser.newPage();
