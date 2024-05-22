@@ -9,9 +9,9 @@ export function SearchResultSkeleton() {
             <div className={`space-y-5 w-[743px]`}>
                 <Skeleton className={`relative overflow-hidden dark:bg-muted bg-gray-200 h-5 rounded-xl`}/>
                 <div className={`space-y-2`}>
-                    <Skeleton className={`relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-2 w-4/5`}/>
-                    <Skeleton className={`relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-2 w-3/5`}/>
-                    <Skeleton className={`relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-2 w-2/5`}/>
+                    <Skeleton className={`relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-4 w-4/5`}/>
+                    <Skeleton className={`relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-4 w-3/5`}/>
+                    <Skeleton className={`relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-4 w-2/5`}/>
                 </div>
                 <div className="flex flex-row gap-3">
                     <Skeleton className={`relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-3 w-[100px]`}/>
@@ -27,7 +27,6 @@ export function SearchResultsSkeleton() {
             <SearchResultSkeleton />
             <SearchResultSkeleton />
             <SearchResultSkeleton />
-            <SearchResultSkeleton />
         </div>
     )
 }
@@ -35,23 +34,30 @@ export function SearchResultsSkeleton() {
 export function SearchCopilotSkeleton() {
     return (
         <div
-            className={`flex flex-col rounded-3xl px-6 py-4 space-y-5 max-w-4xl`}
+            className="flex flex-col rounded-3xl py-4 max-w-6xl space-y-3 justify-start items-start"
         >   
-            <div className='flex flex-row'>
+            <div className='flex flex-row mb-5'>
                 <div className="flex items-center space-x-2">
                     <Skeleton className={`relative overflow-hidden bg-gray-200 dark:bg-muted size-[50px] h-5 w-[80px] rounded-lg`}/>
                     <Skeleton className={`relative overflow-hidden bg-gray-200 dark:bg-muted size-[50px] h-5 w-[80px] rounded-lg`}/>
                 </div>
             </div>
             <div className={`space-y-3 w-full`}>
-                <Skeleton className={`relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-3 w-4/5`}/>
-                <Skeleton className={`relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-3 w-3/5`}/>
-                <Skeleton className={`relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-3 w-2/5`}/>
+                <Skeleton className={`relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-5 w-4/5`}/>
+                <Skeleton className={`relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-5 w-3/5`}/>
+                <Skeleton className={`relative overflow-hidden bg-gray-200 dark:bg-muted rounded-xl h-5 w-2/5`}/>
             </div>
+            <Skeleton className={`relative overflow-hidden bg-gray-200 dark:bg-muted size-[50px] h-8 w-[80px] rounded-2xl`}/>
+            <div className="flex flex-row">
+                <div className="flex items-center space-x-5">
+                    <Skeleton className={`relative overflow-hidden bg-gray-200 dark:bg-muted size-[50px] h-[80px] w-[200px] rounded-2xl`}/>
+                    <Skeleton className={`relative overflow-hidden bg-gray-200 dark:bg-muted size-[50px] h-[80px] w-[200px] rounded-2xl`}/>
+                </div>
+            </div>
+
         </div>
     )
 }
-
 
 export function SearchByAppFilterSkeleton() {
     return (

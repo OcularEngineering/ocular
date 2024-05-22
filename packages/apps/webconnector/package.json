@@ -22,6 +22,6 @@
     "@ocular/ocular": "*",
     "@ocular/types": "*",
     "@ocular/utils": "*",
-    "puppeteer": "^22.8.0"
+    "puppeteer": "^22.9.0"
   }
 }
