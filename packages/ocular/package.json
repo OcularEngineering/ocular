@@ -60,6 +60,7 @@
     "pdf-parse": "^1.1.1",
     "puppeteer": "^19.7.2",
     "rate-limiter-flexible": "^5.0.3",
+    "scrypt-kdf": "^2.0.1",
     "typeorm": "^0.3.20",
     "uuid": "^9.0.1"
   }
