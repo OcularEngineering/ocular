@@ -77,6 +77,9 @@ module.exports = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
+      flexGrow: {
+        '3': '3',
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
