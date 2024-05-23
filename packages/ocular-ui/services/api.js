@@ -1,4 +1,5 @@
 import ocularRequest from './request';
+import ocularStreamingRequest from './streaming-request';
 
 export default {
   apps: {
@@ -90,11 +91,29 @@ export default {
     },
   },
   search: {
+    ask(q, sources, date,stream=false) {
+      const path = `/ask`;
+      const body = {
+        context: {
+          top: 5,
+          stream:stream
+        },
+        q: q
+      };
+      if (date.from || date.to) {
+        body.context.date = date;
+      }
+      if (sources && sources.length > 0) {
+        body.context.sources = sources;
+      }
+      return ocularStreamingRequest("POST", path, body,stream);
+    },
     search(q, sources, date) {
       const path = `/search`;
       const body = {
         context: {
           top: 20,
+          // date: date,
           ai_completion: true
         },
         q: q
