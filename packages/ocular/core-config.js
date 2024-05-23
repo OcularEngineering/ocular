@@ -180,35 +180,35 @@ module.exports = {
         chunk_over_lap: 0,
       },
     },
-    // {
-    //   resolve: PluginNameDefinitions.AZUREOPENAI,
-    //   options: {
-    //     open_ai_key: process.env.AZURE_OPEN_AI_KEY,
-    //     open_ai_version: "2023-05-15",
-    //     endpoint: process.env.AZURE_OPEN_AI_ENDPOINT,
-    //     embedding_deployment_name:
-    //       process.env.AZURE_OPEN_AI_EMBEDDER_DEPLOYMENT_NAME,
-    //     embedding_model: process.env.AZURE_OPEN_AI_EMBEDDING_MODEL,
-    //     chat_deployment_name: process.env.AZURE_OPEN_AI_CHAT_DEPLOYMENT_NAME,
-    //     chat_model: process.env.AZURE_OPEN_AI_CHAT_MODEL,
-    //     rate_limiter_opts: {
-    //       requests: 1, // Number of Tokens
-    //       interval: 1, // Interval in Seconds
-    //     },
-    //   },
-    // },
     {
-      resolve: PluginNameDefinitions.OPENAI,
+      resolve: PluginNameDefinitions.AZUREOPENAI,
       options: {
-        open_ai_key: process.env.OPEN_AI_KEY,
-        embedding_model: process.env.OPEN_AI_EMBEDDING_MODEL,
-        chat_model: process.env.OPEN_AI_CHAT_MODEL,
+        open_ai_key: process.env.AZURE_OPEN_AI_KEY,
+        open_ai_version: "2023-05-15",
+        endpoint: process.env.AZURE_OPEN_AI_ENDPOINT,
+        embedding_deployment_name:
+          process.env.AZURE_OPEN_AI_EMBEDDER_DEPLOYMENT_NAME,
+        embedding_model: process.env.AZURE_OPEN_AI_EMBEDDING_MODEL,
+        chat_deployment_name: process.env.AZURE_OPEN_AI_CHAT_DEPLOYMENT_NAME,
+        chat_model: process.env.AZURE_OPEN_AI_CHAT_MODEL,
         rate_limiter_opts: {
-          requests: 1000000, // Number of Tokens
-          interval: 60, // Interval in Seconds
+          requests: 1, // Number of Tokens
+          interval: 1, // Interval in Seconds
         },
       },
     },
+    // {
+    //   resolve: PluginNameDefinitions.OPENAI,
+    //   options: {
+    //     open_ai_key: process.env.OPEN_AI_KEY,
+    //     embedding_model: process.env.OPEN_AI_EMBEDDING_MODEL,
+    //     chat_model: process.env.OPEN_AI_CHAT_MODEL,
+    //     rate_limiter_opts: {
+    //       requests: 1000000, // Number of Tokens
+    //       interval: 60, // Interval in Seconds
+    //     },
+    //   },
+    // },
     {
       resolve: `qdrant-vector-search-service`,
       options: {

@@ -1,7 +1,5 @@
 // Ocular uses Axios on all its services to make HTTP requests. However Axios does support client streaming in the
-//browser so we created this stream api as a workaround.
-
-// The streaming api is a simple wrapper around the fetch api that allows you to make streaming requests to the server.
+// browser so we created this stream api as a workaround. The streaming api is a simple wrapper around the fetch api that allows you to make streaming requests to the server.
 export const OCULAR_BACKEND_URL =
   process.env.OCULAR_BACKEND_URL || 'http://localhost:9000/v1';
 
