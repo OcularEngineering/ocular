@@ -96,7 +96,6 @@ export default {
         context: {
           top: 20,
           ai_completion: true
-          // date: date,
         },
         q: q
       };
