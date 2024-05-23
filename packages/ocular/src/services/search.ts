@@ -9,6 +9,7 @@ import {
   SearchResults,
   SearchChunk,
   IEmbedderInterface,
+  SearchDocument,
 } from "@ocular/types";
 import {
   AzureOpenAIOptions,
@@ -47,11 +48,11 @@ class SearchService extends AbstractSearchService {
     this.embedderService_ = container.embedderService;
   }
 
-  async search(
+  async searchDocuments(
     indexName?: string,
     query?: string,
     context?: SearchContext
-  ): Promise<SearchResults> {
+  ): Promise<SearchDocument[]> {
     indexName = indexName ? indexName : this.defaultIndexName_;
 
     // Compute Embeddings For The Query
@@ -72,23 +73,32 @@ class SearchService extends AbstractSearchService {
     const docMetadata = await this.documentMetadataService_.list(docIds);
 
     // Join The Document Metadata With The Search Results
-    searchResults.hits = searchResults.hits.map((hit) => {
+    const hits = searchResults.hits.map((hit) => {
       const metadata = docMetadata.find((doc) => doc.id === hit.documentId);
       return { ...hit, documentMetadata: { ...metadata } };
     });
+    return hits;
+  }
 
-    // Retrieve Chunks Top Indipendent Chunks Irrespective of the Document
-    if (context.retrieve_chunks) {
-      searchResults.chat_completion = {};
-      searchResults.chat_completion.citations =
-        await this.vectorDBService_.searchDocumentChunks(
-          indexName,
-          queryVector[0],
-          context
-        );
-    }
-    console.log("Search Results", searchResults);
-    return searchResults;
+  async searchChunks(
+    indexName?: string,
+    query?: string,
+    context?: SearchContext
+  ): Promise<SearchChunk[]> {
+    indexName = indexName ? indexName : this.defaultIndexName_;
+
+    // Compute Embeddings For The Query
+    const queryVector = await this.embedderService_.createEmbeddings([query!]);
+
+    // Search the index for the query vector
+    const chunks: SearchChunk[] =
+      await this.vectorDBService_.searchDocumentChunks(
+        indexName,
+        queryVector[0],
+        context
+      );
+
+    return chunks;
   }
 }
 

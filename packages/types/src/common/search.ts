@@ -46,7 +46,7 @@ export interface SearchResults {
     content?: string;
     citations?: SearchChunk[];
   };
-  hits: SearchDocument[];
+  hits?: SearchDocument[];
   sources?: AppNameDefinitions[];
 }
 

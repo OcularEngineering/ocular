@@ -12,26 +12,21 @@ import { validator } from "@ocular/utils";
 import { AppNameDefinitions, DocType } from "@ocular/types";
 import { Type } from "class-transformer";
 
-// TODO: The SearchApproach used currently is hardcoded to be AskRetrieveReadApproach.
-// Improve to dynamically resolve the SearchApproaches based on the approach enum.
 export default async (req, res) => {
   try {
-    console.log("PostSearchReq", req.body);
-    const validated = await validator(PostSearchReq, req.body);
-    const { q, context } = validated;
+    const { q, context } = await validator(PostSearchReq, req.body);
+    const searchService = req.scope.resolve("searchService");
     const loggedInUser = req.scope.resolve("loggedInUser");
-    const searchApproach = req.scope.resolve("askRetrieveReadApproache");
-    // Add Organization Id And User ID As Required Fields
-    console.log("context", context);
-    const results = await searchApproach.run(
-      loggedInUser.organisation_id.toLowerCase().substring(4),
-      q,
-      (context as any) ?? {}
+    const searchResults = await searchService.searchDocuments(null, q, context);
+    const sources = new Set(
+      searchResults.map(
+        (hit) => hit.documentMetadata?.source as AppNameDefinitions
+      )
     );
-    return res.status(200).send(results);
+    return res.status(200).send({ hits: searchResults, sources: [...sources] });
   } catch (_error: unknown) {
     console.log(_error);
-    return res.status(500).send(`Error: Failed to execute SearchApproach.`);
+    return res.status(500).send(`Error: Failed to Search .`);
   }
 };
 
@@ -46,18 +41,6 @@ class PostSearchReq {
 }
 
 class SearchContextReq {
-  @IsOptional()
-  @IsBoolean()
-  ai_completion?: boolean;
-
-  @IsOptional()
-  @IsString()
-  prompt_template?: string;
-
-  @IsOptional()
-  @IsBoolean()
-  suggest_followup_questions?: boolean;
-
   @IsOptional()
   @IsNumber()
   top?: number;

@@ -23,7 +23,7 @@ export interface ISearchApproach {
   runWithStreaming(
     query: string,
     context?: SearchContext
-  ): AsyncGenerator<SearchResultChunk, void>;
+  ): AsyncGenerator<SearchResults, void>;
 }
 
 export interface IChatApproach {

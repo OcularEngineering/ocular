@@ -169,7 +169,8 @@ export default class ChatReadRetrieveRead implements IChatApproach {
     // STEP 2: Retrieve relevant documents from the search index with the GPT optimized query
     // -----------------------------------------------------------------------
 
-    let hits = await this.searchService_.search(null, queryText, context);
+    // let hits = await this.searchService_.search(null, queryText, context);
+    let hits: SearchResults = { hits: [] };
 
     // hits = hits.filter((doc) => doc !== null);
     // hits

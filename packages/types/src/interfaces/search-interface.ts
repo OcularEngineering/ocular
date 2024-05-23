@@ -1,15 +1,22 @@
 import {
   IndexableDocChunk,
   Message,
+  SearchChunk,
   SearchContext,
+  SearchDocument,
   SearchResults,
 } from "../common";
 export interface ISearchService {
-  search(
+  searchDocuments(
     indexName: string,
     query: string,
     context?: SearchContext
-  ): Promise<SearchResults>;
+  ): Promise<SearchDocument[]>;
+  searchChunks(
+    indexName: string,
+    query: string,
+    context?: SearchContext
+  ): Promise<SearchChunk[]>;
 }
 
 export abstract class AbstractSearchService implements ISearchService {
@@ -29,9 +36,14 @@ export abstract class AbstractSearchService implements ISearchService {
   protected constructor(container, options) {
     this.options_ = options;
   }
-  abstract search(
+  abstract searchDocuments(
     indexName: string,
     query: string,
     context?: SearchContext
-  ): Promise<SearchResults>;
+  ): Promise<SearchDocument[]>;
+  abstract searchChunks(
+    indexName: string,
+    query: string,
+    context?: SearchContext
+  ): Promise<SearchChunk[]>;
 }
