@@ -49,13 +49,13 @@ const selectedDate = useMemo(() => {
     const stream = true;
     api.search.ask(router.query.q, selectedResultSources, selectedDate, stream)
     .then(async response => {
+      setIsLoadingCopilot(false);
       if(stream){
         const reader = createReader(response.body);
         const chunks = readStream(reader);
         for await (const chunk of chunks) {
           setAiResults(chunk.chat_completion.content);
           setai_citations(chunk.chat_completion.citations);
-          setIsLoadingCopilot(false);
         }
       } else {
         setAiResults(response.data.chat_completion.content);

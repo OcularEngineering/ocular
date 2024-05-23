@@ -40,7 +40,7 @@ export async function* readStream<T>(reader: any): AsyncGenerator<T, void> {
     yield new Promise<T>((resolve) => {
       setTimeout(() => {
         resolve(value as T);
-      }, 1000);
+      }, 50);
     });
   }
 }
