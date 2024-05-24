@@ -11,9 +11,11 @@ import { SearchService } from "../../../../services";
 import { validator } from "@ocular/utils";
 import { AppNameDefinitions, DocType } from "@ocular/types";
 import { Type } from "class-transformer";
+import { track } from "ocular-telemetry";
 
 export default async (req, res) => {
   try {
+    track("ASK_API_REQUEST");
     console.log("Search API: Ask Request Received", req.body);
     const { q, context } = await validator(PostAskReq, req.body);
     const searchApproach = req.scope.resolve("askRetrieveReadApproache");
