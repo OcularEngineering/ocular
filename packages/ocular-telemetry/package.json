@@ -1,0 +1,39 @@
+{
+  "name": "ocular-telemetry",
+  "version": "1.0.0",
+  "description": "Telemetry for Ocular",
+  "main": "dist/index.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=16"
+  },
+  "author": "Louis Murerwa",
+  "devDependencies": {
+    "@babel/node": "^7.23.9",
+    "@babel/preset-env": "^7.24.5",
+    "@babel/preset-typescript": "^7.24.1",
+    "cross-env": "^7.0.3",
+    "nodemon": "^3.1.0"
+  },
+  "scripts": {
+    "start": "nodemon --watch plugins/ --watch src/ --exec babel-node src/index.js",
+    "prepare": "cross-env NODE_ENV=production npm run build",
+    "watch": "babel -w src --out-dir dist/ --extensions \".ts,.js\" --ignore '**/__tests__','**/__mocks__'",
+    "build": "babel src -d dist --extensions \".ts,.js\" --ignore '**/__tests__','**/__mocks__'",
+    "serve": "node dist/index.js",
+    "postinstall": "node dist/postinstall.js || true",
+    "test": "jest --passWithNoTests src"
+  },
+  "dependencies": {
+    "@babel/cli": "^7.24.5",
+    "axios": "^0.21.4",
+    "axios-retry": "^3.1.9",
+    "boxen": "^5.0.1",
+    "ci-info": "^3.2.0",
+    "configstore": "5.0.1",
+    "global": "^4.4.0",
+    "is-docker": "^2.2.1",
+    "remove-trailing-slash": "^0.1.1",
+    "uuid": "^8.3.2"
+  }
+}

@@ -26,6 +26,7 @@ import {
   AbstractFileService,
 } from "@ocular/types";
 import { AbstractVectorDBService } from "@ocular/types";
+import { trackInstallation } from "ocular-telemetry";
 
 type Options = {
   rootDirectory: string;
@@ -96,6 +97,7 @@ function getResolvedPlugins(
     }
 
     const details = resolvePlugin(plugin.resolve);
+    trackInstallation(details.name, "plugin");
     details.options = plugin.options;
 
     return details;
