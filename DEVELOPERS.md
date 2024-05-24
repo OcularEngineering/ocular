@@ -128,7 +128,7 @@ Follow these steps to get the web UI up and running for your Dockerized Postgres
 Use the command below to start your Docker container:
 
 ```bash
-   docker compose -f docker-compose.dev.yml up
+docker compose -f docker-compose.dev.yml up
 ```
 
 ## 2. Access the Web UI
