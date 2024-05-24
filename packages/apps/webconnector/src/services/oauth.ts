@@ -28,14 +28,13 @@ class webConnectorOauth extends OauthService {
 
     return {
       name: AppNameDefinitions.WEBCONNECTOR,
-      logo: "/asana.svg",
-      description:
-        "WebConnector",
+      logo: "/web-connecter.svg",
+      description: "WebConnector",
       oauth_url: "",
       slug: AppNameDefinitions.WEBCONNECTOR,
       category: AppCategoryDefinitions.SOTWARE_DEVELOPMENT,
       developer: "Ocular AI",
-      images: ["/asana.svg"],
+      images: ["/web-connector.svg"],
       overview: "WebConnector",
       docs: "https://developer.atlassian.com/",
       website: "https://www.atlassian.com/software/confluence",
