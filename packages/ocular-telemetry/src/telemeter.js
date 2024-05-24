@@ -26,7 +26,7 @@ class Telemeter {
     this.queueCount_ = this.store_.getQueueCount()
 
     this.featureFlags_ = new Set()
-    this.modules_ = new Set()
+    this.apps_ = []
     this.plugins_ = []
   }
 
@@ -103,21 +103,19 @@ class Telemeter {
   }
 
   enqueue_(type, data) {
-
     const event = {
-      id: `te_${uuidv4()}`,
-      type,
-      properties: data,
+      event:type,
+      distinct_id: this.getMachineId(),
+      properties:{
+        ...data,
+        machine_id: this.getMachineId(),
+        os_info: this.getOsInfo(),
+        ocular_version: this.getOcularVersion(),
+        apps: this.apps_,
+        plugins: this.plugins_,
+      },
       timestamp: new Date(),
-      machine_id: this.getMachineId(),
-      os_info: this.getOsInfo(),
-      ocular_version: this.getOcularVersion(),
-      feature_flags: Array.from(this.featureFlags_),
-      modules: Array.from(this.modules_),
-      plugins: this.plugins_,
     }
-
-    console.log("event", event)
     this.store_.addEvent(event)
 
     this.queueCount_ += 1
@@ -139,15 +137,10 @@ class Telemeter {
     }
   }
 
-  trackFeatureFlag(flag) {
-    if (flag) {
-      this.featureFlags_.add(flag)
-    }
-  }
 
-  trackModule(module) {
-    if (module) {
-      this.modules_.add(module)
+  trackApp(app) {
+    if (app) {
+      this.apps_.push(app)
     }
   }
 

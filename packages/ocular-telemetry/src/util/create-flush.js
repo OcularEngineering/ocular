@@ -13,10 +13,9 @@ function createFlush(enabled) {
     if (isTruthy(OCULAR_TELEMETRY_VERBOSE)) {
       console.log("Flushing queue...")
     }
-
     const forked = fork(join(__dirname, `send.js`), {
       detached: true,
-      stdio: OCULAR_TELEMETRY_VERBOSE ? `inherit` : `ignore`,
+      stdio: "inherit",
       execArgv: [],
     })
     forked.unref()

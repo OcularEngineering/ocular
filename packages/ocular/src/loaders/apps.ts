@@ -13,6 +13,7 @@ import { formatRegistrationName } from "../utils/format-registration-name";
 import { asValue, asFunction, Lifetime } from "awilix";
 import { OauthService } from "@ocular/types";
 import { pathByOS } from "@ocular/utils";
+import { trackInstallation } from "ocular-telemetry";
 
 import { AppService } from "../services";
 import { error } from "console";
@@ -82,6 +83,7 @@ function getResolvedApps(
     }
 
     const details = resolveApp(app.resolve);
+    trackInstallation(details.name, "app");
     details.options = app.options;
     return details;
   });

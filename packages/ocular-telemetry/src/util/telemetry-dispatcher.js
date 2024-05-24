@@ -7,15 +7,14 @@ import Store from "../store"
 import isTruthy from "./is-truthy"
 
 const OCULAR_TELEMETRY_VERBOSE = process.env.OCULAR_TELEMETRY_VERBOSE || false
-
 class TelemetryDispatcher {
   constructor(options) {
     this.store_ = new Store()
 
     this.host = removeSlash(
-      options.host || "https://telemetry.ocular.com"
+      options.host || "https://us.i.posthog.com/batch/"
     )
-    this.path = removeSlash(options.path || "/batch")
+    this.public_key = options.public_key || "phc_fExEtFcrzPBqQ17LW0UbP4umSAnRHpPfOVIScJKvj0B"
 
     let axiosInstance = options.axiosInstance
     if (!axiosInstance) {
@@ -62,19 +61,22 @@ class TelemetryDispatcher {
       }
 
       const data = {
+        api_key: this.public_key,
         batch: events,
         timestamp: new Date(),
-      }
+      };
 
       const req = {
-        headers: {},
+        headers: {
+          'Content-Type': 'application/json'
+        },
       }
 
       return await this.axiosInstance
-        .post(`${this.host}${this.path}`, data, req)
+        .post(`${this.host}`, data, req)
         .then(() => {
           if (isTruthy(OCULAR_TELEMETRY_VERBOSE)) {
-            console.log("POSTing batch succeeded")
+            console.log("Posting batch succeeded")
           }
           return true
         })

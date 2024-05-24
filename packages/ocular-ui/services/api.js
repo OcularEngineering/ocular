@@ -106,6 +106,7 @@ export default {
       if (sources && sources.length > 0) {
         body.context.sources = sources;
       }
+      console.log("Calling Ask AI")
       return ocularStreamingRequest("POST", path, body,stream);
     },
     search(q, sources, date) {
