@@ -11,8 +11,10 @@ import { SearchService } from "../../../../services";
 import { validator } from "@ocular/utils";
 import { AppNameDefinitions, DocType } from "@ocular/types";
 import { Type } from "class-transformer";
+import { track } from "ocular-telemetry";
 
 export default async (req, res) => {
+  track("SEARCH_API_REQUEST");
   try {
     const { q, context } = await validator(PostSearchReq, req.body);
     const searchService = req.scope.resolve("searchService");
