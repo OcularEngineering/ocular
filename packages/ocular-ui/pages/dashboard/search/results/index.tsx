@@ -22,57 +22,64 @@ export default function Search() {
   const { selectedResultSources, resultFilterDate, setResultSources, resultSources } = useContext(ApplicationContext)
 
   // Serialize the date to JSON format when logging
-const selectedDate = useMemo(() => {
-  return resultFilterDate ? {
-    "from": resultFilterDate.from?.toISOString(),
-    "to": resultFilterDate.to?.toISOString()
-  } : {
-    "from": null,
-    "to": null
-  };
-}, [resultFilterDate]);
+  const selectedDate = useMemo(() => {
+    return resultFilterDate ? {
+      "from": resultFilterDate.from?.toISOString(),
+      "to": resultFilterDate.to?.toISOString()
+    } : {
+      "from": null,
+      "to": null
+    };
+  }, [resultFilterDate]);
+
+  const query = router.query.q;
 
   useEffect(() => {
-    setIsLoadingResults(true); 
-    setIsLoadingCopilot(true);
-    // Search
-    api.search.search(router.query.q, selectedResultSources, selectedDate)
-      .then(data => { 
-        setSearchResults(data.data.hits); 
-        setResultSources(data.data.sources); 
-        setIsLoadingResults(false); 
-      })
-      .catch(error => {
-        setIsLoadingResults(false);
-      });
-    // Copilot
-    const stream = true;
-    api.search.ask(router.query.q, selectedResultSources, selectedDate, stream)
-    .then(async response => {
-      setIsLoadingCopilot(false);
-      if(stream){
-        const reader = createReader(response.body);
-        const chunks = readStream(reader);
-        for await (const chunk of chunks) {
-          setAiResults(chunk.chat_completion.content);
-          setai_citations(chunk.chat_completion.citations);
-        }
-      } else {
-        setAiResults(response.data.chat_completion.content);
-        setai_citations(response.data.chat_completion.citations);
-        setIsLoadingCopilot(false);
-      }
-    })
-    .catch(error => {
-      console.error(error);
-      setIsLoadingCopilot(false);
-    });
-  }, [router.query.q, selectedResultSources, setResultSources, selectedDate]); 
+    if (query && selectedResultSources && selectedDate) {
+      setIsLoadingResults(true);
+      setIsLoadingCopilot(true);
+
+      // Search
+      api.search.search(query, selectedResultSources, selectedDate)
+        .then(data => {
+          setSearchResults(data.data.hits);
+          setResultSources(data.data.sources);
+          setIsLoadingResults(false);
+        })
+        .catch(error => {
+          setIsLoadingResults(false);
+        });
+
+      // Copilot
+      const stream = true;
+      api.search.ask(query, selectedResultSources, selectedDate, stream)
+        .then(async response => {
+          setIsLoadingCopilot(false);
+
+          if (stream) {
+            const reader = createReader(response.body);
+            const chunks = readStream(reader);
+            for await (const chunk of chunks) {
+              setAiResults(chunk.chat_completion.content);
+              setai_citations(chunk.chat_completion.citations);
+            }
+          } else {
+            setAiResults(response.data.chat_completion.content);
+            setai_citations(response.data.chat_completion.citations);
+            setIsLoadingCopilot(false);
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          setIsLoadingCopilot(false);
+        });
+    }
+  }, [query, selectedResultSources, selectedDate]);
 
   return (
     <div className="dark:bg-background w-full bg-white text-black ">
       <Head>
-        <title>{router.query.q} - Ocular</title>
+        <title>{query} - Ocular</title>
         <link rel="icon" href="/Ocular-Profile-Logo.png" />
       </Head>
       <Header />
