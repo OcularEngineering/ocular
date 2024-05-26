@@ -30,10 +30,9 @@ type InjectedDependencies = AutoflowContainer & {
   logger: Logger;
 };
 
-class OAuthService extends TransactionBaseService {
+class APIAuthService extends TransactionBaseService {
   static Events = {
-    TOKEN_GENERATED: "oauth.token_generated",
-    TOKEN_REFRESHED: "oauth.token_refreshed",
+    TOKEN_GENERATED: "APIauth.token_generated",
   };
 
   protected container_: InjectedDependencies;
@@ -69,7 +68,7 @@ class OAuthService extends TransactionBaseService {
         app_name: retrieveConfig.app_name,
       },
     });
-    return oauth as OAuth;
+    return oauth;
   }
 
   // List Apps Owned BY The Logged In User
@@ -154,14 +153,14 @@ class OAuthService extends TransactionBaseService {
       type: token.type,
       token: token.token,
       token_expires_at: token.token_expires_at,
-      auth_strategy: token.auth_strategy,
+      auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
       refresh_token: token.refresh_token,
       refresh_token_expires_at: token.refresh_token_expires_at,
       organisation: this.loggedInUser_.organisation,
       app_name: app.name,
       metadata: token.metadata,
     }).then(async (result) => {
-      await this.eventBus_.emit(OAuthService.Events.TOKEN_GENERATED, {
+      await this.eventBus_.emit(APIAuthService.Events.TOKEN_GENERATED, {
         organisation: this.loggedInUser_.organisation,
         app_name: app.name,
       });
@@ -208,8 +207,8 @@ class OAuthService extends TransactionBaseService {
       oauth.metadata = metadata;
     }
 
-    return (await repo.save(oauth)) as OAuth;
+    return await repo.save(oauth);
   }
 }
 
-export default OAuthService;
+export default APIAuthService;
