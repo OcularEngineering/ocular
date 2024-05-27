@@ -39,7 +39,7 @@ const selectedDate = useMemo(() => {
     api.search.search(router.query.q, selectedResultSources, selectedDate)
       .then(data => { 
         setSearchResults(data.data.hits); 
-        setResultSources(data.data.sources); 
+        // setResultSources(data.data.sources); 
         setIsLoadingResults(false); 
       })
       .catch(error => {
@@ -67,7 +67,8 @@ const selectedDate = useMemo(() => {
       console.error(error);
       setIsLoadingCopilot(false);
     });
-  }, [router.query.q, selectedResultSources, setResultSources, selectedDate]); 
+  }, [router.query.q, setResultSources, selectedDate]);
+  // selectedResultSources,
 
   return (
     <div className="dark:bg-background w-full bg-white text-black ">
