@@ -6,10 +6,8 @@ export async function GetSession() {
         const response = await api.auth.loggedInUserDetails();
 
         if (response.data.user) {
-            console.log("User is Logged In");
             return true;
         } else {
-            console.log("User is not Logged In");
             return false;
         }
     } catch (error) {
