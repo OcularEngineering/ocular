@@ -1,6 +1,7 @@
 import { GetSession } from "./auth";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState, useContext } from "react";
 import { useRouter } from 'next/router';
+import { ApplicationContext } from "@/context/context"
 
 type PrivateRouteProps = {
     children: ReactNode;
@@ -10,11 +11,19 @@ const PrivateRoute = ({ children }: PrivateRouteProps) => {
     const router = useRouter() 
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
+    const { profile, setProfile } = useContext(ApplicationContext);
 
     useEffect(() => {
         const checkAuthentication = async () => {
-            const authenticated = await GetSession();
-            setIsAuthenticated(authenticated);
+
+            const profile = await GetSession();
+
+            if (profile) {
+
+                setIsAuthenticated(true);
+                setProfile(profile);
+
+            }
             setLoading(false);
         };
 
@@ -22,7 +31,9 @@ const PrivateRoute = ({ children }: PrivateRouteProps) => {
     }, []);
 
     if (loading) {
-        return <div>Loading...</div>;
+
+        return <div>Loading...</div>; // Need an actual loading spinner here   
+
     }
 
     if (isAuthenticated) {

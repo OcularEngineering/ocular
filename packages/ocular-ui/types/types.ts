@@ -75,12 +75,13 @@ export interface Integration {
 // User Profile
 export interface Profile {
   id: string
-  first_name: string
-  last_name: string
-  email: string
-  avatar: string
-  role: string
   created_at: string
   updated_at: string
+  role: string
+  email: string
+  first_name: string
+  last_name: string
   organisation_id: string
+  avatar?: string
+  metadata?: any
 }

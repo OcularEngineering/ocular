@@ -35,7 +35,7 @@ export default function Search() {
   const query = router.query.q;
 
   useEffect(() => {
-    if (query && selectedResultSources && selectedDate) {
+    console.log("Sending Search Sources")
       setIsLoadingResults(true);
       setIsLoadingCopilot(true);
 
@@ -54,6 +54,7 @@ export default function Search() {
       const stream = true;
       api.search.ask(query, selectedResultSources, selectedDate, stream)
         .then(async response => {
+          console.log("Streaming Copilot 1")
           setIsLoadingCopilot(false);
 
           if (stream) {
@@ -73,7 +74,7 @@ export default function Search() {
           console.error(error);
           setIsLoadingCopilot(false);
         });
-    }
+      
   }, [query, selectedResultSources, selectedDate]);
 
   return (
