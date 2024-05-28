@@ -164,7 +164,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   }, [])
 
   const fetchStartingChatData = async () => {
-    const user = await (await api.auth.loggedInUserDetails()).data.user
+    // const user = await (await api.auth.loggedInUserDetails()).data.user
 
     // if (user) {
     //   const user = session.user

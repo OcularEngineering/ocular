@@ -79,10 +79,10 @@ export default function Search() {
 
   return (
     <div className="dark:bg-background w-full bg-white text-black ">
-      <Head>
+      {/* <Head>
         <title>{query} - Ocular</title>
         <link rel="icon" href="/Ocular-Profile-Logo.png" />
-      </Head>
+      </Head> */}
       <Header />
       <SearchResults search_results={search_results} ai_content={ai_content} ai_citations={ai_citations} isLoadingResults={isLoadingResults} isLoadingCopilot={isLoadingCopilot} resultSources={resultSources} />
     </div>

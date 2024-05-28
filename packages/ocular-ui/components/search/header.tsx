@@ -19,7 +19,7 @@ export default function Header() {
     setSearchInput(e.target.value);
   }
 
-  console.log("Checking 456")
+  console.log("123")
 
   return (
     <header className={`bg-background sticky flex flex-col justify-center items-center top-0 dark:text-white shadow-sm dark:border-b z-1000`}>
