@@ -18,6 +18,8 @@ import DashboardLayout from '@/components/dashboard-layout';
 import AuthLayout from '@/components/auth-layout';
 import ChatLayout from '@/components/chat-layout';
 
+import PrivateRoute from "@/lib/private-route";
+
 function MyApp({ Component, pageProps }: AppProps) {
 
   const router = useRouter();
@@ -43,7 +45,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     if (router.pathname.startsWith('/dashboard')) {
 
       // eslint-disable-next-line react/display-name
-      return (page: ReactNode) => <DashboardLayout>{page}</DashboardLayout>;
+      return (page: ReactNode) => <DashboardLayout><PrivateRoute>{page}</PrivateRoute></DashboardLayout>;
       
     } else if ((router.pathname.startsWith('/sign-in')) || (router.pathname.startsWith('/create-account')) || (router.pathname.startsWith('/invite'))) {
 
