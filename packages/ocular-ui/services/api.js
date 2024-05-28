@@ -114,11 +114,9 @@ export default {
       const body = {
         context: {
           top: 20,
-          // date: date,
         },
         q: q
       };
-      console.log('Date here', date);
       if (date.from || date.to) {
         body.context.date = date;
       }
