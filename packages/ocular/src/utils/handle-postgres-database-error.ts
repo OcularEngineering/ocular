@@ -1,4 +1,4 @@
-import { EOL } from "os"
+import { EOL } from "os";
 
 export const DatabaseErrorCode = {
   databaseDoesNotExist: "3D000",
@@ -6,13 +6,14 @@ export const DatabaseErrorCode = {
   wrongCredentials: "28000",
   notFound: "ENOTFOUND",
   migrationMissing: "42P01",
-}
+};
 
 export function handlePostgresDatabaseError(err: any): never {
+  console.log(err);
   if (DatabaseErrorCode.databaseDoesNotExist === err.code) {
     throw new Error(
       `The specified PostgreSQL database does not exist. Please create it and try again.${EOL}${err.message}`
-    )
+    );
   }
 
   if (DatabaseErrorCode.connectionFailure === err.code) {
@@ -24,26 +25,26 @@ export function handlePostgresDatabaseError(err: any): never {
       "postgres://[username]:[password]@[host]:[post]/[db_name]" - If there is no password, you can omit it from the connection string
       ${EOL}
       ${err.message}`
-    )
+    );
   }
 
   if (DatabaseErrorCode.wrongCredentials === err.code) {
     throw new Error(
       `The specified credentials does not exists for the specified PostgreSQL database.${EOL}${err.message}`
-    )
+    );
   }
 
   if (DatabaseErrorCode.notFound === err.code) {
     throw new Error(
       `The specified connection string for your PostgreSQL database might have illegal characters. Please check that it only contains allowed characters [a-zA-Z0-9]${EOL}${err.message}`
-    )
+    );
   }
 
   if (DatabaseErrorCode.migrationMissing === err.code) {
     throw new Error(
       `Migrations missing. Please run 'npm typeorm:migrate' and try again.`
-    )
+    );
   }
 
-  throw err
+  throw err;
 }
