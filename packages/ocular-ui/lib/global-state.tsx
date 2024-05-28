@@ -5,6 +5,7 @@
 import { ApplicationContext } from "@/context/context"
 import  api  from "@/services/api"
 import { DateRange } from "react-day-picker";
+import { Profile } from "@/types/types";
 
 import {
   Chat,
@@ -31,7 +32,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const router = useRouter()
 
   // PROFILE STORE
-  // const [profile, setProfile] = useState<Tables<"profiles"> | null>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
 
   // ITEMS STORE
   // const [assistants, setAssistants] = useState<Tables<"assistants">[]>([])
@@ -220,6 +221,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         // setAssistants,
         // collections,
         // setCollections,
+        profile,
+        setProfile,
         chats,
         setChats,
         selectedResultSources,

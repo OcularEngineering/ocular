@@ -6,8 +6,11 @@ export async function GetSession() {
         const response = await api.auth.loggedInUserDetails();
 
         if (response.data.user) {
-            return true;
+
+            return response.data.user;
+
         } else {
+
             return false;
         }
     } catch (error) {

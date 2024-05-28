@@ -45,7 +45,12 @@ function MyApp({ Component, pageProps }: AppProps) {
     if (router.pathname.startsWith('/dashboard')) {
 
       // eslint-disable-next-line react/display-name
-      return (page: ReactNode) => <DashboardLayout><PrivateRoute>{page}</PrivateRoute></DashboardLayout>;
+      return (page: ReactNode) => 
+        <DashboardLayout>
+          <PrivateRoute>
+            {page}
+          </PrivateRoute>
+        </DashboardLayout>;
       
     } else if ((router.pathname.startsWith('/sign-in')) || (router.pathname.startsWith('/create-account')) || (router.pathname.startsWith('/invite'))) {
 
