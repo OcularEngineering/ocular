@@ -5,10 +5,6 @@ import { ApplicationContext } from "@/context/context";
 import { DatePickerWithRange } from "@/components/date-picker";
 import { AppsFacetedFilter } from "./apps-faceted-filter";
 import { formatLabel } from '@/lib/utils';
-
-import {
-  CollectionIcon
-} from "@heroicons/react/outline";
 import { LayoutGrid } from 'lucide-react';
 
 export default function HeaderFilterToolbar() {
@@ -19,6 +15,8 @@ export default function HeaderFilterToolbar() {
     value: source,
     icon: `/${source}.svg`,
   }));
+
+
 
   return (
      <div className="flex flex-row gap-3">

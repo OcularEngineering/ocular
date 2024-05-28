@@ -5,7 +5,6 @@
 import { ApplicationContext } from "@/context/context"
 import  api  from "@/services/api"
 import { DateRange } from "react-day-picker";
-import { addDays, format as formatDateFns } from "date-fns"
 
 import {
   Chat,

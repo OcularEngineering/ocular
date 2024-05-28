@@ -19,6 +19,8 @@ export default function Header() {
     setSearchInput(e.target.value);
   }
 
+  console.log("Checking 456")
+
   return (
     <header className={`bg-background sticky flex flex-col justify-center items-center top-0 dark:text-white shadow-sm dark:border-b z-1000`}>
       <div className="w-full max-w-7xl mx-auto px-6 pt-5">

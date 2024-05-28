@@ -1,17 +1,16 @@
-import * as React from "react"
+import * as React from "react";
 import { useState, useContext } from 'react';
-import { CalendarIcon } from "@radix-ui/react-icons"
-import { format as formatDateFns } from "date-fns"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+import { CalendarIcon } from "@radix-ui/react-icons";
+import { format as formatDateFns } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import { ApplicationContext } from "@/context/context";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-
+} from "@/components/ui/popover";
 import {
   ChevronDownIcon,
 } from "@heroicons/react/outline";
@@ -23,16 +22,9 @@ export function DatePickerWithRange({
   const { resultFilterDate, setResultFilterDate } = useContext(ApplicationContext);
   const [isSelected, setIsSelected] = useState(false);
 
-  // Serialize the date to JSON format when logging
-  const logDate = resultFilterDate ? {
-    "date": {
-      "from": resultFilterDate.from?.toISOString(),
-      "to": resultFilterDate.to?.toISOString()
-    }
-  } : {
-    "date": {
-      "from": null,
-      "to": null
+  const handleSelect = (date) => {
+    if (date?.from !== resultFilterDate?.from || date?.to !== resultFilterDate?.to) {
+      setResultFilterDate(date);
     }
   };
 
@@ -71,11 +63,11 @@ export function DatePickerWithRange({
             mode="range"
             defaultMonth={resultFilterDate?.from}
             selected={resultFilterDate}
-            onSelect={setResultFilterDate}
+            onSelect={handleSelect}
             numberOfMonths={2}
           />
         </PopoverContent>
       </Popover>
     </div>
-  )
+  );
 }
