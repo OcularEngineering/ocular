@@ -38,7 +38,6 @@ export default class AsanaService extends TransactionBaseService {
     org: Organisation
   ): AsyncGenerator<IndexableDocument[]> {
     this.logger_.info(`Starting oculation of Asana for ${org.id} organisation`);
-
     // Get Asana OAuth for the organisation
     const oauth = await this.oauthService_.retrieve({
       id: org.id,
@@ -58,61 +57,61 @@ export default class AsanaService extends TransactionBaseService {
 
     let documents: IndexableDocument[] = [];
     try {
-      const projects = await this.getAsanaProjects(oauth.token, last_sync);
-      for (const project of projects) {
-        const tasks = await this.getAsanaTasks(
-          oauth.token,
-          project.gid,
-          last_sync
-        );
-        for (const task of tasks) {
-          const doc: IndexableDocument = {
-            id: task.gid,
-            organisationId: org.id,
-            title: task.name,
-            source: AppNameDefinitions.ASANA,
-            sections: [
-              {
-                link: `https://app.asana.com/0/${project.gid}/${task.gid}`,
-                content: task.notes,
-              },
-            ],
-            type: DocType.TXT,
-            updatedAt: new Date(task.modified_at),
-            metadata: {
-              completed: task.completed,
-              project_id: project.gid,
-              project_name: project.name,
-              project_link: `https://app.asana.com/api/1.0/projects/${project.gid}`,
-            },
-          };
-          documents.push(doc);
-          if (documents.length >= 100) {
-            yield documents;
-            documents = [];
-          }
-        }
-      }
-      yield documents;
+      // const projects = await this.getAsanaProjects(oauth.token, last_sync);
+      // for (const project of projects) {
+      //   const tasks = await this.getAsanaTasks(
+      //     oauth.token,
+      //     project.gid,
+      //     last_sync
+      //   );
+      //   for (const task of tasks) {
+      //     const doc: IndexableDocument = {
+      //       id: task.gid,
+      //       organisationId: org.id,
+      //       title: task.name,
+      //       source: AppNameDefinitions.ASANA,
+      //       sections: [
+      //         {
+      //           link: `https://app.asana.com/0/${project.gid}/${task.gid}`,
+      //           content: task.notes,
+      //         },
+      //       ],
+      //       type: DocType.TXT,
+      //       updatedAt: new Date(task.modified_at),
+      //       metadata: {
+      //         completed: task.completed,
+      //         project_id: project.gid,
+      //         project_name: project.name,
+      //         project_link: `https://app.asana.com/api/1.0/projects/${project.gid}`,
+      //       },
+      //     };
+      //     documents.push(doc);
+      //     if (documents.length >= 100) {
+      //       yield documents;
+      //       documents = [];
+      //     }
+      //   }
+      // }
+      // yield documents;
       await this.oauthService_.update(oauth.id, { last_sync: new Date() });
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        // Check if it's an unauthorized error
-        this.logger_.info(`Refreshing Asana token for ${org.id} organisation`);
+      // if (error.response && error.response.status === 401) {
+      //   // Check if it's an unauthorized error
+      //   this.logger_.info(`Refreshing Asana token for ${org.id} organisation`);
 
-        // Refresh the token
-        const oauthToken = await this.container_["asanaOauth"].refreshToken(
-          oauth.refresh_token
-        );
+      //   // Refresh the token
+      //   const oauthToken = await this.container_["asanaOauth"].refreshToken(
+      //     oauth.refresh_token
+      //   );
 
-        // Update the OAuth record with the new token
-        await this.oauthService_.update(oauth.id, oauthToken);
+      //   // Update the OAuth record with the new token
+      //   await this.oauthService_.update(oauth.id, oauthToken);
 
-        // Retry the request
-        return this.getAsanaTasksAndProjects(org);
-      } else {
-        console.error(error);
-      }
+      //   // Retry the request
+      //   return this.getAsanaTasksAndProjects(org);
+      // } else {
+      console.error(error);
+      // }
     }
     this.logger_.info(`Finished oculation of Asana for ${org.id} organisation`);
   }

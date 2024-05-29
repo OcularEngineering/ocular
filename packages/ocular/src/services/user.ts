@@ -1,28 +1,26 @@
-import { AutoflowAiError } from "@ocular/utils"
-import Scrypt from "scrypt-kdf"
-import { EntityManager } from "typeorm"
-import { TransactionBaseService, UserRoles } from "@ocular/types"
-import { User } from "../models"
-import { UserRepository } from "../repositories/user"
-import {
-    CreateUserInput, FilterableUserProps, UserRole,
-} from "../types/user"
-import { validateEmail } from "../utils/is-email"
-import {buildQuery} from "../utils/build-query"
-import { FindConfig } from "../types/common"
-import OrganisationService from "./organisation"
-import { CreateOrganisationInput } from "../types/organisation"
-import { isDefined } from "../utils/is-defined"
-import EventBusService from "./event-bus"
+import { AutoflowAiError } from "@ocular/utils";
+import Scrypt from "scrypt-kdf";
+// const Scrypt = require("scrypt-kdf");
 
-
+import { EntityManager } from "typeorm";
+import { TransactionBaseService, UserRoles } from "@ocular/types";
+import { User } from "../models";
+import { UserRepository } from "../repositories/user";
+import { CreateUserInput, FilterableUserProps, UserRole } from "../types/user";
+import { validateEmail } from "../utils/is-email";
+import { buildQuery } from "../utils/build-query";
+import { FindConfig } from "../types/common";
+import OrganisationService from "./organisation";
+import { CreateOrganisationInput } from "../types/organisation";
+import { isDefined } from "../utils/is-defined";
+import EventBusService from "./event-bus";
 
 type UserServiceProps = {
-  userRepository: typeof UserRepository
-  organisationService: OrganisationService
-  eventBusService: EventBusService
-  manager: EntityManager
-}
+  userRepository: typeof UserRepository;
+  organisationService: OrganisationService;
+  eventBusService: EventBusService;
+  manager: EntityManager;
+};
 
 /**
  * Provides layer to manipulate users.
@@ -33,35 +31,35 @@ class UserService extends TransactionBaseService {
     CREATED: "user.created",
     UPDATED: "user.updated",
     DELETED: "user.deleted",
-  }
+  };
 
-  protected readonly userRepository_: typeof UserRepository
-  protected readonly organisationService_: OrganisationService
-  protected readonly eventBus_: EventBusService
+  protected readonly userRepository_: typeof UserRepository;
+  protected readonly organisationService_: OrganisationService;
+  protected readonly eventBus_: EventBusService;
 
-  static readonly IndexName = `users`
+  static readonly IndexName = `users`;
 
   constructor({
     userRepository,
     organisationService,
-    eventBusService
+    eventBusService,
   }: UserServiceProps) {
     // eslint-disable-next-line prefer-rest-params
-    super(arguments[0])
-    this.userRepository_ = userRepository
-    this.organisationService_ = organisationService
-    this.eventBus_ = eventBusService
+    super(arguments[0]);
+    this.userRepository_ = userRepository;
+    this.organisationService_ = organisationService;
+    this.eventBus_ = eventBusService;
   }
 
-    /**
+  /**
    * @param {FilterableUserProps} selector - the query object for find
    * @param {Object} config - the configuration object for the query
    * @return {Promise} the result of the find operation
    */
-    async list(selector: FilterableUserProps, config = {}): Promise<User[]> {
-      const userRepo = this.activeManager_.withRepository(this.userRepository_)
-      return await userRepo.find(buildQuery(selector, config))
-    }
+  async list(selector: FilterableUserProps, config = {}): Promise<User[]> {
+    const userRepo = this.activeManager_.withRepository(this.userRepository_);
+    return await userRepo.find(buildQuery(selector, config));
+  }
 
   // /**
   //  * @param {FilterableUserProps} selector - the query object for find
@@ -85,22 +83,22 @@ class UserService extends TransactionBaseService {
       throw new AutoflowAiError(
         AutoflowAiError.Types.NOT_FOUND,
         `"userId" must be defined`
-      )
+      );
     }
 
-    const userRepo = this.activeManager_.withRepository(this.userRepository_)
-    const query = buildQuery({ id: userId }, config)
+    const userRepo = this.activeManager_.withRepository(this.userRepository_);
+    const query = buildQuery({ id: userId }, config);
 
-    const users = await userRepo.find(query)
+    const users = await userRepo.find(query);
 
     if (!users.length) {
       throw new AutoflowAiError(
         AutoflowAiError.Types.NOT_FOUND,
         `User with id: ${userId} was not found`
-      )
+      );
     }
 
-    return users[0]
+    return users[0];
   }
 
   /**
@@ -114,19 +112,19 @@ class UserService extends TransactionBaseService {
     email: string,
     config: FindConfig<User> = {}
   ): Promise<User> {
-    const userRepo = this.activeManager_.withRepository(this.userRepository_)
+    const userRepo = this.activeManager_.withRepository(this.userRepository_);
 
-    const query = buildQuery({ email: email.toLowerCase() }, config)
-    const user = await userRepo.findOne(query)
+    const query = buildQuery({ email: email.toLowerCase() }, config);
+    const user = await userRepo.findOne(query);
 
     if (!user) {
       throw new AutoflowAiError(
         AutoflowAiError.Types.NOT_FOUND,
         `User with email: ${email} was not found`
-      )
+      );
     }
 
-    return user
+    return user;
   }
 
   /**
@@ -135,8 +133,8 @@ class UserService extends TransactionBaseService {
    * @return {string} hashed password
    */
   async hashPassword_(password: string): Promise<string> {
-    const buf = await Scrypt.kdf(password, { logN: 1, r: 1, p: 1 })
-    return buf.toString("base64")
+    const buf = await Scrypt.kdf(password, { logN: 1, r: 1, p: 1 });
+    return buf.toString("base64");
   }
 
   /**
@@ -146,90 +144,99 @@ class UserService extends TransactionBaseService {
    * @param {string} password - user's password to hash
    * @return {Promise} the result of create
    */
-  async createOrganisationAdmin(createUser: CreateUserInput, password: string): Promise<User> {
+  async createOrganisationAdmin(
+    createUser: CreateUserInput,
+    password: string
+  ): Promise<User> {
     return await this.atomicPhase_(async (manager: EntityManager) => {
-      
-      const userRepo = manager.withRepository(this.userRepository_)
+      const userRepo = manager.withRepository(this.userRepository_);
 
       const createUserData = { ...createUser } as CreateUserInput & {
-        password_hash: string
-      }
+        password_hash: string;
+      };
 
-      const validatedEmail = validateEmail(createUserData.email)
+      const validatedEmail = validateEmail(createUserData.email);
 
       const userEntity = await userRepo.findOne({
         where: { email: validatedEmail },
-      })
+      });
 
       if (userEntity) {
         throw new AutoflowAiError(
           AutoflowAiError.Types.INVALID_DATA,
           "A user with the same email already exists."
-        )
+        );
       }
 
       if (password) {
-        const hashedPassword = await this.hashPassword_(password)
-        createUserData.password_hash = hashedPassword
+        const hashedPassword = await this.hashPassword_(password);
+        createUserData.password_hash = hashedPassword;
       }
 
-
       // Create a new organisation for User
-      createUserData.email = validatedEmail
+      createUserData.email = validatedEmail;
       createUserData.role = UserRoles.ADMIN;
-      const user = userRepo.create({...createUserData})
-      const createOrganisatonData = { ...user.organisation} as CreateOrganisationInput
-      const organisationService = this.organisationService_.withTransaction(manager)
-      const organisation = await organisationService.create(createOrganisatonData)
-      user.organisation = organisation
+      const user = userRepo.create({ ...createUserData });
+      const createOrganisatonData = {
+        ...user.organisation,
+      } as CreateOrganisationInput;
+      const organisationService =
+        this.organisationService_.withTransaction(manager);
+      const organisation = await organisationService.create(
+        createOrganisatonData
+      );
+      user.organisation = organisation;
 
-      const newUser = await userRepo.save(user)
+      const newUser = await userRepo.save(user);
 
       // Genererate verify token for user
       await this.eventBus_
-      .withTransaction(manager)
-      .emit(UserService.Events.CREATED, { user: newUser})
-      return newUser
-    })
+        .withTransaction(manager)
+        .emit(UserService.Events.CREATED, { user: newUser });
+      return newUser;
+    });
   }
 
-    /**
+  /**
    * Creates a user with username being validated. User will have an organisation associated to them and will be the admin.
    * Fails if email is not a valid format.
    * @param {object} user - the user to create
    * @param {string} password - user's password to hash
    * @return {Promise} the result of create
    */
-    async createInvitedUser(createUser: CreateUserInput, password: string): Promise<User> {
-      return await this.atomicPhase_(async (manager: EntityManager) => {
-        const userRepo = manager.withRepository(this.userRepository_)
-  
-        const createUserData = { ...createUser } as CreateUserInput & {
-          password_hash: string
-        }
-  
-        const validatedEmail = validateEmail(createUserData.email)
-  
-        const userEntity = await userRepo.findOne({
-          where: { email: validatedEmail },
-        })
-  
-        if (userEntity) {
-          throw new AutoflowAiError(
-            AutoflowAiError.Types.INVALID_DATA,
-            "A user with the same email already exists."
-          )
-        }
-  
-        if (password) {
-          const hashedPassword = await this.hashPassword_(password)
-          createUserData.password_hash = hashedPassword
-        }
+  async createInvitedUser(
+    createUser: CreateUserInput,
+    password: string
+  ): Promise<User> {
+    return await this.atomicPhase_(async (manager: EntityManager) => {
+      const userRepo = manager.withRepository(this.userRepository_);
 
-         const user = userRepo.create({...createUserData})
-         return await userRepo.save(user)
-      })
-    }
+      const createUserData = { ...createUser } as CreateUserInput & {
+        password_hash: string;
+      };
+
+      const validatedEmail = validateEmail(createUserData.email);
+
+      const userEntity = await userRepo.findOne({
+        where: { email: validatedEmail },
+      });
+
+      if (userEntity) {
+        throw new AutoflowAiError(
+          AutoflowAiError.Types.INVALID_DATA,
+          "A user with the same email already exists."
+        );
+      }
+
+      if (password) {
+        const hashedPassword = await this.hashPassword_(password);
+        createUserData.password_hash = hashedPassword;
+      }
+
+      const user = userRepo.create({ ...createUserData });
+      return await userRepo.save(user);
+    });
+  }
 
   // // If invite is true, then we are inviting a user to an existing organisation else we are creating a new organisation.
   // if(invite) {
@@ -286,4 +293,4 @@ class UserService extends TransactionBaseService {
   // }
 }
 
-export default UserService
+export default UserService;

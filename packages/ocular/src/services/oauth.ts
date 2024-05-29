@@ -134,7 +134,6 @@ class OAuthService extends TransactionBaseService {
     }
 
     const token: OAuthToken = await service.generateToken(code, installationId);
-
     const oauth = this.oauthRepository_.find({
       where: {
         organisation_id: this.loggedInUser_.organisation_id,

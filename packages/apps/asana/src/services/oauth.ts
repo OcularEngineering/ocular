@@ -26,7 +26,6 @@ class AsanaOauth extends OauthService {
   }
 
   static getAppDetails(projectConfig, options) {
-    console.log("OPTIONS", options);
     const client_id = options.client_id;
     const client_secret = options.client_secret;
     const redirect = options.redirect_uri;
@@ -92,9 +91,9 @@ class AsanaOauth extends OauthService {
         type: "API token",
         token: code,
         token_expires_at: new Date(),
-        refresh_token: null,
+        refresh_token: code,
         refresh_token_expires_at: new Date(),
-        auth_strategy: this.auth_strategy_,
+        auth_strategy: AppAuthStrategy.API_TOKEN_STRATEGY,
       } as OAuthToken;
     }
 

@@ -19,14 +19,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -49,7 +41,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus } from 'lucide-react';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -98,7 +89,6 @@ export default function WebConnector({ links }: { links: Link[] }) {
   });
 
   async function formSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
     const { title, description, link } = values;
 
     try {

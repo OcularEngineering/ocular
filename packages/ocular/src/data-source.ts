@@ -28,6 +28,8 @@ const getMigrations = (directory) => {
     return glob.sync(pathByOS(dir));
   });
 
+  console.log("COREMIGRATIONS", coreMigrations);
+
   const migrations = coreMigrations
     .map((file) => {
       const loaded = require(file);

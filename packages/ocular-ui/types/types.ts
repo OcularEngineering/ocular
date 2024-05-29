@@ -8,79 +8,96 @@ export interface SearchBarProps {
 
 // SETTINGS TYPES
 export interface SettingsLayoutProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   items: {
-    href: string
-    title: string
-  }[]
+    href: string;
+    title: string;
+  }[];
 }
 
 // ICON TYPES
 
-export type IconKeys = 'Search' | 'Bot' | 'Chat' | 'Settings' | 'LayoutGrid' | 'HelpCircle' | 'BarChart2' | 'Users'; 
-export type VariantKeys = "ghost" | "link" | "default" | "destructive" | "outline" | "secondary" | null | undefined;
+export type IconKeys =
+  | 'Search'
+  | 'Bot'
+  | 'Chat'
+  | 'Settings'
+  | 'LayoutGrid'
+  | 'HelpCircle'
+  | 'BarChart2'
+  | 'Users';
+export type VariantKeys =
+  | 'ghost'
+  | 'link'
+  | 'default'
+  | 'destructive'
+  | 'outline'
+  | 'secondary'
+  | null
+  | undefined;
 
 // LINK TYPES
 
 export interface LinkProps {
-  title: string
-  label?: string
-  icon: IconKeys
-  variant: VariantKeys
-  link: string
+  title: string;
+  label?: string;
+  icon: IconKeys;
+  variant: VariantKeys;
+  link: string;
 }
 
 // NAVIGATION TYPES
 
 export interface NavProps {
-  links: LinkProps[]
+  links: LinkProps[];
 }
 
 export interface NavItem {
-    title: string
-    href?: string
-    disabled?: boolean
-    external?: boolean
+  title: string;
+  href?: string;
+  disabled?: boolean;
+  external?: boolean;
 }
 
 export interface MainNavProps {
-    items?: NavItem[]
+  items?: NavItem[];
 }
 
 // ROOT TYPES
 
 export interface RootLayoutProps {
-    children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export interface Integration {
-  id: string
-  slug: string
-  category: string
-  developer: string
-  name: string
-  description: string
-  logo: string
-  images: string[]
-  overview: string
-  website: string
-  docs: string
-  oauth_url: string
-  install_url: string
+  id: string;
+  slug: string;
+  category: string;
+  developer: string;
+  name: string;
+  description: string;
+  logo: string;
+  images: string[];
+  overview: string;
+  website: string;
+  docs: string;
+  oauth_url: string;
+  install_url: string;
+  auth_strategy: string;
 }
 
 // User Profile
 export interface Profile {
-  id: string
-  first_name: string
-  last_name: string
-  email: string
-  avatar: string
-  role: string
-  created_at: string
-  updated_at: string
-  organisation_id: string
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  avatar: string;
+  role: string;
+  created_at: string;
+  updated_at: string;
+  organisation_id: string;
 }
