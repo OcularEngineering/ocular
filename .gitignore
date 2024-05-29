@@ -35,4 +35,5 @@ typesense-data/
 redis-data/
 
 env.local
+.env.local
 Kafka 

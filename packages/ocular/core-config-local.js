@@ -44,6 +44,19 @@ module.exports = {
   },
   apps: [
     {
+      resolve: `asana`,
+      options: {
+        client_id: process.env.ASANA_CLIENT_ID,
+        client_secret: process.env.ASANA_CLIENT_SECRET,
+        scope: "openid email profile",
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/asana`,
+        rate_limiter_opts: {
+          requests: 1500, // Number of Requests
+          interval: 60, // Interval in Seconds
+        },
+      },
+    },
+    {
       resolve: `google-drive`,
       options: {
         client_id: process.env.GOOGLE_CLIENT_ID,
@@ -77,7 +90,6 @@ module.exports = {
       resolve: PluginNameDefinitions.OPENAI,
       options: {
         open_ai_key: process.env.OPEN_AI_KEY,
-        embedding_model: process.env.OPEN_AI_EMBEDDING_MODEL,
         chat_model: process.env.OPEN_AI_CHAT_MODEL,
         rate_limiter_opts: {
           requests: 1000000, // Number of Tokens

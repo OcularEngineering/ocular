@@ -30,14 +30,17 @@ services:
       - ./redis-data:/data
 
   zookeeper:
-    image: "bitnami/zookeeper:latest"
+    image: "confluentinc/cp-zookeeper:latest"
     ports:
       - "2181:2181"
     environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ZOOKEEPER_CLIENT_PORT=2181
+      - ZOOKEEPER_TICK_TIME=2000
+    volumes:
+      - ./log4j.properties:/opt/bitnami/zookeeper/conf/log4j.properties
 
   kafka:
-    image: "bitnami/kafka:latest"
+    image: confluentinc/cp-kafka:latest
     user: root
     ports:
       - "9092:9092"
@@ -51,8 +54,10 @@ services:
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
       - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_LOG4J_LOGGERS=org.apache.zookeeper=ERROR,org.apache.kafka=ERROR,kafka=ERROR,kafka.cluster=ERROR,kafka.controller=ERROR,kafka.coordinator=ERROR,kafka.log=ERROR,kafka.server=ERROR,kafka.zookeeper=ERROR,state.change.logger=ERROR
     volumes:
       - ./Kafka:/bitnami/kafka
+      - ./log4j.properties:/etc/kafka/log4j.properties
 
   ocular-db:
     image: postgres:14-alpine
@@ -88,7 +93,7 @@ services:
       - UI_CORS=http://ocular-ui:9000
       - REDIS_URL=redis:6379
       - KAFKA_URL=kafka:29092
-      - OCULAR_MODELS_SERVER_URL=ocular-models-server:8000
+      - OCULAR_MODELS_SERVER_URL=http://ocular-models-server:8000
 
   ocular-ui:
     container_name: ocular-ui
