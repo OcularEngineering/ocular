@@ -31,8 +31,4 @@ COPY . .
 RUN npm install --verbose
 RUN turbo build
 
-EXPOSE 8080
-
 WORKDIR /usr/src/app/packages/ocular
-
-CMD ["NODE_ENV", "=", "development", "npm", "run", "start"]

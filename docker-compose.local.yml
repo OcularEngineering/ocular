@@ -18,9 +18,6 @@ services:
       - 6333
       - 6334
       - 6335
-    configs:
-      - source: qdrant_config
-        target: /qdrant/config/production.yaml
     volumes:
       - ./qdrant_data:/qdrant_data
 
@@ -44,16 +41,18 @@ services:
     user: root
     ports:
       - "9092:9092"
+      - "29092:29092"
+    depends_on:
+      - zookeeper
     environment:
       - KAFKA_BROKER_ID=1
-      - KAFKA_LISTENERS=PLAINTEXT://:9092
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,EXTERNAL://kafka:29092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://:9092,EXTERNAL://kafka:29092
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
       - ALLOW_PLAINTEXT_LISTENER=yes
     volumes:
       - ./Kafka:/bitnami/kafka
-    depends_on:
-      - zookeeper
 
   ocular-db:
     image: postgres:14-alpine
@@ -64,18 +63,6 @@ services:
       POSTGRES_USER: ocular
       POSTGRES_DB: ocular
 
-  ocular-db-migration:
-    container_name: ocular-db-migration
-    depends_on:
-      - ocular-db
-    build:
-      context: .
-      dockerfile: packages/ocular/Dockerfile.local
-    environment:
-      - DATABASE_URL=postgresql://ocular:ocular@ocular-db:5432/ocular
-      - DATABASE_NAME=ocular
-    command: npm run typeorm migration:run
-
   ocular-backend:
     container_name: ocular-backend
     build:
@@ -84,22 +71,24 @@ services:
     depends_on:
       ocular-db:
         condition: service_started
-      ocular-db-migration:
-        condition: service_completed_successfully
       qdrant:
         condition: service_started
-      # typesense:
-      #   condition: service_started
+      ocular-models-server:
+        condition: service_started
+      kafka:
+        condition: service_started
     ports:
       - 9000:9000
+    command: /bin/sh -c "npm run typeorm:local migration:run && npm run local"
     environment:
       - DATABASE_URL=postgresql://ocular:ocular@ocular-db:5432/ocular
       - DATABASE_NAME=ocular
       - NODE_ENV=development
       - QDRANT_DB_URL=http://qdrant:6333
-      # - TYPESENSE_HOST=typesense
       - UI_CORS=http://ocular-ui:9000
       - REDIS_URL=redis:6379
+      - KAFKA_URL=kafka:29092
+      - OCULAR_MODELS_SERVER_URL=ocular-models-server:8000
 
   ocular-ui:
     container_name: ocular-ui
@@ -110,8 +99,3 @@ services:
       - 3001:3001
     depends_on:
       - ocular-backend
-
-configs:
-  qdrant_config:
-    content: |
-      log_level: INFO

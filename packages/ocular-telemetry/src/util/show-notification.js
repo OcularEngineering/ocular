@@ -8,7 +8,7 @@ const defaultConfig = {
 
 const defaultMessage =
   `Ocular collects anonymous usage analytics\n` +
-  `to help improve Medusa for all users.\n` +
+  `to help improve Ocular for all users.\n` +
   `\n` +
   `If you'd like to opt-out, you can use \`ocular telemetry --disable\`\n`
 

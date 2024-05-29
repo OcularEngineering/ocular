@@ -15,7 +15,10 @@ const fg = require("fast-glob");
 const rootDirectory = path.resolve(`.`);
 
 const getMigrations = (directory) => {
-  const { configModule, error } = getConfigFile(directory, `core-config`);
+  const { configModule, error } = getConfigFile(
+    directory,
+    process.env.CONFIG_FILE
+  );
 
   const migrationDirs = [];
   const corePackageMigrations = path.resolve(
