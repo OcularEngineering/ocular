@@ -29,7 +29,6 @@ interface GlobalStateProps {
 }
 
 export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
-  const router = useRouter()
 
   // PROFILE STORE
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -212,17 +211,16 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   return (
     <ApplicationContext.Provider
       value={{
-        // // PROFILE STORE
-        // profile,
-        // setProfile,
+        
+        // PROFILE STORE
+        profile,
+        setProfile,
 
         // // ITEMS STORE
         // assistants,
         // setAssistants,
         // collections,
         // setCollections,
-        profile,
-        setProfile,
         chats,
         setChats,
         selectedResultSources,
