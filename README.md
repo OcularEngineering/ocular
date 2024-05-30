@@ -64,7 +64,7 @@ First, make sure you have the Docker installed on your device. You can download 
 4. Run Docker.
 
    ```sh
-   docker compose -f docker-compose.local.yml up
+   docker compose -f docker-compose.local.yml up --build --force-recreate
    ```
 
 This command initializes the containers specified in the `docker-compose.local.yml` file. It might take a few moments to complete, depending on your computer and internet connection.
