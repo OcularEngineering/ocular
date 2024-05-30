@@ -10,14 +10,7 @@ import Layout from '@/components/layout';
 import WebConnector from '@/components/marketplace/webConnector';
 import SectionContainer from '@/components/section-container';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -51,12 +44,15 @@ const formSchema = z.object({
     .describe('The API token for Integration of APP in Ocular'),
 });
 
+const OAUTHTOKEN = 'OAUTHTOKEN';
+const WEBCONNECTOR = 'webConnector';
+
 function Integrations() {
+  const router = useRouter();
+  let { slug, code, installation_id } = router.query;
   const [integration, setIntegration] = useState<Integration | null>(null);
   const [authorized, setAuthorized] = useState(false);
   const [links, setLinks] = useState<Link[] | null>(null);
-  const router = useRouter();
-  let { slug, code, installation_id } = router.query;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -65,13 +61,14 @@ function Integrations() {
     },
   });
 
-  async function formSubmit(values: z.infer<typeof formSchema>) {
+  const authorizeApp = async (code: string) => {
+    if (code == null) return; // If OAuth code is not present, return
     try {
       const response = await api.apps.authorizeApp({
-        code: values.apiToken as string,
+        code: code as string,
         name: slug as string,
         installationId: installation_id,
-      });
+      }); // Adjust this to match your actual API call
       if (response) {
         setAuthorized(true);
         router.push(`/dashboard/marketplace/${slug}`); // Redirect to the integration page
@@ -79,7 +76,20 @@ function Integrations() {
     } catch (error) {
       console.error('Failed to authorize integration', error);
     }
+  };
+
+  async function formSubmit(values: z.infer<typeof formSchema>) {
+    await authorizeApp(values.apiToken);
   }
+
+  const updateWebConnectorLinks = (apps: any) => {
+    const webConnector = apps.find((app: any) => app.name === 'webConnector');
+    setLinks(webConnector?.links || []);
+  };
+
+  const addWebConnector = async () => {
+    await authorizeApp('Fake Code');
+  };
 
   useEffect(() => {
     const fetchIntegration = async () => {
@@ -113,20 +123,8 @@ function Integrations() {
             (app: any) => app.name === slug
           );
           setAuthorized(installed);
-
-          if (slug === 'webConnector' && authorized) {
-            const webConnector = response.data.apps.find(
-              (app: any) => app.name === slug
-            );
-            if (
-              webConnector &&
-              webConnector.links &&
-              webConnector.links.length > 0
-            ) {
-              setLinks(webConnector.links);
-            } else {
-              setLinks([]);
-            }
+          if (slug === WEBCONNECTOR && authorized) {
+            updateWebConnectorLinks(response.data.apps);
           }
         }
       } catch (error) {
@@ -137,44 +135,12 @@ function Integrations() {
   }, [slug, authorized]);
 
   useEffect(() => {
-    const authorizeApp = async () => {
-      if (code == null) return; // If OAuth code is not present, return
-      try {
-        const response = await api.apps.authorizeApp({
-          code: code as string,
-          name: slug as string,
-          installationId: installation_id,
-        }); // Adjust this to match your actual API call
-        if (response) {
-          setAuthorized(true);
-          router.push(`/dashboard/marketplace/${slug}`); // Redirect to the integration page
-        }
-      } catch (error) {
-        console.error('Failed to authorize integration', error);
-      }
-    };
-    authorizeApp();
+    authorizeApp(code as string);
   }, [code, installation_id]);
-
-  const addWebConnector = async () => {
-    try {
-      const response = await api.apps.authorizeApp({
-        code: 'Fake Code' as string,
-        name: slug as string,
-        installationId: installation_id,
-      }); // Adjust this to match your actual API call
-      if (response) {
-        setAuthorized(true);
-        router.push(`/dashboard/marketplace/${slug}`); // Redirect to the integration page
-      }
-    } catch (error) {
-      console.error('Failed to authorize integration', error);
-    }
-  };
 
   if (!integration) return <div>Loading...</div>;
 
-  if (slug === 'webConnector' && authorized) {
+  if (slug === WEBCONNECTOR && authorized) {
     if (!links) {
       return <div>Loading...</div>;
     }
@@ -219,9 +185,9 @@ function Integrations() {
                 <Button disabled>Installed</Button>
               ) : (
                 <div>
-                  {integration.auth_strategy === 'OAUTHTOKEN' && (
+                  {integration.auth_strategy === OAUTHTOKEN && (
                     <div>
-                      {slug === 'webConnector' ? (
+                      {slug === WEBCONNECTOR ? (
                         <Button onClick={addWebConnector}>
                           {' '}
                           Add {integration.name} for Ocular
@@ -394,9 +360,9 @@ function Integrations() {
                   <Button disabled>Installed</Button>
                 ) : (
                   <div>
-                    {integration.auth_strategy === 'OAUTHTOKEN' && (
+                    {integration.auth_strategy === OAUTHTOKEN && (
                       <div>
-                        {slug === 'webConnector' ? (
+                        {slug === WEBCONNECTOR ? (
                           <Button onClick={addWebConnector}>
                             {' '}
                             Add {integration.name} for Ocular
