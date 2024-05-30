@@ -19,6 +19,7 @@ import AuthLayout from '@/components/auth-layout';
 import ChatLayout from '@/components/chat-layout';
 
 import PrivateRoute from "@/lib/private-route";
+import AuthRoute from "@/lib/auth-route";
 
 function MyApp({ Component, pageProps }: AppProps) {
 
@@ -55,7 +56,12 @@ function MyApp({ Component, pageProps }: AppProps) {
     } else if ((router.pathname.startsWith('/sign-in')) || (router.pathname.startsWith('/create-account')) || (router.pathname.startsWith('/invite'))) {
 
       // eslint-disable-next-line react/display-name
-      return (page: ReactNode) => <AuthLayout>{page}</AuthLayout>;
+      return (page: ReactNode) => 
+        <AuthLayout>
+          <AuthRoute>
+            {page}
+          </AuthRoute>
+        </AuthLayout>;
 
     } else if (router.pathname.startsWith('/dashboard/search')){
 

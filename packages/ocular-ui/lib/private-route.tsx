@@ -11,7 +11,7 @@ const PrivateRoute = ({ children }: PrivateRouteProps) => {
     const router = useRouter() 
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
-    const { profile, setProfile } = useContext(ApplicationContext);
+    const { setProfile } = useContext(ApplicationContext);
 
     useEffect(() => {
         const checkAuthentication = async () => {
@@ -22,6 +22,7 @@ const PrivateRoute = ({ children }: PrivateRouteProps) => {
 
                 setIsAuthenticated(true);
                 setProfile(profile);
+                console.log("Profile", profile?.first_name);
 
             }
             setLoading(false);

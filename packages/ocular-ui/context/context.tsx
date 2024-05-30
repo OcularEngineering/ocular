@@ -143,7 +143,7 @@ interface ApplicationContext {
 }
 
 export const ApplicationContext = createContext<ApplicationContext>({
-// PROFILE STORE
+  // PROFILE STORE
   profile: null,
   setProfile: () => {},
 
