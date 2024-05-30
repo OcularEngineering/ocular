@@ -80,3 +80,7 @@ We love contributions. Check out our guide to see how to [get started](https://g
 Not sure where to get started? You can:
 
 - Join our <a href="https://join.slack.com/t/ocular-ai/shared_invite/zt-2g7ka0j1c-Tx~Q46MjplNma2Sk2Ruplw">Slack</a>, and ask us any questions there.
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=OcularEngineering/ocular&type=Date)](https://star-history.com/#OcularEngineering/ocular&Date)
