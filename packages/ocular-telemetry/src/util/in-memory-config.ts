@@ -2,12 +2,21 @@ import { v4 as uuidv4 } from "uuid"
 import os from "os"
 import { join } from "path"
 
-export class InMemoryConfigStore {
+class InMemoryConfigStore {
   config = {}
   path = join(os.tmpdir(), `medusa`)
 
+  static instance
+
   constructor() {
     this.config = this.createBaseConfig()
+  }
+
+  static getInstance(){
+    if(!InMemoryConfigStore.instance){
+      InMemoryConfigStore.instance = new InMemoryConfigStore()
+    }
+    return InMemoryConfigStore.instance
   }
 
   createBaseConfig() {
@@ -45,3 +54,5 @@ export class InMemoryConfigStore {
     this.config = this.createBaseConfig()
   }
 }
+
+export default InMemoryConfigStore.getInstance()

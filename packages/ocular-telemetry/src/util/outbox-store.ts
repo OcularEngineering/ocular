@@ -14,13 +14,17 @@ import isTruthy from "./is-truthy"
 const OCULAR_TELEMETRY_VERBOSE = process.env.OCULAR_TELEMETRY_VERBOSE || false
 
 class Outbox {
-  constructor(baseDir) {
+  eventsJsonFileName: string
+  bufferFilePath: string
+  baseDir:string
+
+  constructor(baseDir:string) {
     this.eventsJsonFileName = `events.json`
     this.bufferFilePath = path.join(baseDir, this.eventsJsonFileName)
     this.baseDir = baseDir
   }
 
-  appendToBuffer(event) {
+  appendToBuffer(event:string) {
     try {
       appendFileSync(this.bufferFilePath, event, `utf8`)
     } catch (e) {
@@ -30,7 +34,7 @@ class Outbox {
     }
   }
 
-  getSize() {
+  getSize():number {
     if (!existsSync(this.bufferFilePath)) {
       return 0
     }
@@ -46,7 +50,7 @@ class Outbox {
     return 0
   }
 
-  getCount() {
+  getCount():number {
     if (!existsSync(this.bufferFilePath)) {
       return 0
     }
@@ -64,7 +68,7 @@ class Outbox {
     return 0
   }
 
-  async flushFile(filePath, flushOperation) {
+  async flushFile(filePath:string, flushOperation) {
     const now = `${Date.now()}-${process.pid}`
     let success = false
     let contents = ``

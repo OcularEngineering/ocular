@@ -6,11 +6,16 @@ import isTruthy from "./util/is-truthy"
 import OutboxStore from "./util/outbox-store"
 
 class Store {
+
+  private config_: Configstore
+  private outbox_: OutboxStore
+  private disabled_: boolean
+
   constructor() {
     try {
       this.config_ = new Configstore(`ocular`, {}, { globalConfigPath: true })
     } catch (e) {
-      this.config_ = new InMemoryConfigStore()
+      this.config_ = new InMemoryConfigStore() as any
     }
 
     const baseDir = path.dirname(this.config_.path)
@@ -19,15 +24,15 @@ class Store {
     this.disabled_ = isTruthy(process.env.OCULAR_DISABLE_TELEMETRY)
   }
 
-  getQueueSize() {
+  public getQueueSize() :number{
     return this.outbox_.getSize()
   }
 
-  getQueueCount() {
+  public getQueueCount():number {
     return this.outbox_.getCount()
   }
 
-  addEvent(event) {
+  public addEvent(event):string|null {
     if (this.disabled_) {
       return
     }
@@ -36,8 +41,8 @@ class Store {
     return this.outbox_.appendToBuffer(eventString + `\n`)
   }
 
-  async flushEvents(handler) {
-    return await this.outbox_.startFlushEvents(async (eventData) => {
+  public async flushEvents(handler: (events: any[]) => Promise<boolean>): Promise<boolean> {
+    return await this.outbox_.startFlushEvents(async (eventData:string) => {
       const events = eventData
         .split(`\n`)
         .filter((e) => e && e.length > 2)
@@ -47,11 +52,11 @@ class Store {
     })
   }
 
-  getConfig(path) {
+  public getConfig(path:string) :any{
     return this.config_.get(path)
   }
 
-  setConfig(path, val) {
+  public setConfig(path:string, val:any) :void{
     return this.config_.set(path, val)
   }
 }
