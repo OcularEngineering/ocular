@@ -12,12 +12,10 @@ NProgress.configure({
   showSpinner: false,
 });
 
-{/* Layouts */}
 import Layout from '@/components/layout';
 import DashboardLayout from '@/components/dashboard-layout';
 import AuthLayout from '@/components/auth-layout';
 import ChatLayout from '@/components/chat-layout';
-
 import PrivateRoute from "@/lib/private-route";
 import AuthRoute from "@/lib/auth-route";
 
@@ -73,7 +71,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       // eslint-disable-next-line react/display-name
       return (page: ReactNode) => <ChatLayout>{page}</ChatLayout>;
       
-    }
+    } 
 
     return (page: ReactNode) => page;
   };

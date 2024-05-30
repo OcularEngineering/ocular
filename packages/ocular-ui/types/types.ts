@@ -7,7 +7,7 @@ export interface SearchBarProps {
 }
 
 // SETTINGS TYPES
-export interface SettingsLayoutProps {
+export interface MarketplaceLayoutProps {
   children: React.ReactNode
 }
 

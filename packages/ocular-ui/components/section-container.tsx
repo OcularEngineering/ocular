@@ -8,7 +8,7 @@ interface SectionContainerProps {
 const SectionContainer = ({ children, className }: PropsWithChildren<SectionContainerProps>) => (
   <div
     className={classNames(
-      `container mx-auto px-6 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24 justify-center items-center`,
+      `container relative justify-center items-center`,
       className
     )}
   >
