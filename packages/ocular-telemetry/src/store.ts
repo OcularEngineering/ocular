@@ -11,6 +11,8 @@ class Store {
   private outbox_: OutboxStore
   private disabled_: boolean
 
+  private static instance:Store
+
   constructor() {
     try {
       this.config_ = new Configstore(`ocular`, {}, { globalConfigPath: true })
@@ -22,6 +24,13 @@ class Store {
     this.outbox_ = new OutboxStore(baseDir)
 
     this.disabled_ = isTruthy(process.env.OCULAR_DISABLE_TELEMETRY)
+  }
+
+  static getInstance():Store{
+    if(!Store.instance){
+      Store.instance = new Store()
+    }
+    return Store.instance
   }
 
   public getQueueSize() :number{
@@ -61,4 +70,4 @@ class Store {
   }
 }
 
-export default Store
+export default Store.getInstance()

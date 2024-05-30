@@ -16,7 +16,7 @@ interface Options{
 }
 
 class TelemetryDispatcher {
-  private store_: Store;
+  private store_: typeof Store;
   private host: string;
   private public_key: string;
   private axiosInstance: AxiosInstance|AxiosStatic; // Use AxiosInstance type
@@ -25,8 +25,6 @@ class TelemetryDispatcher {
   private trackingEnabled: boolean;
 
   constructor(options: Options) {
-    this.store_ = new Store();
-  
     this.host = removeSlash(options.host || "https://us.i.posthog.com/batch/");
     this.public_key =
       options.public_key ||

@@ -30,9 +30,10 @@ interface OsInfo {
   docker: boolean;
   term_program: string;
 }
+
 class Telemeter {
 
-  private store_: Store
+  private store_: typeof Store
   private flushAt: number
   private maxQueueSize: number
   private flushInterval: number
@@ -49,7 +50,6 @@ class Telemeter {
 
   
   constructor(options :Options) {
-    this.store_ = new Store()
 
     this.flushAt = Math.max(options.flushAt, 1) || 20
     this.maxQueueSize = options.maxQueueSize || 1024 * 500

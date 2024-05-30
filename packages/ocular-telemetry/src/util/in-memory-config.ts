@@ -3,10 +3,10 @@ import os from "os"
 import { join } from "path"
 
 class InMemoryConfigStore {
-  config = {}
-  path = join(os.tmpdir(), `medusa`)
+  private config:object = {}
+  private path:string = join(os.tmpdir(), `medusa`)
 
-  static instance
+  private static instance:InMemoryConfigStore
 
   constructor() {
     this.config = this.createBaseConfig()
