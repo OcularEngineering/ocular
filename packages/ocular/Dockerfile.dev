@@ -4,7 +4,6 @@ FROM node:18-alpine
 RUN apk update && \
   apk add chromium
 
-
 WORKDIR /usr/src/app
 
 RUN npm cache clean --force
@@ -20,7 +19,7 @@ COPY package-lock.json ./
 # Copy the docs package.json
 COPY packages/ocular/package.json ./packages/ocular/package.json
 
-# COPY packages/ocular/env.local ./packages/ocular/.env.local
+COPY env.local ./packages/ocular/.env.local
 
 # Copy turbo.json
 COPY turbo.json ./
@@ -31,12 +30,4 @@ COPY . .
 RUN npm install --verbose
 RUN turbo build
 
-EXPOSE 8080
-
 WORKDIR /usr/src/app/packages/ocular
-
-RUN apk add --no-cache bash curl && curl -1sLf \
-  'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.alpine.sh' | bash \
-  && apk add infisical
-
-CMD ["sh", "-c", "infisical run --env=dev -- npm run start"]
