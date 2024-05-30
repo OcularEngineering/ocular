@@ -7,7 +7,6 @@ services:
       dockerfile: packages/ocular-models-server/Dockerfile.models
     ports:
       - 8000:8000
-
   qdrant:
     image: qdrant/qdrant:latest
     restart: always
@@ -19,9 +18,6 @@ services:
       - 6333
       - 6334
       - 6335
-    configs:
-      - source: qdrant_config
-        target: /qdrant/config/production.yaml
     volumes:
       - ./qdrant_data:/qdrant_data
 
@@ -34,27 +30,32 @@ services:
       - ./redis-data:/data
 
   zookeeper:
-    image: "bitnami/zookeeper:latest"
+    image: "confluentinc/cp-zookeeper:latest"
     ports:
       - "2181:2181"
     environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ZOOKEEPER_CLIENT_PORT=2181
+      - ZOOKEEPER_TICK_TIME=2000
+    volumes:
+      - ./log4j.properties:/opt/bitnami/zookeeper/conf/log4j.properties
 
   kafka:
-    image: "bitnami/kafka:latest"
+    image: confluentinc/cp-kafka:latest
     user: root
     ports:
       - "9092:9092"
+    depends_on:
+      - zookeeper
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_LISTENERS=PLAINTEXT://:9092
       - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
       - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_LOG4J_LOGGERS=org.apache.zookeeper=ERROR,org.apache.kafka=ERROR,kafka=ERROR,kafka.cluster=ERROR,kafka.controller=ERROR,kafka.coordinator=ERROR,kafka.log=ERROR,kafka.server=ERROR,kafka.zookeeper=ERROR,state.change.logger=ERROR
     volumes:
       - ./Kafka:/bitnami/kafka
-    depends_on:
-      - zookeeper
+      - ./log4j.properties:/etc/kafka/log4j.properties
 
   ocular-db:
     image: postgres:14-alpine
@@ -75,7 +76,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://ocular:ocular@ocular-db:5432/ocular
       - DATABASE_NAME=ocular
-    command: npm run typeorm migration:run
+    command: npm run typeorm:local migration:run
 
   pgadmin:
     image: dpage/pgadmin4

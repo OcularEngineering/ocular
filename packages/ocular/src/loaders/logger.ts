@@ -1,18 +1,17 @@
-import stackTrace from "stack-trace"
-import { ulid } from "ulid"
-import winston from "winston"
-import ora from "ora"
-import * as Transport from "winston-transport"
-
+import stackTrace from "stack-trace";
+import { ulid } from "ulid";
+import winston from "winston";
+import ora from "ora";
+import * as Transport from "winston-transport";
 
 // Panic Handler
 export type PanicData = {
-  id: string
+  id: string;
   context: {
-    rootPath: string
-    path: string
-  }
-}
+    rootPath: string;
+    path: string;
+  };
+};
 
 export enum PanicId {
   InvalidProjectName = "10000",
@@ -21,37 +20,37 @@ export enum PanicId {
 }
 
 export const panicHandler = (panicData: PanicData = {} as PanicData) => {
-  const { id, context } = panicData
+  const { id, context } = panicData;
   switch (id) {
     case "10000":
       return {
         message: `Looks like you provided a URL as your project name. Please provide a project name instead.`,
-      }
+      };
     case "10002":
       return {
         message: `Could not create project because ${context.path} is not a valid path.`,
-      }
+      };
     case "10003":
       return {
         message: `Directory ${context.rootPath} is already a Node project.`,
-      }
+      };
     default:
       return {
         message: "Unknown error",
-      }
+      };
   }
-}
+};
 
 // Logger
-const LOG_LEVEL = process.env.LOG_LEVEL || "silly"
-const LOG_FILE = process.env.LOG_FILE || ""
-const NODE_ENV = process.env.NODE_ENV || "development"
-const IS_DEV = NODE_ENV.startsWith("dev")
+const LOG_LEVEL = process.env.LOG_LEVEL || "silly";
+const LOG_FILE = process.env.LOG_FILE || "";
+const NODE_ENV = process.env.NODE_ENV || "development";
+const IS_DEV = NODE_ENV.startsWith("dev") || NODE_ENV.startsWith("local");
 
-let transports: Transport[] = []
+let transports: Transport[] = [];
 
 if (!IS_DEV) {
-  transports.push(new winston.transports.Console())
+  transports.push(new winston.transports.Console());
 } else {
   transports.push(
     new winston.transports.Console({
@@ -60,15 +59,15 @@ if (!IS_DEV) {
         winston.format.splat()
       ),
     })
-  )
+  );
 }
 
 if (LOG_FILE) {
   transports.push(
     new winston.transports.File({
-      filename: LOG_FILE
+      filename: LOG_FILE,
     })
-  )
+  );
 }
 
 const loggerInstance = winston.createLogger({
@@ -83,30 +82,30 @@ const loggerInstance = winston.createLogger({
     winston.format.json()
   ),
   transports,
-})
+});
 
 export class Reporter {
-  protected activities_: Record<string, any>
-  protected loggerInstance_: winston.Logger
-  protected ora_: typeof ora
+  protected activities_: Record<string, any>;
+  protected loggerInstance_: winston.Logger;
+  protected ora_: typeof ora;
 
   constructor({ logger, activityLogger }) {
-    this.activities_ = {}
-    this.loggerInstance_ = logger
-    this.ora_ = activityLogger
+    this.activities_ = {};
+    this.loggerInstance_ = logger;
+    this.ora_ = activityLogger;
   }
 
   panic = (data) => {
-    const parsedPanic = panicHandler(data)
+    const parsedPanic = panicHandler(data);
 
     this.loggerInstance_.log({
       level: "error",
       details: data,
       message: parsedPanic.message,
-    })
+    });
 
-    process.exit(1)
-  }
+    process.exit(1);
+  };
 
   /**
    * Determines if the logger should log at a given level.
@@ -114,26 +113,26 @@ export class Reporter {
    * @return {boolean} whether we should log
    */
   shouldLog = (level) => {
-    level = this.loggerInstance_.levels[level]
-    const logLevel = this.loggerInstance_.levels[this.loggerInstance_.level]
-    return level <= logLevel
-  }
+    level = this.loggerInstance_.levels[level];
+    const logLevel = this.loggerInstance_.levels[this.loggerInstance_.level];
+    return level <= logLevel;
+  };
 
   /**
    * Sets the log level of the logger.
    * @param {string} level - the level to set the logger to
    */
   setLogLevel = (level) => {
-    this.loggerInstance_.level = level
-  }
+    this.loggerInstance_.level = level;
+  };
 
   /**
    * Resets the logger to the value specified by the LOG_LEVEL env var. If no
    * LOG_LEVEL is set it defaults to "silly".
    */
   unsetLogLevel = () => {
-    this.loggerInstance_.level = LOG_LEVEL
-  }
+    this.loggerInstance_.level = LOG_LEVEL;
+  };
 
   /**
    * Begin an activity. In development an activity is displayed as a spinner;
@@ -144,32 +143,32 @@ export class Reporter {
    *   further operations on the activity such as success, failure, progress.
    */
   activity = (message, config = {}) => {
-    const id = ulid()
+    const id = ulid();
     if (IS_DEV && this.shouldLog("info")) {
-      const activity = this.ora_(message).start()
+      const activity = this.ora_(message).start();
 
       this.activities_[id] = {
         activity,
         config,
         start: Date.now(),
-      }
+      };
 
-      return id
+      return id;
     } else {
       this.activities_[id] = {
         start: Date.now(),
         config,
-      }
+      };
       this.loggerInstance_.log({
         activity_id: id,
         level: "info",
         config,
         message,
-      })
+      });
 
-      return id
+      return id;
     }
-  }
+  };
 
   /**
    * Reports progress on an activity. In development this will update the
@@ -182,20 +181,20 @@ export class Reporter {
     const toLog = {
       level: "info",
       message,
-    }
+    };
 
     if (typeof activityId === "string" && this.activities_[activityId]) {
-      const activity = this.activities_[activityId]
+      const activity = this.activities_[activityId];
       if (activity.activity) {
-        activity.text = message
+        activity.text = message;
       } else {
-        toLog["activity_id"] = activityId
-        this.loggerInstance_.log(toLog)
+        toLog["activity_id"] = activityId;
+        this.loggerInstance_.log(toLog);
       }
     } else {
-      this.loggerInstance_.log(toLog)
+      this.loggerInstance_.log(toLog);
     }
-  }
+  };
 
   /**
    * Logs an error. If an error object is provided the stack trace for the error
@@ -205,28 +204,28 @@ export class Reporter {
    * @param {Error?} error - an error object to log message with
    */
   error = (messageOrError, error = null) => {
-    let message = messageOrError
+    let message = messageOrError;
     if (typeof messageOrError === "object") {
-      message = messageOrError.message
-      error = messageOrError
+      message = messageOrError.message;
+      error = messageOrError;
     }
 
     const toLog = {
       level: "error",
       message,
-    }
+    };
 
     if (error) {
-      toLog["stack"] = stackTrace.parse(error)
+      toLog["stack"] = stackTrace.parse(error);
     }
 
-    this.loggerInstance_.log(toLog)
+    this.loggerInstance_.log(toLog);
 
     // Give stack traces and details in dev
     if (error && IS_DEV) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   /**
    * Reports failure of an activity. In development the activity will be udpated
@@ -237,35 +236,35 @@ export class Reporter {
    * @returns {object} data about the activity
    */
   failure = (activityId, message) => {
-    const time = Date.now()
+    const time = Date.now();
     const toLog = {
       level: "error",
       message,
-    }
+    };
 
     if (typeof activityId === "string" && this.activities_[activityId]) {
-      const activity = this.activities_[activityId]
+      const activity = this.activities_[activityId];
       if (activity.activity) {
-        activity.activity.fail(`${message} – ${time - activity.start}`)
+        activity.activity.fail(`${message} – ${time - activity.start}`);
       } else {
-        toLog["duration"] = time - activity.start
-        toLog["activity_id"] = activityId
-        this.loggerInstance_.log(toLog)
+        toLog["duration"] = time - activity.start;
+        toLog["activity_id"] = activityId;
+        this.loggerInstance_.log(toLog);
       }
     } else {
-      this.loggerInstance_.log(toLog)
+      this.loggerInstance_.log(toLog);
     }
 
     if (this.activities_[activityId]) {
-      const activity = this.activities_[activityId]
+      const activity = this.activities_[activityId];
       return {
         ...activity,
         duration: time - activity.start,
-      }
+      };
     }
 
-    return null
-  }
+    return null;
+  };
 
   /**
    * Reports success of an activity. In development the activity will be udpated
@@ -276,35 +275,35 @@ export class Reporter {
    * @returns {Record<string, any>} data about the activity
    */
   success = (activityId, message) => {
-    const time = Date.now()
+    const time = Date.now();
     const toLog = {
       level: "info",
       message,
-    }
+    };
 
     if (typeof activityId === "string" && this.activities_[activityId]) {
-      const activity = this.activities_[activityId]
+      const activity = this.activities_[activityId];
       if (activity.activity) {
-        activity.activity.succeed(`${message} – ${time - activity.start}ms`)
+        activity.activity.succeed(`${message} – ${time - activity.start}ms`);
       } else {
-        toLog["duration"] = time - activity.start
-        toLog["activity_id"] = activityId
-        this.loggerInstance_.log(toLog)
+        toLog["duration"] = time - activity.start;
+        toLog["activity_id"] = activityId;
+        this.loggerInstance_.log(toLog);
       }
     } else {
-      this.loggerInstance_.log(toLog)
+      this.loggerInstance_.log(toLog);
     }
 
     if (this.activities_[activityId]) {
-      const activity = this.activities_[activityId]
+      const activity = this.activities_[activityId];
       return {
         ...activity,
         duration: time - activity.start,
-      }
+      };
     }
 
-    return null
-  }
+    return null;
+  };
 
   /**
    * Logs a message at the info level.
@@ -314,8 +313,8 @@ export class Reporter {
     this.loggerInstance_.log({
       level: "debug",
       message,
-    })
-  }
+    });
+  };
 
   /**
    * Logs a message at the info level.
@@ -325,8 +324,8 @@ export class Reporter {
     this.loggerInstance_.log({
       level: "info",
       message,
-    })
-  }
+    });
+  };
 
   /**
    * Logs a message at the warn level.
@@ -336,21 +335,21 @@ export class Reporter {
     this.loggerInstance_.warn({
       level: "warn",
       message,
-    })
-  }
+    });
+  };
 
   /**
    * A wrapper around winston's log method.
    */
   log = (...args) => {
     // @ts-ignore
-    this.loggerInstance_.log(...args)
-  }
+    this.loggerInstance_.log(...args);
+  };
 }
 
 const logger = new Reporter({
   logger: loggerInstance,
   activityLogger: ora,
-})
+});
 
-export default logger
+export default logger;

@@ -127,43 +127,49 @@ export default class QueueService extends AbstractQueueService {
     consumer: Consumer,
     context: ConsumerContext
   ): Promise<void> {
-    if (typeof consumer !== `function`) {
-      throw new Error("Subscriber must be a function");
-    }
-    const kafkaConsumer = this.kafkaClient_.consumer({
-      groupId: context.groupId,
-      sessionTimeout: 60000, // 60 seconds
-    });
-    kafkaConsumer.connect();
-    kafkaConsumer.subscribe({ topic: topicName, fromBeginning: false });
-    kafkaConsumer.run({
-      eachBatchAutoResolve: true,
-      eachBatch: async ({ batch, heartbeat }) => {
-        try {
-          const docs: IndexableDocument[] = batch.messages.map((message) => {
-            return JSON.parse(message.value.toString()) as IndexableDocument;
-          });
-          this.logger_.info(
-            `eachBatch: Batch Received ${docs.length} messages`
-          );
-          consumer(docs, topic).catch((error) => {
+    try {
+      if (typeof consumer !== `function`) {
+        throw new Error("Subscriber must be a function");
+      }
+      const kafkaConsumer = this.kafkaClient_.consumer({
+        groupId: context.groupId,
+        sessionTimeout: 60000, // 60 seconds
+      });
+      kafkaConsumer.connect();
+      kafkaConsumer.subscribe({ topic: topicName, fromBeginning: false });
+      kafkaConsumer.run({
+        eachBatchAutoResolve: true,
+        eachBatch: async ({ batch, heartbeat }) => {
+          try {
+            const docs: IndexableDocument[] = batch.messages.map((message) => {
+              return JSON.parse(message.value.toString()) as IndexableDocument;
+            });
+            this.logger_.info(
+              `eachBatch: Batch Received ${docs.length} messages`
+            );
+            consumer(docs, topic).catch((error) => {
+              this.logger_.error(`Error processing message: ${error.message}`);
+            });
+            this.logger_.info(
+              `eachBatch: Batch Processing ${docs.length} done`
+            );
+            await heartbeat();
+          } catch (error) {
             this.logger_.error(`Error processing message: ${error.message}`);
-          });
-          this.logger_.info(`eachBatch: Batch Processing ${docs.length} done`);
-          await heartbeat();
-        } catch (error) {
-          this.logger_.error(`Error processing message: ${error.message}`);
-        }
-      },
-    });
+          }
+        },
+      });
 
-    const randId = ulid();
-    const topic = topicName.toString();
+      const randId = ulid();
+      const topic = topicName.toString();
 
-    this.storeConsumers({
-      topicName,
-      consumerId: `${topic}-${randId}`,
-      consumer: kafkaConsumer,
-    });
+      this.storeConsumers({
+        topicName,
+        consumerId: `${topic}-${randId}`,
+        consumer: kafkaConsumer,
+      });
+    } catch (error) {
+      this.logger_.error(`Error subscribing to topic: ${error.message}`);
+    }
   }
 }
