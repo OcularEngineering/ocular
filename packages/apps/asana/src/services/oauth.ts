@@ -127,7 +127,7 @@ class AsanaOauth extends OauthService {
           token_expires_at: new Date(Date.now() + res.data.expires_in * 1000),
           refresh_token: res.data.refresh_token,
           refresh_token_expires_at: new Date(Date.now() + 172800 * 1000),
-          auth_strategy: this.auth_strategy_,
+          auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
         } as OAuthToken;
       })
       .catch((err) => {

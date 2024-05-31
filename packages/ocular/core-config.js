@@ -54,7 +54,7 @@ module.exports = {
         client_secret: process.env.ASANA_CLIENT_SECRET,
         scope: "openid email profile",
         redirect_uri: `${UI_CORS}/dashboard/marketplace/asana`,
-        auth_strategy: AppAuthStrategy.API_TOKEN_STRATEGY,
+        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
         rate_limiter_opts: {
           requests: 1500, // Number of Requests
           interval: 60, // Interval in Seconds
