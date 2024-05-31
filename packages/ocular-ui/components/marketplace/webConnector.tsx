@@ -1,5 +1,6 @@
 'use client';
 
+import SectionContainer from '@/components/section-container';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -18,7 +19,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';;
 import {
   Table,
   TableBody,
@@ -44,7 +44,6 @@ import {
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import SectionContainer from '@/components/section-container';
 
 export type Link = {
   location: string;
@@ -90,7 +89,6 @@ export default function WebConnector({ links }: { links: Link[] }) {
   });
 
   async function formSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
     const { title, description, link } = values;
 
     try {

@@ -1,5 +1,6 @@
 import { EntityManager } from "typeorm";
 import {
+  AppAuthStrategy,
   AppNameDefinitions,
   Logger,
   TransactionBaseService,
@@ -68,7 +69,7 @@ class OAuthService extends TransactionBaseService {
         app_name: retrieveConfig.app_name,
       },
     });
-    return oauth;
+    return oauth as OAuth;
   }
 
   // List Apps Owned BY The Logged In User
@@ -98,7 +99,7 @@ class OAuthService extends TransactionBaseService {
       organisation: this.loggedInUser_.organisation,
       ...app,
     });
-    return await oauthRepo.save(application);
+    return (await oauthRepo.save(application)) as OAuth;
   }
 
   async generateToken(
@@ -133,7 +134,6 @@ class OAuthService extends TransactionBaseService {
     }
 
     const token: OAuthToken = await service.generateToken(code, installationId);
-
     const oauth = this.oauthRepository_.find({
       where: {
         organisation_id: this.loggedInUser_.organisation_id,
@@ -153,6 +153,7 @@ class OAuthService extends TransactionBaseService {
       type: token.type,
       token: token.token,
       token_expires_at: token.token_expires_at,
+      auth_strategy: token.auth_strategy,
       refresh_token: token.refresh_token,
       refresh_token_expires_at: token.refresh_token_expires_at,
       organisation: this.loggedInUser_.organisation,
@@ -206,7 +207,7 @@ class OAuthService extends TransactionBaseService {
       oauth.metadata = metadata;
     }
 
-    return await repo.save(oauth);
+    return (await repo.save(oauth)) as OAuth;
   }
 }
 

@@ -1,52 +1,67 @@
-import { CreateDateColumn, BeforeInsert, Column, Entity, Index, JoinColumn, ManyToOne, OneToMany} from "typeorm"
-import { DbAwareColumn } from "../../../utils/src/db-aware-column"
-import { generateEntityId } from "../utils/generate-entity-id"
-import { Organisation } from "./organisation"
-import { AppNameDefinitions, BaseEntity } from "@ocular/types"
-import { resolveDbType } from "@ocular/utils"
-import { App } from "./app"
-import { Event } from "./event"
-import { type } from "os"
-
+import {
+  CreateDateColumn,
+  BeforeInsert,
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+} from "typeorm";
+import { DbAwareColumn } from "../../../utils/src/db-aware-column";
+import { generateEntityId } from "../utils/generate-entity-id";
+import { Organisation } from "./organisation";
+import { AppNameDefinitions, BaseEntity, AppAuthStrategy } from "@ocular/types";
+import { resolveDbType } from "@ocular/utils";
+import { App } from "./app";
+import { Event } from "./event";
+import { type } from "os";
 
 @Entity()
 export class OAuth extends BaseEntity {
-
   @Index("OAuthAppName")
   @DbAwareColumn({
     type: "enum",
     enum: AppNameDefinitions,
     nullable: false,
-    unique: false
+    unique: false,
   })
-  app_name: AppNameDefinitions
+  app_name: AppNameDefinitions;
+
+  @DbAwareColumn({
+    type: "enum",
+    enum: AppAuthStrategy,
+    nullable: false,
+    unique: false,
+  })
+  auth_strategy: AppAuthStrategy;
 
   @Column({ type: "varchar", nullable: false })
-  type: string
+  type: string;
 
   @Column({ type: "varchar", nullable: false })
-  token: string
+  token: string;
 
   @CreateDateColumn({ type: resolveDbType("timestamptz") })
-  token_expires_at: Date
+  token_expires_at: Date;
 
   @Column({ type: "varchar", nullable: false })
-  refresh_token: string
+  refresh_token: string;
 
   @CreateDateColumn({ type: resolveDbType("timestamptz") })
-  refresh_token_expires_at: Date
+  refresh_token_expires_at: Date;
 
-  @Column({ type: "timestamptz", nullable: true, default: () => 'NULL'})
+  @Column({ type: "timestamptz", nullable: true, default: () => "NULL" })
   last_sync: Date;
- 
+
   @Column({ type: "varchar", nullable: true })
   organisation_id: string;
 
   @DbAwareColumn({ type: "jsonb", nullable: true })
-  metadata?: Record<string, unknown> | null
+  metadata?: Record<string, unknown> | null;
 
   @ManyToOne(() => Organisation, (organisation) => organisation.members)
-  @JoinColumn({ name: 'organisation_id', referencedColumnName: 'id' })
+  @JoinColumn({ name: "organisation_id", referencedColumnName: "id" })
   organisation: Organisation;
 
   @OneToMany(() => Event, (event) => event?.oauth)
@@ -57,6 +72,6 @@ export class OAuth extends BaseEntity {
    */
   @BeforeInsert()
   private beforeInsert(): void {
-    this.id = generateEntityId(this.id, "oauth")
+    this.id = generateEntityId(this.id, "oauth");
   }
 }

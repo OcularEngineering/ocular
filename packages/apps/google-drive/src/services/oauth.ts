@@ -5,19 +5,23 @@ import {
   AppNameDefinitions,
   AppCategoryDefinitions,
   OAuthToken,
+  AppAuthStrategy,
 } from "@ocular/types";
 import { config } from "process";
 import { OAuth2Client } from "google-auth-library";
+import { auth } from "googleapis/build/src/apis/abusiveexperiencereport";
 
 class GoogleDriveOauth extends OauthService {
   protected client_id_: string;
   protected client_secret_: string;
   protected oauth2Client_: OAuth2Client;
+  protected auth_strategy_: AppAuthStrategy;
 
   constructor(container, options) {
     super(arguments[0]);
     this.client_id_ = options.client_id;
     this.client_secret_ = options.client_secret;
+    this.auth_strategy_ = options.auth_strategy;
     this.oauth2Client_ = new google.auth.OAuth2(
       options.client_id,
       options.client_secret,
@@ -32,6 +36,7 @@ class GoogleDriveOauth extends OauthService {
       options.client_secret,
       options.redirect_uri
     );
+    const auth_strategy = options.auth_strategy;
     const authorizeUrl = oauth2Client.generateAuthUrl({
       access_type: "offline",
       prompt: "consent",
@@ -49,6 +54,7 @@ class GoogleDriveOauth extends OauthService {
       oauth_url: authorizeUrl,
       slug: AppNameDefinitions.GOOGLEDRIVE,
       category: AppCategoryDefinitions.FILE_STORAGE,
+      auth_strategy: auth_strategy,
       developer: "Ocular AI",
       images: ["/google-drive.png"],
       overview:
@@ -81,6 +87,7 @@ class GoogleDriveOauth extends OauthService {
         token_expires_at: new Date(tokens.expiry_date),
         refresh_token: tokens.refresh_token,
         refresh_token_expires_at: new Date(Date.now() + 172800000),
+        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
       };
     } catch (error) {
       console.error(error);

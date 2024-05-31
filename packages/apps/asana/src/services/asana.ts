@@ -38,7 +38,6 @@ export default class AsanaService extends TransactionBaseService {
     org: Organisation
   ): AsyncGenerator<IndexableDocument[]> {
     this.logger_.info(`Starting oculation of Asana for ${org.id} organisation`);
-
     // Get Asana OAuth for the organisation
     const oauth = await this.oauthService_.retrieve({
       id: org.id,

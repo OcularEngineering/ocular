@@ -1,4 +1,4 @@
-const { PluginNameDefinitions } = require("@ocular/types");
+const { PluginNameDefinitions, AppAuthStrategy } = require("@ocular/types");
 const dotenv = require("dotenv");
 
 let ENV_FILE_NAME = "";
@@ -56,60 +56,61 @@ module.exports = {
         client_secret: process.env.ASANA_CLIENT_SECRET,
         scope: "openid email profile",
         redirect_uri: `${UI_CORS}/dashboard/marketplace/asana`,
+        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
         rate_limiter_opts: {
           requests: 1500, // Number of Requests
           interval: 60, // Interval in Seconds
         },
       },
     },
-    {
-      resolve: `confluence`,
-      options: {
-        client_id: process.env.CONFLUENCE_CLIENT_ID,
-        client_secret: process.env.CONFLUENCE_CLIENT_SECRET,
-        redirect_uri: `${UI_CORS}/dashboard/marketplace/confluence`,
-        rate_limiter_opts: {
-          requests: 10, // Number of Requests
-          interval: 1, // Interval in Seconds
-        },
-      },
-    },
-    {
-      resolve: `jira`,
-      options: {
-        client_id: process.env.JIRA_CLIENT_ID,
-        client_secret: process.env.JIRA_CLIENT_SECRET,
-        redirect_uri: `${UI_CORS}/dashboard/marketplace/jira`,
-        rate_limiter_opts: {
-          requests: 10, // Number of Requests
-          interval: 1, // Interval in Seconds
-        },
-      },
-    },
-    {
-      resolve: `notion`,
-      options: {
-        client_id: process.env.NOTION_CLIENT_ID,
-        client_secret: process.env.NOTION_CLIENT_SECRET,
-        redirect_uri: `${UI_CORS}/dashboard/marketplace/notion`,
-      },
-      rate_limiter_opts: {
-        requests: 3, // Number of Requests
-        interval: 1, // Interval in Seconds
-      },
-    },
-    {
-      resolve: `slack`,
-      options: {
-        client_id: process.env.SLACK_CLIENT_ID,
-        client_secret: process.env.SLACK_CLIENT_SECRET,
-        redirect_uri: `${UI_CORS}/dashboard/marketplace/slack`,
-        rate_limiter_opts: {
-          requests: 60, // Number of Requests
-          interval: 60, // Interval in Seconds
-        },
-      },
-    },
+    // {
+    //   resolve: `confluence`,
+    //   options: {
+    //     client_id: process.env.CONFLUENCE_CLIENT_ID,
+    //     client_secret: process.env.CONFLUENCE_CLIENT_SECRET,
+    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/confluence`,
+    //     rate_limiter_opts: {
+    //       requests: 10, // Number of Requests
+    //       interval: 1, // Interval in Seconds
+    //     },
+    //   },
+    // },
+    // {
+    //   resolve: `jira`,
+    //   options: {
+    //     client_id: process.env.JIRA_CLIENT_ID,
+    //     client_secret: process.env.JIRA_CLIENT_SECRET,
+    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/jira`,
+    //     rate_limiter_opts: {
+    //       requests: 10, // Number of Requests
+    //       interval: 1, // Interval in Seconds
+    //     },
+    //   },
+    // },
+    // {
+    //   resolve: `notion`,
+    //   options: {
+    //     client_id: process.env.NOTION_CLIENT_ID,
+    //     client_secret: process.env.NOTION_CLIENT_SECRET,
+    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/notion`,
+    //   },
+    //   rate_limiter_opts: {
+    //     requests: 3, // Number of Requests
+    //     interval: 1, // Interval in Seconds
+    //   },
+    // },
+    // {
+    //   resolve: `slack`,
+    //   options: {
+    //     client_id: process.env.SLACK_CLIENT_ID,
+    //     client_secret: process.env.SLACK_CLIENT_SECRET,
+    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/slack`,
+    //     rate_limiter_opts: {
+    //       requests: 60, // Number of Requests
+    //       interval: 60, // Interval in Seconds
+    //     },
+    //   },
+    // },
     // {
     //   resolve: "bitbucket",
     //   options: {
@@ -118,47 +119,49 @@ module.exports = {
     //     redirect_uri: `${UI_CORS}/dashboard/marketplace/bitbucket`,
     //   },
     // },
-    {
-      resolve: `github`,
-      options: {
-        client_id: process.env.GITHUB_CLIENT_ID,
-        client_secret: process.env.GITHUB_CLIENT_SECRET,
-        redirect_uri: `${UI_CORS}/dashboard/marketplace/github`,
-        app_id: process.env.GITHUB_APP_ID,
-        private_key: process.env.GITHUB_PRIVATE_KEY_PATH,
-        scope: "repo",
-      },
-    },
+    // {
+    //   resolve: `github`,
+    //   options: {
+    //     client_id: process.env.GITHUB_CLIENT_ID,
+    //     client_secret: process.env.GITHUB_CLIENT_SECRET,
+    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/github`,
+    //     app_id: process.env.GITHUB_APP_ID,
+    //     private_key: process.env.GITHUB_PRIVATE_KEY_PATH,
+    //     scope: "repo",
+    //   },
+    // },
     {
       resolve: `google-drive`,
       options: {
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/google-drive`,
+        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
         rate_limiter_opts: {
           requests: 60, // Number of Requests
           interval: 60, // Interval in Seconds
         },
       },
     },
-    {
-      resolve: `gmail`,
-      options: {
-        client_id: process.env.GOOGLE_CLIENT_ID,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: `${UI_CORS}/dashboard/marketplace/gmail`,
-        rate_limiter_opts: {
-          requests: 60, // Number of Requests
-          interval: 60, // Interval in Seconds
-        },
-      },
-    },
+    // {
+    //   resolve: `gmail`,
+    //   options: {
+    //     client_id: process.env.GOOGLE_CLIENT_ID,
+    //     client_secret: process.env.GOOGLE_CLIENT_SECRET,
+    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/gmail`,
+    //     rate_limiter_opts: {
+    //       requests: 60, // Number of Requests
+    //       interval: 60, // Interval in Seconds
+    //     },
+    //   },
+    // },
     {
       resolve: `webConnector`,
       options: {
         client_id: "FAKE_ID",
         client_secret: "FAKE_SECRET",
         redirect_uri: `${UI_CORS}/dashboard/marketplace/webConnector`,
+        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
       },
     },
     // {
