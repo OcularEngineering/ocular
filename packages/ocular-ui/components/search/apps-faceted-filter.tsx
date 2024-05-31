@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useEffect, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { CheckIcon } from "@radix-ui/react-icons";
 import Image from 'next/image';
 import {
@@ -45,18 +45,20 @@ export function AppsFacetedFilter<TData, TValue>({
   Icon,
 }: AppsFacetedFilterProps<TData, TValue>) {
   const [selectedValues, setSelectedValues] = useState<Set<string>>(new Set()); // Track selected values with a Set
-  const [selectedArray, setSelectedArray] = useState<string[]>([]); // Additional state for an array of selected values
 
-  const { setselectedResultSources, selectedResultSources } = useContext(ApplicationContext);
+  const { setselectedResultSources } = useContext(ApplicationContext);
 
-  // Effect to print and handle selected values array whenever selectedValues changes
-  useEffect(() => {
-    const newSelectedArray = Array.from(selectedValues);
-    
-    setSelectedArray(newSelectedArray);
+  const handleSelect = (value: string) => {
+    const newSelectedValues = new Set(selectedValues);
+    if (newSelectedValues.has(value)) {
+      newSelectedValues.delete(value);
+    } else {
+      newSelectedValues.add(value);
+    }
+    setSelectedValues(newSelectedValues); // Update state
+    const newSelectedArray = Array.from(newSelectedValues);
     setselectedResultSources(newSelectedArray); // Update the result sources whenever selection changes
-    
-  }, [selectedValues, setselectedResultSources]);
+  };
 
   return (
     <Popover>
@@ -117,15 +119,7 @@ export function AppsFacetedFilter<TData, TValue>({
                 return (
                   <CommandItem
                     key={option.value}
-                    onSelect={() => {
-                      const newSelectedValues = new Set(selectedValues);
-                      if (isSelected) {
-                        newSelectedValues.delete(option.value);
-                      } else {
-                        newSelectedValues.add(option.value);
-                      }
-                      setSelectedValues(newSelectedValues); // Update state
-                    }}
+                    onSelect={() => handleSelect(option.value)}
                   >
                     <div
                       className={cn(
@@ -153,7 +147,7 @@ export function AppsFacetedFilter<TData, TValue>({
                   <CommandItem
                     onSelect={() => {
                       setSelectedValues(new Set());
-                      setSelectedArray([]); // Clear the selection array as well
+                      setselectedResultSources([]); // Clear the selection array as well
                     }}
                     className="justify-center text-center"
                   >

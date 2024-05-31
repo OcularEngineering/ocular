@@ -3,6 +3,8 @@ const dotenv = require("dotenv");
 
 let ENV_FILE_NAME = "";
 switch (process.env.NODE_ENV) {
+  case "local":
+    ENV_FILE_NAME = ".env.local";
   case "production":
     ENV_FILE_NAME = ".env.production";
     break;
@@ -16,7 +18,7 @@ switch (process.env.NODE_ENV) {
     ENV_FILE_NAME = ".env.dev";
     break;
   default:
-    ENV_FILE_NAME = ".env.dev";
+    ENV_FILE_NAME = ".env.local";
     break;
 }
 

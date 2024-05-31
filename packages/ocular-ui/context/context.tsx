@@ -11,11 +11,12 @@ import { da } from "date-fns/locale"
 // import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { Dispatch, SetStateAction, createContext } from "react"
 import { DateRange } from "react-day-picker"
+import { Profile } from "@/types/types";
 
 interface ApplicationContext {
   // PROFILE STORE
-  // profile: Profile | null
-  // setProfile: Dispatch<SetStateAction<Profile | null>>
+  profile: Profile | null
+  setProfile: Dispatch<SetStateAction<Profile | null>>
 
   // // ITEMS STORE
   // assistants: Tables<"assistants">[]
@@ -142,9 +143,9 @@ interface ApplicationContext {
 }
 
 export const ApplicationContext = createContext<ApplicationContext>({
-// PROFILE STORE
-  // profile: null,
-  // setProfile: () => {},
+  // PROFILE STORE
+  profile: null,
+  setProfile: () => {},
 
 //   // ITEMS STORE
 //   assistants: [],

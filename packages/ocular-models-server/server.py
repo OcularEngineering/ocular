@@ -17,7 +17,6 @@ model = AutoModel.from_pretrained(model_id).to(device)
 model.eval()
 
 def embed(docs: list[str]) -> list[list[float]]:
-    print(docs)
     # tokenize
     tokens = tokenizer(
         docs, padding=True, max_length=512, truncation=True, return_tensors="pt"

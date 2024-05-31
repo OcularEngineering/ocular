@@ -17,25 +17,24 @@ async function kafkaLoader({
   configModule,
   logger,
 }: Options): Promise<void> {
+  console.log("Kafka Loader", configModule.projectConfig.kafka_url);
   if (configModule.projectConfig.kafka_url) {
-    const kafkaClient = new Kafka({
-      clientId: "ocular",
-      brokers: [configModule.projectConfig.kafka_url],
-      logLevel: logLevel.ERROR,
-    });
-
     try {
+      const kafkaClient = new Kafka({
+        clientId: "ocular",
+        brokers: [configModule.projectConfig.kafka_url],
+        logLevel: logLevel.ERROR,
+      });
       await kafkaClient.admin().connect();
       logger?.info(`Connection to Kafka established`);
+      container.register({
+        kafkaClient: asValue(kafkaClient),
+      });
     } catch (err) {
       throw new Error(
         `An error occurred while connecting to Kafka:${EOL} ${err}`
       );
     }
-
-    container.register({
-      kafkaClient: asValue(kafkaClient),
-    });
   } else {
     throw new Error(
       `No Kafka url was provided - using Ocular without a proper Kafka instance is allowed`

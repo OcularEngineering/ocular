@@ -47,40 +47,29 @@ First, make sure you have the Docker installed on your device. You can download 
 1. Clone the Ocular directory.
 
    ```sh
-   git clone https://github.com/OcularEngineering/ocular.git
+   git clone https://github.com/OcularEngineering/ocular.git && cd ocular
    ```
 
-2. Navigate to Ocular Dir
-
-   ```sh
-    cd ocular
-   ```
-
-3. In the home directory, open `env.local.example` add the required env variables
+2. In the home directory, open `env.local` add the required OPEN AI env variables
 
     - <u>Required Keys</u>
 
-      -  Open AI Keys (Azure|Open AI) - To run Ocular **an LLM provider must be setup in the backend** . By default Azure Open AI is the LLM Provider for Ocular so please add the Azure Open AI keys in `env.local`.
-      - Support for Open AI is coming soon!
+      -  Open AI Keys - To run Ocular **an LLM provider must be setup in the backend** . By default Open AI is the LLM Provider for Ocular so please add the Open AI keys in `env.local`.
+      - Support for other LLM providers is coming soon!
   
     - <u>Optional Keys</u>
       - Apps (Gmail|GoogleDrive|Asana|GitHub etc) - To Index Documents from Apps the Api keys have to be set up in the `env.local` for that specific app. Please read our docs on how to set up each app.
 
-4. Copy the example `env.local.example` to `.env.local`
+
+4. Run Docker.
 
    ```sh
-      cp env.local.example packages/ocular/.env.local
-   ```
-
-5. Run Docker.
-
-   ```sh
-   docker compose -f docker-compose.local.yml up
+   docker compose -f docker-compose.local.yml up --build --force-recreate
    ```
 
 This command initializes the containers specified in the `docker-compose.local.yml` file. It might take a few moments to complete, depending on your computer and internet connection.
 
-Once the `docker compose` process completes, you should have your local version of Ocular up and running within Docker containers. You can access it at `http://localhost:3001`.
+Once the `docker compose` process completes, you should have your local version of Ocular up and running within Docker containers. You can access it at `http://localhost:3001/create-account`.
 
 Remember to keep the Docker application open as long as you're working with your local Ocular instance.
 
@@ -91,3 +80,7 @@ We love contributions. Check out our guide to see how to [get started](https://g
 Not sure where to get started? You can:
 
 - Join our <a href="https://join.slack.com/t/ocular-ai/shared_invite/zt-2g7ka0j1c-Tx~Q46MjplNma2Sk2Ruplw">Slack</a>, and ask us any questions there.
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=OcularEngineering/ocular&type=Date)](https://star-history.com/#OcularEngineering/ocular&Date)

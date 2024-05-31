@@ -51,7 +51,7 @@ class Telemeter {
     let enabled = this.store_.getConfig(`telemetry.enabled`)
     if (enabled === undefined || enabled === null) {
       if (!isCI()) {
-        showAnalyticsNotification()
+        // showAnalyticsNotification()
       }
       enabled = true
       this.store_.setConfig(`telemetry.enabled`, enabled)

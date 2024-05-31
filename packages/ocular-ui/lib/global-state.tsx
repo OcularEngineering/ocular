@@ -5,7 +5,7 @@
 import { ApplicationContext } from "@/context/context"
 import  api  from "@/services/api"
 import { DateRange } from "react-day-picker";
-import { addDays, format as formatDateFns } from "date-fns"
+import { Profile } from "@/types/types";
 
 import {
   Chat,
@@ -29,10 +29,9 @@ interface GlobalStateProps {
 }
 
 export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
-  const router = useRouter()
 
   // PROFILE STORE
-  // const [profile, setProfile] = useState<Tables<"profiles"> | null>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
 
   // ITEMS STORE
   // const [assistants, setAssistants] = useState<Tables<"assistants">[]>([])
@@ -165,8 +164,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   }, [])
 
   const fetchStartingChatData = async () => {
-    const user = await (await api.auth.loggedInUserDetails()).data.user
-    console.log("user",user)
+    // const user = await (await api.auth.loggedInUserDetails()).data.user
 
     // if (user) {
     //   const user = session.user
@@ -213,9 +211,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   return (
     <ApplicationContext.Provider
       value={{
-        // // PROFILE STORE
-        // profile,
-        // setProfile,
+        
+        // PROFILE STORE
+        profile,
+        setProfile,
 
         // // ITEMS STORE
         // assistants,
