@@ -267,7 +267,7 @@ function Integrations() {
                               )}
                             />
                           </div>
-                          <Button type="submit" className="ml-auto mt-2">
+                          <Button type="submit" className="w-full mt-4">
                             Add {integration.name} for Ocular
                           </Button>
                         </form>

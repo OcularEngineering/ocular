@@ -48,7 +48,6 @@ export default class AsanaService extends TransactionBaseService {
       return;
     }
 
-    console.log("OAUTH", oauth);
     // Get the last sync date - this is the time the latest document that was synced from Google Drive.
     let last_sync = "";
     if (oauth.last_sync !== null) {

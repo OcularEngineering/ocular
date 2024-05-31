@@ -8,6 +8,7 @@ import {
   AppAuthStrategy,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
+import { TokenTypes } from "@ocular/types/src/apps/definition";
 
 class AsanaOauth extends OauthService {
   protected client_id_: string;
@@ -88,7 +89,7 @@ class AsanaOauth extends OauthService {
 
     if (this.auth_strategy_ === AppAuthStrategy.API_TOKEN_STRATEGY) {
       return {
-        type: "API token",
+        type: TokenTypes.BEARER,
         token: code,
         token_expires_at: new Date(),
         refresh_token: code,

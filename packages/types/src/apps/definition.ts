@@ -25,6 +25,10 @@ export enum AppAuthStrategy {
   OAUTH_TOKEN_STRATEGY = "OAUTHTOKEN",
 }
 
+export enum TokenTypes {
+  BEARER = "Bearer",
+}
+
 export enum AppCategoryDefinitions {
   /**
    * GitHub
