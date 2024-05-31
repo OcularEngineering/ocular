@@ -6,9 +6,9 @@ import {
   AppCategoryDefinitions,
   OAuthToken,
   AppAuthStrategy,
+  TokenTypes,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
-import { TokenTypes } from "@ocular/types/src/apps/definition";
 
 class AsanaOauth extends OauthService {
   protected client_id_: string;
