@@ -130,18 +130,19 @@ module.exports = {
     //     scope: "repo",
     //   },
     // },
-    // {
-    //   resolve: `google-drive`,
-    //   options: {
-    //     client_id: process.env.GOOGLE_CLIENT_ID,
-    //     client_secret: process.env.GOOGLE_CLIENT_SECRET,
-    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/google-drive`,
-    //     rate_limiter_opts: {
-    //       requests: 60, // Number of Requests
-    //       interval: 60, // Interval in Seconds
-    //     },
-    //   },
-    // },
+    {
+      resolve: `google-drive`,
+      options: {
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/google-drive`,
+        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
+        rate_limiter_opts: {
+          requests: 60, // Number of Requests
+          interval: 60, // Interval in Seconds
+        },
+      },
+    },
     // {
     //   resolve: `gmail`,
     //   options: {
@@ -154,14 +155,15 @@ module.exports = {
     //     },
     //   },
     // },
-    // {
-    //   resolve: `webConnector`,
-    //   options: {
-    //     client_id: "FAKE_ID",
-    //     client_secret: "FAKE_SECRET",
-    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/webConnector`,
-    //   },
-    // },
+    {
+      resolve: `webConnector`,
+      options: {
+        client_id: "FAKE_ID",
+        client_secret: "FAKE_SECRET",
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/webConnector`,
+        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
+      },
+    },
     // {
     //   resolve: `github`,
     //   options: {
