@@ -12,12 +12,12 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
   return (
     <nav
       className={cn(
-        "flex flex-col lg:space-x-0 lg:space-y-1",
+        "flex flex-col lg:space-y-2 mt-20 mx-5",
         className
       )}
       {...props}
     >
-      {items.map((item, index) => (
+      {items.map((item) => (
         <Link
           key={item.href}
           href={item.href}
@@ -25,9 +25,8 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
             buttonVariants({ variant: "ghost" }),
             pathname === item.href
               ? "bg-muted hover:bg-muted"
-              : "hover:bg-transparent hover:underline",
-            "justify-start",
-            index === 0 ? "mb-0" : ""  
+              : "hover:bg-gray-100 dark:hover:bg-muted",
+            "justify-start hover:dark:bg-muted box-border flex h-10 cursor-pointer justify-start rounded-full px-5 hover:bg-gray-100"
           )}
         >
           {item.title}

@@ -30,7 +30,7 @@ interface IntegrationsByCategory {
   [key: string]: Integration[];
 }
 
-function BrowseAppsPage() {
+function BrowseApps() {
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [allIntegrations, setAllIntegrations] = useState<Integration[]>([]);
   const [search, setSearch] = useState('');
@@ -107,7 +107,7 @@ function BrowseAppsPage() {
         <meta name="description" content={metadata.description}></meta>
         <link rel="icon" href="/Ocular-Profile-Logo.png" />
       </Head>
-      <SectionContainer className=" space-y-10">
+      <SectionContainer className=" space-y-10 mb-10">
         <div className="flex flex-col items-center justify-center space-y-5">
           <div className="dark:bg-transparent md:dark:hover:border-gray-100 mt-5 flex w-full max-w-md items-center  rounded-full border bg-white  px-5 py-2 focus-within:shadow hover:shadow sm:max-w-xl sm:py-3 md:hover:border-white lg:max-w-4xl">
             {/* <IconSearch className="mr-3 h-6 text-gray-600 " /> */}
@@ -162,4 +162,4 @@ function BrowseAppsPage() {
   );
 }
 
-export default BrowseAppsPage;
+export default BrowseApps;
