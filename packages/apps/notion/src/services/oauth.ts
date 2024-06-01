@@ -26,6 +26,7 @@ class NotionOauth extends OauthService {
     const client_id = options.client_id;
     const client_secret = options.client_secret;
     const redirect = options.redirect_uri;
+    const auth_strategy = options.auth_strategy;
     return {
       name: AppNameDefinitions.NOTION,
       logo: '/notion.svg',
@@ -37,6 +38,7 @@ class NotionOauth extends OauthService {
       slug: AppNameDefinitions.NOTION,
       category: AppCategoryDefinitions.PRODUCTIVITY,
       developer: 'Ocular AI',
+      auth_strategy: auth_strategy,
       images: ['/notion.svg'],
       overview:
         'Notion is a single space where you can think, write, and plan. Capture thoughts, manage projects, or even run an entire company — and do it exactly the way you want.',

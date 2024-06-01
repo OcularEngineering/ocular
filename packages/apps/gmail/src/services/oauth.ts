@@ -37,7 +37,7 @@ class GmailOauth extends OauthService {
     });
     const client_id = options.client_id
     const client_secret = options.client_secret
-
+    const auth_strategy = options.auth_strategy;
     return {
       name: AppNameDefinitions.GMAIL,
       logo: "/gmail.png",
@@ -46,6 +46,7 @@ class GmailOauth extends OauthService {
       oauth_url: authorizeUrl,
       slug:AppNameDefinitions.GMAIL,
       category:AppCategoryDefinitions.FILE_STORAGE,
+      auth_strategy: auth_strategy,
       developer:"Ocular AI",
       images:["/gmail.png"],
       overview: "Gmail uses industry-leading encryption for all messages you receive and send. We never use your Gmail content to personalize ads.",

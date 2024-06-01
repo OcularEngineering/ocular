@@ -26,12 +26,14 @@ class GithubOauth extends OauthService {
     const client_id = options.client_id
     const client_secret = options.client_secret
     const redirect = options.redirect_uri
+    const auth_strategy = options.auth_strategy;
     return {
       name: AppNameDefinitions.GITHUB,
       logo: "/github.svg",
       description: "GitHub is a web code hosting platform for version control and collaboration. It lets you and others work together on projects from anywhere.",
       oauth_url: `https://github.com/apps/ocular-ai/installations/new`,
       slug:AppNameDefinitions.GITHUB,
+      auth_strategy: auth_strategy,
       category:AppCategoryDefinitions.SOTWARE_DEVELOPMENT,
       developer:"Ocular AI",
       images:["/github.svg"],
