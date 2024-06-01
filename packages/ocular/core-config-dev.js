@@ -1,5 +1,4 @@
 const { PluginNameDefinitions, AppAuthStrategy } = require("@ocular/types");
-const { PluginNameDefinitions, AppAuthStrategy } = require("@ocular/types");
 const dotenv = require("dotenv");
 
 let ENV_FILE_NAME = "";
