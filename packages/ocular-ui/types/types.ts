@@ -7,8 +7,8 @@ export interface SearchBarProps {
 }
 
 // SETTINGS TYPES
-export interface SettingsLayoutProps {
-  children: React.ReactNode;
+export interface MarketplaceLayoutProps {
+  children: React.ReactNode
 }
 
 export interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
