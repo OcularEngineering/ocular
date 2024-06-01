@@ -1,7 +1,9 @@
 import { EntityManager } from "typeorm";
-import { TransactionBaseService } from "@ocular/types";
+import { OauthService, TransactionBaseService } from "@ocular/types";
 import { Organisation, User } from "../models";
 import { OrganisationRepository } from "../repositories/organisation";
+import OAuthRepository from "../repositories/oauth";
+
 import { FindConfig } from "../types/common";
 import { buildQuery } from "../utils/build-query";
 import {
@@ -14,17 +16,18 @@ import { AutoflowAiError, AutoflowAiErrorTypes } from "@ocular/utils";
 import { AppNameDefinitions } from "@ocular/types";
 import { AppRepository } from "../repositories";
 import EventBusService from "./event-bus";
+import OAuthService from "./oauth";
 import Locator from "puppeteer";
+import { UpdateOAuthInput } from "../types/oauth";
 
 type InjectedDependencies = {
   manager: EntityManager;
   appRepository: typeof AppRepository;
   loggedInUser: User;
   organisationRepository: typeof OrganisationRepository;
+  oauthService: OAuthService;
   eventBusService: EventBusService;
 };
-
-type AppsArray = any;
 
 /**
  * Provides layer to manipulate store settings.
@@ -33,6 +36,7 @@ class OrganisationService extends TransactionBaseService {
   protected readonly appRepository_: typeof AppRepository;
   protected readonly loggedInUser_: User | null;
   protected readonly organisationRepository_: typeof OrganisationRepository;
+  protected oauthService_: OAuthService;
   protected readonly eventBusService_: EventBusService;
 
   constructor(container: InjectedDependencies) {
@@ -41,6 +45,7 @@ class OrganisationService extends TransactionBaseService {
     this.appRepository_ = container.appRepository;
     this.organisationRepository_ = container.organisationRepository;
     this.eventBusService_ = container.eventBusService;
+    this.oauthService_ = container.oauthService;
 
     try {
       this.loggedInUser_ = container.loggedInUser;
@@ -151,57 +156,55 @@ class OrganisationService extends TransactionBaseService {
     });
   }
 
-  async updateInstalledApp(
-    app_name: string,
-    data: any
-  ): Promise<AppsArray[] | null> {
+  async updateInstalledApp(app_name: string, data: any): Promise<any | null> {
     return await this.atomicPhase_(
       async (transactionManager: EntityManager) => {
         switch (app_name) {
           case AppNameDefinitions.WEBCONNECTOR:
-            const org = await this.listInstalledApps();
-            const installed_apps: any = org.installed_apps;
-            const webConnector_index = installed_apps.findIndex(
-              (app) => app.name === AppNameDefinitions.WEBCONNECTOR
-            );
+            //Retrieve the OAuth token
+            const oauthToken = await this.oauthService_.retrieve({
+              id: this.loggedInUser_.organisation_id,
+              app_name: AppNameDefinitions.WEBCONNECTOR,
+            });
 
-            if (webConnector_index !== -1) {
-              if (!installed_apps[webConnector_index].links) {
-                installed_apps[webConnector_index].links = [];
-              }
+            if (!oauthToken) {
+              throw new AutoflowAiError(
+                AutoflowAiError.Types.NOT_FOUND,
+                `No OAuth token found for ${AppNameDefinitions.WEBCONNECTOR}`
+              );
+            }
 
-              const linkExist = installed_apps[
-                webConnector_index
-              ].links.findIndex((ele) => ele.id === data.link_id);
-              if (linkExist !== -1) {
-                installed_apps[webConnector_index].links[linkExist] = {
-                  ...installed_apps[webConnector_index].links[linkExist],
-                  status: data.status,
-                };
-              } else {
-                installed_apps[webConnector_index].links.push({
-                  id: data.link_id,
-                  location: data.link,
-                  status: data.status,
-                  title: data.title,
-                  description: data.title,
-                });
-              }
+            const metadata = oauthToken.metadata;
 
-              await this.update(data.org_id, {
-                installed_apps,
+            // Ensure metadata.links is initialized as an array
+            if (!metadata.links) {
+              metadata.links = [];
+            }
+
+            if (Array.isArray(metadata.links)) {
+              metadata.links.push({
+                id: data.link_id,
+                location: data.link,
+                status: data.status,
+                title: data.title,
+                description: data.description,
               });
             }
+
+            // Update the metadata in Oauth token
+            await this.oauthService_.update(oauthToken.id, {
+              metadata,
+            } as UpdateOAuthInput);
+
             if (data.emit_event) {
               await this.eventBusService_.emit("webConnectorInstalled", {
                 organisation: this.loggedInUser_.organisation,
                 app_name: AppNameDefinitions.WEBCONNECTOR,
                 link: data.link,
                 link_id: data.link_id,
-                org_id: data.org_id,
               });
             }
-            return installed_apps[webConnector_index].links;
+            return metadata.links;
 
           default:
             return null;

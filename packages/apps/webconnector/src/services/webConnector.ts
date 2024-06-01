@@ -15,10 +15,14 @@ import {
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 import puppeteer, { Browser, Page } from "puppeteer";
+import { UpdateOAuthInput } from "@ocular/ocular/src/types/oauth";
 
 interface metadataLink {
   location: string;
   status: string;
+  title: string;
+  id: string;
+  description: string;
 }
 
 export default class webConnectorService extends TransactionBaseService {
@@ -38,19 +42,15 @@ export default class webConnectorService extends TransactionBaseService {
   async getWebConnectorData(
     org: Organisation,
     base_url: string,
-    link_id: string,
-    org_id: string
+    link_id: string
   ) {
-    return Readable.from(
-      this.crawlWebConnectorData(org, base_url, link_id, org_id)
-    );
+    return Readable.from(this.crawlWebConnectorData(org, base_url, link_id));
   }
 
   async *crawlWebConnectorData(
     org: Organisation,
     base_url: string,
-    link_id: string,
-    org_id: string
+    link_id: string
   ): AsyncGenerator<IndexableDocument[]> {
     this.logger_.info(
       `Starting oculation of webConnector for ${org.id} organisation`
@@ -100,34 +100,42 @@ export default class webConnectorService extends TransactionBaseService {
 
       yield documents;
 
-      await this.oauthService_.update(oauth.id, { last_sync: new Date() });
+      await this.oauthService_.update(oauth.id, {});
 
-      // const data = {
-      //   link_id,
-      //   emit_event: false,
-      //   status: "success",
-      //   org_id,
-      // };
-      // await this.organisationService_.updateInstalledApp(
-      //   AppNameDefinitions.WEBCONNECTOR,
-      //   data
-      // );
+      if (oauth.metadata && Array.isArray(oauth.metadata.links)) {
+        const linkIndex = oauth.metadata.links.findIndex(
+          (link: any) => link.id === link_id
+        );
+
+        if (linkIndex !== -1) {
+          oauth.metadata.links[linkIndex].status = "success";
+        }
+      }
+
+      await this.oauthService_.update(oauth.id, {
+        metadata: oauth.metadata,
+        last_sync: new Date(),
+      } as UpdateOAuthInput);
 
       this.logger_.info(
         `Finished oculation of Web Connector for ${org.id} organisation`
       );
     } catch (error) {
       console.error("Error fetching web commector content:", error);
-      // const data = {
-      //   link_id,
-      //   emit_event: false,
-      //   status: "failed",
-      //   org_id,
-      // };
-      // await this.organisationService_.updateInstalledApp(
-      //   AppNameDefinitions.WEBCONNECTOR,
-      //   data
-      // );
+      if (oauth.metadata && Array.isArray(oauth.metadata.links)) {
+        const linkIndex = oauth.metadata.links.findIndex(
+          (link: any) => link.id === link_id
+        );
+
+        if (linkIndex !== -1) {
+          oauth.metadata.links[linkIndex].status = "failed";
+        }
+      }
+
+      await this.oauthService_.update(oauth.id, {
+        metadata: oauth.metadata,
+        last_sync: new Date(),
+      } as UpdateOAuthInput);
     }
   }
 

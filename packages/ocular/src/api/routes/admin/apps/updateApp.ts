@@ -5,15 +5,14 @@ import {
   IsEnum,
   ValidateNested,
 } from "class-validator";
+import { AppNameDefinitions } from "@ocular/types";
 import { Type } from "class-transformer";
 import { validator } from "@ocular/utils";
 import { OAuthService, OrganisationService } from "../../../../services";
-import { AppNameDefinitions } from "@ocular/types";
 const { v4: uuidv4 } = require("uuid");
 
 export default async (req, res) => {
   const validated = await validator(PostAppsReq, req.body);
-  const loggedInUser = req.scope.resolve("loggedInUser");
   const organisationService: OrganisationService = req.scope.resolve(
     "organisationService"
   );
@@ -26,7 +25,6 @@ export default async (req, res) => {
         emit_event: true,
         status: "processing",
         link_id: uuidv4(),
-        org_id: loggedInUser.organisation_id,
       };
       break;
 

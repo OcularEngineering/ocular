@@ -16,7 +16,6 @@ import {
   FormControl,
   FormDescription,
   FormField,
-  FormItem,
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
@@ -82,11 +81,6 @@ function Integrations() {
     await authorizeApp(values.apiToken);
   }
 
-  const updateWebConnectorLinks = (apps: any) => {
-    const webConnector = apps.find((app: any) => app.name === 'webConnector');
-    setLinks(webConnector?.links || []);
-  };
-
   const addWebConnector = async () => {
     await authorizeApp('Fake Code');
   };
@@ -111,8 +105,33 @@ function Integrations() {
       }
     };
 
+    const fetchApp = async () => {
+      try {
+        const response = await api.apps.retrieveApp({
+          name: slug as string,
+        });
+
+        if (response) {
+          const fetchedApp = response.data.app;
+          const appMetadata = fetchedApp.metadata;
+
+          switch (slug) {
+            case WEBCONNECTOR:
+              setLinks(appMetadata.links || []);
+              break;
+
+            default:
+              break;
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch integration details', error);
+      }
+    };
+
+    fetchApp();
     fetchIntegration();
-  }, [slug]);
+  }, [slug, authorized]);
 
   useEffect(() => {
     const listInstalled = async () => {
@@ -123,9 +142,6 @@ function Integrations() {
             (app: any) => app.name === slug
           );
           setAuthorized(installed);
-          if (slug === WEBCONNECTOR && authorized) {
-            updateWebConnectorLinks(response.data.apps);
-          }
         }
       } catch (error) {
         console.error('Failed to get installed apps', error);

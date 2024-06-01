@@ -24,6 +24,7 @@ export default (app) => {
   // )
 
   route.get("/", middlewares.wrap(require("./list-apps").default));
+  route.post("/getapp", middlewares.wrap(require("./get-app").default));
   route.post(
     "/authorize",
     middlewares.wrap(require("./authorize-app").default)

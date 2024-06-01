@@ -27,8 +27,7 @@ class webConnectorStrategy extends AbstractBatchJobStrategy {
     const stream = await this.webConnectorService_.getWebConnectorData(
       batchJob.context?.org as Organisation,
       batchJob.context?.link as string,
-      batchJob.context?.link_id as string,
-      batchJob.context?.org_id as string
+      batchJob.context?.link_id as string
     );
     stream.on("data", (documents) => {
       this.queueService_.sendBatch(APPS_INDEXING_TOPIC, documents);
