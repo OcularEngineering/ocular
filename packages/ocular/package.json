@@ -22,11 +22,13 @@
     "watch": "tsc --build --watch",
     "prepublishOnly": "cross-env NODE_ENV=production tsc --build",
     "build": "rimraf dist && tsc --build",
-    "dev": "npm run build && nodemon dist/ocular/src/main.js",
+    "dev": "cross-env CONFIG_FILE=core-config-dev.js NODE_ENV=development npm run start",
+    "local": "cross-env CONFIG_FILE=core-config-local.js NODE_ENV=local npm run start",
     "start": "npm run build && nodemon dist/ocular/src/main.js",
     "clean": "rimraf dist node_modules",
     "test": "jest src --detectOpenHandles",
-    "typeorm": "npm run build && typeorm-ts-node-esm -d dist/ocular/src/data-source.js"
+    "typeorm:dev": "npm run build && cross-env CONFIG_FILE=core-config-dev.js typeorm-ts-node-esm -d dist/ocular/src/data-source.js",
+    "typeorm:local": "npm run build && cross-env CONFIG_FILE=core-config-local.js typeorm-ts-node-esm -d dist/ocular/src/data-source.js"
   },
   "dependencies": {
     "@azure/search-documents": "^12.0.0",
@@ -60,7 +62,7 @@
     "passport-local": "^1.0.0",
     "path": "^0.12.7",
     "pdf-parse": "^1.1.1",
-    "puppeteer": "^19.7.2",
+    "puppeteer": "^22.10.0",
     "rate-limiter-flexible": "^5.0.3",
     "scrypt-kdf": "^2.0.1",
     "typeorm": "^0.3.20",

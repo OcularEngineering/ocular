@@ -29,7 +29,6 @@ export default class OpenAIService extends AbstractLLMService {
     this.requestQueue_ = this.rateLimiterService_.getRequestQueue(
       PluginNameDefinitions.OPENAI
     );
-
     // Models
     this.embeddingModel_ = options.embedding_model;
     this.chatModel_ = options.chat_model;

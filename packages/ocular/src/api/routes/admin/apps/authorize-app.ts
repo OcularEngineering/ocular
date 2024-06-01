@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsString, IsEnum, IsOptional } from "class-validator";
 import { validator } from "@ocular/utils";
 import { OAuthService, OrganisationService } from "../../../../services";
-import { AppNameDefinitions } from "@ocular/types";
+import { AppAuthStrategy, AppNameDefinitions } from "@ocular/types";
 
 export default async (req, res) => {
   const validated = await validator(PostAppsReq, req.body);

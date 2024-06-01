@@ -1,6 +1,10 @@
 
 FROM node:18-alpine
 
+
+RUN apk update && \
+  apk add chromium
+
 WORKDIR /usr/src/app
 
 RUN npm cache clean --force
@@ -27,8 +31,4 @@ COPY . .
 RUN npm install --verbose
 RUN turbo build
 
-EXPOSE 8080
-
 WORKDIR /usr/src/app/packages/ocular
-
-CMD ["NODE_ENV", "=", "development", "npm", "run", "start"]
