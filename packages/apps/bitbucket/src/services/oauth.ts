@@ -25,6 +25,7 @@ class BitBucketOauth extends OauthService {
     const client_id = options.client_id;
     const client_secret = options.client_secret;
     const redirect = options.redirect_uri;
+    const auth_strategy = options.auth_strategy;
     return {
       name: AppNameDefinitions.BITBUCKET,
       logo: '/bitbucket.svg',
@@ -35,6 +36,7 @@ class BitBucketOauth extends OauthService {
       category: AppCategoryDefinitions.FILE_STORAGE,
       developer: 'Ocular AI',
       images: ['/bitbucket.svg'],
+      auth_strategy: auth_strategy,
       overview:
         'Bitbucket is a Git-based source code repository hosting service owned by Atlassian',
       docs: 'https://developer.atlassian.com/cloud/bitbucket/rest',

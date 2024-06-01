@@ -25,6 +25,7 @@ class JiarOauth extends OauthService {
     const client_id = options.client_id;
     const client_secret = options.client_secret;
     const redirect = options.redirect_uri;
+    const auth_strategy = options.auth_strategy;
     return {
       name: AppNameDefinitions.JIRA,
       logo: '/jira.svg',
@@ -34,6 +35,7 @@ class JiarOauth extends OauthService {
         redirect
       )}&response_type=code&prompt=consent`,
       slug: AppNameDefinitions.JIRA,
+      auth_strategy: auth_strategy,
       category: AppCategoryDefinitions.PRODUCTIVITY,
       developer: 'Ocular AI',
       images: ['/jira.svg'],

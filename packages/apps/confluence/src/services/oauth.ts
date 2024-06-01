@@ -25,6 +25,7 @@ class ConfluenceOauth extends OauthService {
     const client_id = options.client_id;
     const client_secret = options.client_secret;
     const redirect = options.redirect_uri;
+    const auth_strategy = options.auth_strategy;
 
     return {
       name: AppNameDefinitions.CONFLUENCE,
@@ -35,6 +36,7 @@ class ConfluenceOauth extends OauthService {
         redirect
       )}&response_type=code&prompt=consent`,
       slug: AppNameDefinitions.CONFLUENCE,
+      auth_strategy: auth_strategy,
       category: AppCategoryDefinitions.PRODUCTIVITY,
       developer: 'Ocular AI',
       images: ['/confluence.svg'],
