@@ -3,8 +3,6 @@ import BrowseAppsPage from "./browse-apps"
 
 export default function Marketplace() {
   return (
-    <MarketplaceLayout>
-        <BrowseAppsPage />
-    </MarketplaceLayout>
+    <BrowseAppsPage />
   )
 }

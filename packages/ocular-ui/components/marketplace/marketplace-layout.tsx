@@ -1,7 +1,6 @@
 import { Metadata } from "next"
 import { SidebarNav } from "@/components/marketplace/sidebar-nav"
 import { MarketplaceLayoutProps } from "@/types/types"
-import SectionContainer from '@/components/section-container';
 
 export const metadata: Metadata = {
   title: "Marketplace",
@@ -22,9 +21,11 @@ const sidebarNavLinks = [
 
 export default function MarketplaceLayout({ children }: MarketplaceLayoutProps) {
   return (
-    <div className="items-start justify-start">
-        <SidebarNav items={sidebarNavLinks} />
-        <div className="flex items-center justify-center">
+    <div className="flex flex-row items-start justify-start">
+        <div className="border-r h-screen sticky w-[250px] top-0">
+            <SidebarNav items={sidebarNavLinks} />
+        </div>
+        <div style={{ flex: 20 }} className="flex items-center justify-center">
             {children}
         </div>
     </div>
