@@ -16,6 +16,10 @@ const sidebarNavLinks = [
     title: "Manage apps",
     href: "/dashboard/marketplace/manage-apps",
   },
+  {
+    title: "OAuth credentials",
+    href: "/dashboard/marketplace/oauth-credentials",
+  },
 
 ]
 

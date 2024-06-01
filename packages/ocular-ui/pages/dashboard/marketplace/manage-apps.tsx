@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useState } from 'react';
 import SectionContainer from '@/components/section-container';
 import {
   Table,
@@ -21,9 +22,9 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import * as React from 'react';
 import Image from 'next/image';
 import { formatLabel } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 // Define the App type
 export type App = {
@@ -39,13 +40,13 @@ export const columns: ColumnDef<App>[] = [
     cell: ({ row }) => (
       <div className="flex items-center">
         <Image
-            src={`/${row.original.name}.svg`}
-            alt={`${row.original.name} logo`}
-            className="w-6 h-6 mr-2"
-            width={24}
-            height={24}
+          src={`/${row.original.name}.svg`}
+          alt={`${row.original.name} logo`}
+          className="w-6 h-6 mr-2"
+          width={24}
+          height={24}
         />
-        <div>{formatLabel(row.getValue('name'))}</div>
+        <div className='text-md font-semibold'>{formatLabel(row.getValue('name'))}</div>
       </div>
     ),
   },
@@ -61,6 +62,7 @@ export default function ManageApps() {
   const [appData, setAppData] = React.useState<App[]>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [expandedRow, setExpandedRow] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     async function fetchApps() {
@@ -79,6 +81,10 @@ export default function ManageApps() {
     }
     fetchApps();
   }, []);
+
+  const handleRowClick = (rowId: string) => {
+    setExpandedRow(expandedRow === rowId ? null : rowId);
+  };
 
   const table = useReactTable({
     data: appData,
@@ -122,19 +128,34 @@ export default function ManageApps() {
           <TableBody className="overflow-y-auto">
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
+                <React.Fragment key={row.id}>
+                  <TableRow
+                    data-state={row.getIsSelected() && 'selected'}
+                    onClick={() => handleRowClick(row.id)}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                  {expandedRow === row.id && (
+                    <TableRow>
+                      <TableCell colSpan={columns.length}>
+                        <div className="p-5 rounded-xl space-y-5">
+                          <div className='space-x-5'>
+                            <Button >Configure</Button>
+                            <Button variant={"secondary"}>Uninstall</Button>
+                          </div>
+                          <p><strong>App ID:</strong> {row.original.id}</p>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
               ))
             ) : (
               <TableRow>
