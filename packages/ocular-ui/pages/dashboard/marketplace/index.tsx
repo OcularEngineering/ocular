@@ -1,7 +1,7 @@
-import BrowseAppsPage from "./browse-apps"
+import BrowseApps from "./browse-apps"
 
 export default function Marketplace() {
   return (
-    <BrowseAppsPage />
+    <BrowseApps />
   )
 }

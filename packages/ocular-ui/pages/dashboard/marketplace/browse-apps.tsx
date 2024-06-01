@@ -30,7 +30,7 @@ interface IntegrationsByCategory {
   [key: string]: Integration[];
 }
 
-function BrowseAppsPage() {
+function BrowseApps() {
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [allIntegrations, setAllIntegrations] = useState<Integration[]>([]);
   const [search, setSearch] = useState('');
@@ -162,4 +162,4 @@ function BrowseAppsPage() {
   );
 }
 
-export default BrowseAppsPage;
+export default BrowseApps;
