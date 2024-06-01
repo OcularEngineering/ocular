@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { ChevronRight } from 'lucide-react';
 import SectionContainer from '@/components/section-container';
 import {
   Table,
@@ -39,6 +40,11 @@ export const columns: ColumnDef<App>[] = [
     header: 'App Name',
     cell: ({ row }) => (
       <div className="flex items-center">
+        <ChevronRight
+          className={`mr-2 h-4 transition-transform ${
+            row.getIsExpanded() ? 'rotate-90' : ''
+          }`}
+        />
         <Image
           src={`/${row.original.name}.svg`}
           alt={`${row.original.name} logo`}
@@ -50,11 +56,11 @@ export const columns: ColumnDef<App>[] = [
       </div>
     ),
   },
-  {
-    accessorKey: 'id',
-    header: 'App ID',
-    cell: ({ row }) => <div>{row.getValue('id')}</div>,
-  },
+  // {
+  //   accessorKey: 'id',
+  //   header: 'App ID',
+  //   cell: ({ row }) => <div>{row.getValue('id')}</div>,
+  // },
 ];
 
 export default function ManageApps() {
@@ -135,9 +141,30 @@ export default function ManageApps() {
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
+                        {cell.id.includes('name') && (
+                          <div className="flex items-center">
+                            <ChevronRight
+                              className={`mr-2 h-4 transition-transform ${
+                                expandedRow === row.id ? 'rotate-90' : ''
+                              }`}
+                            />
+                            <Image
+                              src={`/${row.original.name}.svg`}
+                              alt={`${row.original.name} logo`}
+                              className="w-6 h-6 mr-2"
+                              width={24}
+                              height={24}
+                            />
+                            <div className="text-md font-semibold">
+                              {formatLabel(row.getValue('name'))}
+                            </div>
+                          </div>
+                        )}
+                        {cell.id.includes('name') === false && (
+                          flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )
                         )}
                       </TableCell>
                     ))}
@@ -147,7 +174,7 @@ export default function ManageApps() {
                       <TableCell colSpan={columns.length}>
                         <div className="p-5 rounded-xl space-y-5">
                           <div className='space-x-5'>
-                            <Button >Configure</Button>
+                            <Button>Configure</Button>
                             <Button variant={"secondary"}>Uninstall</Button>
                           </div>
                           <p><strong>App ID:</strong> {row.original.id}</p>
