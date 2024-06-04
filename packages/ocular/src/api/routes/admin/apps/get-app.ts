@@ -13,6 +13,8 @@ export default async (req, res) => {
     app_name: validated.name,
   });
 
+  console.log("OauthToken", oauthToken);
+
   if (!oauthToken) {
     return res.status(404).json({ message: "No app data found" });
   }

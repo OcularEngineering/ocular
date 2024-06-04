@@ -34,7 +34,7 @@ export default (app) => {
     middlewares.wrap(require("./list-installed-apps").default)
   );
 
-  route.post("/updateapp", middlewares.wrap(require("./updateApp").default));
+  route.post("/updateapp", middlewares.wrap(require("./update-app").default));
   return app;
 };
 

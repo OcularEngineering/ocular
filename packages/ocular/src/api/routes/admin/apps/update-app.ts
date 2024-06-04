@@ -8,7 +8,7 @@ import {
 import { AppNameDefinitions } from "@ocular/types";
 import { Type } from "class-transformer";
 import { validator } from "@ocular/utils";
-import { OAuthService, OrganisationService } from "../../../../services";
+import { OrganisationService } from "../../../../services";
 const { v4: uuidv4 } = require("uuid");
 
 export default async (req, res) => {
@@ -21,7 +21,7 @@ export default async (req, res) => {
   switch (validated.name) {
     case AppNameDefinitions.WEBCONNECTOR:
       data = {
-        ...(validated.metadata || {}),
+        ...validated.metadata,
         emit_event: true,
         status: "processing",
         link_id: uuidv4(),
@@ -30,7 +30,7 @@ export default async (req, res) => {
 
     default:
       data = {
-        ...(validated.metadata || {}),
+        ...validated.metadata,
       };
       break;
   }

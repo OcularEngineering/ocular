@@ -41,7 +41,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -69,12 +69,12 @@ const formSchema = z.object({
   link: z.string().url(),
 });
 
-export default function WebConnector({ links }: { links: Link[] }) {
+export default function WebConnector() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-  const [linkData, setLinkdata] = React.useState<Link[]>(links);
+  const [linkData, setLinkdata] = React.useState<Link[]>([]);
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
@@ -123,6 +123,26 @@ export default function WebConnector({ links }: { links: Link[] }) {
       console.error('Error fetching integrations:', error);
     }
   }
+
+  useEffect(() => {
+    const fetchApp = async () => {
+      try {
+        const response = await api.apps.retrieveApp({
+          name: 'webConnector' as string,
+        });
+
+        if (response) {
+          const fetchedApp = response.data.app;
+          const appMetadata = fetchedApp.metadata;
+          setLinkdata(appMetadata.links);
+        }
+      } catch (error) {
+        console.error('Failed to fetch integration details links', error);
+      }
+    };
+
+    fetchApp();
+  }, []);
 
   const table = useReactTable({
     data: linkData,

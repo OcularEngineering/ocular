@@ -7,7 +7,7 @@ import React, { use, useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import Layout from '@/components/layout';
-import WebConnector from '@/components/marketplace/webConnector';
+import WebConnector from '@/components/marketplace/web-connector';
 import SectionContainer from '@/components/section-container';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -51,7 +51,6 @@ function Integrations() {
   let { slug, code, installation_id } = router.query;
   const [integration, setIntegration] = useState<Integration | null>(null);
   const [authorized, setAuthorized] = useState(false);
-  const [links, setLinks] = useState<Link[] | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -105,31 +104,6 @@ function Integrations() {
       }
     };
 
-    const fetchApp = async () => {
-      try {
-        const response = await api.apps.retrieveApp({
-          name: slug as string,
-        });
-
-        if (response) {
-          const fetchedApp = response.data.app;
-          const appMetadata = fetchedApp.metadata;
-
-          switch (slug) {
-            case WEBCONNECTOR:
-              setLinks(appMetadata.links || []);
-              break;
-
-            default:
-              break;
-          }
-        }
-      } catch (error) {
-        console.error('Failed to fetch integration details', error);
-      }
-    };
-
-    fetchApp();
     fetchIntegration();
   }, [slug, authorized]);
 
@@ -157,10 +131,7 @@ function Integrations() {
   if (!integration) return <div>Loading...</div>;
 
   if (slug === WEBCONNECTOR && authorized) {
-    if (!links) {
-      return <div>Loading...</div>;
-    }
-    return <WebConnector links={links} />;
+    return <WebConnector />;
   }
 
   return (
