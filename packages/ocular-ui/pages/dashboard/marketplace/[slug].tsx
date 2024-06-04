@@ -113,7 +113,7 @@ function Integrations() {
         const response = await api.apps.listInstalled(); // Adjust this to match your actual API call
         if (response) {
           const installed = response.data.apps.some(
-            (app: any) => app.name === slug
+            (app: any) => app.app_name === slug
           );
           setAuthorized(installed);
         }
