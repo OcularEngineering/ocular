@@ -156,64 +156,6 @@ class OrganisationService extends TransactionBaseService {
     });
   }
 
-  async updateInstalledApp(app_name: string, data: any): Promise<any | null> {
-    return await this.atomicPhase_(
-      async (transactionManager: EntityManager) => {
-        switch (app_name) {
-          case AppNameDefinitions.WEBCONNECTOR:
-            //Retrieve the OAuth token
-            const oauthToken = await this.oauthService_.retrieve({
-              id: this.loggedInUser_.organisation_id,
-              app_name: AppNameDefinitions.WEBCONNECTOR,
-            });
-
-            if (!oauthToken) {
-              throw new AutoflowAiError(
-                AutoflowAiError.Types.NOT_FOUND,
-                `No OAuth token found for ${AppNameDefinitions.WEBCONNECTOR}`
-              );
-            }
-
-            const metadata = oauthToken.metadata;
-
-            // Ensure metadata.links is initialized as an array
-            if (!metadata.links) {
-              metadata.links = [];
-            }
-
-            if (Array.isArray(metadata.links)) {
-              metadata.links.push({
-                id: data.link_id,
-                location: data.link,
-                status: data.status,
-                title: data.title,
-                description: data.description,
-              });
-            }
-
-            // Update the metadata in Oauth token
-            await this.oauthService_.update(oauthToken.id, {
-              metadata,
-            } as UpdateOAuthInput);
-
-            if (data.emit_event) {
-              await this.eventBusService_.emit("webConnectorInstalled", {
-                organisation: this.loggedInUser_.organisation,
-                app_name: AppNameDefinitions.WEBCONNECTOR,
-                link: data.link,
-                link_id: data.link_id,
-              });
-            }
-            return metadata.links;
-
-          default:
-            return null;
-            break;
-        }
-      }
-    );
-  }
-
   async update(
     org_id: string,
     data: UpdateOrganisationInput

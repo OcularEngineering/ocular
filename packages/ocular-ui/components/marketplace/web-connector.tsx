@@ -95,6 +95,7 @@ export default function WebConnector({ appId }: { appId: string | null }) {
           description,
         },
         name: 'webConnector' as string,
+        app_id: appId as string,
       });
       if (response.status === 200) {
         const updatedLinkData: WebConnectorLink[] = [

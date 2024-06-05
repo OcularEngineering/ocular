@@ -1,5 +1,9 @@
 import { EntityManager } from "typeorm";
-import { Logger, TransactionBaseService } from "@ocular/types";
+import {
+  AppNameDefinitions,
+  Logger,
+  TransactionBaseService,
+} from "@ocular/types";
 import EventBusService from "./event-bus";
 import { AutoflowContainer } from "@ocular/types";
 import { AutoflowAiError, AutoflowAiErrorTypes } from "@ocular/utils";
@@ -173,6 +177,69 @@ class OAuthService extends TransactionBaseService {
       return result;
     });
     return null;
+  }
+
+  async updateInstalledApp(
+    app_name: string,
+    app_id: string,
+    data: any
+  ): Promise<string | null> {
+    return this.atomicPhase_(async (transactionManager: EntityManager) => {
+      try {
+        switch (app_name) {
+          case AppNameDefinitions.WEBCONNECTOR:
+            // Retrieve the OAuth token
+            const oauthToken = await this.retrieveById({ app_id });
+
+            if (!oauthToken) {
+              throw new AutoflowAiError(
+                AutoflowAiError.Types.NOT_FOUND,
+                `No OAuth token found for ${AppNameDefinitions.WEBCONNECTOR}`
+              );
+            }
+
+            const metadata = oauthToken.metadata;
+
+            // Ensure metadata.links is initialized as an array
+            if (!metadata.links) {
+              metadata.links = [];
+            }
+
+            if (Array.isArray(metadata.links)) {
+              metadata.links.push({
+                id: data.link_id,
+                location: data.link,
+                status: data.status,
+                title: data.title,
+                description: data.description,
+              });
+            }
+
+            // Update the metadata in OAuth token
+            await this.update(oauthToken.id, {
+              metadata,
+            } as UpdateOAuthInput);
+
+            // Emit event if required
+            if (data.emit_event) {
+              await this.eventBus_.emit("webConnectorInstalled", {
+                organisation: this.loggedInUser_.organisation,
+                app_name: AppNameDefinitions.WEBCONNECTOR,
+                link: data.link,
+                link_id: data.link_id,
+              });
+            }
+
+            return "Link saved Succesfully";
+
+          default:
+            return "No such App exists in the system to update";
+        }
+      } catch (error) {
+        console.error(`Failed to update installed app: ${error.message}`);
+        return null;
+      }
+    });
   }
 
   async update(id: string, update: UpdateOAuthInput): Promise<OAuth> {
