@@ -83,7 +83,6 @@ class OAuthService extends TransactionBaseService {
 
   // List Apps Owned BY The Logged In User
   async list(selector: Selector<OAuth>): Promise<OAuth[]> {
-    console.log("REACHED HERE");
     if (!this.loggedInUser_ || !this.loggedInUser_.organisation) {
       throw new AutoflowAiError(
         AutoflowAiErrorTypes.NOT_FOUND,
