@@ -17,6 +17,13 @@ export const links: LinkProps[] =[
     link: "/dashboard/chat"
   },
   {
+    title: "Files",
+    label: "",
+    icon: "Files",
+    variant: "ghost",
+    link: "/dashboard/files"
+  },
+  {
     title: "Marketplace",
     label: "",
     icon: "LayoutGrid",

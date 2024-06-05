@@ -22,6 +22,7 @@ export interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
 
 export type IconKeys =
   | 'Search'
+  | 'Files'
   | 'Bot'
   | 'Chat'
   | 'Settings'
