@@ -33,16 +33,18 @@ class webConnectorOauth extends OauthService {
     return {
       name: AppNameDefinitions.WEBCONNECTOR,
       logo: "/web-connector.svg",
-      description: "WebConnector",
+      description:
+        "WebConnector: Your Gateway to Efficient Web Data Extraction",
       oauth_url: "",
       slug: AppNameDefinitions.WEBCONNECTOR,
       category: AppCategoryDefinitions.SOTWARE_DEVELOPMENT,
       developer: "Ocular AI",
       images: ["/web-connector.svg"],
-      overview: "WebConnector",
-      docs: "https://developer.atlassian.com/",
+      overview:
+        "Web Connector: Effortlessly extract and index data from any website link into your database. Simplify data collection and boost productivity with our user-friendly app.",
+      docs: "https://docs.useocular.com/overview",
       auth_strategy: auth_strategy,
-      website: "https://www.atlassian.com/software/confluence",
+      website: "https://www.useocular.com/",
     };
   }
 
