@@ -19,7 +19,7 @@ export default {
       const path = `/admin/apps`;
       return ocularRequest('GET', path);
     },
-    retrieve(id) {
+    retrieveApp(id) {
       const path = `/admin/apps/${id}`;
       return ocularRequest('GET', path);
     },
@@ -36,6 +36,16 @@ export default {
     list() {
       const path = `/admin/invites`;
       return ocularRequest('GET', path);
+    },
+  },
+  files: {
+    upload(files) {
+      const formData = new FormData()
+      for (const f of files) {
+        formData.append("files", f)
+      }
+      const path = `/admin/files`;
+      return ocularRequest('POST', path,formData);
     },
   },
   organisation: {

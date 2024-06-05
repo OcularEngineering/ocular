@@ -28,6 +28,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import api from '@/services/admin-api';
+import { WebConnectorLink } from '@/types/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   ColumnDef,
@@ -41,16 +42,11 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-export type Link = {
-  location: string;
-  status: 'processing' | 'success' | 'failed';
-};
-
-export const columns: ColumnDef<Link>[] = [
+export const columns: ColumnDef<WebConnectorLink>[] = [
   {
     accessorKey: 'location',
     header: 'Link',
@@ -69,12 +65,12 @@ const formSchema = z.object({
   link: z.string().url(),
 });
 
-export default function WebConnector({ links }: { links: Link[] }) {
+export default function WebConnector({ appId }: { appId: string | null }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-  const [linkData, setLinkdata] = React.useState<Link[]>(links);
+  const [linkData, setLinkdata] = React.useState<WebConnectorLink[]>([]);
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
@@ -99,9 +95,10 @@ export default function WebConnector({ links }: { links: Link[] }) {
           description,
         },
         name: 'webConnector' as string,
+        app_id: appId as string,
       });
       if (response.status === 200) {
-        const updatedLinkData: Link[] = [
+        const updatedLinkData: WebConnectorLink[] = [
           ...linkData,
           {
             location: link,
@@ -110,7 +107,7 @@ export default function WebConnector({ links }: { links: Link[] }) {
         ];
         setLinkdata(updatedLinkData);
       } else {
-        const updatedLinkData: Link[] = [
+        const updatedLinkData: WebConnectorLink[] = [
           ...linkData,
           {
             location: link,
@@ -123,6 +120,26 @@ export default function WebConnector({ links }: { links: Link[] }) {
       console.error('Error fetching integrations:', error);
     }
   }
+
+  useEffect(() => {
+    const fetchApp = async () => {
+      if (!appId) {
+        return;
+      }
+      try {
+        const response = await api.apps.retrieveApp(appId);
+        if (response) {
+          const fetchedApp = response.data.app;
+          const appMetadata = fetchedApp.metadata;
+          setLinkdata(appMetadata.links);
+        }
+      } catch (error) {
+        console.error('Failed to fetch integration details', error);
+      }
+    };
+
+    fetchApp();
+  }, []);
 
   const table = useReactTable({
     data: linkData,

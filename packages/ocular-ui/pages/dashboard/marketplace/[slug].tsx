@@ -7,7 +7,7 @@ import React, { use, useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import Layout from '@/components/layout';
-import WebConnector from '@/components/marketplace/webConnector';
+import WebConnector from '@/components/marketplace/web-connector';
 import SectionContainer from '@/components/section-container';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -16,26 +16,17 @@ import {
   FormControl,
   FormDescription,
   FormField,
-  FormItem,
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { formatLabel } from '@/lib/utils';
 import api from '@/services/admin-api';
-import { Integration } from '@/types/types';
+import { Integration, WebConnectorLink } from '@/types/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IconChevronLeft, IconExternalLink } from '@supabase/ui';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-
-interface Link {
-  id: string;
-  location: string;
-  status: 'processing' | 'success' | 'failed';
-  title: string;
-  description: string;
-}
 
 const formSchema = z.object({
   apiToken: z
@@ -52,7 +43,7 @@ function Integrations() {
   let { slug, code, installation_id } = router.query;
   const [integration, setIntegration] = useState<Integration | null>(null);
   const [authorized, setAuthorized] = useState(false);
-  const [links, setLinks] = useState<Link[] | null>(null);
+  const [appId, setAppId] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -82,11 +73,6 @@ function Integrations() {
     await authorizeApp(values.apiToken);
   }
 
-  const updateWebConnectorLinks = (apps: any) => {
-    const webConnector = apps.find((app: any) => app.name === 'webConnector');
-    setLinks(webConnector?.links || []);
-  };
-
   const addWebConnector = async () => {
     await authorizeApp('Fake Code');
   };
@@ -111,27 +97,23 @@ function Integrations() {
       }
     };
 
-    fetchIntegration();
-  }, [slug]);
-
-  useEffect(() => {
     const listInstalled = async () => {
       try {
         const response = await api.apps.listInstalled(); // Adjust this to match your actual API call
         if (response) {
-          const installed = response.data.apps.some(
-            (app: any) => app.name === slug
+          const app = response.data.apps.find(
+            (app: any) => app.app_name === slug
           );
-          setAuthorized(installed);
-          if (slug === WEBCONNECTOR && authorized) {
-            updateWebConnectorLinks(response.data.apps);
-          }
+          setAuthorized(app !== undefined);
+          setAppId(app.id);
         }
       } catch (error) {
         console.error('Failed to get installed apps', error);
       }
     };
+
     listInstalled();
+    fetchIntegration();
   }, [slug, authorized]);
 
   useEffect(() => {
@@ -141,16 +123,16 @@ function Integrations() {
   if (!integration) return <div>Loading...</div>;
 
   if (slug === WEBCONNECTOR && authorized) {
-    if (!links) {
+    if (!appId) {
       return <div>Loading...</div>;
     }
-    return <WebConnector links={links} />;
+    return <WebConnector appId={appId} />;
   }
 
   return (
     <div>
       <Head>
-        <title>{integration.name} | Ocular Integration Marketplace</title>
+        <title>{integration.name} | Ocular Integrxation Marketplace</title>
         <meta name="description" content={integration.description}></meta>
         <link rel="icon" href="/Ocular-Profile-Logo.png" />
       </Head>

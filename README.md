@@ -81,6 +81,12 @@ Not sure where to get started? You can:
 
 - Join our <a href="https://join.slack.com/t/ocular-ai/shared_invite/zt-2g7ka0j1c-Tx~Q46MjplNma2Sk2Ruplw">Slack</a>, and ask us any questions there.
 
+## Resources
+- [Docs](https://docs.useocular.com) for comprehensive documentation and guides
+- [Slack](https://join.slack.com/t/ocular-ai/shared_invite/zt-2g7ka0j1c-Tx~Q46MjplNma2Sk2Ruplw) for discussion with the community and Ocular team.
+- [GitHub](https://github.com/OcularEngineering/ocular/issues) for code, issues, and pull requests
+- Roadmap - Coming Soon
+
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=OcularEngineering/ocular&type=Date)](https://star-history.com/#OcularEngineering/ocular&Date)
