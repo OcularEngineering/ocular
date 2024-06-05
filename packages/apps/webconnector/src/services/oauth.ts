@@ -32,13 +32,13 @@ class webConnectorOauth extends OauthService {
     const auth_strategy = options.auth_strategy;
     return {
       name: AppNameDefinitions.WEBCONNECTOR,
-      logo: "/web-connecter.svg",
+      logo: "/web-connector.svg",
       description: "WebConnector",
       oauth_url: "",
       slug: AppNameDefinitions.WEBCONNECTOR,
       category: AppCategoryDefinitions.SOTWARE_DEVELOPMENT,
       developer: "Ocular AI",
-      images: ["/web-connecter.svg"],
+      images: ["/web-connector.svg"],
       overview: "WebConnector",
       docs: "https://developer.atlassian.com/",
       auth_strategy: auth_strategy,
