@@ -38,6 +38,16 @@ export default {
       return ocularRequest('GET', path);
     },
   },
+  files: {
+    upload(files) {
+      const formData = new FormData()
+      for (const f of files) {
+        formData.append("files", f)
+      }
+      const path = `/admin/files`;
+      return ocularRequest('POST', path,formData);
+    },
+  },
   organisation: {
     retrive(id, search = {}) {
       const params = Object.keys(search)
