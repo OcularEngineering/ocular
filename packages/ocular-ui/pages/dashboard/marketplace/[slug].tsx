@@ -22,19 +22,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { formatLabel } from '@/lib/utils';
 import api from '@/services/admin-api';
-import { Integration } from '@/types/types';
+import { Integration, WebConnectorLink } from '@/types/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IconChevronLeft, IconExternalLink } from '@supabase/ui';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-
-interface Link {
-  id: string;
-  location: string;
-  status: 'processing' | 'success' | 'failed';
-  title: string;
-  description: string;
-}
 
 const formSchema = z.object({
   apiToken: z
@@ -51,6 +43,7 @@ function Integrations() {
   let { slug, code, installation_id } = router.query;
   const [integration, setIntegration] = useState<Integration | null>(null);
   const [authorized, setAuthorized] = useState(false);
+  const [appId, setAppId] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -104,24 +97,23 @@ function Integrations() {
       }
     };
 
-    fetchIntegration();
-  }, [slug, authorized]);
-
-  useEffect(() => {
     const listInstalled = async () => {
       try {
         const response = await api.apps.listInstalled(); // Adjust this to match your actual API call
         if (response) {
-          const installed = response.data.apps.some(
+          const app = response.data.apps.find(
             (app: any) => app.app_name === slug
           );
-          setAuthorized(installed);
+          setAuthorized(app !== undefined);
+          setAppId(app.id);
         }
       } catch (error) {
         console.error('Failed to get installed apps', error);
       }
     };
+
     listInstalled();
+    fetchIntegration();
   }, [slug, authorized]);
 
   useEffect(() => {
@@ -131,13 +123,16 @@ function Integrations() {
   if (!integration) return <div>Loading...</div>;
 
   if (slug === WEBCONNECTOR && authorized) {
-    return <WebConnector />;
+    if (!appId) {
+      return <div>Loading...</div>;
+    }
+    return <WebConnector appId={appId} />;
   }
 
   return (
     <>
       <Head>
-        <title>{integration.name} | Ocular Integration Marketplace</title>
+        <title>{integration.name} | Ocular Integrxation Marketplace</title>
         <meta name="description" content={integration.description}></meta>
         <link rel="icon" href="/Ocular-Profile-Logo.png" />
       </Head>

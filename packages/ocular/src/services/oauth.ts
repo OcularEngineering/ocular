@@ -1,10 +1,5 @@
 import { EntityManager } from "typeorm";
-import {
-  AppAuthStrategy,
-  AppNameDefinitions,
-  Logger,
-  TransactionBaseService,
-} from "@ocular/types";
+import { Logger, TransactionBaseService } from "@ocular/types";
 import EventBusService from "./event-bus";
 import { AutoflowContainer } from "@ocular/types";
 import { AutoflowAiError, AutoflowAiErrorTypes } from "@ocular/utils";
@@ -72,8 +67,19 @@ class OAuthService extends TransactionBaseService {
     return oauth as OAuth;
   }
 
+  async retrieveById({ app_id }: { app_id: string }): Promise<OAuth> {
+    const oauthRepo = this.activeManager_.withRepository(this.oauthRepository_);
+    const oauth = await oauthRepo.findOne({
+      where: {
+        id: app_id,
+      },
+    });
+    return oauth as OAuth;
+  }
+
   // List Apps Owned BY The Logged In User
   async list(selector: Selector<OAuth>): Promise<OAuth[]> {
+    console.log("REACHED HERE");
     if (!this.loggedInUser_ || !this.loggedInUser_.organisation) {
       throw new AutoflowAiError(
         AutoflowAiErrorTypes.NOT_FOUND,

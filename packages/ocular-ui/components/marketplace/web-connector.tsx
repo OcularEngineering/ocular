@@ -28,6 +28,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import api from '@/services/admin-api';
+import { WebConnectorLink } from '@/types/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   ColumnDef,
@@ -45,12 +46,7 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-export type Link = {
-  location: string;
-  status: 'processing' | 'success' | 'failed';
-};
-
-export const columns: ColumnDef<Link>[] = [
+export const columns: ColumnDef<WebConnectorLink>[] = [
   {
     accessorKey: 'location',
     header: 'Link',
@@ -69,12 +65,12 @@ const formSchema = z.object({
   link: z.string().url(),
 });
 
-export default function WebConnector() {
+export default function WebConnector({ appId }: { appId: string | null }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-  const [linkData, setLinkdata] = React.useState<Link[]>([]);
+  const [linkData, setLinkdata] = React.useState<WebConnectorLink[]>([]);
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
@@ -101,7 +97,7 @@ export default function WebConnector() {
         name: 'webConnector' as string,
       });
       if (response.status === 200) {
-        const updatedLinkData: Link[] = [
+        const updatedLinkData: WebConnectorLink[] = [
           ...linkData,
           {
             location: link,
@@ -110,7 +106,7 @@ export default function WebConnector() {
         ];
         setLinkdata(updatedLinkData);
       } else {
-        const updatedLinkData: Link[] = [
+        const updatedLinkData: WebConnectorLink[] = [
           ...linkData,
           {
             location: link,
@@ -126,18 +122,18 @@ export default function WebConnector() {
 
   useEffect(() => {
     const fetchApp = async () => {
+      if (!appId) {
+        return;
+      }
       try {
-        const response = await api.apps.retrieveApp({
-          name: 'webConnector' as string,
-        });
-
+        const response = await api.apps.retrieveApp(appId);
         if (response) {
           const fetchedApp = response.data.app;
           const appMetadata = fetchedApp.metadata;
           setLinkdata(appMetadata.links);
         }
       } catch (error) {
-        console.error('Failed to fetch integration details links', error);
+        console.error('Failed to fetch integration details', error);
       }
     };
 

@@ -19,9 +19,9 @@ export default {
       const path = `/admin/apps`;
       return ocularRequest('GET', path);
     },
-    retrieveApp(data) {
-      const path = `/admin/apps/getapp`;
-      return ocularRequest('POST', path, data);
+    retrieveApp(id) {
+      const path = `/admin/apps/${id}`;
+      return ocularRequest('GET', path);
     },
     updateApp(data: any) {
       const path = `/admin/apps/updateapp`;
