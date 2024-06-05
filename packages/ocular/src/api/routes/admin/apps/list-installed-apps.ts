@@ -1,17 +1,11 @@
-import { IsNotEmpty, IsString, IsEnum} from "class-validator"
-import { OrganisationService } from "../../../../services"
-import { validator } from "@ocular/utils"
-import {AppNameDefinitions} from "@ocular/types"
+import { OAuthService } from "../../../../services";
 
 export default async (req, res) => {
-  console.log("req.body  code ->", req.body)
-  const organisationService: OrganisationService = req.scope.resolve("organisationService")
-  const org = await organisationService.listInstalledApps()
-  if (!org) {
-    return res.status(404).json({ message: "No organisation found" })
+  const oauthService: OAuthService = req.scope.resolve("oauthService");
+  const appList = await oauthService.list({});
+
+  if (!appList) {
+    return res.status(200).json({ apps: [] });
   }
-  if (!org.installed_apps) {
-    return res.status(200).json({ apps: []})
-  }
-  return res.status(200).json({ apps: org.installed_apps })
-}
+  return res.status(200).json({ apps: appList });
+};

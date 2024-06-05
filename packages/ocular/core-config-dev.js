@@ -43,13 +43,6 @@ module.exports = {
     redis_url: process.env.REDIS_URL,
     kafka_url: process.env.KAFKA_URL,
     ui_cors: UI_CORS,
-    azure_open_ai_options: {
-      apiKey: process.env.AZURE_OPENAI_API_KEY,
-      serviceName: process.env.AZURE_OPEN_AI_SERVICE_NAME,
-      apiVersion: process.env.AZURE_OPENAI_API_VERSION,
-      deploymentName: process.env.AZURE_OPENAI_DEPLOYMENT_NAME,
-      openAIModel: "gpt-4",
-    },
   },
   apps: [
     {
@@ -60,12 +53,10 @@ module.exports = {
         scope: "openid email profile",
         redirect_uri: `${UI_CORS}/dashboard/marketplace/asana`,
         auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
-        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
         rate_limiter_opts: {
           requests: 1500, // Number of Requests
           interval: 60, // Interval in Seconds
         },
-        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
       },
     },
     {
@@ -148,12 +139,10 @@ module.exports = {
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/google-drive`,
         auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
-        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
         rate_limiter_opts: {
           requests: 60, // Number of Requests
           interval: 60, // Interval in Seconds
         },
-        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
       },
     },
     {
