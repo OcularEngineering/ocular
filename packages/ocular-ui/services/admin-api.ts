@@ -19,7 +19,7 @@ export default {
       const path = `/admin/apps`;
       return ocularRequest('GET', path);
     },
-    retrieve(id) {
+    retrieveApp(id) {
       const path = `/admin/apps/${id}`;
       return ocularRequest('GET', path);
     },

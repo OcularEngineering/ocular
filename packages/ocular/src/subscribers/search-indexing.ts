@@ -146,7 +146,6 @@ class SearchIndexingSubscriber {
         org: organisation,
         link: link,
         link_id,
-        org_id,
       },
       // created_by: "system",
       dry_run: false,

@@ -89,6 +89,15 @@ export interface Integration {
   auth_strategy: string;
 }
 
+// WebConnector Link interface
+export interface WebConnectorLink {
+  id?: string;
+  location: string;
+  status: 'processing' | 'success' | 'failed';
+  title?: string;
+  description?: string;
+}
+
 // User Profile
 export interface Profile {
   id: string;
