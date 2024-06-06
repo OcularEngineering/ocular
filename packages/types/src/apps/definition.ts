@@ -46,3 +46,10 @@ export type InstalledApp = {
   installation_id?: string;
   permissions?: Record<string, string>;
 };
+
+export type ApiConfig = {
+  headers: {
+    Authorization: string;
+    Accept: string;
+  };
+};
