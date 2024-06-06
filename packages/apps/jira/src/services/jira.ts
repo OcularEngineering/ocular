@@ -1,7 +1,11 @@
 import fs from "fs";
 import axios from "axios";
 import { Readable } from "stream";
-import { OAuthService, Organisation, RateLimiterService } from "@ocular/ocular";
+import {
+  AppAuthorizationService,
+  Organisation,
+  RateLimiterService,
+} from "@ocular/ocular";
 import {
   IndexableDocument,
   TransactionBaseService,
@@ -20,7 +24,7 @@ interface Config {
 }
 
 export default class JiraService extends TransactionBaseService {
-  protected oauthService_: OAuthService;
+  protected appAuthorizationService_: AppAuthorizationService;
   protected logger_: Logger;
   protected container_: ConfigModule;
   protected rateLimiterService_: RateLimiterService;
@@ -28,7 +32,7 @@ export default class JiraService extends TransactionBaseService {
 
   constructor(container) {
     super(arguments[0]);
-    this.oauthService_ = container.oauthService;
+    this.appAuthorizationService_ = container.appAuthorizationService;
     this.logger_ = container.logger;
     this.container_ = container;
     this.rateLimiterService_ = container.rateLimiterService;
@@ -46,20 +50,20 @@ export default class JiraService extends TransactionBaseService {
   ): AsyncGenerator<IndexableDocument[]> {
     this.logger_.info(`Starting oculation of Jira for ${org.id} organisation`);
 
-    // Get Confluence OAuth for the organisation
-    const oauth = await this.oauthService_.retrieve({
+    // Get Confluence auth for the organisation
+    const auth = await this.appAuthorizationService_.retrieve({
       id: org.id,
       app_name: AppNameDefinitions.JIRA,
     });
 
-    if (!oauth) {
-      this.logger_.error(`No Jira OAuth found for ${org.id} organisation`);
+    if (!auth) {
+      this.logger_.error(`No Jira auth found for ${org.id} organisation`);
       return;
     }
 
     const config: Config = {
       headers: {
-        Authorization: `Bearer ${oauth.token}`,
+        Authorization: `Bearer ${auth.token}`,
         Accept: "application/json",
       },
     };
@@ -132,7 +136,7 @@ export default class JiraService extends TransactionBaseService {
       }
 
       yield documents;
-      await this.oauthService_.update(oauth.id, {
+      await this.appAuthorizationService_.update(auth.id, {
         last_sync: new Date(),
       });
     } catch (error) {
@@ -141,12 +145,12 @@ export default class JiraService extends TransactionBaseService {
         this.logger_.info(`Refreshing Jira token for ${org.id} organisation`);
 
         // Refresh the token
-        const oauthToken = await this.container_["jiraOauth"].refreshToken(
-          oauth.refresh_token
+        const authToken = await this.container_["jiraOauth"].refreshToken(
+          auth.refresh_token
         );
 
-        // Update the OAuth record with the new token
-        await this.oauthService_.update(oauth.id, oauthToken);
+        // Update the auth record with the new token
+        await this.appAuthorizationService_.update(auth.id, authToken);
 
         // Retry the request
         return this.getJiraProjectsAndIssues(org);
