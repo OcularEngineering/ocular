@@ -3,7 +3,7 @@ import { id } from 'date-fns/locale';
 
 export default {
   apps: {
-    installApp(data) {
+    installApp(data: {} | undefined) {
       const path = `/admin/oauth`;
       return ocularRequest('POST', path, data);
     },
@@ -103,7 +103,7 @@ export default {
       const path = `/admin/users`;
       return ocularRequest('POST', path, data);
     },
-    retrieve(id, search = {}) {
+    retrieve(id: any, search = {}) {
       const params = Object.keys(search)
         .map((k) => {
           if (search[k] === '' || search[k] === null) {

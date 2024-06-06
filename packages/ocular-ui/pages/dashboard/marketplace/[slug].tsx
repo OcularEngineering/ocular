@@ -24,7 +24,7 @@ import { formatLabel } from '@/lib/utils';
 import api from '@/services/admin-api';
 import { Integration, WebConnectorLink } from '@/types/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { IconChevronLeft, IconExternalLink } from '@supabase/ui';
+import { ChevronLeft, ExternalLink } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -141,7 +141,7 @@ function Integrations() {
         <div className="col-span-12 mx-auto mb-2 max-w-5xl space-y-12 lg:col-span-2">
           <Link href="/dashboard/marketplace" legacyBehavior>
             <a className="text-scale-1200 hover:text-scale-1000 flex cursor-pointer items-center transition-colors">
-              <IconChevronLeft style={{ padding: 0 }} />
+              <ChevronLeft style={{ padding: 0 }} />
               Back to Integrations Marketplace
             </a>
           </Link>
@@ -331,7 +331,7 @@ function Integrations() {
                     >
                       <span className="flex items-center space-x-1">
                         <span>Learn</span>
-                        <IconExternalLink size="small" />
+                        <ExternalLink className='h-4' />
                       </span>
                     </a>
                   </div>

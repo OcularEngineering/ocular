@@ -23,7 +23,7 @@ import {
   LayoutGrid,
   BarChart2,
   Users, 
-  Files,
+  File,
 } from "lucide-react"
 const iconMapping = {
   Search: Search,
@@ -33,7 +33,7 @@ const iconMapping = {
   LayoutGrid,
   BarChart2,
   Users, 
-  Files
+  File
 };
 
 export function SideNav({ links }: NavProps)  {

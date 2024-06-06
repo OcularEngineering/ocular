@@ -19,7 +19,7 @@ export const links: LinkProps[] =[
   {
     title: "Files",
     label: "",
-    icon: "Files",
+    icon: "File",
     variant: "ghost",
     link: "/dashboard/files"
   },

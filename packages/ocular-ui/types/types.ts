@@ -22,7 +22,7 @@ export interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
 
 export type IconKeys =
   | 'Search'
-  | 'Files'
+  | 'File'
   | 'Bot'
   | 'Chat'
   | 'Settings'
@@ -112,3 +112,10 @@ export interface Profile {
   avatar?: string;
   metadata?: any;
 }
+
+// Files
+
+import { type ClientUploadedFileData } from "uploadthing/types"
+
+export interface UploadedFile<T = unknown> extends ClientUploadedFileData<T> {}
+
