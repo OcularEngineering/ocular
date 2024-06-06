@@ -1,58 +1,54 @@
-import * as React from "react"
-import type { UploadedFile } from "@/types/types"
-import { toast } from "sonner"
-import type { UploadFilesOptions } from "uploadthing/types"
+import * as React from "react";
+import { toast } from "sonner";
+import api from '@/services/admin-api';
+import type { UploadedFile } from "@/types/types";
 
-import { getErrorMessage } from "@/lib/files/handle-error"
-import { uploadFiles } from "@/lib/files/uploadthing"
-import { type OurFileRouter } from "@/app/api/uploadthing/core"
-
-interface UseUploadFileProps
-  extends Pick<
-    UploadFilesOptions<OurFileRouter, keyof OurFileRouter>,
-    "headers" | "onUploadBegin" | "onUploadProgress" | "skipPolling"
-  > {
-  defaultUploadedFiles?: UploadedFile[]
+interface UseUploadFileProps {
+  defaultUploadedFiles?: UploadedFile[];
 }
 
 export function useUploadFile(
-  endpoint: keyof OurFileRouter,
+  endpoint: string,
   { defaultUploadedFiles = [], ...props }: UseUploadFileProps = {}
 ) {
-  const [uploadedFiles, setUploadedFiles] =
-    React.useState<UploadedFile[]>(defaultUploadedFiles)
-  const [progresses, setProgresses] = React.useState<Record<string, number>>({})
-  const [isUploading, setIsUploading] = React.useState(false)
+  const [uploadedFiles, setUploadedFiles] = React.useState<UploadedFile[]>(defaultUploadedFiles);
+  const [progresses, setProgresses] = React.useState<Record<string, number>>({});
+  const [isUploading, setIsUploading] = React.useState(false);
 
-  async function uploadThings(files: File[]) {
-    setIsUploading(true)
+  async function uploadFiles(files: File[]) {
+    setIsUploading(true);
     try {
-      const res = await uploadFiles(endpoint, {
-        ...props,
-        files,
-        onUploadProgress: ({ file, progress }) => {
-          setProgresses((prev) => {
-            return {
-              ...prev,
-              [file]: progress,
-            }
-          })
-        },
-      })
+      const formData = new FormData();
+      files.forEach(file => {
+        console.log('File here:', file)
+        console.log('Appending file:', file.name);
+        formData.append('files', file);
+      });
 
-      setUploadedFiles((prev) => (prev ? [...prev, ...res] : res))
+      console.log('Form Data:', formData);
+
+      // Log FormData content
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+      }
+
+      const response = await api.files.upload(formData);
+
+      // Assuming the response contains the uploaded file details
+      setUploadedFiles((prev) => (prev ? [...prev, ...response.data] : response.data));
+      toast.success(`${files.length} files uploaded successfully.`);
     } catch (err) {
-      toast.error(getErrorMessage(err))
+      toast.error(`Failed to upload files: ${err.message}`);
     } finally {
-      setProgresses({})
-      setIsUploading(false)
+      setProgresses({});
+      setIsUploading(false);
     }
   }
 
   return {
     uploadedFiles,
     progresses,
-    uploadFiles: uploadThings,
+    uploadFiles,
     isUploading,
-  }
+  };
 }
