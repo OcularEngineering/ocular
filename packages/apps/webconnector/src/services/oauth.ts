@@ -1,20 +1,20 @@
 import axios from "axios";
 import {
-  OauthService,
+  AppauthorizationService,
   AppNameDefinitions,
   AppCategoryDefinitions,
-  OAuthToken,
-  AppAuthStrategy,
+  AuthToken,
+  AuthStrategy,
   TokenTypes,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 
-class webConnectorOauth extends OauthService {
+class webConnectorOauth extends AppauthorizationService {
   protected client_id_: string;
   protected client_secret_: string;
   protected configModule_: ConfigModule;
   protected redirect_uri_: string;
-  protected auth_strategy_: AppAuthStrategy;
+  protected auth_strategy_: AuthStrategy;
 
   constructor(container, options) {
     super(arguments[0]);
@@ -48,18 +48,18 @@ class webConnectorOauth extends OauthService {
     };
   }
 
-  async generateToken(code: string): Promise<OAuthToken> {
+  async generateToken(code: string): Promise<AuthToken> {
     console.log("***** Generating token from the code:\n");
 
-    const fakeToken: OAuthToken = {
+    const fakeToken: AuthToken = {
       type: TokenTypes.BEARER,
       token: "Fake Token for Web Connector",
       token_expires_at: new Date(),
       refresh_token_expires_at: new Date(),
       refresh_token: "Fake Refresh Token",
-      auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
+      auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
       metadata: {},
-    } as OAuthToken;
+    } as AuthToken;
 
     return fakeToken;
   }
