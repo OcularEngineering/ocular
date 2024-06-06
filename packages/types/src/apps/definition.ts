@@ -15,7 +15,7 @@ export enum AppNameDefinitions {
   JIRA = "jira",
   NOTION = "notion",
   SLACK = "slack",
-  WEBCONNECTOR = "webConnector",
+  WEBCONNECTOR = "web-connector",
   BITBUCKET = "bitbucket",
   OCULAR_API = "ocular-api",
 }

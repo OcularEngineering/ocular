@@ -25,7 +25,7 @@ interface metadataLink {
   description: string;
 }
 
-export default class webConnectorService extends TransactionBaseService {
+export default class WebConnectorService extends TransactionBaseService {
   protected oauthService_: OAuthService;
   protected logger_: Logger;
   protected container_: ConfigModule;
@@ -121,7 +121,7 @@ export default class webConnectorService extends TransactionBaseService {
         `Finished oculation of Web Connector for ${org.id} organisation`
       );
     } catch (error) {
-      console.error("Error fetching web commector content:", error);
+      console.error("Error fetching web connector content:", error);
       if (oauth.metadata && Array.isArray(oauth.metadata.links)) {
         const linkIndex = oauth.metadata.links.findIndex(
           (link: any) => link.id === link_id
@@ -159,6 +159,8 @@ export default class webConnectorService extends TransactionBaseService {
   ): Promise<Array<{ text: string; location: string }>> {
     const browser: Browser = await puppeteer.launch({
       headless: true,
+      executablePath: "/usr/bin/chromium-browser",
+      args: ["--no-sandbox", "--disable-dev-shm-usage"],
     });
 
     const page: Page = await browser.newPage();
