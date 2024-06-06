@@ -1,6 +1,10 @@
 import { Readable } from "stream";
 import { EntityManager } from "typeorm";
-import { OAuthService, Organisation, RateLimiterService } from "@ocular/ocular";
+import {
+  AppAuthorizationService,
+  Organisation,
+  RateLimiterService,
+} from "@ocular/ocular";
 import {
   IndexableDocument,
   TransactionBaseService,
@@ -15,7 +19,7 @@ import { google } from "googleapis";
 import { RateLimiterQueue } from "rate-limiter-flexible";
 
 export default class GmailService extends TransactionBaseService {
-  protected oauthService_: OAuthService;
+  protected appAuthorizationService_: AppAuthorizationService;
   protected rateLimiterService_: RateLimiterService;
   protected requestQueue_: RateLimiterQueue;
   protected logger_: Logger;
@@ -23,7 +27,7 @@ export default class GmailService extends TransactionBaseService {
 
   constructor(container) {
     super(arguments[0]);
-    this.oauthService_ = container.oauthService;
+    this.appAuthorizationService_ = container.appAuthorizationService;
     this.logger_ = container.logger;
     this.container_ = container;
     this.rateLimiterService_ = container.rateLimiterService;
@@ -39,12 +43,12 @@ export default class GmailService extends TransactionBaseService {
   async *getGmailFiles(org: Organisation): AsyncGenerator<IndexableDocument[]> {
     this.logger_.info(`Starting oculation of Gmail for ${org.id} organisation`);
 
-    // Check if the OAuth record exists for this App in this Organisation.
-    const oauth = await this.oauthService_.retrieve({
+    // Check if the auth record exists for this App in this Organisation.
+    const auth = await this.appAuthorizationService_.retrieve({
       id: org.id,
       app_name: AppNameDefinitions.GMAIL,
     });
-    if (!oauth) {
+    if (!auth) {
       this.logger_.error(
         `No Gmail OAuth Cred found for ${org.id} organisation`
       );
@@ -53,17 +57,17 @@ export default class GmailService extends TransactionBaseService {
 
     // Get the last sync date - this is the time the latest document that was synced from Gmail.
     let last_sync = "";
-    if (oauth.last_sync !== null) {
-      last_sync = oauth.last_sync.toISOString();
+    if (auth.last_sync !== null) {
+      last_sync = auth.last_sync.toISOString();
     }
 
-    // Get the OAuth2Client for the Gmail App and set the credentials.
+    // Get the auth2Client for the Gmail App and set the credentials.
     const oauth2Client: OAuth2Client = await this.container_[
       `${AppNameDefinitions.GMAIL}Oauth`
     ].getOauthCLient();
     oauth2Client.setCredentials({
-      access_token: oauth.token,
-      refresh_token: oauth.refresh_token,
+      access_token: auth.token,
+      refresh_token: auth.refresh_token,
     });
     const gmail = google.gmail({ version: "v1", auth: oauth2Client });
 
@@ -138,19 +142,21 @@ export default class GmailService extends TransactionBaseService {
       } while (nextPageToken);
       yield documents;
       // Update the last sync date  for the connector
-      await this.oauthService_.update(oauth.id, { last_sync: new Date() });
+      await this.appAuthorizationService_.update(auth.id, {
+        last_sync: new Date(),
+      });
     } catch (error) {
       if (error.response && error.response.status === 401) {
         // Check if it's an unauthorized error
         this.logger_.info(`Refreshing Gmail token for ${org.id} organisation`);
 
         // Refresh the token
-        const oauthToken = await this.container_[
+        const authToken = await this.container_[
           "google-driveOauth"
-        ].refreshToken(oauth.refresh_token);
+        ].refreshToken(auth.refresh_token);
 
-        // Update the OAuth record with the new token
-        await this.oauthService_.update(oauth.id, oauthToken);
+        // Update the Auth record with the new token
+        await this.appAuthorizationService_.update(auth.id, authToken);
 
         // Retry the request
         return this.getGmailFiles(org);
