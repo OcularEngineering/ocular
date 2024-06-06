@@ -1,14 +1,16 @@
 import SectionContainer from "@/components/section-container"
-import { EmptyCard } from "@/components/files/empty-card"
+import { UploadedFilesCard } from "@/components/files/uploaded-files-card"
+import { useUploadFile } from "@/lib/hooks/files/use-upload-file"
 
 export default function Files() {
+  const { uploadFiles, progresses, uploadedFiles, isUploading } = useUploadFile(
+    "imageUploader",
+    { defaultUploadedFiles: [] }
+  )
+
   return (
     <SectionContainer>
-      <EmptyCard
-        title="No files uploaded"
-        description="Upload some files to see them here"
-        className="w-full"
-      />
+      <UploadedFilesCard uploadedFiles={uploadedFiles} />
     </SectionContainer>
   )
 }
