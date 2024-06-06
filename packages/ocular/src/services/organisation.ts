@@ -1,8 +1,8 @@
 import { EntityManager } from "typeorm";
-import { OauthService, TransactionBaseService } from "@ocular/types";
+import { AppauthorizationService, TransactionBaseService } from "@ocular/types";
 import { Organisation, User } from "../models";
 import { OrganisationRepository } from "../repositories/organisation";
-import OAuthRepository from "../repositories/oauth";
+import AppAuthorizationRepository from "../repositories/oauth";
 
 import { FindConfig } from "../types/common";
 import { buildQuery } from "../utils/build-query";
@@ -16,16 +16,15 @@ import { AutoflowAiError, AutoflowAiErrorTypes } from "@ocular/utils";
 import { AppNameDefinitions } from "@ocular/types";
 import { AppRepository } from "../repositories";
 import EventBusService from "./event-bus";
-import OAuthService from "./oauth";
-import Locator from "puppeteer";
-import { UpdateOAuthInput } from "../types/oauth";
+import AppAuthorizationService from "./oauth";
+import { UpdateAuthInput } from "../types/oauth";
 
 type InjectedDependencies = {
   manager: EntityManager;
   appRepository: typeof AppRepository;
   loggedInUser: User;
   organisationRepository: typeof OrganisationRepository;
-  oauthService: OAuthService;
+  appAuthorazationService: AppAuthorizationService;
   eventBusService: EventBusService;
 };
 
@@ -36,7 +35,7 @@ class OrganisationService extends TransactionBaseService {
   protected readonly appRepository_: typeof AppRepository;
   protected readonly loggedInUser_: User | null;
   protected readonly organisationRepository_: typeof OrganisationRepository;
-  protected oauthService_: OAuthService;
+  protected appAuthorazationService_: AppAuthorizationService;
   protected readonly eventBusService_: EventBusService;
 
   constructor(container: InjectedDependencies) {
@@ -45,7 +44,7 @@ class OrganisationService extends TransactionBaseService {
     this.appRepository_ = container.appRepository;
     this.organisationRepository_ = container.organisationRepository;
     this.eventBusService_ = container.eventBusService;
-    this.oauthService_ = container.oauthService;
+    this.appAuthorazationService_ = container.appAuthorazationService;
 
     try {
       this.loggedInUser_ = container.loggedInUser;

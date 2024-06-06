@@ -11,15 +11,15 @@ import {
 import { DbAwareColumn } from "../../../utils/src/db-aware-column";
 import { generateEntityId } from "../utils/generate-entity-id";
 import { Organisation } from "./organisation";
-import { AppNameDefinitions, BaseEntity, AppAuthStrategy } from "@ocular/types";
+import { AppNameDefinitions, BaseEntity, AuthStrategy } from "@ocular/types";
 import { resolveDbType } from "@ocular/utils";
 import { App } from "./app";
 import { Event } from "./event";
 import { type } from "os";
 
 @Entity()
-export class OAuth extends BaseEntity {
-  @Index("OAuthAppName")
+export class AppAuthorization extends BaseEntity {
+  @Index("AuthorizationAppName")
   @DbAwareColumn({
     type: "enum",
     enum: AppNameDefinitions,
@@ -30,11 +30,11 @@ export class OAuth extends BaseEntity {
 
   @DbAwareColumn({
     type: "enum",
-    enum: AppAuthStrategy,
+    enum: AuthStrategy,
     nullable: false,
     unique: false,
   })
-  auth_strategy: AppAuthStrategy;
+  auth_strategy: AuthStrategy;
 
   @Column({ type: "varchar", nullable: false })
   type: string;
@@ -64,7 +64,7 @@ export class OAuth extends BaseEntity {
   @JoinColumn({ name: "organisation_id", referencedColumnName: "id" })
   organisation: Organisation;
 
-  @OneToMany(() => Event, (event) => event?.oauth)
+  @OneToMany(() => Event, (event) => event?.app_authorization)
   events?: Event[];
 
   /**
@@ -72,6 +72,6 @@ export class OAuth extends BaseEntity {
    */
   @BeforeInsert()
   private beforeInsert(): void {
-    this.id = generateEntityId(this.id, "oauth");
+    this.id = generateEntityId(this.id, "app_authorization");
   }
 }

@@ -1,8 +1,8 @@
 import { AppNameDefinitions } from "@ocular/types";
-import { App, OAuth } from "../models";
+import { App, AppAuthorization } from "../models";
 
-export type CreateOAuthInput = Omit<
-  OAuth,
+export type CreateAuthInput = Omit<
+  AppAuthorization,
   | "id"
   | "last_sync"
   | "organisation_id"
@@ -12,7 +12,7 @@ export type CreateOAuthInput = Omit<
   | "deleted_at"
 >;
 
-export type UpdateOAuthInput = {
+export type UpdateAuthInput = {
   token?: string;
   token_expires_at?: Date;
   refresh_token?: string;
@@ -21,7 +21,7 @@ export type UpdateOAuthInput = {
   metadata?: Record<string, any>;
 };
 
-export type RetrieveOAuthConfig = {
+export type RetrieveAuthConfig = {
   id: string;
   app_name: AppNameDefinitions;
 };

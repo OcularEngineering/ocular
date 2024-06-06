@@ -1,27 +1,27 @@
-import { TransactionBaseService } from "./transaction-base-service"
+import { TransactionBaseService } from "./transaction-base-service";
 
 /**
  * Interface for file connectors
  * @interface
  */
-class BaseOauthService extends TransactionBaseService {
-  static _isOauthService = true
+class BaseauthService extends TransactionBaseService {
+  static _isAuthService = true;
 
-  static isOauthService(obj) {
-    return obj?.constructor?._isOauthService
+  static isAuthService(obj) {
+    return obj?.constructor?._isAuthService;
   }
 
-  generateToken(code: string,installation_id?: string) {
-    throw Error("generateToken must be overridden by the child class")
+  generateToken(code: string, installation_id?: string) {
+    throw Error("generateToken must be overridden by the child class");
   }
 
   refreshToken(refresh_token: string) {
-    throw Error("refreshToken must be overridden by the child class")
+    throw Error("refreshToken must be overridden by the child class");
   }
 
   destroyToken() {
-    throw Error("destroyToken must be overridden by the child class")
+    throw Error("destroyToken must be overridden by the child class");
   }
 }
 
-export default BaseOauthService
+export default BaseauthService;

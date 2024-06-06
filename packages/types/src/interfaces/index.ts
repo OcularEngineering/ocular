@@ -3,7 +3,7 @@ export * from "./transaction-base-service";
 export * from "./approach-interface";
 export * from "./models";
 export * from "./notifications-service";
-export { default as OauthService } from "./oauth-service";
+export { default as AppauthorizationService } from "./oauth-service";
 export * from "./batch-job-strategy";
 export * from "./indexer-interface";
 export * from "./document-processor";

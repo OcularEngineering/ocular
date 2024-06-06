@@ -27,6 +27,7 @@ export default ({ container, configModule }: Options): void => {
     const loaded = require(fn).default;
     if (loaded) {
       const name = formatRegistrationName(fn);
+      console.log("SERVICE NAME", name);
       container.register({
         [name]: asFunction(
           (cradle) => new loaded(cradle, configModule)

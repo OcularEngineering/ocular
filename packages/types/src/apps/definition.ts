@@ -20,7 +20,7 @@ export enum AppNameDefinitions {
   OCULAR_API = "ocular-api",
 }
 
-export enum AppAuthStrategy {
+export enum AuthStrategy {
   API_TOKEN_STRATEGY = "APITOKEN",
   OAUTH_TOKEN_STRATEGY = "OAUTHTOKEN",
 }

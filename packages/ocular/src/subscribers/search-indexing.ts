@@ -20,8 +20,8 @@ import { SearchEngineOptions } from "../types/search/options";
 import api from "../api";
 import IndexerService from "../services/indexer";
 import { SEARCH_INDEX_EVENT } from "../loaders/search";
-import OAuthService from "../services/oauth";
 import { orgIdToIndexName } from "@ocular/utils";
+import AppAuthorizationService from "../services/oauth";
 
 type InjectedDependencies = {
   indexerService: IndexerService;
@@ -66,11 +66,11 @@ class SearchIndexingSubscriber {
     this.logger_ = logger;
     this.eventBusService_.subscribe(SEARCH_INDEX_EVENT, this.buildSearchIndex);
     this.eventBusService_.subscribe(
-      OAuthService.Events.TOKEN_GENERATED,
+      AppAuthorizationService.Events.TOKEN_GENERATED,
       this.addSearchIndexingJob
     );
     this.eventBusService_.subscribe(
-      "webConnectorInstalled",
+      AppAuthorizationService.Events.WEB_CONNECTOR_INSTALLED,
       this.addSearchIndexingJobWebConnector
     );
     this.indexName_ = indexName;

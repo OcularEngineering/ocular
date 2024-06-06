@@ -1,5 +1,5 @@
-import { OAuth } from "../models/oauth"
+import { AppAuthorization } from "../models/oauth"
 import { dataSource } from "../loaders/database"
 
-export const OAuthRepository = dataSource.getRepository(OAuth)
-export default OAuthRepository
+export const AppAuthorizationRepository = dataSource.getRepository(AppAuthorization);
+export default AppAuthorizationRepository;

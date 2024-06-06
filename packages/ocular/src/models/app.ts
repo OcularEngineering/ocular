@@ -13,9 +13,9 @@ import {
   BaseEntity,
   AppNameDefinitions,
   AppCategoryDefinitions,
-  AppAuthStrategy,
+  AuthStrategy,
 } from "@ocular/types";
-import { OAuth } from "./oauth";
+import { AppAuthorization } from "./oauth";
 import { DbAwareColumn } from "@ocular/utils";
 import { Organisation } from "./organisation";
 
@@ -32,11 +32,11 @@ export class App extends BaseEntity {
 
   @DbAwareColumn({
     type: "enum",
-    enum: AppAuthStrategy,
+    enum: AuthStrategy,
     nullable: false,
     unique: false,
   })
-  auth_strategy: AppAuthStrategy;
+  auth_strategy: AuthStrategy;
 
   @Column({ type: "varchar", nullable: true })
   oauth_url: string;
