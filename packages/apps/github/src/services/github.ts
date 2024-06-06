@@ -1,7 +1,7 @@
 import { Readable } from "stream";
 import { EntityManager } from "typeorm";
 import { App } from "octokit";
-import { OAuthService, Organisation, RateLimiterService } from "@ocular/ocular";
+import { AppAuthorizationService, Organisation, RateLimiterService } from "@ocular/ocular";
 import {
   IndexableDocument,
   TransactionBaseService,
@@ -15,7 +15,7 @@ import e from "express";
 import { RateLimiterQueue } from "rate-limiter-flexible";
 
 export default class GitHubService extends TransactionBaseService {
-  protected oauthService_: OAuthService;
+  protected appAuthorizationService_: AppAuthorizationService;
   protected logger_: Logger;
   protected container_: ConfigModule;
   protected rateLimiterService_: RateLimiterService;
@@ -23,7 +23,7 @@ export default class GitHubService extends TransactionBaseService {
 
   constructor(container) {
     super(arguments[0]);
-    this.oauthService_ = container.oauthService;
+    this.appAuthorizationService_ = container.appAuthorizationService;
     this.logger_ = container.logger;
     this.container_ = container;
     this.rateLimiterService_ = container.rateLimiterService;
@@ -43,22 +43,22 @@ export default class GitHubService extends TransactionBaseService {
       `Starting oculation of Github for ${org.id} organisation`
     );
 
-    // Check if the OAuth record exists for this App in this Organisation.
-    const oauth = await this.oauthService_.retrieve({
+    // Check if the Auth record exists for this App in this Organisation.
+    const auth = await this.appAuthorizationService_.retrieve({
       id: org.id,
       app_name: AppNameDefinitions.GITHUB,
     });
-    if (!oauth) {
+    if (!auth) {
       this.logger_.error(
-        `No Github OAuth Cred found for ${org.id} organisation`
+        `No Github Auth Cred found for ${org.id} organisation`
       );
       return;
     }
 
     // Get the last sync date - this is the time the latest document that was synced from Gmail.
     let last_sync = "";
-    if (oauth.last_sync !== null) {
-      last_sync = oauth.last_sync.toISOString();
+    if (auth.last_sync !== null) {
+      last_sync = auth.last_sync.toISOString();
     }
 
     // Array storing the processed documents
@@ -74,7 +74,7 @@ export default class GitHubService extends TransactionBaseService {
     });
 
     const octokit = await app.getInstallationOctokit(
-      Number(oauth.metadata.installation_id)
+      Number(auth.metadata.installation_id)
     );
     try {
       // Block Until Rate Limit Allows Request
@@ -170,7 +170,7 @@ export default class GitHubService extends TransactionBaseService {
         };
         documents.push(repoDoc);
       }
-      await this.oauthService_.update(oauth.id, { last_sync: new Date() });
+      await this.appAuthorizationService_.update(auth.id, { last_sync: new Date() });
       yield documents;
     } catch (error) {
       console.error(error);
