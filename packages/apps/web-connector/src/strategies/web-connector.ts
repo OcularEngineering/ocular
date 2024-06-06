@@ -4,15 +4,15 @@ import {
   EventBusService,
   QueueService,
 } from "@ocular/ocular";
-import webConnectorService from "../services/webConnector";
+import WebConnectorService from "../services/web-connector";
 import { INDEX_DOCUMENT_EVENT } from "@ocular/types";
 import { AbstractBatchJobStrategy, APPS_INDEXING_TOPIC } from "@ocular/types";
 
-class webConnectorStrategy extends AbstractBatchJobStrategy {
-  static identifier = "webConnector-indexing-strategy";
-  static batchType = "webConnector";
+class WebConnectorStrategy extends AbstractBatchJobStrategy {
+  static identifier = "web-connector-indexing-strategy";
+  static batchType = "web-connector";
   protected batchJobService_: BatchJobService;
-  protected webConnectorService_: webConnectorService;
+  protected webConnectorService_: WebConnectorService;
   protected queueService_: QueueService;
 
   constructor(container) {
@@ -42,4 +42,4 @@ class webConnectorStrategy extends AbstractBatchJobStrategy {
   }
 }
 
-export default webConnectorStrategy;
+export default WebConnectorStrategy;

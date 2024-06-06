@@ -9,7 +9,7 @@ import {
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 
-class webConnectorOauth extends OauthService {
+class WebConnectorOauth extends OauthService {
   protected client_id_: string;
   protected client_secret_: string;
   protected configModule_: ConfigModule;
@@ -65,4 +65,4 @@ class webConnectorOauth extends OauthService {
   }
 }
 
-export default webConnectorOauth;
+export default WebConnectorOauth;

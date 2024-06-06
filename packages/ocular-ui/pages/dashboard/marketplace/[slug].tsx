@@ -36,7 +36,7 @@ const formSchema = z.object({
 });
 
 const OAUTHTOKEN = 'OAUTHTOKEN';
-const WEBCONNECTOR = 'webConnector';
+const WEBCONNECTOR = 'web-connector';
 
 function Integrations() {
   const router = useRouter();

@@ -157,7 +157,7 @@ module.exports = {
       },
     },
     {
-      resolve: `webConnector`,
+      resolve: `web-connector`,
       options: {
         client_id: "FAKE_ID",
         client_secret: "FAKE_SECRET",

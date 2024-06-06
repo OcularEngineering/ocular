@@ -94,7 +94,7 @@ export default function WebConnector({ appId }: { appId: string | null }) {
           title,
           description,
         },
-        name: 'webConnector' as string,
+        name: 'web-connector' as string,
         app_id: appId as string,
       });
       if (response.status === 200) {
