@@ -1,21 +1,21 @@
 const { google } = require("googleapis");
 import randomize from "randomatic";
 import {
-  OauthService,
+  AppauthorizationService,
   AppNameDefinitions,
   AppCategoryDefinitions,
-  OAuthToken,
-  AppAuthStrategy,
+  AuthToken,
+  AuthStrategy,
 } from "@ocular/types";
 import { config } from "process";
 import { OAuth2Client } from "google-auth-library";
 import { auth } from "googleapis/build/src/apis/abusiveexperiencereport";
 
-class GoogleDriveOauth extends OauthService {
+class GoogleDriveOauth extends AppauthorizationService {
   protected client_id_: string;
   protected client_secret_: string;
   protected oauth2Client_: OAuth2Client;
-  protected auth_strategy_: AppAuthStrategy;
+  protected auth_strategy_: AuthStrategy;
 
   constructor(container, options) {
     super(arguments[0]);
@@ -64,7 +64,7 @@ class GoogleDriveOauth extends OauthService {
     };
   }
 
-  async refreshToken(refresh_token: string): Promise<OAuthToken> {
+  async refreshToken(refresh_token: string): Promise<AuthToken> {
     try {
       await this.oauth2Client_.setCredentials({ refresh_token: refresh_token });
       const newToken = await this.oauth2Client_.refreshAccessToken();
@@ -78,7 +78,7 @@ class GoogleDriveOauth extends OauthService {
     }
   }
 
-  async generateToken(code: string): Promise<OAuthToken> {
+  async generateToken(code: string): Promise<AuthToken> {
     try {
       const { tokens } = await this.oauth2Client_.getToken(code);
       return {
@@ -87,7 +87,7 @@ class GoogleDriveOauth extends OauthService {
         token_expires_at: new Date(tokens.expiry_date),
         refresh_token: tokens.refresh_token,
         refresh_token_expires_at: new Date(Date.now() + 172800000),
-        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
+        auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
       };
     } catch (error) {
       console.error(error);
