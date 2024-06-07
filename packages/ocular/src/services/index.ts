@@ -2,7 +2,7 @@ export { default as AppService } from "./app";
 export { default as AuthService } from "./auth";
 export { default as BatchJobService } from "./batch-job";
 export { default as EventBusService } from "./event-bus";
-export { default as AppAuthorizationService } from "./oauth";
+export { default as AppAuthorizationService } from "./app-authorization";
 export { default as OrganisationService } from "./organisation";
 export { default as SearchService } from "./search";
 export { default as StrategyResolverService } from "./strategy-resolver";

@@ -2,7 +2,7 @@ import { EntityManager } from "typeorm";
 import { AppauthorizationService, TransactionBaseService } from "@ocular/types";
 import { Organisation, User } from "../models";
 import { OrganisationRepository } from "../repositories/organisation";
-import AppAuthorizationRepository from "../repositories/oauth";
+import AppAuthorizationRepository from "../repositories/app-authorization";
 
 import { FindConfig } from "../types/common";
 import { buildQuery } from "../utils/build-query";
@@ -16,15 +16,15 @@ import { AutoflowAiError, AutoflowAiErrorTypes } from "@ocular/utils";
 import { AppNameDefinitions } from "@ocular/types";
 import { AppRepository } from "../repositories";
 import EventBusService from "./event-bus";
-import AppAuthorizationService from "./oauth";
-import { UpdateAuthInput } from "../types/oauth";
+import AppAuthorizationService from "./app-authorization";
+import { UpdateAuthInput } from "../types/app-authorization";
 
 type InjectedDependencies = {
   manager: EntityManager;
   appRepository: typeof AppRepository;
   loggedInUser: User;
   organisationRepository: typeof OrganisationRepository;
-  appAuthorazationService: AppAuthorizationService;
+  appAuthorizationService: AppAuthorizationService;
   eventBusService: EventBusService;
 };
 
@@ -35,7 +35,7 @@ class OrganisationService extends TransactionBaseService {
   protected readonly appRepository_: typeof AppRepository;
   protected readonly loggedInUser_: User | null;
   protected readonly organisationRepository_: typeof OrganisationRepository;
-  protected appAuthorazationService_: AppAuthorizationService;
+  protected appAuthorizationService_: AppAuthorizationService;
   protected readonly eventBusService_: EventBusService;
 
   constructor(container: InjectedDependencies) {
@@ -44,7 +44,7 @@ class OrganisationService extends TransactionBaseService {
     this.appRepository_ = container.appRepository;
     this.organisationRepository_ = container.organisationRepository;
     this.eventBusService_ = container.eventBusService;
-    this.appAuthorazationService_ = container.appAuthorazationService;
+    this.appAuthorizationService_ = container.appAuthorizationService;
 
     try {
       this.loggedInUser_ = container.loggedInUser;

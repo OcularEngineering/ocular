@@ -3,7 +3,7 @@ import { AppAuthorizationService } from "../../../../services";
 export default async (req, res) => {
   const { id } = req.params;
   const appAuthorizationService: AppAuthorizationService = req.scope.resolve(
-    "appAutherizationService"
+    "appAuthorizationService"
   );
 
   const authToken = await appAuthorizationService.retrieveById({

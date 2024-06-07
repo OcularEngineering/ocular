@@ -27,7 +27,7 @@
     "start": "npm run build && nodemon dist/ocular/src/main.js",
     "clean": "rimraf dist node_modules",
     "test": "jest src --detectOpenHandles",
-    "typeorm:dev": "npm run build && cross-env CONFIG_FILE=core-config-dev.js typeorm-ts-node-esm -d dist/ocular/src/data-source.js",
+    "typeorm:dev": "npm run build && cross-env CONFIG_FILE=core-config-dev.js NODE_ENV=development typeorm-ts-node-esm -d dist/ocular/src/data-source.js",
     "typeorm:local": "npm run build && cross-env CONFIG_FILE=core-config-local.js typeorm-ts-node-esm -d dist/ocular/src/data-source.js"
   },
   "dependencies": {

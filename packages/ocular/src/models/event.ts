@@ -12,7 +12,7 @@ import { BaseEntity } from "@ocular/types";
 import { generateEntityId } from "../utils/generate-entity-id";
 import { Organisation } from "./organisation";
 import { DbAwareColumn } from "../../../utils/src/db-aware-column";
-import { AppAuthorization } from "./oauth";
+import { AppAuthorization } from "./app-authorization";
 import { App } from "./app";
 
 @Entity()

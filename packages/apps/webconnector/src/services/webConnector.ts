@@ -15,7 +15,6 @@ import {
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 import puppeteer, { Browser, Page } from "puppeteer";
-import { UpdateAuthInput } from "@ocular/ocular/src/types/oauth";
 
 interface metadataLink {
   location: string;
@@ -115,7 +114,7 @@ export default class webConnectorService extends TransactionBaseService {
       await this.appAuthorizationService_.update(auth.id, {
         metadata: auth.metadata,
         last_sync: new Date(),
-      } as UpdateAuthInput);
+      });
 
       this.logger_.info(
         `Finished oculation of Web Connector for ${org.id} organisation`
@@ -135,7 +134,7 @@ export default class webConnectorService extends TransactionBaseService {
       await this.appAuthorizationService_.update(auth.id, {
         metadata: auth.metadata,
         last_sync: new Date(),
-      } as UpdateAuthInput);
+      });
     }
   }
 

@@ -9,7 +9,6 @@ export default async (container, options) => {
     }
     const rateLimiterOpts: RateLimiterOpts = options.rate_limiter_opts
     const rateLimiterService: RateLimiterService = container.resolve("rateLimiterService")
-    console.log("Gmail: Rate Limiter Options", rateLimiterOpts)
     await rateLimiterService.register(AppNameDefinitions.GMAIL,rateLimiterOpts.requests, rateLimiterOpts.interval);
   } catch (err) {
     console.log(err)

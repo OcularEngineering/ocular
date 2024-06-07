@@ -1,4 +1,4 @@
-const { PluginNameDefinitions, AppAuthStrategy } = require("@ocular/types");
+const { PluginNameDefinitions, AuthStrategy } = require("@ocular/types");
 const dotenv = require("dotenv");
 
 let ENV_FILE_NAME = "";
@@ -52,7 +52,7 @@ module.exports = {
         client_secret: process.env.ASANA_CLIENT_SECRET,
         scope: "openid email profile",
         redirect_uri: `${UI_CORS}/dashboard/marketplace/asana`,
-        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
+        auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
         rate_limiter_opts: {
           requests: 1500, // Number of Requests
           interval: 60, // Interval in Seconds
@@ -69,7 +69,7 @@ module.exports = {
           requests: 10, // Number of Requests
           interval: 1, // Interval in Seconds
         },
-        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
+        auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
       },
     },
     {
@@ -82,7 +82,7 @@ module.exports = {
           requests: 10, // Number of Requests
           interval: 1, // Interval in Seconds
         },
-        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
+        auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
       },
     },
     {
@@ -95,7 +95,7 @@ module.exports = {
           requests: 3, // Number of Requests
           interval: 1, // Interval in Seconds
         },
-        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
+        auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
       },
     },
     {
@@ -108,7 +108,7 @@ module.exports = {
           requests: 60, // Number of Requests
           interval: 60, // Interval in Seconds
         },
-        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
+        auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
       },
     },
     {
@@ -117,7 +117,7 @@ module.exports = {
         client_id: process.env.BITBUCKET_CLIENT_ID,
         client_secret: process.env.BITBUCKET_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/bitbucket`,
-        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
+        auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
       },
     },
     {
@@ -129,7 +129,7 @@ module.exports = {
         app_id: process.env.GITHUB_APP_ID,
         private_key: process.env.GITHUB_PRIVATE_KEY_PATH,
         scope: "repo",
-        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
+        auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
       },
     },
     {
@@ -138,7 +138,7 @@ module.exports = {
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/google-drive`,
-        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
+        auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
         rate_limiter_opts: {
           requests: 60, // Number of Requests
           interval: 60, // Interval in Seconds
@@ -155,7 +155,7 @@ module.exports = {
           requests: 60, // Number of Requests
           interval: 60, // Interval in Seconds
         },
-        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
+        auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
       },
     },
     {
@@ -164,7 +164,7 @@ module.exports = {
         client_id: "FAKE_ID",
         client_secret: "FAKE_SECRET",
         redirect_uri: `${UI_CORS}/dashboard/marketplace/webConnector`,
-        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
+        auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
       },
     },
     {
@@ -176,8 +176,8 @@ module.exports = {
         app_id: process.env.GITHUB_APP_ID,
         private_key: process.env.GITHUB_PRIVATE_KEY_PATH,
         scope: "repo",
-        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
-      }
+        auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
+      },
     },
   ],
   plugins: [

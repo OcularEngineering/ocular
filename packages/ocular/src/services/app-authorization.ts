@@ -13,10 +13,10 @@ import {
   CreateAuthInput,
   RetrieveAuthConfig,
   UpdateAuthInput,
-} from "../types/oauth";
+} from "../types/app-authorization";
 import { AppAuthorization } from "../models";
 import AppService from "./app";
-import AppAuthorizationRepository from "../repositories/oauth";
+import AppAuthorizationRepository from "../repositories/app-authorization";
 import { Selector } from "../types/common";
 import { AuthToken } from "@ocular/types";
 

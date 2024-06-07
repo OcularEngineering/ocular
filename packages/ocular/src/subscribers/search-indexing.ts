@@ -21,7 +21,7 @@ import api from "../api";
 import IndexerService from "../services/indexer";
 import { SEARCH_INDEX_EVENT } from "../loaders/search";
 import { orgIdToIndexName } from "@ocular/utils";
-import AppAuthorizationService from "../services/oauth";
+import AppAuthorizationService from "../services/app-authorization";
 
 type InjectedDependencies = {
   indexerService: IndexerService;
