@@ -155,15 +155,15 @@ module.exports = {
         auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
       },
     },
-    // {
-    //   resolve: `web-connector`,
-    //   options: {
-    //     client_id: "FAKE_ID",
-    //     client_secret: "FAKE_SECRET",
-    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/webConnector`,
-    //     auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
-    //   },
-    // },
+    {
+      resolve: `web-connector`,
+      options: {
+        client_id: "FAKE_ID",
+        client_secret: "FAKE_SECRET",
+        redirect_uri: `${UI_CORS}/dashboard/marketplace/webConnector`,
+        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
+      },
+    },
     {
       resolve: `github`,
       options: {
