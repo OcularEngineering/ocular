@@ -5,8 +5,6 @@ let ENV_FILE_NAME = "";
 switch (process.env.NODE_ENV) {
   case "local":
     ENV_FILE_NAME = ".env.local";
-  case "local":
-    ENV_FILE_NAME = ".env.local";
   case "production":
     ENV_FILE_NAME = ".env.production";
     break;
@@ -20,7 +18,6 @@ switch (process.env.NODE_ENV) {
     ENV_FILE_NAME = ".env.dev";
     break;
   default:
-    ENV_FILE_NAME = ".env.local";
     ENV_FILE_NAME = ".env.local";
     break;
 }
@@ -158,15 +155,15 @@ module.exports = {
         auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
       },
     },
-    {
-      resolve: `webConnector`,
-      options: {
-        client_id: "FAKE_ID",
-        client_secret: "FAKE_SECRET",
-        redirect_uri: `${UI_CORS}/dashboard/marketplace/webConnector`,
-        auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
-      },
-    },
+    // {
+    //   resolve: `web-connector`,
+    //   options: {
+    //     client_id: "FAKE_ID",
+    //     client_secret: "FAKE_SECRET",
+    //     redirect_uri: `${UI_CORS}/dashboard/marketplace/webConnector`,
+    //     auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
+    //   },
+    // },
     {
       resolve: `github`,
       options: {
