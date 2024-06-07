@@ -22,33 +22,47 @@ export function useUploadFile(
     try {
       // Ensure this code runs only on the client-side
       if (typeof window === 'undefined') {
+
         throw new Error("File upload can only be performed on the client-side");
+
       }
 
       const formData = new FormData();
 
       files.forEach(file => {
-        console.log('File here:', file);
+
         if (file instanceof File) {
-          formData.set('files', file);
-          console.log(`Appended file: ${file.name}`);
+
+          formData.append('files', file);
+
         } else {
+
           console.error('Invalid file object:', file);
+
         }
       });
 
-
-
       const response = await api.files.upload(files);
 
-      // Assuming the response contains the uploaded file details
-      // setUploadedFiles((prev) => (prev ? [...prev, ...response.data] : response.data));
+      setUploadedFiles((prev) => (prev ? [...prev, ...response.data.uploads] : response.data.uploads));
       toast.success(`${files.length} files uploaded successfully.`);
+
     } catch (err) {
-      toast.error(`Failed to upload files: ${err.message}`);
+
+      if (err instanceof Error) {
+
+        toast.error(`Failed to upload files: ${err.message}`);
+
+      } else {
+  
+        toast.error(`Failed to upload files: ${String(err)}`);
+      }
+      
     } finally {
+
       setProgresses({});
       setIsUploading(false);
+
     }
   }
 

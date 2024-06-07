@@ -84,7 +84,7 @@ const Results = ({ results }) => (
                       </p>
                       <span className="font-regular text-sm text-gray-500">·</span>
                       <p className="font-regular line-clamp-3 text-sm text-gray-500">
-                        {result.documentMetadata.type.charAt(0).toUpperCase() + result.documentMetadata.type.slice(1)}
+                        {result.documentMetadata.type.toUpperCase()}
                       </p>
                     </div>
                   </div>

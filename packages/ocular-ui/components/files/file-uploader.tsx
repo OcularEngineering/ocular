@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
+
 import { Cross2Icon, UploadIcon } from "@radix-ui/react-icons";
 import Dropzone, { type DropzoneProps, type FileRejection } from "react-dropzone";
 import { toast } from "sonner";
@@ -29,10 +30,10 @@ export function FileUploader(props: FileUploaderProps) {
     onValueChange,
     onUpload,
     progresses,
-    accept = { "application/pdf": [] },
-    maxSize = 1024 * 1024 * 2,
-    maxFiles = 1,
-    multiple = false,
+    accept = undefined, 
+    maxSize = Infinity, 
+    maxFiles = Infinity,
+    multiple = true,
     disabled = false,
     className,
     ...dropzoneProps
@@ -45,10 +46,6 @@ export function FileUploader(props: FileUploaderProps) {
 
   const onDrop = React.useCallback(
     (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
-      if (!multiple && maxFiles === 1 && acceptedFiles.length > 1) {
-        toast.error("Cannot upload more than 1 file at a time");
-        return;
-      }
 
       if ((files?.length ?? 0) + acceptedFiles.length > maxFiles) {
         toast.error(`Cannot upload more than ${maxFiles} files`);
@@ -149,8 +146,8 @@ export function FileUploader(props: FileUploaderProps) {
                   <p className="text-sm text-muted-foreground/70">
                     You can upload
                     {maxFiles > 1
-                      ? ` ${maxFiles === Infinity ? "multiple" : maxFiles} files (up to ${formatBytes(maxSize)} each)`
-                      : ` a file with ${formatBytes(maxSize)}`}
+                      ? ` ${maxFiles === Infinity ? "multiple" : maxFiles} files of any size`
+                      : ` a file of any size`}
                   </p>
                 </div>
               </div>
