@@ -51,9 +51,9 @@ class Telemeter {
   
   constructor(options :Options) {
 
-    this.flushAt = Math.max(options.flushAt, 1) || 20
-    this.maxQueueSize = options.maxQueueSize || 1024 * 500
-    this.flushInterval = options.flushInterval || 10 * 1000
+    this.flushAt = Math.max(options.flushAt, 1)
+    this.maxQueueSize = options.maxQueueSize
+    this.flushInterval = options.flushInterval
     this.flushed = false
 
     this.queueSize_ = this.store_.getQueueSize()

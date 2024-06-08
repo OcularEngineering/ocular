@@ -24,7 +24,7 @@ class Outbox {
     this.baseDir = baseDir
   }
 
-  appendToBuffer(event:string) {
+  public appendToBuffer(event:string) :string{
     try {
       appendFileSync(this.bufferFilePath, event, `utf8`)
     } catch (e) {
@@ -32,9 +32,10 @@ class Outbox {
         console.error("Failed to append to buffer", e)
       }
     }
+    return this.bufferFilePath
   }
 
-  getSize():number {
+  public getSize():number {
     if (!existsSync(this.bufferFilePath)) {
       return 0
     }
@@ -50,7 +51,7 @@ class Outbox {
     return 0
   }
 
-  getCount():number {
+  public getCount():number {
     if (!existsSync(this.bufferFilePath)) {
       return 0
     }
@@ -68,7 +69,7 @@ class Outbox {
     return 0
   }
 
-  async flushFile(filePath:string, flushOperation) {
+  public async flushFile(filePath:string, flushOperation) {
     const now = `${Date.now()}-${process.pid}`
     let success = false
     let contents = ``
@@ -104,7 +105,7 @@ class Outbox {
     return true
   }
 
-  async startFlushEvents(flushOperation) {
+  public async startFlushEvents(flushOperation) {
     try {
       await this.flushFile(this.bufferFilePath, flushOperation)
       const files = readdirSync(this.baseDir)

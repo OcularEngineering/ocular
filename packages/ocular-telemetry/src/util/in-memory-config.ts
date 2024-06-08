@@ -4,7 +4,7 @@ import { join } from "path"
 
 class InMemoryConfigStore {
   private config:object = {}
-  private path:string = join(os.tmpdir(), `medusa`)
+  public path:string = join(os.tmpdir(), `medusa`)
 
   private static instance:InMemoryConfigStore
 
@@ -19,38 +19,38 @@ class InMemoryConfigStore {
     return InMemoryConfigStore.instance
   }
 
-  createBaseConfig() {
+  public createBaseConfig() {
     return {
       "telemetry.enabled": true,
       "telemetry.machine_id": `not-a-machine-id-${uuidv4()}`,
     }
   }
 
-  get(key) {
+  public get(key) {
     return this.config[key]
   }
 
-  set(key, value) {
+  public set(key, value) {
     this.config[key] = value
   }
 
-  all() {
+  public all() {
     return this.config
   }
 
-  size() {
+  public size() {
     return Object.keys(this.config).length
   }
 
-  has(key) {
+  public has(key) {
     return !!this.config[key]
   }
 
-  del(key) {
+  public del(key) {
     delete this.config[key]
   }
 
-  clear() {
+  public clear() {
     this.config = this.createBaseConfig()
   }
 }

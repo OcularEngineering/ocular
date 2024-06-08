@@ -1,7 +1,11 @@
 import Telemeter from "./telemeter"
 import createFlush from "./util/create-flush"
 
-const telemeter = new Telemeter()
+const telemeter = new Telemeter({
+  flushAt:20,
+  maxQueueSize:1024*500,
+  flushInterval:10*1000
+})
 
 export const flush = createFlush(telemeter.isTrackingEnabled())
 

@@ -1,13 +1,13 @@
 import Configstore from "configstore"
 import path from "path"
 
-import { InMemoryConfigStore } from "./util/in-memory-config"
+import  InMemoryConfigStore from "./util/in-memory-config"
 import isTruthy from "./util/is-truthy"
 import OutboxStore from "./util/outbox-store"
 
 class Store {
 
-  private config_: Configstore
+  private config_: typeof InMemoryConfigStore
   private outbox_: OutboxStore
   private disabled_: boolean
 
@@ -17,7 +17,7 @@ class Store {
     try {
       this.config_ = new Configstore(`ocular`, {}, { globalConfigPath: true })
     } catch (e) {
-      this.config_ = new InMemoryConfigStore() as any
+      console.error(e)
     }
 
     const baseDir = path.dirname(this.config_.path)
@@ -45,7 +45,6 @@ class Store {
     if (this.disabled_) {
       return
     }
-
     const eventString = JSON.stringify(event)
     return this.outbox_.appendToBuffer(eventString + `\n`)
   }
