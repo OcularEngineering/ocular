@@ -26,13 +26,13 @@ export default class OcularEmbeddingService extends AbstractEmbedderService {
 
   async createEmbeddings(texts: string[]): Promise<Array<number[]>> {
     try {
-      this.logger_.info(
-        `createEmbeddings: Creating Embeddings for Texts ${texts.length}`
-      );
+      // this.logger_.info(
+      //   `createEmbeddings: Creating Embeddings for Texts ${texts.length}`
+      // );
       const embdeddings = await axios.post(`${this.ocularModelsUrl_}/embed`, {
         texts: texts,
       });
-      this.logger_.info(`createEmbeddings: Done  embedding ${texts.length} `);
+      // this.logger_.info(`createEmbeddings: Done  embedding ${texts.length} `);
       return embdeddings.data;
     } catch (error) {
       this.logger_.error(

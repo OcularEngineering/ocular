@@ -34,11 +34,13 @@ export default class QueueService extends AbstractQueueService {
       this.kafkaClient_ = kafkaClient;
       this.producer_ = kafkaClient.producer();
     } catch (error) {
-      this.logger_.error(`Error creating Kafka producer: ${error.message}`);
+      this.logger_.error(
+        `queueService: Error creating Kafka producer: ${error.message}`
+      );
     }
 
     process.on("exit", async () => {
-      this.logger_.info("Disconnecting all consumers");
+      this.logger_.info("queueService: Disconnecting all consumers");
       await this.clearConsumers();
     });
   }
@@ -56,8 +58,9 @@ export default class QueueService extends AbstractQueueService {
       });
       await this.producer_.disconnect();
     } catch (error) {
-      this.logger_.error(`Error sending message to Kafka: ${error.message}`);
-      throw error;
+      this.logger_.error(
+        `send: Error sending message to Kafka: ${error.message}`
+      );
     }
   }
 
@@ -66,6 +69,7 @@ export default class QueueService extends AbstractQueueService {
     data: T[],
     options?: Record<string, unknown>
   ): Promise<void> {
+    // Track And Count The Number of Messages Sent To Indexing Queue
     try {
       await this.producer_.connect();
       const messages = data.map((doc) => {
@@ -82,9 +86,8 @@ export default class QueueService extends AbstractQueueService {
       await this.producer_.disconnect();
     } catch (error) {
       this.logger_.error(
-        `Error sending batch message to Kafka: ${error.message}`
+        `sendBatch:Error sending batch message to Kafka: ${error.message}`
       );
-      throw error;
     }
   }
 
@@ -141,21 +144,31 @@ export default class QueueService extends AbstractQueueService {
         eachBatchAutoResolve: true,
         eachBatch: async ({ batch, heartbeat }) => {
           try {
+            // Start Tracking The Activity of The Indexing Process
+            const eachBatchProcessingActivity = this.logger_.activity(
+              `eachBatch: Batch Received ${batch.messages.length} messages in topic ${topicName}\n`
+            );
             const docs: IndexableDocument[] = batch.messages.map((message) => {
               return JSON.parse(message.value.toString()) as IndexableDocument;
             });
-            this.logger_.info(
-              `eachBatch: Batch Received ${docs.length} messages`
+
+            for (let i = 0; i < docs.length; i++) {
+              await consumer([docs[i]], topic);
+              this.logger_.progress(
+                eachBatchProcessingActivity,
+                `eachBatch: Indexed ${i} messages Out of  Received ${batch.messages.length} messages in topic ${topicName}\n`
+              );
+              await heartbeat();
+            }
+
+            this.logger_.success(
+              eachBatchProcessingActivity,
+              `eachBatch: Finished Batch Processing ${batch.messages.length} messages in topic ${topicName}\n`
             );
-            consumer(docs, topic).catch((error) => {
-              this.logger_.error(`Error processing message: ${error.message}`);
-            });
-            this.logger_.info(
-              `eachBatch: Batch Processing ${docs.length} done`
-            );
-            await heartbeat();
           } catch (error) {
-            this.logger_.error(`Error processing message: ${error.message}`);
+            this.logger_.error(
+              `eachBatch: Error processing message: ${error.message}`
+            );
           }
         },
       });
@@ -169,7 +182,9 @@ export default class QueueService extends AbstractQueueService {
         consumer: kafkaConsumer,
       });
     } catch (error) {
-      this.logger_.error(`Error subscribing to topic: ${error.message}`);
+      this.logger_.error(
+        `subscribeBatch: Error subscribing to topic: ${error.message}`
+      );
     }
   }
 }
