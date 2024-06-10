@@ -17,6 +17,7 @@ import { ConfigModule } from "@ocular/ocular/src/types";
 import fs from "fs";
 import { google, drive_v3 } from "googleapis";
 import { RateLimiterQueue } from "rate-limiter-flexible";
+import { AutoflowAiError, AutoflowAiErrorTypes } from "@ocular/utils";
 
 export default class GoogleDriveService extends TransactionBaseService {
   protected appAuthorizationService_: AppAuthorizationService;
@@ -43,45 +44,41 @@ export default class GoogleDriveService extends TransactionBaseService {
   async *getGoogleDriveFiles(
     org: Organisation
   ): AsyncGenerator<IndexableDocument[]> {
-    this.logger_.info(
-      `Starting oculation of Google Drive for ${org.id} organisation`
-    );
-
     // Check if the auth record exists for this App in this Organisation.
     const auth = await this.appAuthorizationService_.retrieve({
       id: org.id,
       app_name: AppNameDefinitions.GOOGLEDRIVE,
     });
+
     if (!auth) {
       this.logger_.error(
         `No Google Drive auth Cred found for ${org.id} organisation`
       );
-      return;
+      return null;
     }
-
-    // Get the last sync date - this is the time the latest document that was synced from Google Drive.
-    let last_sync = "";
-    if (auth.last_sync !== null) {
-      last_sync = auth.last_sync.toISOString();
-    }
-
-    // Get the OAuth2Client for the Google Drive App and set the credentials.
-    const oauth2Client: OAuth2Client = await this.container_[
-      `${AppNameDefinitions.GOOGLEDRIVE}Oauth`
-    ].getOauthCLient();
-    oauth2Client.setCredentials({
-      access_token: auth.token,
-      refresh_token: auth.refresh_token,
-    });
-    const drive: drive_v3.Drive = await google.drive({
-      version: "v3",
-      auth: oauth2Client,
-    });
-
-    // Array storing the processed documents
-    let documents: IndexableDocument[] = [];
 
     try {
+      // Get the last sync date - this is the time the latest document that was synced from Google Drive.
+      let last_sync = "";
+      if (auth.last_sync !== null) {
+        last_sync = auth.last_sync.toISOString();
+      }
+
+      // Get the OAuth2Client for the Google Drive App and set the credentials.
+      const oauth2Client: OAuth2Client = await this.container_[
+        `${AppNameDefinitions.GOOGLEDRIVE}Oauth`
+      ].getOauthCLient();
+      oauth2Client.setCredentials({
+        access_token: auth.token,
+        refresh_token: auth.refresh_token,
+      });
+      const drive: drive_v3.Drive = await google.drive({
+        version: "v3",
+        auth: oauth2Client,
+      });
+
+      // Array storing the processed documents
+      let documents: IndexableDocument[] = [];
       // Only Sync Files Modified After Last Sync.
       let query = "mimeType='application/vnd.google-apps.document'";
       if (last_sync !== "") {
@@ -105,6 +102,9 @@ export default class GoogleDriveService extends TransactionBaseService {
         for (const file of data.files) {
           // Get Each Files Content As Plain Text
           const content = await this.getGoogleDriveFileContent(file.id, drive);
+          if (!content) {
+            continue;
+          }
           const doc: IndexableDocument = {
             id: file.id,
             organisationId: org.id,
@@ -122,6 +122,7 @@ export default class GoogleDriveService extends TransactionBaseService {
           };
           // Batch Documents To Be Yielded To Max 100 At A Time
           if (documents.length == 100) {
+            this.logger_.info("getGoogleDriveFiles: Yielding 100 documents");
             yield documents;
             documents = [];
           }
@@ -139,7 +140,9 @@ export default class GoogleDriveService extends TransactionBaseService {
       // If the error is an unauthorized error, refresh the token and retry the request
       if (error.response && error.response.status === 401) {
         // Check if it's an unauthorized error
-        this.logger_.info(`Refreshing Asana token for ${org.id} organisation`);
+        this.logger_.info(
+          `getGoogleDriveFiles: Refreshing Google Drive token for ${org.id} organisation`
+        );
 
         // Refresh the token
         const authToken = await this.container_[
@@ -151,39 +154,41 @@ export default class GoogleDriveService extends TransactionBaseService {
 
         // Retry the request
         return this.getGoogleDriveFiles(org);
-      } else {
-        console.error(error);
       }
-
-      console.log(error);
-      console.error("The API returned an error: " + error);
+      this.logger_.error(
+        "getGoogleDriveFiles: The API returned an error: " + error.message
+      );
       return null;
     }
-    this.logger_.info(
-      `Finished oculation of Google Drive for ${org.id} organisation`
-    );
   }
 
   // Get The Content Of A Google Drive File
   async getGoogleDriveFileContent(fileId: string, drive: drive_v3.Drive) {
-    await this.requestQueue_.removeTokens(1, AppNameDefinitions.GOOGLEDRIVE);
-    return await new Promise<string>((resolve, reject) => {
-      let data = "";
-      drive.files
-        .export(
-          {
-            fileId: fileId,
-            mimeType: "text/plain",
-          },
-          { responseType: "stream" }
-        )
-        .then((response) => {
-          response.data
-            .on("data", (chunk) => (data += chunk))
-            .on("end", () => resolve(data))
-            .on("error", reject);
-        })
-        .catch(reject);
-    });
+    try {
+      await this.requestQueue_.removeTokens(1, AppNameDefinitions.GOOGLEDRIVE);
+      return await new Promise<string>((resolve, reject) => {
+        let data = "";
+        drive.files
+          .export(
+            {
+              fileId: fileId,
+              mimeType: "text/plain",
+            },
+            { responseType: "stream" }
+          )
+          .then((response) => {
+            response.data
+              .on("data", (chunk) => (data += chunk))
+              .on("end", () => resolve(data))
+              .on("error", reject);
+          })
+          .catch(reject);
+      });
+    } catch (error) {
+      this.logger_.error(
+        `getGoogleDriveFileContent: Error fetching content for file ${fileId} with error: ${error.message}`
+      );
+      return null;
+    }
   }
 }

@@ -6,22 +6,27 @@ import {
   AppCategoryDefinitions,
   AuthToken,
   AuthStrategy,
+  Logger,
 } from "@ocular/types";
 import { config } from "process";
 import { OAuth2Client } from "google-auth-library";
 import { auth } from "googleapis/build/src/apis/abusiveexperiencereport";
+import { AutoflowAiError, AutoflowAiErrorTypes } from "@ocular/utils";
+import e from "express";
 
 class GoogleDriveOauth extends AppauthorizationService {
   protected client_id_: string;
   protected client_secret_: string;
   protected oauth2Client_: OAuth2Client;
   protected auth_strategy_: AuthStrategy;
+  protected logger_: Logger;
 
   constructor(container, options) {
     super(arguments[0]);
     this.client_id_ = options.client_id;
     this.client_secret_ = options.client_secret;
     this.auth_strategy_ = options.auth_strategy;
+    this.logger_ = container.logger;
     this.oauth2Client_ = new google.auth.OAuth2(
       options.client_id,
       options.client_secret,
@@ -73,8 +78,10 @@ class GoogleDriveOauth extends AppauthorizationService {
         token: accessToken,
       };
     } catch (error) {
-      console.error(error);
-      throw error;
+      this.logger_.error(
+        "refreshToken: Error refreshing token for Google Drive with error: " +
+          error.message
+      );
     }
   }
 
@@ -90,8 +97,10 @@ class GoogleDriveOauth extends AppauthorizationService {
         auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
       };
     } catch (error) {
-      console.error(error);
-      throw error;
+      this.logger_.error(
+        "generatingToken: Error generationg token for Google Drive with: " +
+          error.message
+      );
     }
   }
 

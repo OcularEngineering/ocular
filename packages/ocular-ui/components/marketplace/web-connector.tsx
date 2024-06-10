@@ -65,15 +65,12 @@ const formSchema = z.object({
   link: z.string().url(),
 });
 
-export default function WebConnector({ appId }: { appId: string | null }) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [linkData, setLinkdata] = React.useState<WebConnectorLink[]>([]);
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+export default function WebConnector({ appId }: { appId: string }) {
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [linkData, setLinkData] = useState<WebConnectorLink[]>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -94,28 +91,18 @@ export default function WebConnector({ appId }: { appId: string | null }) {
           title,
           description,
         },
-        name: 'webConnector' as string,
-        app_id: appId as string,
+        name: 'web-connector',
+        app_id: appId,
       });
-      if (response.status === 200) {
-        const updatedLinkData: WebConnectorLink[] = [
-          ...linkData,
-          {
-            location: link,
-            status: 'processing',
-          },
-        ];
-        setLinkdata(updatedLinkData);
-      } else {
-        const updatedLinkData: WebConnectorLink[] = [
-          ...linkData,
-          {
-            location: link,
-            status: 'failed',
-          },
-        ];
-        setLinkdata(updatedLinkData);
-      }
+
+      const updatedLinkData: WebConnectorLink[] = [
+        ...linkData,
+        {
+          location: link,
+          status: response.status === 200 ? 'processing' : 'failed',
+        },
+      ];
+      setLinkData(updatedLinkData || []);
     } catch (error) {
       console.error('Error fetching integrations:', error);
     }
@@ -131,7 +118,7 @@ export default function WebConnector({ appId }: { appId: string | null }) {
         if (response) {
           const fetchedApp = response.data.app;
           const appMetadata = fetchedApp.metadata;
-          setLinkdata(appMetadata.links);
+          setLinkData(appMetadata.links || []);
         }
       } catch (error) {
         console.error('Failed to fetch integration details', error);
@@ -139,7 +126,7 @@ export default function WebConnector({ appId }: { appId: string | null }) {
     };
 
     fetchApp();
-  }, []);
+  }, [appId]);
 
   const table = useReactTable({
     data: linkData,
@@ -159,6 +146,10 @@ export default function WebConnector({ appId }: { appId: string | null }) {
       rowSelection,
     },
   });
+
+  if (!linkData) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <SectionContainer className="items-center justify-center space-y-16">

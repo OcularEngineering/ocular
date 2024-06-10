@@ -5,8 +5,6 @@ let ENV_FILE_NAME = "";
 switch (process.env.NODE_ENV) {
   case "local":
     ENV_FILE_NAME = ".env.local";
-  case "local":
-    ENV_FILE_NAME = ".env.local";
   case "production":
     ENV_FILE_NAME = ".env.production";
     break;
@@ -20,7 +18,6 @@ switch (process.env.NODE_ENV) {
     ENV_FILE_NAME = ".env.dev";
     break;
   default:
-    ENV_FILE_NAME = ".env.local";
     ENV_FILE_NAME = ".env.local";
     break;
 }
@@ -159,7 +156,7 @@ module.exports = {
       },
     },
     {
-      resolve: `webConnector`,
+      resolve: `web-connector`,
       options: {
         client_id: "FAKE_ID",
         client_secret: "FAKE_SECRET",
