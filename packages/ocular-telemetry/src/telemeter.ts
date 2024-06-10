@@ -13,13 +13,47 @@ import showAnalyticsNotification from "./util/show-notification"
 
 const OCULAR_TELEMETRY_VERBOSE = process.env.OCULAR_TELEMETRY_VERBOSE || false
 
-class Telemeter {
-  constructor(options = {}) {
-    this.store_ = new Store()
+interface Options{
+  flushAt: number
+  maxQueueSize: number
+  flushInterval: number
+}
 
-    this.flushAt = Math.max(options.flushAt, 1) || 20
-    this.maxQueueSize = options.maxQueueSize || 1024 * 500
-    this.flushInterval = options.flushInterval || 10 * 1000
+interface OsInfo {
+  node_version: string;
+  platform: string;
+  release: string;
+  cpus: number;
+  is_ci: boolean;
+  ci_name: string;
+  arch: string;
+  docker: boolean;
+  term_program: string;
+}
+
+class Telemeter {
+
+  private store_: typeof Store
+  private flushAt: number
+  private maxQueueSize: number
+  private flushInterval: number
+  private flushed: boolean
+  private queueSize_: number
+  private queueCount_:number
+  private machineId: string|unknown
+  private trackingEnabled: boolean|unknown
+  private featureFlags_:Set<string>
+  private osInfo:OsInfo
+  private apps_:Array<any>
+  private plugins_:Array<any>
+  private timer:NodeJS.Timeout|undefined
+
+  
+  constructor(options :Options) {
+
+    this.flushAt = Math.max(options.flushAt, 1)
+    this.maxQueueSize = options.maxQueueSize
+    this.flushInterval = options.flushInterval
     this.flushed = false
 
     this.queueSize_ = this.store_.getQueueSize()
@@ -30,7 +64,7 @@ class Telemeter {
     this.plugins_ = []
   }
 
-  getMachineId() {
+  public getMachineId() :string|unknown{
     if (this.machineId) {
       return this.machineId
     }
@@ -43,7 +77,7 @@ class Telemeter {
     return machineId
   }
 
-  isTrackingEnabled() {
+  public isTrackingEnabled() :string|unknown{
     // Cache the result
     if (this.trackingEnabled !== undefined) {
       return this.trackingEnabled
@@ -60,27 +94,27 @@ class Telemeter {
     return enabled
   }
 
-  getOsInfo() {
+  public getOsInfo(): OsInfo {
     if (this.osInfo) {
-      return this.osInfo
+      return this.osInfo;
     }
-    const cpus = os.cpus()
-    const osInfo = {
+    const cpus = os.cpus();
+    const osInfo: OsInfo = {
       node_version: process.version,
-      platform: os.platform(),
-      release: os.release(),
-      cpus: (cpus && cpus.length > 0 && cpus[0].model) || undefined,
+      platform: os.platform(), // Directly use os.platform() to get platform information
+      release: os.release(), // Directly use os.release() to get release information
+      cpus: cpus ? cpus.length : 0, // Store the length of CPUs
       is_ci: isCI(),
       ci_name: getCIName(),
       arch: os.arch(),
       docker: isDocker(),
       term_program: getTermProgram(),
-    }
-    this.osInfo = osInfo
-    return osInfo
+    };
+    this.osInfo = osInfo;
+    return osInfo;
   }
 
-  getOcularVersion() {
+  public getOcularVersion() :string{
     try {
       const packageJson = require.resolve(`@ocular/ocular/package.json`)
       const { version } = JSON.parse(fs.readFileSync(packageJson, `utf-8`))
@@ -93,16 +127,16 @@ class Telemeter {
     return `-0.0.0`
   }
 
-  setTelemetryEnabled(enabled) {
+  public setTelemetryEnabled(enabled:boolean):void {
     this.trackingEnabled = enabled
     this.store_.setConfig(`telemetry.enabled`, enabled)
   }
 
-  track(event, data) {
+  public track(event:string, data:object):void {
     return this.enqueue_(event, data)
   }
 
-  enqueue_(type, data) {
+  public enqueue_(type:string, data:object):void {
     const event = {
       event:type,
       distinct_id: this.getMachineId(),
@@ -138,13 +172,13 @@ class Telemeter {
   }
 
 
-  trackApp(app) {
+  public trackApp(app):void {
     if (app) {
       this.apps_.push(app)
     }
   }
 
-  trackPlugin(plugin) {
+  public trackPlugin(plugin) :void{
     if (plugin) {
       this.plugins_.push(plugin)
     }
