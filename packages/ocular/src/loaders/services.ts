@@ -20,7 +20,6 @@ type Options = {
 export default ({ container, configModule }: Options): void => {
   const corePath = "../services/*.js";
   const coreFull = pathByOS(path.join(__dirname, corePath));
-
   const core = glob.sync(coreFull, { cwd: __dirname });
   core.forEach((fn) => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires

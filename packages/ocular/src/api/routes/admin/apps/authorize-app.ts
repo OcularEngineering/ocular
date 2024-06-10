@@ -1,16 +1,21 @@
 import { IsNotEmpty, IsString, IsEnum, IsOptional } from "class-validator";
 import { validator } from "@ocular/utils";
-import { OAuthService, OrganisationService } from "../../../../services";
-import { AppAuthStrategy, AppNameDefinitions } from "@ocular/types";
+import {
+  AppAuthorizationService,
+  OrganisationService,
+} from "../../../../services";
+import { AppNameDefinitions } from "@ocular/types";
 
 export default async (req, res) => {
   const validated = await validator(PostAppsReq, req.body);
-  const oauthService: OAuthService = req.scope.resolve("oauthService");
+  const appAuthorizationService: AppAuthorizationService = req.scope.resolve(
+    "appAuthorizationService"
+  );
   const organisationService: OrganisationService = req.scope.resolve(
     "organisationService"
   );
 
-  oauthService
+  appAuthorizationService
     .generateToken(validated.name, validated.code, validated.installationId)
     .then((data) => {
       return organisationService.installApp(validated.name);

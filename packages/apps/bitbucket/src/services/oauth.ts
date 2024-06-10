@@ -1,13 +1,13 @@
-import axios from 'axios';
+import axios from "axios";
 import {
-  OauthService,
+  AppauthorizationService,
   AppNameDefinitions,
   AppCategoryDefinitions,
-  OAuthToken,
-} from '@ocular/types';
-import { ConfigModule } from '@ocular/ocular/src/types';
+  AuthToken,
+} from "@ocular/types";
+import { ConfigModule } from "@ocular/ocular/src/types";
 
-class BitBucketOauth extends OauthService {
+class BitBucketOauth extends AppauthorizationService {
   protected client_id_: string;
   protected client_secret_: string;
   protected configModule_: ConfigModule;
@@ -28,25 +28,25 @@ class BitBucketOauth extends OauthService {
     const auth_strategy = options.auth_strategy;
     return {
       name: AppNameDefinitions.BITBUCKET,
-      logo: '/bitbucket.svg',
+      logo: "/bitbucket.svg",
       description:
-        'Bitbucket is a Git-based source code repository hosting service owned by Atlassian',
+        "Bitbucket is a Git-based source code repository hosting service owned by Atlassian",
       oauth_url: `https://bitbucket.org/site/oauth2/authorize?client_id=${client_id}&response_type=code.`,
       slug: AppNameDefinitions.BITBUCKET,
       category: AppCategoryDefinitions.FILE_STORAGE,
-      developer: 'Ocular AI',
-      images: ['/bitbucket.svg'],
+      developer: "Ocular AI",
+      images: ["/bitbucket.svg"],
       auth_strategy: auth_strategy,
       overview:
-        'Bitbucket is a Git-based source code repository hosting service owned by Atlassian',
-      docs: 'https://developer.atlassian.com/cloud/bitbucket/rest',
-      website: 'https://bitbucket.org/product/',
+        "Bitbucket is a Git-based source code repository hosting service owned by Atlassian",
+      docs: "https://developer.atlassian.com/cloud/bitbucket/rest",
+      website: "https://bitbucket.org/product/",
     };
   }
 
-  async refreshToken(refresh_token: string): Promise<OAuthToken> {
+  async refreshToken(refresh_token: string): Promise<AuthToken> {
     const body = {
-      grant_type: 'refresh_token',
+      grant_type: "refresh_token",
       client_id: this.client_id_,
       client_secret: this.client_secret_,
       refresh_token: refresh_token,
@@ -54,18 +54,22 @@ class BitBucketOauth extends OauthService {
 
     const config = {
       headers: {
-        'content-type': 'application/json',
+        "content-type": "application/json",
       },
     };
 
     return axios
-      .post(`https://bitbucket.org/site/oauth2/access_token?grant_type=refresh_token&refresh_token=${refresh_token}`, body, config)
+      .post(
+        `https://bitbucket.org/site/oauth2/access_token?grant_type=refresh_token&refresh_token=${refresh_token}`,
+        body,
+        config
+      )
       .then((res) => {
         return {
           token: res.data.access_token,
           token_expires_at: new Date(Date.now() + res.data.expires_in * 1000),
           refresh_token: res.data.refresh_token,
-        } as OAuthToken;
+        } as AuthToken;
       })
       .catch((err) => {
         console.error(err);
@@ -73,11 +77,11 @@ class BitBucketOauth extends OauthService {
       });
   }
 
-  async generateToken(code: string): Promise<OAuthToken> {
-    console.log('***** Generating token from the code:\n');
+  async generateToken(code: string): Promise<AuthToken> {
+    console.log("***** Generating token from the code:\n");
 
     const body = {
-      grant_type: 'authorization_code',
+      grant_type: "authorization_code",
       client_id: `${this.client_id_}`,
       client_secret: `${this.client_secret_}`,
       code: code,
@@ -86,19 +90,23 @@ class BitBucketOauth extends OauthService {
 
     const config = {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     };
 
     return axios
-      .post(`https://bitbucket.org/site/oauth2/access_token?grant_type=authorization_code&code=${code}`, body, config)
+      .post(
+        `https://bitbucket.org/site/oauth2/access_token?grant_type=authorization_code&code=${code}`,
+        body,
+        config
+      )
       .then((res) => {
         return {
           type: res.data.token_type,
           token: res.data.access_token,
           token_expires_at: new Date(Date.now() + res.data.expires_in * 1000),
           refresh_token: res.data.refresh_token,
-        } as OAuthToken;
+        } as AuthToken;
       })
       .catch((err) => {
         console.error(err);

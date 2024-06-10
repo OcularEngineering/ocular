@@ -1,6 +1,10 @@
 import axios from "axios";
 import { Readable } from "stream";
-import { OAuthService, Organisation, RateLimiterService } from "@ocular/ocular";
+import {
+  AppAuthorizationService,
+  Organisation,
+  RateLimiterService,
+} from "@ocular/ocular";
 import {
   AppNameDefinitions,
   DocType,
@@ -8,19 +12,13 @@ import {
   Logger,
   Section,
   TransactionBaseService,
+  ApiConfig,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 import { RateLimiterQueue } from "rate-limiter-flexible";
 
-interface Config {
-  headers: {
-    Authorization: string;
-    Accept: string;
-  };
-}
-
 export default class BitBucketService extends TransactionBaseService {
-  protected oauthService_: OAuthService;
+  protected appAuthorizationService_: AppAuthorizationService;
   protected logger_: Logger;
   protected container_: ConfigModule;
   protected rateLimiterService_: RateLimiterService;
@@ -28,7 +26,7 @@ export default class BitBucketService extends TransactionBaseService {
 
   constructor(container) {
     super(arguments[0]);
-    this.oauthService_ = container.oauthService;
+    this.appAuthorizationService_ = container.appAuthorizationService;
     this.logger_ = container.logger;
     this.container_ = container;
     this.rateLimiterService_ = container.rateLimiterService;
@@ -48,20 +46,20 @@ export default class BitBucketService extends TransactionBaseService {
       `Starting oculation of BitBucket for ${org.id} organisation`
     );
 
-    // Get BitBucket OAuth for the organisation
-    const oauth = await this.oauthService_.retrieve({
+    // Get BitBucket AuthToken for the organisation
+    const auth = await this.appAuthorizationService_.retrieve({
       id: org.id,
       app_name: AppNameDefinitions.BITBUCKET,
     });
 
-    if (!oauth) {
-      this.logger_.error(`No Bitbucket OAuth found for ${org.id} organisation`);
+    if (!auth) {
+      this.logger_.error(`No Bitbucket Auth found for ${org.id} organisation`);
       return;
     }
 
-    const config: Config = {
+    const config: ApiConfig = {
       headers: {
-        Authorization: `Bearer ${oauth.token}`,
+        Authorization: `Bearer ${auth.token}`,
         Accept: "application/json",
       },
     };
@@ -154,7 +152,7 @@ export default class BitBucketService extends TransactionBaseService {
         }
       }
       yield documents;
-      await this.oauthService_.update(oauth.id, {
+      await this.appAuthorizationService_.update(auth.id, {
         last_sync: new Date(),
       });
     } catch (error) {
@@ -165,12 +163,12 @@ export default class BitBucketService extends TransactionBaseService {
         );
 
         // Refresh the token
-        const oauthToken = await this.container_["bitbucketOauth"].refreshToken(
-          oauth.refresh_token
+        const authToken = await this.container_["bitbucketOauth"].refreshToken(
+          auth.refresh_token
         );
 
-        // Update the OAuth record with the new token
-        await this.oauthService_.update(oauth.id, oauthToken);
+        // Update the Auth record with the new token
+        await this.appAuthorizationService_.update(auth.id, authToken);
 
         // Retry the request
         return this.getBitBucketInformation(org);
@@ -184,7 +182,7 @@ export default class BitBucketService extends TransactionBaseService {
     );
   }
 
-  async fetchWorkspaces(config: Config) {
+  async fetchWorkspaces(config: ApiConfig) {
     // Block Until Rate Limit Allows Request
     await this.requestQueue_.removeTokens(1, AppNameDefinitions.BITBUCKET);
     try {
@@ -199,7 +197,10 @@ export default class BitBucketService extends TransactionBaseService {
     }
   }
 
-  async fetchRepositoriesForWorkspace(workspace_slug: string, config: Config) {
+  async fetchRepositoriesForWorkspace(
+    workspace_slug: string,
+    config: ApiConfig
+  ) {
     await this.requestQueue_.removeTokens(1, AppNameDefinitions.BITBUCKET);
     try {
       const repoEndpoint = await axios.get(
@@ -216,7 +217,7 @@ export default class BitBucketService extends TransactionBaseService {
   async fetchPRForRepositories(
     workspace_slug: string,
     repo_slug: string,
-    config: Config
+    config: ApiConfig
   ) {
     await this.requestQueue_.removeTokens(1, AppNameDefinitions.BITBUCKET);
     try {
@@ -233,7 +234,7 @@ export default class BitBucketService extends TransactionBaseService {
   async fetchIssueForRepositories(
     workspace_slug: string,
     repo_slug: string,
-    config: Config
+    config: ApiConfig
   ) {
     await this.requestQueue_.removeTokens(1, AppNameDefinitions.BITBUCKET);
     try {
@@ -252,7 +253,7 @@ export default class BitBucketService extends TransactionBaseService {
     workspace_slug: string,
     repo_slug: string,
     issue_id: string,
-    config: Config
+    config: ApiConfig
   ) {
     await this.requestQueue_.removeTokens(1, AppNameDefinitions.BITBUCKET);
     try {
@@ -271,7 +272,7 @@ export default class BitBucketService extends TransactionBaseService {
     workspace_slug: string,
     repo_slug: string,
     pr_id: string,
-    config: Config
+    config: ApiConfig
   ) {
     await this.requestQueue_.removeTokens(1, AppNameDefinitions.BITBUCKET);
     try {

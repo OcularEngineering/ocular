@@ -13,9 +13,9 @@ import {
   BaseEntity,
   AppNameDefinitions,
   AppCategoryDefinitions,
-  AppAuthStrategy,
+  AuthStrategy,
 } from "@ocular/types";
-import { OAuth } from "./oauth";
+import { AppAuthorization } from "./app-authorization";
 import { DbAwareColumn } from "@ocular/utils";
 import { Organisation } from "./organisation";
 
@@ -32,11 +32,11 @@ export class App extends BaseEntity {
 
   @DbAwareColumn({
     type: "enum",
-    enum: AppAuthStrategy,
+    enum: AuthStrategy,
     nullable: false,
     unique: false,
   })
-  auth_strategy: AppAuthStrategy;
+  auth_strategy: AuthStrategy;
 
   @Column({ type: "varchar", nullable: true })
   oauth_url: string;
@@ -92,6 +92,6 @@ export class App extends BaseEntity {
 
   // Function to generate tsv value based on specified columns
   private generateTsv(): void {
-    this.tsv = `setweight(to_tsvector('english', ${this.name}), 'A') || setweight(to_tsvector('english', ${this.description}), 'B') || setweight(to_tsvector('english', ${this.overview}), 'C') || setweight(to_tsvector('english', ${this.category}), 'D') || setweight(to_tsvector('english', ${this.slug}), 'D')`;
+    this.tsv = `setweight(to_tsvector('english', '${this.name}'), 'A') || setweight(to_tsvector('english', '${this.description}'), 'B') || setweight(to_tsvector('english', '${this.overview}'), 'C') || setweight(to_tsvector('english', '${this.category}'), 'D') || setweight(to_tsvector('english', '${this.slug}'), 'D')`;
   }
 }

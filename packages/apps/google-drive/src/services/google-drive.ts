@@ -1,8 +1,7 @@
 import { Readable } from "stream";
 import { EntityManager } from "typeorm";
 import {
-  App,
-  OAuthService,
+  AppAuthorizationService,
   Organisation,
   RateLimiterService,
 } from "@ocular/ocular";
@@ -21,7 +20,7 @@ import { RateLimiterQueue } from "rate-limiter-flexible";
 import { AutoflowAiError, AutoflowAiErrorTypes } from "@ocular/utils";
 
 export default class GoogleDriveService extends TransactionBaseService {
-  protected oauthService_: OAuthService;
+  protected appAuthorizationService_: AppAuthorizationService;
   protected rateLimiterService_: RateLimiterService;
   protected logger_: Logger;
   protected container_: ConfigModule;
@@ -29,7 +28,7 @@ export default class GoogleDriveService extends TransactionBaseService {
 
   constructor(container) {
     super(arguments[0]);
-    this.oauthService_ = container.oauthService;
+    this.appAuthorizationService_ = container.appAuthorizationService;
     this.rateLimiterService_ = container.rateLimiterService;
     this.logger_ = container.logger;
     this.container_ = container;
@@ -45,15 +44,15 @@ export default class GoogleDriveService extends TransactionBaseService {
   async *getGoogleDriveFiles(
     org: Organisation
   ): AsyncGenerator<IndexableDocument[]> {
-    // Check if the OAuth record exists for this App in this Organisation.
-    const oauth = await this.oauthService_.retrieve({
+    // Check if the auth record exists for this App in this Organisation.
+    const auth = await this.appAuthorizationService_.retrieve({
       id: org.id,
       app_name: AppNameDefinitions.GOOGLEDRIVE,
     });
 
-    if (!oauth) {
+    if (!auth) {
       this.logger_.error(
-        `getGoogleDriveFiles: No Google Drive OAuth Credential found for ${org.id} organisation`
+        `No Google Drive auth Cred found for ${org.id} organisation`
       );
       return null;
     }
@@ -61,20 +60,18 @@ export default class GoogleDriveService extends TransactionBaseService {
     try {
       // Get the last sync date - this is the time the latest document that was synced from Google Drive.
       let last_sync = "";
-      if (oauth.last_sync !== null) {
-        last_sync = oauth.last_sync.toISOString();
+      if (auth.last_sync !== null) {
+        last_sync = auth.last_sync.toISOString();
       }
 
       // Get the OAuth2Client for the Google Drive App and set the credentials.
       const oauth2Client: OAuth2Client = await this.container_[
         `${AppNameDefinitions.GOOGLEDRIVE}Oauth`
       ].getOauthCLient();
-
       oauth2Client.setCredentials({
-        access_token: oauth.token,
-        refresh_token: oauth.refresh_token,
+        access_token: auth.token,
+        refresh_token: auth.refresh_token,
       });
-
       const drive: drive_v3.Drive = await google.drive({
         version: "v3",
         auth: oauth2Client,
@@ -136,7 +133,9 @@ export default class GoogleDriveService extends TransactionBaseService {
       // Yield The Remaining Documents
       yield documents;
       // Update the last sync date  for the connector
-      await this.oauthService_.update(oauth.id, { last_sync: new Date() });
+      await this.appAuthorizationService_.update(auth.id, {
+        last_sync: new Date(),
+      });
     } catch (error) {
       // If the error is an unauthorized error, refresh the token and retry the request
       if (error.response && error.response.status === 401) {
@@ -146,12 +145,12 @@ export default class GoogleDriveService extends TransactionBaseService {
         );
 
         // Refresh the token
-        const oauthToken = await this.container_[
+        const authToken = await this.container_[
           "google-driveOauth"
-        ].refreshToken(oauth.refresh_token);
+        ].refreshToken(auth.refresh_token);
 
-        // Update the OAuth record with the new token
-        await this.oauthService_.update(oauth.id, oauthToken);
+        // Update the auth record with the new token
+        await this.appAuthorizationService_.update(auth.id, authToken);
 
         // Retry the request
         return this.getGoogleDriveFiles(org);

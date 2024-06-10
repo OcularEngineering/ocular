@@ -1,8 +1,8 @@
-import { AppAuthStrategy } from "./apps";
+import { AuthStrategy } from "./apps";
 
-export type OAuthToken = {
+export type AuthToken = {
   type?: string;
-  auth_strategy?: AppAuthStrategy;
+  auth_strategy?: AuthStrategy;
   token?: string;
   token_expires_at?: Date;
   refresh_token?: string;

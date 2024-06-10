@@ -10,34 +10,35 @@ import { AutoflowAiError, AutoflowAiErrorTypes } from "@ocular/utils";
 import { App, User } from "../models";
 import { buildQuery } from "../utils/build-query";
 import {
-  CreateOAuthInput,
-  RetrieveOAuthConfig,
-  UpdateOAuthInput,
-} from "../types/oauth";
-import { OAuth } from "../models";
+  CreateAuthInput,
+  RetrieveAuthConfig,
+  UpdateAuthInput,
+} from "../types/app-authorization";
+import { AppAuthorization } from "../models";
 import AppService from "./app";
-import OAuthRepository from "../repositories/oauth";
+import AppAuthorizationRepository from "../repositories/app-authorization";
 import { Selector } from "../types/common";
-import { OAuthToken } from "@ocular/types";
+import { AuthToken } from "@ocular/types";
 
 type InjectedDependencies = AutoflowContainer & {
   manager: EntityManager;
   eventBusService: EventBusService;
   appService: AppService;
-  oauthRepository: typeof OAuthRepository;
+  appAuthorizationRepository: typeof AppAuthorizationRepository;
   loggedInUser: User;
   logger: Logger;
 };
 
-class OAuthService extends TransactionBaseService {
+class AppAuthorizationService extends TransactionBaseService {
   static Events = {
     TOKEN_GENERATED: "oauth.token_generated",
     TOKEN_REFRESHED: "oauth.token_refreshed",
+    WEB_CONNECTOR_INSTALLED: "webConnectorInstalled",
   };
 
   protected container_: InjectedDependencies;
   protected appService_: AppService;
-  protected oauthRepository_: typeof OAuthRepository;
+  protected appAuthorizationRepository_: typeof AppAuthorizationRepository;
   protected eventBus_: EventBusService;
   protected readonly loggedInUser_: User;
   protected readonly logger_: Logger;
@@ -48,7 +49,7 @@ class OAuthService extends TransactionBaseService {
     this.container_ = container;
     this.appService_ = container.appService;
     this.eventBus_ = container.eventBusService;
-    this.oauthRepository_ = container.oauthRepository;
+    this.appAuthorizationRepository_ = container.appAuthorizationRepository;
     this.logger_ = container.logger;
 
     try {
@@ -60,29 +61,41 @@ class OAuthService extends TransactionBaseService {
 
   // Expose this to Internal Services Only
   // Hack To Expose This Credientals To Indexing Apps
-  async retrieve(retrieveConfig: RetrieveOAuthConfig): Promise<OAuth> {
-    const oauthRepo = this.activeManager_.withRepository(this.oauthRepository_);
-    const oauth = await oauthRepo.findOne({
+  async retrieve(
+    retrieveConfig: RetrieveAuthConfig
+  ): Promise<AppAuthorization> {
+    const authRepo = this.activeManager_.withRepository(
+      this.appAuthorizationRepository_
+    );
+    const authToken = await authRepo.findOne({
       where: {
         organisation_id: retrieveConfig.id,
         app_name: retrieveConfig.app_name,
       },
     });
-    return oauth as OAuth;
+    return authToken as AppAuthorization;
   }
 
-  async retrieveById({ app_id }: { app_id: string }): Promise<OAuth> {
-    const oauthRepo = this.activeManager_.withRepository(this.oauthRepository_);
-    const oauth = await oauthRepo.findOne({
+  async retrieveById({
+    app_id,
+  }: {
+    app_id: string;
+  }): Promise<AppAuthorization> {
+    const authRepo = this.activeManager_.withRepository(
+      this.appAuthorizationRepository_
+    );
+    const authToken = await authRepo.findOne({
       where: {
         id: app_id,
       },
     });
-    return oauth as OAuth;
+    return authToken as AppAuthorization;
   }
 
   // List Apps Owned BY The Logged In User
-  async list(selector: Selector<OAuth>): Promise<OAuth[]> {
+  async list(
+    selector: Selector<AppAuthorization>
+  ): Promise<AppAuthorization[]> {
     if (!this.loggedInUser_ || !this.loggedInUser_.organisation) {
       throw new AutoflowAiError(
         AutoflowAiErrorTypes.NOT_FOUND,
@@ -90,32 +103,36 @@ class OAuthService extends TransactionBaseService {
       );
     }
     //Select only apps that belong to the logged in user's organisation
-    const appRepo = this.activeManager_.withRepository(this.oauthRepository_);
+    const appRepo = this.activeManager_.withRepository(
+      this.appAuthorizationRepository_
+    );
     selector["organisation_id"] = this.loggedInUser_.organisation_id;
     const query = buildQuery(selector, {});
     return await appRepo.find(query);
   }
 
-  async create(app: CreateOAuthInput): Promise<OAuth> {
+  async create(app: CreateAuthInput): Promise<AppAuthorization> {
     if (!this.loggedInUser_ || !this.loggedInUser_.organisation) {
       throw new AutoflowAiError(
         AutoflowAiErrorTypes.NOT_FOUND,
         `User must belong to an "organisation" must be defined to create an OAuth`
       );
     }
-    const oauthRepo = this.activeManager_.withRepository(this.oauthRepository_);
-    const application = oauthRepo.create({
+    const authRepo = this.activeManager_.withRepository(
+      this.appAuthorizationRepository_
+    );
+    const application = authRepo.create({
       organisation: this.loggedInUser_.organisation,
       ...app,
     });
-    return (await oauthRepo.save(application)) as OAuth;
+    return (await authRepo.save(application)) as AppAuthorization;
   }
 
   async generateToken(
     name: string,
     code: string,
     installationId?: string
-  ): Promise<OAuth> {
+  ): Promise<AppAuthorization> {
     this.logger_.info(`generateToken: Generating Token for App ${name}`);
     // Check If The User Generating the Token Belongs To An Organisation
     if (!this.loggedInUser_ || !this.loggedInUser_.organisation) {
@@ -142,16 +159,16 @@ class OAuthService extends TransactionBaseService {
       );
     }
 
-    const token: OAuthToken = await service.generateToken(code, installationId);
-    const oauth = this.oauthRepository_.find({
+    const token: AuthToken = await service.generateToken(code, installationId);
+    const authToken = this.appAuthorizationRepository_.find({
       where: {
         organisation_id: this.loggedInUser_.organisation_id,
         app_name: app.name,
       },
     });
 
-    if (oauth) {
-      await this.oauthRepository_.delete({
+    if (authToken) {
+      await this.appAuthorizationRepository_.delete({
         organisation_id: this.loggedInUser_.organisation_id,
         app_name: app.name,
       });
@@ -169,10 +186,13 @@ class OAuthService extends TransactionBaseService {
       app_name: app.name,
       metadata: token.metadata,
     }).then(async (result) => {
-      await this.eventBus_.emit(OAuthService.Events.TOKEN_GENERATED, {
-        organisation: this.loggedInUser_.organisation,
-        app_name: app.name,
-      });
+      await this.eventBus_.emit(
+        AppAuthorizationService.Events.TOKEN_GENERATED,
+        {
+          organisation: this.loggedInUser_.organisation,
+          app_name: app.name,
+        }
+      );
       return result;
     });
     return null;
@@ -187,17 +207,17 @@ class OAuthService extends TransactionBaseService {
       try {
         switch (app_name) {
           case AppNameDefinitions.WEBCONNECTOR:
-            // Retrieve the OAuth token
-            const oauthToken = await this.retrieveById({ app_id });
+            // Retrieve the Auth token
+            const authToken = await this.retrieveById({ app_id });
 
-            if (!oauthToken) {
+            if (!authToken) {
               throw new AutoflowAiError(
                 AutoflowAiError.Types.NOT_FOUND,
-                `No OAuth token found for ${AppNameDefinitions.WEBCONNECTOR}`
+                `No Authorization token found for ${AppNameDefinitions.WEBCONNECTOR}`
               );
             }
 
-            const metadata = oauthToken.metadata;
+            const metadata = authToken.metadata;
 
             // Ensure metadata.links is initialized as an array
             if (!metadata.links) {
@@ -215,21 +235,24 @@ class OAuthService extends TransactionBaseService {
             }
 
             // Update the metadata in OAuth token
-            await this.update(oauthToken.id, {
+            await this.update(authToken.id, {
               metadata,
-            } as UpdateOAuthInput);
+            } as UpdateAuthInput);
 
             // Emit event if required
             if (data.emit_event) {
-              await this.eventBus_.emit("webConnectorInstalled", {
-                organisation: this.loggedInUser_.organisation,
-                app_name: AppNameDefinitions.WEBCONNECTOR,
-                link: data.link,
-                link_id: data.link_id,
-              });
+              await this.eventBus_.emit(
+                AppAuthorizationService.Events.WEB_CONNECTOR_INSTALLED,
+                {
+                  organisation: this.loggedInUser_.organisation,
+                  app_name: AppNameDefinitions.WEBCONNECTOR,
+                  link: data.link,
+                  link_id: data.link_id,
+                }
+              );
             }
 
-            return "Link saved Succesfully";
+            return "WebConnector Link saved Succesfully";
 
           default:
             return "No such App exists in the system to update";
@@ -241,10 +264,12 @@ class OAuthService extends TransactionBaseService {
     });
   }
 
-  async update(id: string, update: UpdateOAuthInput): Promise<OAuth> {
-    const repo = this.activeManager_.withRepository(this.oauthRepository_);
+  async update(id: string, update: UpdateAuthInput): Promise<AppAuthorization> {
+    const repo = this.activeManager_.withRepository(
+      this.appAuthorizationRepository_
+    );
 
-    const oauth = await this.oauthRepository_.findOne({
+    const appAuth = await this.appAuthorizationRepository_.findOne({
       where: {
         id: id,
       },
@@ -260,27 +285,27 @@ class OAuthService extends TransactionBaseService {
     } = update;
 
     if (last_sync) {
-      oauth.last_sync = last_sync;
+      appAuth.last_sync = last_sync;
     }
     if (token) {
-      oauth.token = token;
+      appAuth.token = token;
     }
     if (token_expires_at) {
-      oauth.token_expires_at = token_expires_at;
+      appAuth.token_expires_at = token_expires_at;
     }
     if (refresh_token) {
-      oauth.refresh_token = refresh_token;
+      appAuth.refresh_token = refresh_token;
     }
     if (refresh_token_expires_at) {
-      oauth.refresh_token_expires_at = refresh_token_expires_at;
+      appAuth.refresh_token_expires_at = refresh_token_expires_at;
     }
 
     if (metadata) {
-      oauth.metadata = metadata;
+      appAuth.metadata = metadata;
     }
 
-    return (await repo.save(oauth)) as OAuth;
+    return (await repo.save(appAuth)) as AppAuthorization;
   }
 }
 
-export default OAuthService;
+export default AppAuthorizationService;

@@ -8,12 +8,14 @@ import {
 import { AppNameDefinitions } from "@ocular/types";
 import { Type } from "class-transformer";
 import { validator } from "@ocular/utils";
-import { OAuthService } from "../../../../services";
+import { AppAuthorizationService } from "../../../../services";
 const { v4: uuidv4 } = require("uuid");
 
 export default async (req, res) => {
   const validated = await validator(PostAppsReq, req.body);
-  const oauthService: OAuthService = req.scope.resolve("oauthService");
+  const appAuthorizationService: AppAuthorizationService = req.scope.resolve(
+    "appAuthorizationService"
+  );
 
   let data = {};
   switch (validated.name) {
@@ -32,7 +34,7 @@ export default async (req, res) => {
       };
       break;
   }
-  const response = await oauthService.updateInstalledApp(
+  const response = await appAuthorizationService.updateInstalledApp(
     validated.name,
     validated.app_id,
     data
