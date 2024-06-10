@@ -70,7 +70,7 @@ class SearchService extends AbstractSearchService {
     const docIds: string[] = searchResults.hits.map((hit) => hit.documentId);
 
     // Get The Document Metadata From The Document Ids
-    const docMetadata = await this.documentMetadataService_.list(docIds);
+    const docMetadata = await this.documentMetadataService_.listByIds(docIds);
 
     // Join The Document Metadata With The Search Results
     const hits = searchResults.hits.map((hit) => {
