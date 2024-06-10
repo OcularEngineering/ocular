@@ -56,11 +56,21 @@ export const columns: ColumnDef<App>[] = [
       </div>
     ),
   },
-  // {
-  //   accessorKey: 'id',
-  //   header: 'App ID',
-  //   cell: ({ row }) => <div>{row.getValue('id')}</div>,
-  // },
+  {
+    accessorKey: 'id',
+    header: 'Indexing Status',
+    cell: ({ row }) => <div>{row.getValue('id')}</div>,
+  },
+  {
+    accessorKey: 'id',
+    header: 'Crawling Status',
+    cell: ({ row }) => <div>{row.getValue('id')}</div>,
+  },
+  {
+    accessorKey: 'id',
+    header: 'Assets',
+    cell: ({ row }) => <div>{row.getValue('id')}</div>,
+  },
 ];
 
 export default function ManageApps() {

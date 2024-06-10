@@ -8,25 +8,26 @@ export const OCULAR_BACKEND_URL =
 const client = axios.create({ baseURL: OCULAR_BACKEND_URL });
 
 export default function ocularRequest(
-  method,
+  method: string,
   path = '',
-  payload = {},
+  payload: any = {},
   stream = false,
-  cancelTokenSource: CancelTokenSource | null
+  cancelTokenSource: CancelTokenSource | null = null
 ) {
+  const isFormData = payload instanceof FormData;
   const options = {
     method,
     url: path,
     data: payload,
     responseType: stream ? 'stream' : 'json',
     cancelToken: cancelTokenSource ? cancelTokenSource.token : undefined,
-    json: true,
-    withCredentials: true,
     headers: {
       'Access-Control-Allow-Origin': '*',
-      'Content-Type': 'application/json',
+      'Content-Type': isFormData ? 'multipart/form-data' : 'application/json',
     },
+    withCredentials: true,
   };
+
   return client(options).catch((error) => {
     console.error('Error', error);
     throw error;

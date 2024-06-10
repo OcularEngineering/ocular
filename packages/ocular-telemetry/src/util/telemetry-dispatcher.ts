@@ -8,28 +8,28 @@ import isTruthy from "./is-truthy";
 
 const OCULAR_TELEMETRY_VERBOSE = process.env.OCULAR_TELEMETRY_VERBOSE || false;
 
-interface Options{
+interface Options {
   host: string;
   public_key: string;
-  axiosInstance:AxiosInstance|AxiosStatic;
-  timeout:boolean
+  axiosInstance: AxiosInstance | AxiosStatic;
+  timeout: boolean;
 }
 
 class TelemetryDispatcher {
-  private store_: typeof Store;
+  private store_: Store;
   private host: string;
   private public_key: string;
-  private axiosInstance: AxiosInstance|AxiosStatic; // Use AxiosInstance type
+  private axiosInstance: AxiosInstance | AxiosStatic; // Use AxiosInstance type
   private timeout: boolean;
   private flushed: boolean;
   private trackingEnabled: boolean;
 
   constructor(options: Options) {
+    this.store_ = new Store();
     this.host = removeSlash(options.host || "https://us.i.posthog.com/batch/");
     this.public_key =
-      options.public_key ||
-      "phc_fExEtFcrzPBqQ17LW0UbP4umSAnRHpPfOVIScJKvj0B";
-  
+      options.public_key || "phc_fExEtFcrzPBqQ17LW0UbP4umSAnRHpPfOVIScJKvj0B";
+
     let axiosInstance: AxiosStatic | AxiosInstance;
     if (options.axiosInstance) {
       axiosInstance = options.axiosInstance;
@@ -37,10 +37,10 @@ class TelemetryDispatcher {
       axiosInstance = axios.create();
     }
     this.axiosInstance = axiosInstance;
-  
+
     this.timeout = options.timeout || false;
     this.flushed = false;
-  
+
     // need to resolve this
     //@ts-ignore
     axiosRetry(this.axiosInstance, {
@@ -48,7 +48,7 @@ class TelemetryDispatcher {
       retryDelay: axiosRetry.exponentialDelay,
       retryCondition: this.isErrorRetryable_,
     });
-  }  
+  }
 
   isTrackingEnabled() {
     // Cache the result

@@ -2,7 +2,7 @@
 import {
   ChatFile,
   ChatMessage,
-  ChatSettings,
+  // ChatSettings,
   Chat
 } from "@/types/chat"
 import { CancelToken, CancelTokenSource } from "axios"
