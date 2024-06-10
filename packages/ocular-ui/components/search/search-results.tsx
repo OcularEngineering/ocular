@@ -6,6 +6,7 @@ import { formatLabel } from '@/lib/utils';
 import {
   ChevronDownIcon,
 } from "@heroicons/react/outline";
+import { Skeleton } from "@/components/ui/skeleton"
 
 import { SearchCopilotSkeleton, SearchResultsSkeleton, SearchByAppFilterSkeleton } from '@/components/ui/skeletons';
 
@@ -59,39 +60,51 @@ const Results = ({ results }) => (
     <div className="w-3/5 max-w-5xl items-start justify-start">
       {
         (results && results.length > 0) ? 
-          results.map((result: any, index: any) => (
-            <div key={index}>
-              <div
-                key={index}
-                className="group mb-4 flex max-w-4xl px-3 py-4 text-xs sm:text-base"
-              >
-                <Image src={result && result.documentMetadata.source === 'pagerduty' ? '/PagerDuty.png' : result && result.documentMetadata.source ? `/${result.documentMetadata.source}.svg` : '/default.png'} alt={result.documentMetadata.title} className="mr-4 size-[40px]" width={10} height={10} />
-                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                  <div className='space-y-1'>
-                    <a href={result.documentMetadata.link} target="_blank" rel="noopener noreferrer">
-                      <h3 className="text-l mb-2 truncate font-semibold text-blue-800 group-hover:underline dark:text-blue-400">
-                        {result.documentMetadata.title.charAt(0).toUpperCase() + result.documentMetadata.title.slice(1)}
-                      </h3>
-                    </a>
-                    <p className="font-regular line-clamp-3 text-sm max-w-3xl w-[770px]" dangerouslySetInnerHTML={{ __html: result.snippets.map(snippet => snippet.content).join(" ... ") }}></p>
-                    <div className='flex flex-row gap-2'>
-                      <p className="font-regular line-clamp-3 text-sm text-gray-500">
-                      {
-                        !isNaN(new Date(result.documentMetadata.updated_at).getTime()) ?
-                        new Date(result.documentMetadata.updated_at).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) 
-                        : null
-                      }
-                      </p>
-                      <span className="font-regular text-sm text-gray-500">·</span>
-                      <p className="font-regular line-clamp-3 text-sm text-gray-500">
-                        {result.documentMetadata.type.toUpperCase()}
-                      </p>
+          results
+            .filter(result => result.snippets && result.snippets.length > 0) // Filter out results without snippets
+            .map((result, index) => (
+              <div key={index}>
+                <div
+                  key={index}
+                  className="group mb-4 flex max-w-4xl px-3 py-4 text-xs sm:text-base"
+                >
+                  {
+  result && result.documentMetadata.source === 'ocular-api'
+    ? <div className="overflow-hidden dark:bg-muted bg-gray-200 min-h-[45px] h-[45px] min-w-[45px] w-[45px] rounded-xl mr-4"/>
+    : <Image src={result && result.documentMetadata.source === 'pagerduty' ? '/PagerDuty.png' : result && result.documentMetadata.source ? `/${result.documentMetadata.source}.svg` : '/default.png'} 
+             alt={result.documentMetadata.title} 
+             className="mr-4 size-[40px]" 
+             width={10} 
+             height={10} 
+      />
+}
+                  
+                  <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                    <div className='space-y-1'>
+                      <a href={result.documentMetadata.link} target="_blank" rel="noopener noreferrer">
+                        <h3 className="text-l mb-2 truncate font-semibold text-blue-800 group-hover:underline dark:text-blue-400">
+                          {result.documentMetadata.title.charAt(0).toUpperCase() + result.documentMetadata.title.slice(1)}
+                        </h3>
+                      </a>
+                      <p className="font-regular line-clamp-3 text-sm max-w-3xl w-[770px]" dangerouslySetInnerHTML={{ __html: result.snippets.map(snippet => snippet.content).join(" ... ") }}></p>
+                      <div className='flex flex-row gap-2'>
+                        <p className="font-regular line-clamp-3 text-sm text-gray-500">
+                        {
+                          !isNaN(new Date(result.documentMetadata.updated_at).getTime()) ?
+                          new Date(result.documentMetadata.updated_at).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) 
+                          : null
+                        }
+                        </p>
+                        <span className="font-regular text-sm text-gray-500">·</span>
+                        <p className="font-regular line-clamp-3 text-sm text-gray-500">
+                          {result.documentMetadata.type.toUpperCase()}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
-            </div>
-          </div>
-          ))
+              </div>
+            ))
           : <div className="w-[850px]">
              <p>No results found for this query</p>
             </div>
