@@ -7,8 +7,10 @@ export default async (req, res) => {
     const documentMetadataService: DocumentMetadataService = req.scope.resolve(
       "documentMetadataService"
     );
+    const loggedUser = req.scope.resolve("loggedInUser");
     const data = await documentMetadataService.list({
       source: AppNameDefinitions.OCULAR_API,
+      organisation_id: loggedUser.organisation_id,
     });
     return res.status(200).json({ files: data });
   } catch (err) {
