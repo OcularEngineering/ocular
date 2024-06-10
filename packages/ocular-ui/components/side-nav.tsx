@@ -22,7 +22,8 @@ import {
   HelpCircle,
   LayoutGrid,
   BarChart2,
-  Users
+  Users, 
+  File,
 } from "lucide-react"
 const iconMapping = {
   Search: Search,
@@ -31,7 +32,8 @@ const iconMapping = {
   HelpCircle: HelpCircle,
   LayoutGrid,
   BarChart2,
-  Users
+  Users, 
+  File
 };
 
 export function SideNav({ links }: NavProps)  {
