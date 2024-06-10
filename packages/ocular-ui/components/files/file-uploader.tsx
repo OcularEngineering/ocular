@@ -141,7 +141,7 @@ export function FileUploader(props: FileUploaderProps) {
                 </div>
                 <div className="space-y-px">
                   <p className="font-medium text-muted-foreground">
-                    Drag {'n'} drop files here, or click to select files
+                    Drag & drop files here, or click to select files
                   </p>
                   <p className="text-sm text-muted-foreground/70">
                     You can upload
