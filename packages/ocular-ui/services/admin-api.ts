@@ -40,12 +40,16 @@ export default {
   },
   files: {
     upload(files) {
-      const formData = new FormData()
+      const formData = new FormData();
       for (const f of files) {
-        formData.append("files", f)
+        formData.append('files', f);
       }
-      const path = `/admin/files`;
-      return ocularRequest('POST', path,formData);
+      const path = `/admin/uploads`;
+      return ocularRequest('POST', path, formData);
+    },
+    list() {
+      const path = `/admin/uploads`;
+      return ocularRequest('GET', path);
     },
   },
   organisation: {
