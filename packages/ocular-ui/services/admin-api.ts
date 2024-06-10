@@ -51,6 +51,10 @@ export default {
       const path = `/admin/uploads`;
       return ocularRequest('POST', path, formData);
     },
+    list() {
+      const path = `/admin/uploads`;
+      return ocularRequest('GET', path);
+    }
   },
   organisation: {
     retrive(id, search = {}) {

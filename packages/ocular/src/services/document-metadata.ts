@@ -103,20 +103,17 @@ class DocumentMetadataService extends TransactionBaseService {
   //   return doc
   // }
 
-  // async list(selector: Selector<DocumentMetadata>): Promise<DocumentMetadata[]> {
-  //   if(!this.loggedInUser_ || !this.loggedInUser_.organisation){
-  //     throw new AutoflowAiError(
-  //       AutoflowAiErrorTypes.NOT_FOUND,
-  //       `User must belong to an "organisation" so as to get components`
-  //     )
-  //   }
-  //   const metadataRepo = this.activeManager_.withRepository(this.documentRepository_)
-  //   selector["organisation_id"] = this.loggedInUser_.organisation_id
-  //   const query = buildQuery(selector, {})
-  //   return await metadataRepo.find(query)
-  // }
+  async list(
+    selector: Selector<DocumentMetadata>
+  ): Promise<DocumentMetadata[]> {
+    const metadataRepo = this.activeManager_.withRepository(
+      this.documentMetadataRepository_
+    );
+    const query = buildQuery(selector, {});
+    return await metadataRepo.find(query);
+  }
 
-  async list(ids: string[]): Promise<DocumentMetadata[]> {
+  async listByIds(ids: string[]): Promise<DocumentMetadata[]> {
     return await this.atomicPhase_(
       async (transactionManager: EntityManager) => {
         const documentMetadataRepository = transactionManager.withRepository(

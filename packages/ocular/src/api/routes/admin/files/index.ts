@@ -15,6 +15,8 @@ export default (app) => {
     middlewares.wrap(require("./create-upload").default)
   );
 
+  route.get("/", middlewares.wrap(require("./list-uploads").default));
+
   route.delete(
     "/",
     transformBody(AdminDeleteUploadsReq),
@@ -39,3 +41,4 @@ export type AdminUploadsDownloadUrlRes = {
 
 export * from "./create-upload";
 export * from "./delete-upload";
+export * from "./list-uploads";
