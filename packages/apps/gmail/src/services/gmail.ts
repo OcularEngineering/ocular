@@ -41,13 +41,12 @@ export default class GmailService extends TransactionBaseService {
   }
 
   async *getGmailFiles(org: Organisation): AsyncGenerator<IndexableDocument[]> {
-    this.logger_.info(`Starting oculation of Gmail for ${org.id} organisation`);
-
     // Check if the auth record exists for this App in this Organisation.
     const auth = await this.appAuthorizationService_.retrieve({
       id: org.id,
       app_name: AppNameDefinitions.GMAIL,
     });
+
     if (!auth) {
       this.logger_.error(
         `No Gmail OAuth Cred found for ${org.id} organisation`
@@ -55,24 +54,26 @@ export default class GmailService extends TransactionBaseService {
       return;
     }
 
-    // Get the last sync date - this is the time the latest document that was synced from Gmail.
-    let last_sync = "";
-    if (auth.last_sync !== null) {
-      last_sync = auth.last_sync.toISOString();
-    }
-
-    // Get the auth2Client for the Gmail App and set the credentials.
-    const oauth2Client: OAuth2Client = await this.container_[
-      `${AppNameDefinitions.GMAIL}Oauth`
-    ].getOauthCLient();
-    oauth2Client.setCredentials({
-      access_token: auth.token,
-      refresh_token: auth.refresh_token,
-    });
-    const gmail = google.gmail({ version: "v1", auth: oauth2Client });
-
-    let documents: IndexableDocument[] = [];
     try {
+      // Get the last sync date - this is the time the latest document that was synced from Gmail.
+      let last_sync = "";
+      if (auth.last_sync !== null) {
+        last_sync = auth.last_sync.toISOString();
+      }
+
+      // Get the auth2Client for the Gmail App and set the credentials.
+      const oauth2Client: OAuth2Client = await this.container_[
+        `${AppNameDefinitions.GMAIL}Oauth`
+      ].getOauthCLient();
+
+      oauth2Client.setCredentials({
+        access_token: auth.token,
+        refresh_token: auth.refresh_token,
+      });
+      const gmail = google.gmail({ version: "v1", auth: oauth2Client });
+
+      let documents: IndexableDocument[] = [];
+
       // Only Sync Files Modified After Last Sync.
       let query = "";
       if (last_sync !== "") {
@@ -148,11 +149,13 @@ export default class GmailService extends TransactionBaseService {
     } catch (error) {
       if (error.response && error.response.status === 401) {
         // Check if it's an unauthorized error
-        this.logger_.info(`Refreshing Gmail token for ${org.id} organisation`);
+        this.logger_.info(
+          `getGmailFiles: Refreshing Gmail token for ${org.id} organisation`
+        );
 
         // Refresh the token
         const authToken = await this.container_[
-          "google-driveOauth"
+          "gmail-driveOauth"
         ].refreshToken(auth.refresh_token);
 
         // Update the Auth record with the new token
@@ -160,14 +163,12 @@ export default class GmailService extends TransactionBaseService {
 
         // Retry the request
         return this.getGmailFiles(org);
-      } else {
-        console.error(error);
       }
 
-      console.log(error);
-      console.error("The API returned an error: " + error);
+      this.logger_.error(
+        "getGmailFiles: The API returned an error: " + error.message
+      );
       return null;
     }
-    this.logger_.info(`Finished oculation of Gmail for ${org.id} organisation`);
   }
 }

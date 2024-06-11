@@ -6,12 +6,15 @@ import {
   AppNameDefinitions,
   AppCategoryDefinitions,
   AuthToken,
+  AuthStrategy,
+  Logger,
 } from "@ocular/types";
 
 class GmailOauth extends AppauthorizationService {
   protected client_id_: string;
   protected client_secret_: string;
   protected oauth2Client_: OAuth2Client;
+  protected logger_: Logger;
 
   constructor(container, options) {
     super(arguments[0]);
@@ -67,8 +70,10 @@ class GmailOauth extends AppauthorizationService {
         token: accessToken,
       };
     } catch (error) {
-      console.error(error);
-      throw error;
+      this.logger_.error(
+        "refreshToken: Error refreshing token for Gmail with error: " +
+          error.message
+      );
     }
   }
 
@@ -82,10 +87,13 @@ class GmailOauth extends AppauthorizationService {
         token_expires_at: new Date(tokens.expiry_date),
         refresh_token: tokens.refresh_token,
         refresh_token_expires_at: new Date(Date.now() + 172800000),
+        auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
       };
     } catch (error) {
-      console.error(error);
-      throw error;
+      this.logger_.error(
+        "generatingToken: Error generationg token for Gmail with: " +
+          error.message
+      );
     }
   }
 
