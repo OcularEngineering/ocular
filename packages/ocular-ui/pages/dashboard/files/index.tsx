@@ -12,7 +12,7 @@ export default function Files() {
   return (
     <SectionContainer className="space-y-6 mt-10">
       <FileUploader
-        maxFiles={4}
+        maxFiles={Infinity}
         maxSize={Infinity}
         progresses={progresses}
         onUpload={uploadFiles}

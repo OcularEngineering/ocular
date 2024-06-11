@@ -69,16 +69,15 @@ const Results = ({ results }) => (
                   className="group mb-4 flex max-w-4xl px-3 py-4 text-xs sm:text-base"
                 >
                   {
-  result && result.documentMetadata.source === 'ocular-api'
-    ? <div className="overflow-hidden dark:bg-muted bg-gray-200 min-h-[45px] h-[45px] min-w-[45px] w-[45px] rounded-xl mr-4"/>
-    : <Image src={result && result.documentMetadata.source === 'pagerduty' ? '/PagerDuty.png' : result && result.documentMetadata.source ? `/${result.documentMetadata.source}.svg` : '/default.png'} 
-             alt={result.documentMetadata.title} 
-             className="mr-4 size-[40px]" 
-             width={10} 
-             height={10} 
-      />
-}
-                  
+                    result && result.documentMetadata.source === 'ocular-api'
+                      ? <div className="overflow-hidden dark:bg-muted bg-gray-200 min-h-[40px] h-[40px] min-w-[40px] w-[40px] rounded-xl mr-4"/>
+                      : <Image src={result && result.documentMetadata.source === 'pagerduty' ? '/PagerDuty.png' : result && result.documentMetadata.source ? `/${result.documentMetadata.source}.svg` : '/default.png'} 
+                          alt={result.documentMetadata.title} 
+                          className="mr-4 size-[40px]" 
+                          width={10} 
+                          height={10} 
+                        />
+                  }
                   <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                     <div className='space-y-1'>
                       <a href={result.documentMetadata.link} target="_blank" rel="noopener noreferrer">
