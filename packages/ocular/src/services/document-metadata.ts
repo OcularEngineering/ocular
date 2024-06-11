@@ -62,12 +62,24 @@ class DocumentMetadataService extends TransactionBaseService {
           this.documentMetadataRepository_
         );
         // Get Existing Documents From The Database Based On The IDs.
+
         const allDocIds = documents.map((doc) => doc.id);
 
         const existingDocuments = await documentRepository.find({
           where: { id: In(allDocIds) },
         });
-        // TODO: Update Existing Documents If Updated At Is Greater Than The Existing Document
+
+        // Update Existing Documents If Updated At Is Greater Than The Existing Document
+        for (let doc of documents) {
+          let existingDoc = existingDocuments.find((d) => d.id === doc.id);
+          if (
+            existingDoc &&
+            new Date(doc.updatedAt) > new Date(existingDoc.updated_at)
+          ) {
+            existingDoc.updated_at = doc.updatedAt;
+            await documentRepository.save(existingDoc);
+          }
+        }
 
         // New Documents Metadata To Be Created In The Database
         const existingIds = existingDocuments.map((doc) => doc.id);
@@ -84,7 +96,7 @@ class DocumentMetadataService extends TransactionBaseService {
             type: doc.type,
             source: doc.source,
             organisation_id: doc.organisationId,
-            updated_at: new Date(),
+            updated_at: doc.updatedAt,
           })
         );
         const newCreatedDocuments = await documentRepository.save(
@@ -94,14 +106,6 @@ class DocumentMetadataService extends TransactionBaseService {
       }
     );
   }
-
-  // async retrieveById(id: string): Promise<DocumentMetadata> {
-  //   const documentRepo = this.activeManager_.withRepository(this.documentRepository_)
-  //   const doc = await documentRepo.findOne({
-  //     where: { id: id}
-  //   })
-  //   return doc
-  // }
 
   async list(
     selector: Selector<DocumentMetadata>

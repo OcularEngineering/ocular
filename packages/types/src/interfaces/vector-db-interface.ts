@@ -8,6 +8,7 @@ import {
 export interface IVectorDB {
   createIndex(indexName: string): Promise<void>;
   addDocuments(indexName: string, doc: IndexableDocChunk[]): Promise<void>;
+  deleteDocuments(indexName: string, docIds: string[]): Promise<void>;
   searchDocuments(
     org_id: string,
     vector: number[],
@@ -39,6 +40,7 @@ export abstract class AbstractVectorDBService implements IVectorDB {
     indexName: string,
     doc: IndexableDocChunk[]
   ): Promise<void>;
+  abstract deleteDocuments(indexName: string, docIds: string[]): Promise<void>;
   abstract searchDocuments(
     org_id: string,
     vector: number[],

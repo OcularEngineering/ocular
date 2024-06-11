@@ -60,6 +60,10 @@ export default class IndexerService implements IIndexerInterface {
           documents
         );
       const embeddedChunks = await this.embedChunks(chunks);
+      // Delete Old Chunks Of Documents To Be Added To The Vector Database
+      const documentIds = documents.map((doc) => doc.id);
+      await this.vectorDBService_.deleteDocuments(indexName, documentIds);
+      // Add The New Chunks To The Vector Database
       await this.vectorDBService_.addDocuments(indexName, embeddedChunks);
       this.logger_.info(
         `indexDocuments: Done Indexing Apps Documents ${documents.length} documents in ${indexName}`

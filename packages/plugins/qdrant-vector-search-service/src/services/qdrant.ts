@@ -58,7 +58,9 @@ export default class qdrantService extends AbstractVectorDBService {
 
   async addDocuments(indexName: string, docs: IndexableDocChunk[]) {
     try {
-      this.logger_.info(`addDocuments: Adding Docs To Quadrant ${docs.length}`);
+      this.logger_.info(
+        `addDocuments: Adding Docs Chunks To Quadrant ${docs.length}`
+      );
       // Split the docs into batches of 100
       const docBatches = [];
       for (let i = 0; i < docs.length; i += 100) {
@@ -71,10 +73,39 @@ export default class qdrantService extends AbstractVectorDBService {
         await this.qdrantClient_.upsert(indexName, { points });
       }
       this.logger_.info(
-        `addDocuments: Done Adding Docs To Quadrant ${docs.length}`
+        `addDocuments: Done Adding Doc Chunks To Quadrant ${docs.length}`
       );
     } catch (error) {
-      this.logger_.error(`Error Adding Docs To Quadrant ${error.message}`);
+      this.logger_.error(
+        `addDocuments: Error Adding Docs Chunks To Quadrant ${error.message}`
+      );
+    }
+  }
+
+  async deleteDocuments(indexName: string, docIds: string[]) {
+    try {
+      this.logger_.info(
+        `deleteDocuments: Deleting Docs From Quadrant ${docIds.length}`
+      );
+      await this.qdrantClient_.delete(indexName, {
+        filter: {
+          must: [
+            {
+              key: "documentId",
+              match: {
+                any: docIds,
+              },
+            },
+          ],
+        },
+      });
+      this.logger_.info(
+        `deleteDocuments: Done Deleting Docs From Quadrant ${docIds.length}`
+      );
+    } catch (error) {
+      this.logger_.error(
+        `deleteDocuments: Error Deleting Docs From Quadrant ${error.message}`
+      );
     }
   }
 
