@@ -41,13 +41,10 @@ export default {
   files: {
     upload: (files: File[]) => {
       const formData = new FormData();
-      console.log("Files Uploaded Backend: ", files);
-      console.log("files sent: ", files);
       for (const f of files) {
         console.log("Appending file: ", f);
         formData.append("files", f);
       }
-      console.log("formData: ", formData);
       const path = `/admin/uploads`;
       return ocularRequest('POST', path, formData);
     },

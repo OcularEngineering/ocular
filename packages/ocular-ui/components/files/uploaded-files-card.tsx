@@ -19,14 +19,27 @@ export function UploadedFilesCard({ uploadedFiles }: UploadedFilesCardProps) {
                 <div className="w-12 h-12 bg-gray-100 rounded-xl relative"/>
                 <div className="flex flex-col space-y-1">
                   <p className="text-md font-semibold text-gray-800">{file.title}</p>
-                  <p className="text-sm text-gray-500">
+                  {/* <p className="text-sm text-gray-500">
                     {new Date(file.created_at).toLocaleDateString(undefined, {
                       day: 'numeric',
                       month: 'long',
                       hour: '2-digit',
                       minute: '2-digit' 
                     })}
-                  </p>
+                  </p> */}
+                  <div className='flex flex-row gap-2'>
+                        <p className="font-regular line-clamp-3 text-sm text-gray-500">
+                        {
+                          !isNaN(new Date(file.created_at).getTime()) ?
+                          new Date(file.created_at).toLocaleDateString(undefined, { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) 
+                          : null
+                        }
+                        </p>
+                        <span className="font-regular text-sm text-gray-500">·</span>
+                        <p className="font-regular line-clamp-3 text-sm text-gray-500">
+                          {file.type.toUpperCase()}
+                        </p>
+                      </div>
                 </div>
               </div>
             ))}
