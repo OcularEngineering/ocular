@@ -19,7 +19,7 @@ export function EmptyCard({
   ...props
 }: EmptyCardProps) {
   return (
-    <Card
+    <div
       className={cn(
         "flex w-full flex-col items-center justify-center space-y-6 bg-transparent p-16",
         className
@@ -34,6 +34,6 @@ export function EmptyCard({
         {description ? <CardDescription>{description}</CardDescription> : null}
       </div>
       {action ? action : null}
-    </Card>
+    </div>
   )
 }
