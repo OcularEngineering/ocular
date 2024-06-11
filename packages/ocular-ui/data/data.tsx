@@ -16,13 +16,13 @@ export const links: LinkProps[] =[
     variant: "ghost",
     link: "/dashboard/chat"
   },
-  {
-    title: "Files",
-    label: "",
-    icon: "File",
-    variant: "ghost",
-    link: "/dashboard/files"
-  },
+  // {
+  //   title: "Files",
+  //   label: "",
+  //   icon: "File",
+  //   variant: "ghost",
+  //   link: "/dashboard/files"
+  // },
   {
     title: "Marketplace",
     label: "",
