@@ -34,13 +34,11 @@ export default class documentProcessorService extends AbstractDocumentProcesserS
       case DocType.DOCX:
       case DocType.JSON:
       case DocType.CSV:
-        console.log("chunkIndexableDocument:Document", document);
         chunks = await processTxt(
           document,
           this.max_chunk_length_,
           this.chunk_over_lap_
         );
-        console.log("chunkIndexableDocument:Chunks", chunks);
         return chunks;
       case DocType.MD:
         chunks = await processMarkdown(

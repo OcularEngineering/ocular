@@ -1,26 +1,24 @@
 import fs from "fs";
 import axios from "axios";
 import { Readable } from "stream";
-import { OAuthService, Organisation, RateLimiterService } from "@ocular/ocular";
+import {
+  AppAuthorizationService,
+  Organisation,
+  RateLimiterService,
+} from "@ocular/ocular";
 import {
   IndexableDocument,
   TransactionBaseService,
   Logger,
   AppNameDefinitions,
   DocType,
+  ApiConfig,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 import { RateLimiterQueue } from "rate-limiter-flexible";
 
-interface Config {
-  headers: {
-    Authorization: string;
-    Accept: string;
-  };
-}
-
 export default class ConfluenceService extends TransactionBaseService {
-  protected oauthService_: OAuthService;
+  protected appAuthorizationService_: AppAuthorizationService;
   protected logger_: Logger;
   protected container_: ConfigModule;
   protected rateLimiterService_: RateLimiterService;
@@ -28,7 +26,7 @@ export default class ConfluenceService extends TransactionBaseService {
 
   constructor(container) {
     super(arguments[0]);
-    this.oauthService_ = container.oauthService;
+    this.appAuthorizationService_ = container.appAuthorizationService;
     this.logger_ = container.logger;
     this.container_ = container;
     this.rateLimiterService_ = container.rateLimiterService;
@@ -48,22 +46,20 @@ export default class ConfluenceService extends TransactionBaseService {
       `Starting oculation of Confluence for ${org.id} organisation`
     );
 
-    // Get Confluence OAuth for the organisation
-    const oauth = await this.oauthService_.retrieve({
+    // Get Confluence Auth for the organisation
+    const auth = await this.appAuthorizationService_.retrieve({
       id: org.id,
       app_name: AppNameDefinitions.CONFLUENCE,
     });
 
-    if (!oauth) {
-      this.logger_.error(
-        `No Confluence OAuth found for ${org.id} organisation`
-      );
+    if (!auth) {
+      this.logger_.error(`No Confluence Auth found for ${org.id} organisation`);
       return;
     }
 
-    const config: Config = {
+    const config: ApiConfig = {
       headers: {
-        Authorization: `Bearer ${oauth.token}`,
+        Authorization: `Bearer ${auth.token}`,
         Accept: "application/json",
       },
     };
@@ -112,18 +108,20 @@ export default class ConfluenceService extends TransactionBaseService {
       }
 
       yield documents;
-      await this.oauthService_.update(oauth.id, { last_sync: new Date() });
+      await this.appAuthorizationService_.update(auth.id, {
+        last_sync: new Date(),
+      });
     } catch (error) {
       if (error.response && error.response.status === 401) {
         this.logger_.info(
           `Refreshing Confluence token for ${org.id} organisation`
         );
 
-        const oauthToken = await this.container_[
-          "confluenceOauth"
-        ].refreshToken(oauth.refresh_token);
+        const authToken = await this.container_["confluenceOauth"].refreshToken(
+          auth.refresh_token
+        );
 
-        await this.oauthService_.update(oauth.id, oauthToken);
+        await this.appAuthorizationService_.update(auth.id, authToken);
 
         return this.getConfluenceSpaceAndPages(org);
       } else {
@@ -136,7 +134,7 @@ export default class ConfluenceService extends TransactionBaseService {
     );
   }
 
-  async fetchPageContent(pageID: string, cloudID: string, config: Config) {
+  async fetchPageContent(pageID: string, cloudID: string, config: ApiConfig) {
     try {
       // Block Until Rate Limit Allows Request
       await this.requestQueue_.removeTokens(1, AppNameDefinitions.CONFLUENCE);
@@ -179,7 +177,7 @@ export default class ConfluenceService extends TransactionBaseService {
     }
   }
 
-  async fetchConfluenceCloudID(config: Config) {
+  async fetchConfluenceCloudID(config: ApiConfig) {
     try {
       const accessibleResourcesResponse = await axios.get(
         "https://api.atlassian.com/oauth/token/accessible-resources",
@@ -205,7 +203,7 @@ export default class ConfluenceService extends TransactionBaseService {
     }
   }
 
-  async fetchConfluencePages(cloudID: string, config: Config) {
+  async fetchConfluencePages(cloudID: string, config: ApiConfig) {
     try {
       // Block Until Rate Limit Allows Request
       await this.requestQueue_.removeTokens(1, AppNameDefinitions.CONFLUENCE);

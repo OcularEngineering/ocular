@@ -22,7 +22,6 @@ const PrivateRoute = ({ children }: PrivateRouteProps) => {
 
                 setIsAuthenticated(true);
                 setProfile(profile);
-                console.log("Profile", profile?.first_name);
 
             }
             setLoading(false);

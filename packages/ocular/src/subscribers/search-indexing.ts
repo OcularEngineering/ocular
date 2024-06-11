@@ -20,8 +20,8 @@ import { SearchEngineOptions } from "../types/search/options";
 import api from "../api";
 import IndexerService from "../services/indexer";
 import { SEARCH_INDEX_EVENT } from "../loaders/search";
-import OAuthService from "../services/oauth";
 import { orgIdToIndexName } from "@ocular/utils";
+import AppAuthorizationService from "../services/app-authorization";
 
 type InjectedDependencies = {
   indexerService: IndexerService;
@@ -66,11 +66,11 @@ class SearchIndexingSubscriber {
     this.logger_ = logger;
     this.eventBusService_.subscribe(SEARCH_INDEX_EVENT, this.buildSearchIndex);
     this.eventBusService_.subscribe(
-      OAuthService.Events.TOKEN_GENERATED,
+      AppAuthorizationService.Events.TOKEN_GENERATED,
       this.addSearchIndexingJob
     );
     this.eventBusService_.subscribe(
-      "webConnectorInstalled",
+      AppAuthorizationService.Events.WEB_CONNECTOR_INSTALLED,
       this.addSearchIndexingJobWebConnector
     );
     this.indexName_ = indexName;
@@ -79,7 +79,7 @@ class SearchIndexingSubscriber {
 
   // Builds The Initial Search Index Based On the Installed Apps
   buildSearchIndex = async (): Promise<void> => {
-    console.error("Building Search Indexes");
+    this.logger_.info(`buildSearchIndex: Building Search Index`);
     // Step 1: Create and Index in Qdrant
     await this.indexerService_.createIndex(this.indexName_);
 
@@ -87,11 +87,14 @@ class SearchIndexingSubscriber {
     this.queueService_.subscribeBatch(
       APPS_INDEXING_TOPIC,
       async (docs: IndexableDocument[], topic) => {
+        // Start Tracking The Activity of The Indexing Process
         this.logger_.info(
-          `buildSearchIndex:Indexing Apps Document ${docs.length}`
+          `searchIndexingConsumer: Indexing  ${docs.length} messages in topic ${topic} and index ${this.indexName_}`
         );
         await this.indexerService_.indexDocuments(this.indexName_, docs);
-        this.logger_.info(`buildSearchIndex:Indexing Apps Document Done`);
+        this.logger_.info(
+          `searchIndexingConsumer: Finished Indexing ${docs.length} messages in topic ${topic} and index ${this.indexName_}`
+        );
       },
       { groupId: "ocular-apps-group" }
     );
@@ -110,32 +113,32 @@ class SearchIndexingSubscriber {
       { groupId: "ocular-api-group" }
     );
 
-    // Step 4: Schedule Indexing Jobs For To Index Data From Apps Installed By Organisations
-    const orgs: Organisation[] = await this.organisationService_.list({});
-    orgs.forEach((org) => {
-      if (!org.installed_apps) return;
-      this.jobSchedulerService_.create(
-        `Sync Apps Data for ${org.name}`,
-        { org: org },
-        "*/10 * * * *",
-        async () => {
-          org.installed_apps.forEach((app) => {
-            this.logger_.error(
-              `Schedule an Indexing Job for ${app.name} for ${org.name}`
-            );
-            const jobProps: BatchJobCreateProps = {
-              type: app.name,
-              context: {
-                org: org,
-              },
-              // created_by: "system",
-              dry_run: false,
-            };
-            this.batchJobService_.create(jobProps);
-          });
-        }
-      );
-    });
+    // // Step 4: Schedule Indexing Jobs For To Index Data From Apps Installed By Organisations
+    // const orgs: Organisation[] = await this.organisationService_.list({});
+    // orgs.forEach((org) => {
+    //   if (!org.installed_apps) return;
+    //   this.jobSchedulerService_.create(
+    //     `Sync Apps Data for ${org.name}`,
+    //     { org: org },
+    //     "*/10 * * * *",
+    //     async () => {
+    //       org.installed_apps.forEach((app) => {
+    //         this.logger_.error(
+    //           `Schedule an Indexing Job for ${app.name} for ${org.name}`
+    //         );
+    //         const jobProps: BatchJobCreateProps = {
+    //           type: app.name,
+    //           context: {
+    //             org: org,
+    //           },
+    //           // created_by: "system",
+    //           dry_run: false,
+    //         };
+    //         this.batchJobService_.create(jobProps);
+    //       });
+    //     }
+    //   );
+    // });
   };
 
   addSearchIndexingJobWebConnector = async (data): Promise<void> => {

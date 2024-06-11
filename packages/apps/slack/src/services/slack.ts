@@ -3,7 +3,7 @@ import axios from "axios";
 import { Readable } from "stream";
 import {
   App,
-  OAuthService,
+  AppAuthorizationService,
   Organisation,
   RateLimiterService,
 } from "@ocular/ocular";
@@ -14,19 +14,13 @@ import {
   AppNameDefinitions,
   Section,
   DocType,
+  ApiConfig,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 import { RateLimiterQueue } from "rate-limiter-flexible";
 
-interface Config {
-  headers: {
-    Authorization: string;
-    Accept: string;
-  };
-}
-
 export default class SlackService extends TransactionBaseService {
-  protected oauthService_: OAuthService;
+  protected appAuthorizationService_: AppAuthorizationService;
   protected logger_: Logger;
   protected container_: ConfigModule;
   protected rateLimiterService_: RateLimiterService;
@@ -34,7 +28,7 @@ export default class SlackService extends TransactionBaseService {
 
   constructor(container) {
     super(arguments[0]);
-    this.oauthService_ = container.oauthService;
+    this.appAuthorizationService_ = container.appAuthorizationService;
     this.logger_ = container.logger;
     this.container_ = container;
     this.rateLimiterService_ = container.rateLimiterService;
@@ -52,20 +46,20 @@ export default class SlackService extends TransactionBaseService {
   ): AsyncGenerator<IndexableDocument[]> {
     this.logger_.info(`Starting oculation of Slack for ${org.id} organisation`);
 
-    // Get Slack OAuth for the organisation
-    const oauth = await this.oauthService_.retrieve({
+    // Get Slack auth for the organisation
+    const auth = await this.appAuthorizationService_.retrieve({
       id: org.id,
       app_name: AppNameDefinitions.SLACK,
     });
 
-    if (!oauth) {
-      this.logger_.error(`No Slack OAuth found for ${org.id} organisation`);
+    if (!auth) {
+      this.logger_.error(`No Slack auth found for ${org.id} organisation`);
       return;
     }
 
-    const config: Config = {
+    const config: ApiConfig = {
       headers: {
-        Authorization: `Bearer ${oauth.token}`,
+        Authorization: `Bearer ${auth.token}`,
         Accept: "application/json",
       },
     };
@@ -111,7 +105,7 @@ export default class SlackService extends TransactionBaseService {
         }
       }
       yield documents;
-      await this.oauthService_.update(oauth.id, {
+      await this.appAuthorizationService_.update(auth.id, {
         last_sync: new Date(),
       });
     } catch (error) {
@@ -120,12 +114,12 @@ export default class SlackService extends TransactionBaseService {
         this.logger_.info(`Refreshing Slack token for ${org.id} organisation`);
 
         // Refresh the token
-        const oauthToken = await this.container_["slackOauth"].refreshToken(
-          oauth.refresh_token
+        const authToken = await this.container_["slackOauth"].refreshToken(
+          auth.refresh_token
         );
 
-        // Update the OAuth record with the new token
-        await this.oauthService_.update(oauth.id, oauthToken);
+        // Update the auth record with the new token
+        await this.appAuthorizationService_.update(auth.id, authToken);
 
         // Retry the request
         return this.getSlackChannelsAndConversations(org);
@@ -137,7 +131,7 @@ export default class SlackService extends TransactionBaseService {
     this.logger_.info(`Finished oculation of Slack for ${org.id} organisation`);
   }
 
-  async fetchSlackChannels(config: Config) {
+  async fetchSlackChannels(config: ApiConfig) {
     // Block Until Rate Limit Allows Request
     await this.requestQueue_.removeTokens(1, AppNameDefinitions.SLACK);
     try {
@@ -161,7 +155,7 @@ export default class SlackService extends TransactionBaseService {
     }
   }
 
-  async fetchChannelConversations(channelID: string, config: Config) {
+  async fetchChannelConversations(channelID: string, config: ApiConfig) {
     try {
       // Block Until Rate Limit Allows Request
       await this.requestQueue_.removeTokens(1, AppNameDefinitions.SLACK);
@@ -182,7 +176,7 @@ export default class SlackService extends TransactionBaseService {
   async fetchThreadForConversation(
     channelID: string,
     tsID: string,
-    config: Config
+    config: ApiConfig
   ) {
     try {
       // Block Until Rate Limit Allows Request

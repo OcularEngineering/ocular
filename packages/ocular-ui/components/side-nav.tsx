@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { UserNav } from "./user-nav"
 import { ThemeToggle } from "@/components/theme-toggle"
+import FilesDialog from "@/components/files/files-dialog"
 import { NavProps } from "@/types/types"
 import {
   Tooltip,
@@ -22,8 +23,19 @@ import {
   HelpCircle,
   LayoutGrid,
   BarChart2,
-  Users
+  Users, 
+  File,
 } from "lucide-react"
+
+// Corrected the filesLink object
+const filesLink = {
+  title: "Files",
+  label: "",
+  icon: "File",
+  variant: "ghost",
+  link: "/dashboard/files"
+};
+
 const iconMapping = {
   Search: Search,
   Bot: Bot,
@@ -31,7 +43,8 @@ const iconMapping = {
   HelpCircle: HelpCircle,
   LayoutGrid,
   BarChart2,
-  Users
+  Users, 
+  File
 };
 
 export function SideNav({ links }: NavProps)  {
@@ -83,12 +96,14 @@ export function SideNav({ links }: NavProps)  {
               </Tooltip>
             );
           })}
+          <div className="bg-border h-px w-full"/>
+          <FilesDialog link={filesLink} />
         </TooltipProvider>
       </ul>
       <ul className="flex flex-col items-center justify-center space-y-3">
         <ThemeToggle />
         <TooltipProvider delayDuration={0}>
-            <div className="bg-border h-px w-full"></div>
+            <div className="bg-border h-px w-full"/>
             <div >
               <UserNav />
             </div>

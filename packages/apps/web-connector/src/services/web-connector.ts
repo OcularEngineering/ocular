@@ -2,7 +2,7 @@ import fs from "fs";
 import axios from "axios";
 import { Readable } from "stream";
 import {
-  OAuthService,
+  AppAuthorizationService,
   Organisation,
   OrganisationService,
 } from "@ocular/ocular";
@@ -15,7 +15,6 @@ import {
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 import puppeteer, { Browser, Page } from "puppeteer";
-import { UpdateOAuthInput } from "@ocular/ocular/src/types/oauth";
 
 interface metadataLink {
   location: string;
@@ -25,15 +24,15 @@ interface metadataLink {
   description: string;
 }
 
-export default class WebConnectorService extends TransactionBaseService {
-  protected oauthService_: OAuthService;
+export default class webConnectorService extends TransactionBaseService {
+  protected appAuthorizationService_: AppAuthorizationService;
   protected logger_: Logger;
   protected container_: ConfigModule;
   protected organisationService_: OrganisationService;
 
   constructor(container) {
     super(arguments[0]);
-    this.oauthService_ = container.oauthService;
+    this.appAuthorizationService_ = container.appAuthorizationService;
     this.logger_ = container.logger;
     this.organisationService_ = container.organisationService;
     this.container_ = container;
@@ -56,14 +55,14 @@ export default class WebConnectorService extends TransactionBaseService {
       `Starting oculation of webConnector for ${org.id} organisation`
     );
 
-    const oauth = await this.oauthService_.retrieve({
+    const auth = await this.appAuthorizationService_.retrieve({
       id: org.id,
       app_name: AppNameDefinitions.WEBCONNECTOR,
     });
 
-    if (!oauth) {
+    if (!auth) {
       this.logger_.error(
-        `No WebConnector OAuth found for ${org.id} organisation`
+        `No WebConnector auth found for ${org.id} organisation`
       );
       return;
     }
@@ -100,42 +99,42 @@ export default class WebConnectorService extends TransactionBaseService {
 
       yield documents;
 
-      await this.oauthService_.update(oauth.id, {});
+      await this.appAuthorizationService_.update(auth.id, {});
 
-      if (oauth.metadata && Array.isArray(oauth.metadata.links)) {
-        const linkIndex = oauth.metadata.links.findIndex(
+      if (auth.metadata && Array.isArray(auth.metadata.links)) {
+        const linkIndex = auth.metadata.links.findIndex(
           (link: any) => link.id === link_id
         );
 
         if (linkIndex !== -1) {
-          oauth.metadata.links[linkIndex].status = "success";
+          auth.metadata.links[linkIndex].status = "success";
         }
       }
 
-      await this.oauthService_.update(oauth.id, {
-        metadata: oauth.metadata,
+      await this.appAuthorizationService_.update(auth.id, {
+        metadata: auth.metadata,
         last_sync: new Date(),
-      } as UpdateOAuthInput);
+      });
 
       this.logger_.info(
         `Finished oculation of Web Connector for ${org.id} organisation`
       );
     } catch (error) {
-      console.error("Error fetching web connector content:", error);
-      if (oauth.metadata && Array.isArray(oauth.metadata.links)) {
-        const linkIndex = oauth.metadata.links.findIndex(
+      console.error("Error fetching web commector content:", error);
+      if (auth.metadata && Array.isArray(auth.metadata.links)) {
+        const linkIndex = auth.metadata.links.findIndex(
           (link: any) => link.id === link_id
         );
 
         if (linkIndex !== -1) {
-          oauth.metadata.links[linkIndex].status = "failed";
+          auth.metadata.links[linkIndex].status = "failed";
         }
       }
 
-      await this.oauthService_.update(oauth.id, {
-        metadata: oauth.metadata,
+      await this.appAuthorizationService_.update(auth.id, {
+        metadata: auth.metadata,
         last_sync: new Date(),
-      } as UpdateOAuthInput);
+      });
     }
   }
 
@@ -159,8 +158,6 @@ export default class WebConnectorService extends TransactionBaseService {
   ): Promise<Array<{ text: string; location: string }>> {
     const browser: Browser = await puppeteer.launch({
       headless: true,
-      executablePath: "/usr/bin/chromium-browser",
-      args: ["--no-sandbox", "--disable-dev-shm-usage"],
     });
 
     const page: Page = await browser.newPage();

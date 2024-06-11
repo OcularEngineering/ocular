@@ -11,7 +11,7 @@ import { AutoflowContainer, promiseAll } from "@ocular/utils";
 import { ConfigModule, Logger } from "../types";
 import { formatRegistrationName } from "../utils/format-registration-name";
 import { asValue, asFunction, Lifetime } from "awilix";
-import { OauthService } from "@ocular/types";
+import { AppauthorizationService } from "@ocular/types";
 import { pathByOS } from "@ocular/utils";
 import { trackInstallation } from "ocular-telemetry";
 
@@ -184,7 +184,7 @@ export async function registerServices(
         );
       }
 
-      if (OauthService.isOauthService(loaded.prototype)) {
+      if (AppauthorizationService.isAuthService(loaded.prototype)) {
         const configModule = container.resolve<ConfigModule>("configModule");
         const createAppInput = loaded.getAppDetails(
           configModule.projectConfig,

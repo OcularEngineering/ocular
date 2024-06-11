@@ -3,7 +3,7 @@ import { id } from 'date-fns/locale';
 
 export default {
   apps: {
-    installApp(data) {
+    installApp(data: {} | undefined) {
       const path = `/admin/oauth`;
       return ocularRequest('POST', path, data);
     },
@@ -39,14 +39,22 @@ export default {
     },
   },
   files: {
-    upload(files) {
-      const formData = new FormData()
+    upload: (files: File[]) => {
+      const formData = new FormData();
+      console.log("Files Uploaded Backend: ", files);
+      console.log("files sent: ", files);
       for (const f of files) {
-        formData.append("files", f)
+        console.log("Appending file: ", f);
+        formData.append("files", f);
       }
-      const path = `/admin/files`;
-      return ocularRequest('POST', path,formData);
+      console.log("formData: ", formData);
+      const path = `/admin/uploads`;
+      return ocularRequest('POST', path, formData);
     },
+    list() {
+      const path = `/admin/uploads`;
+      return ocularRequest('GET', path);
+    }
   },
   organisation: {
     retrive(id, search = {}) {
@@ -103,7 +111,7 @@ export default {
       const path = `/admin/users`;
       return ocularRequest('POST', path, data);
     },
-    retrieve(id, search = {}) {
+    retrieve(id: any, search = {}) {
       const params = Object.keys(search)
         .map((k) => {
           if (search[k] === '' || search[k] === null) {

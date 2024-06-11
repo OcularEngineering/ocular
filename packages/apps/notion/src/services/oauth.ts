@@ -1,14 +1,14 @@
-import randomize from 'randomatic';
-import axios from 'axios';
+import randomize from "randomatic";
+import axios from "axios";
 import {
-  OauthService,
+  AppauthorizationService,
   AppNameDefinitions,
   AppCategoryDefinitions,
-  OAuthToken,
-} from '@ocular/types';
-import { ConfigModule } from '@ocular/ocular/src/types';
+  AuthToken,
+} from "@ocular/types";
+import { ConfigModule } from "@ocular/ocular/src/types";
 
-class NotionOauth extends OauthService {
+class NotionOauth extends AppauthorizationService {
   protected client_id_: string;
   protected client_secret_: string;
   protected configModule_: ConfigModule;
@@ -29,55 +29,55 @@ class NotionOauth extends OauthService {
     const auth_strategy = options.auth_strategy;
     return {
       name: AppNameDefinitions.NOTION,
-      logo: '/notion.svg',
+      logo: "/notion.svg",
       description:
-        'Notion is a single space where you can think, write, and plan.',
+        "Notion is a single space where you can think, write, and plan.",
       oauth_url: `https://api.notion.com/v1/oauth/authorize?client_id=${client_id}&response_type=code&owner=user&redirect_uri=${encodeURIComponent(
         redirect
       )}`,
       slug: AppNameDefinitions.NOTION,
       category: AppCategoryDefinitions.PRODUCTIVITY,
-      developer: 'Ocular AI',
+      developer: "Ocular AI",
       auth_strategy: auth_strategy,
-      images: ['/notion.svg'],
+      images: ["/notion.svg"],
       overview:
-        'Notion is a single space where you can think, write, and plan. Capture thoughts, manage projects, or even run an entire company — and do it exactly the way you want.',
-      docs: 'https://developers.notion.com/',
-      website: 'https://www.notion.so/product',
+        "Notion is a single space where you can think, write, and plan. Capture thoughts, manage projects, or even run an entire company — and do it exactly the way you want.",
+      docs: "https://developers.notion.com/",
+      website: "https://www.notion.so/product",
     };
   }
 
-  async generateToken(code: string): Promise<OAuthToken> {
-    console.log('***** Generating token from the code:\n');
+  async generateToken(code: string): Promise<AuthToken> {
+    console.log("***** Generating token from the code:\n");
 
     const encoded = Buffer.from(
       `${this.client_id_}:${this.client_secret_}`
-    ).toString('base64');
+    ).toString("base64");
 
     const body = {
-      grant_type: 'authorization_code',
+      grant_type: "authorization_code",
       redirect_uri: this.redirect_uri_,
       code: code,
     };
 
     const config = {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Basic ${encoded}`,
       },
     };
 
     return axios
-      .post('https://api.notion.com/v1/oauth/token', body, config)
+      .post("https://api.notion.com/v1/oauth/token", body, config)
       .then((res) => {
-        console.log('RESPONSE', res.data);
+        console.log("RESPONSE", res.data);
         return {
           type: res.data.token_type,
           token: res.data.access_token,
           token_expires_at: new Date(),
-          refresh_token: 'No refresh_token',
+          refresh_token: "No refresh_token",
           refresh_token_expires_at: new Date(),
-        } as OAuthToken;
+        } as AuthToken;
       })
       .catch((err) => {
         console.error(err);

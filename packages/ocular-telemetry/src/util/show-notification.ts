@@ -1,9 +1,20 @@
 import boxen from "boxen"
+import { CustomBorderStyle } from "boxen"
+import {BoxStyle, Boxes} from 'cli-boxes';
+
+const borderStyle : CustomBorderStyle = {
+  topLeft: 'a',
+  topRight: 'b',
+  bottomRight: 'c',
+  bottomLeft: 'd',
+  vertical: 'e',
+  horizontal: 'f'
+}
 
 const defaultConfig = {
   padding: 1,
   borderColor: `blue`,
-  borderStyle: `double`,
+  borderStyle: borderStyle,
 }
 
 const defaultMessage =

@@ -1,7 +1,11 @@
 import fs from "fs";
 import axios from "axios";
 import { Readable } from "stream";
-import { OAuthService, Organisation, RateLimiterService } from "@ocular/ocular";
+import {
+  AppAuthorizationService,
+  Organisation,
+  RateLimiterService,
+} from "@ocular/ocular";
 import {
   IndexableDocument,
   TransactionBaseService,
@@ -14,7 +18,7 @@ import { RateLimit } from "async-sema";
 import { RateLimiterQueue } from "rate-limiter-flexible";
 
 export default class NotionService extends TransactionBaseService {
-  protected oauthService_: OAuthService;
+  protected appAuthorizationService_: AppAuthorizationService;
   protected logger_: Logger;
   protected container_: ConfigModule;
   protected rateLimiterService_: RateLimiterService;
@@ -22,7 +26,7 @@ export default class NotionService extends TransactionBaseService {
 
   constructor(container) {
     super(arguments[0]);
-    this.oauthService_ = container.oauthService;
+    this.appAuthorizationService_ = container.appAuthorizationService;
     this.logger_ = container.logger;
     this.container_ = container;
     this.rateLimiterService_ = container.rateLimiterService;
@@ -42,23 +46,23 @@ export default class NotionService extends TransactionBaseService {
       `Starting oculation of Notion for ${org.id} organisation`
     );
 
-    // Get Notion OAuth for the organisation
-    const oauth = await this.oauthService_.retrieve({
+    // Get Notion auth for the organisation
+    const auth = await this.appAuthorizationService_.retrieve({
       id: org.id,
       app_name: AppNameDefinitions.NOTION,
     });
 
-    if (!oauth) {
-      this.logger_.error(`No Notion OAuth found for ${org.id} organisation`);
+    if (!auth) {
+      this.logger_.error(`No Notion auth found for ${org.id} organisation`);
       return;
     }
 
     let documents: IndexableDocument[] = [];
 
     try {
-      const notionPages = await this.getNotionPages(oauth.token);
+      const notionPages = await this.getNotionPages(auth.token);
       for (const page of notionPages) {
-        const text = await this.processBlock(oauth.token, page.id);
+        const text = await this.processBlock(auth.token, page.id);
         const title = this.generateTitleFromParagraph(text);
         // Add Project To Documents
         const pageDoc: IndexableDocument = {
@@ -86,7 +90,9 @@ export default class NotionService extends TransactionBaseService {
 
       yield documents;
 
-      await this.oauthService_.update(oauth.id, { last_sync: new Date() });
+      await this.appAuthorizationService_.update(auth.id, {
+        last_sync: new Date(),
+      });
     } catch (error) {
       console.error(error);
     }

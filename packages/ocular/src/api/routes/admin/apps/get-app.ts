@@ -1,17 +1,18 @@
-import { AppNameDefinitions } from "@ocular/types";
-import { OAuthService } from "../../../../services";
+import { AppAuthorizationService } from "../../../../services";
 
 export default async (req, res) => {
   const { id } = req.params;
-  const oauthService: OAuthService = req.scope.resolve("oauthService");
+  const appAuthorizationService: AppAuthorizationService = req.scope.resolve(
+    "appAuthorizationService"
+  );
 
-  const oauthToken = await oauthService.retrieveById({
+  const authToken = await appAuthorizationService.retrieveById({
     app_id: id,
   });
 
-  if (!oauthToken) {
+  if (!authToken) {
     return res.status(404).json({ message: "No app data found" });
   }
 
-  res.status(200).json({ app: oauthToken });
+  res.status(200).json({ app: authToken });
 };

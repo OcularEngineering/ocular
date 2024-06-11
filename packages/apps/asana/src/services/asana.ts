@@ -1,7 +1,11 @@
 import fs from "fs";
 import axios from "axios";
 import { Readable } from "stream";
-import { OAuthService, Organisation, RateLimiterService } from "@ocular/ocular";
+import {
+  AppAuthorizationService,
+  Organisation,
+  RateLimiterService,
+} from "@ocular/ocular";
 import {
   IndexableDocument,
   DocType,
@@ -13,7 +17,7 @@ import { ConfigModule } from "@ocular/ocular/src/types";
 import { RateLimiterQueue } from "rate-limiter-flexible";
 
 export default class AsanaService extends TransactionBaseService {
-  protected oauthService_: OAuthService;
+  protected appAuthorizationService_: AppAuthorizationService;
   protected logger_: Logger;
   protected container_: ConfigModule;
   protected rateLimiterService_: RateLimiterService;
@@ -21,7 +25,7 @@ export default class AsanaService extends TransactionBaseService {
 
   constructor(container) {
     super(arguments[0]);
-    this.oauthService_ = container.oauthService;
+    this.appAuthorizationService_ = container.appAuthorizationService;
     this.logger_ = container.logger;
     this.container_ = container;
     this.rateLimiterService_ = container.rateLimiterService;
@@ -39,27 +43,27 @@ export default class AsanaService extends TransactionBaseService {
   ): AsyncGenerator<IndexableDocument[]> {
     this.logger_.info(`Starting oculation of Asana for ${org.id} organisation`);
     // Get Asana OAuth for the organisation
-    const oauth = await this.oauthService_.retrieve({
+    const auth = await this.appAuthorizationService_.retrieve({
       id: org.id,
       app_name: AppNameDefinitions.ASANA,
     });
-    if (!oauth) {
+    if (!auth) {
       this.logger_.error(`No Asana OAuth found for ${org.id} organisation`);
       return;
     }
 
     // Get the last sync date - this is the time the latest document that was synced from Google Drive.
     let last_sync = "";
-    if (oauth.last_sync !== null) {
-      last_sync = oauth.last_sync.toISOString();
+    if (auth.last_sync !== null) {
+      last_sync = auth.last_sync.toISOString();
     }
 
     let documents: IndexableDocument[] = [];
     try {
-      const projects = await this.getAsanaProjects(oauth.token, last_sync);
+      const projects = await this.getAsanaProjects(auth.token, last_sync);
       for (const project of projects) {
         const tasks = await this.getAsanaTasks(
-          oauth.token,
+          auth.token,
           project.gid,
           last_sync
         );
@@ -92,19 +96,21 @@ export default class AsanaService extends TransactionBaseService {
         }
       }
       yield documents;
-      await this.oauthService_.update(oauth.id, { last_sync: new Date() });
+      await this.appAuthorizationService_.update(auth.id, {
+        last_sync: new Date(),
+      });
     } catch (error) {
       if (error.response && error.response.status === 401) {
         // Check if it's an unauthorized error
         this.logger_.info(`Refreshing Asana token for ${org.id} organisation`);
 
         // Refresh the token
-        const oauthToken = await this.container_["asanaOauth"].refreshToken(
-          oauth.refresh_token
+        const authToken = await this.container_["asanaOauth"].refreshToken(
+          auth.refresh_token
         );
 
         // Update the OAuth record with the new token
-        await this.oauthService_.update(oauth.id, oauthToken);
+        await this.appAuthorizationService_.update(auth.id, authToken);
 
         // Retry the request
         return this.getAsanaTasksAndProjects(org);

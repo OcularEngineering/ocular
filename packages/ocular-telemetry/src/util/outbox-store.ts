@@ -14,13 +14,17 @@ import isTruthy from "./is-truthy"
 const OCULAR_TELEMETRY_VERBOSE = process.env.OCULAR_TELEMETRY_VERBOSE || false
 
 class Outbox {
-  constructor(baseDir) {
+  eventsJsonFileName: string
+  bufferFilePath: string
+  baseDir:string
+
+  constructor(baseDir:string) {
     this.eventsJsonFileName = `events.json`
     this.bufferFilePath = path.join(baseDir, this.eventsJsonFileName)
     this.baseDir = baseDir
   }
 
-  appendToBuffer(event) {
+  public appendToBuffer(event:string) :string{
     try {
       appendFileSync(this.bufferFilePath, event, `utf8`)
     } catch (e) {
@@ -28,9 +32,10 @@ class Outbox {
         console.error("Failed to append to buffer", e)
       }
     }
+    return this.bufferFilePath
   }
 
-  getSize() {
+  public getSize():number {
     if (!existsSync(this.bufferFilePath)) {
       return 0
     }
@@ -46,7 +51,7 @@ class Outbox {
     return 0
   }
 
-  getCount() {
+  public getCount():number {
     if (!existsSync(this.bufferFilePath)) {
       return 0
     }
@@ -64,7 +69,7 @@ class Outbox {
     return 0
   }
 
-  async flushFile(filePath, flushOperation) {
+  public async flushFile(filePath:string, flushOperation) {
     const now = `${Date.now()}-${process.pid}`
     let success = false
     let contents = ``
@@ -100,7 +105,7 @@ class Outbox {
     return true
   }
 
-  async startFlushEvents(flushOperation) {
+  public async startFlushEvents(flushOperation) {
     try {
       await this.flushFile(this.bufferFilePath, flushOperation)
       const files = readdirSync(this.baseDir)

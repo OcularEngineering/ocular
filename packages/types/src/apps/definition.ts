@@ -20,7 +20,7 @@ export enum AppNameDefinitions {
   OCULAR_API = "ocular-api",
 }
 
-export enum AppAuthStrategy {
+export enum AuthStrategy {
   API_TOKEN_STRATEGY = "APITOKEN",
   OAUTH_TOKEN_STRATEGY = "OAUTHTOKEN",
 }
@@ -45,4 +45,11 @@ export type InstalledApp = {
   name?: string;
   installation_id?: string;
   permissions?: Record<string, string>;
+};
+
+export type ApiConfig = {
+  headers: {
+    Authorization: string;
+    Accept: string;
+  };
 };

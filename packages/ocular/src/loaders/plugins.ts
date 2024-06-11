@@ -18,7 +18,7 @@ import {
   AbstractEmbedderService,
   AbstractNotificationService,
   AbstractSearchService,
-  OauthService,
+  AppauthorizationService,
 } from "@ocular/types";
 import {
   AbstractDocumentProcesserService,
@@ -201,7 +201,7 @@ export async function registerServices(
         );
       }
 
-      if (OauthService.isOauthService(loaded.prototype)) {
+      if (AppauthorizationService.isAuthService(loaded.prototype)) {
         const registerPluginDetails = loaded.getPluginDetails(
           pluginDetails.options
         );

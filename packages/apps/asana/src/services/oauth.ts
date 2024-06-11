@@ -1,21 +1,21 @@
 import randomize from "randomatic";
 import axios from "axios";
 import {
-  OauthService,
+  AppauthorizationService,
   AppNameDefinitions,
   AppCategoryDefinitions,
-  OAuthToken,
-  AppAuthStrategy,
+  AuthToken,
+  AuthStrategy,
   TokenTypes,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 
-class AsanaOauth extends OauthService {
+class AsanaOauth extends AppauthorizationService {
   protected client_id_: string;
   protected client_secret_: string;
   protected configModule_: ConfigModule;
   protected redirect_uri_: string;
-  protected auth_strategy_: AppAuthStrategy;
+  protected auth_strategy_: AuthStrategy;
 
   constructor(container, options) {
     super(arguments[0]);
@@ -48,7 +48,7 @@ class AsanaOauth extends OauthService {
     };
   }
 
-  async refreshToken(refresh_token: string): Promise<OAuthToken> {
+  async refreshToken(refresh_token: string): Promise<AuthToken> {
     const body = {
       grant_type: "refresh_token",
       client_id: this.client_id_,
@@ -76,7 +76,7 @@ class AsanaOauth extends OauthService {
           token_expires_at: new Date(Date.now() + res.data.expires_in * 1000),
           refresh_token: res.data.refresh_token,
           refresh_token_expires_at: new Date(Date.now() + 172800 * 1000),
-        } as OAuthToken;
+        } as AuthToken;
       })
       .catch((err) => {
         console.error(err);
@@ -84,18 +84,18 @@ class AsanaOauth extends OauthService {
       });
   }
 
-  async generateToken(code: string): Promise<OAuthToken> {
+  async generateToken(code: string): Promise<AuthToken> {
     console.log("***** Generating token from the code:\n");
 
-    if (this.auth_strategy_ === AppAuthStrategy.API_TOKEN_STRATEGY) {
+    if (this.auth_strategy_ === AuthStrategy.API_TOKEN_STRATEGY) {
       return {
         type: TokenTypes.BEARER,
         token: code,
         token_expires_at: new Date(),
-        refresh_token: code,
+        refresh_token: code, // this should be refresh token for  API token
         refresh_token_expires_at: new Date(),
-        auth_strategy: AppAuthStrategy.API_TOKEN_STRATEGY,
-      } as OAuthToken;
+        auth_strategy: AuthStrategy.API_TOKEN_STRATEGY,
+      } as AuthToken;
     }
 
     const body = {
@@ -127,8 +127,8 @@ class AsanaOauth extends OauthService {
           token_expires_at: new Date(Date.now() + res.data.expires_in * 1000),
           refresh_token: res.data.refresh_token,
           refresh_token_expires_at: new Date(Date.now() + 172800 * 1000),
-          auth_strategy: AppAuthStrategy.OAUTH_TOKEN_STRATEGY,
-        } as OAuthToken;
+          auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
+        } as AuthToken;
       })
       .catch((err) => {
         console.error(err);
