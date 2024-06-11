@@ -5,6 +5,7 @@ import {
   // ChatSettings,
   Chat
 } from "@/types/chat"
+import type { Files } from "@/types/types"
 import { CancelToken, CancelTokenSource } from "axios"
 import { da } from "date-fns/locale"
 // import { AssistantImage } from "@/types/images/assistant-image"
@@ -27,6 +28,9 @@ interface ApplicationContext {
   setChats: Dispatch<SetStateAction<Chat[]>>
   // files: Tables<"files">[]
   // setFiles: Dispatch<SetStateAction<Tables<"files">[]>>
+  files: Files[]
+  setFiles: Dispatch<SetStateAction<Files[]>>
+
   // folders: Tables<"folders">[]
   // setFolders: Dispatch<SetStateAction<Tables<"folders">[]>>
   // models: Tables<"models">[]
@@ -154,8 +158,8 @@ export const ApplicationContext = createContext<ApplicationContext>({
 //   setCollections: () => {},
   chats: [],
   setChats: () => {},
-//   files: [],
-//   setFiles: () => {},
+  files: [],
+  setFiles: () => {},
 //   folders: [],
 //   setFolders: () => {},
 //   models: [],
