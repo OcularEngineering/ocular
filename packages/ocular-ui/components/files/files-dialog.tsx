@@ -70,11 +70,11 @@ export default function FilesDialog({ link }) {
         </div>
       </Tooltip>
 
-      <DialogContent className="w-[60vw] h-[90vh] ">
-        <DialogHeader>
-        </DialogHeader>
-        
-        <div>
+      <DialogContent className="flex flex-col w-[60vw] h-[90vh] max-h-[90vh] justify-between overflow-auto">
+
+        <UploadedFilesCard uploadedFiles={uploadedFiles} />
+
+        <DialogFooter className="justify-end sticky bottom-0">
           <FileUploader
             maxFiles={Infinity}
             maxSize={Infinity}
@@ -82,16 +82,7 @@ export default function FilesDialog({ link }) {
             onUpload={uploadFiles}
             disabled={isUploading}
           />
-          <UploadedFilesCard uploadedFiles={uploadedFiles} />
-        </div>
-
-        {/* <DialogFooter className="sm:justify-start">
-          <DialogClose asChild>
-            <Button type="button" variant="secondary">
-              Close
-            </Button>
-          </DialogClose>
-        </DialogFooter> */}
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

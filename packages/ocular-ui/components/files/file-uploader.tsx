@@ -4,7 +4,6 @@ import * as React from "react";
 import Image from "next/image";
 
 import { Cross2Icon, UploadIcon } from "@radix-ui/react-icons";
-import Dropzone, { type DropzoneProps, type FileRejection } from "react-dropzone";
 import { toast } from "sonner";
 import { cn, formatBytes } from "@/lib/utils";
 import { useControllableState } from "@/lib/hooks/files/use-controllable-state";
@@ -17,9 +16,9 @@ interface FileUploaderProps extends React.HTMLAttributes<HTMLDivElement> {
   onValueChange?: React.Dispatch<React.SetStateAction<File[]>>;
   onUpload?: (files: File[]) => Promise<void>;
   progresses?: Record<string, number>;
-  accept?: DropzoneProps["accept"];
-  maxSize?: DropzoneProps["maxSize"];
-  maxFiles?: DropzoneProps["maxFiles"];
+  accept?: string;
+  maxSize?: number;
+  maxFiles?: number;
   multiple?: boolean;
   disabled?: boolean;
 }
@@ -30,13 +29,13 @@ export function FileUploader(props: FileUploaderProps) {
     onValueChange,
     onUpload,
     progresses,
-    accept = undefined, 
-    maxSize = Infinity, 
+    accept = undefined,
+    maxSize = Infinity,
     maxFiles = Infinity,
     multiple = true,
     disabled = false,
     className,
-    ...dropzoneProps
+    ...otherProps
   } = props;
 
   const [files, setFiles] = useControllableState({
@@ -44,45 +43,41 @@ export function FileUploader(props: FileUploaderProps) {
     onChange: onValueChange,
   });
 
-  const onDrop = React.useCallback(
-    (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
+  const handleFiles = (selectedFiles: FileList) => {
+    const acceptedFiles = Array.from(selectedFiles);
+    if ((files?.length ?? 0) + acceptedFiles.length > maxFiles) {
+      toast.error(`Cannot upload more than ${maxFiles} files`);
+      return;
+    }
 
-      if ((files?.length ?? 0) + acceptedFiles.length > maxFiles) {
-        toast.error(`Cannot upload more than ${maxFiles} files`);
-        return;
-      }
+    const newFiles = acceptedFiles.map((file) =>
+      Object.assign(file, {
+        preview: URL.createObjectURL(file),
+      })
+    );
 
-      const newFiles = acceptedFiles.map((file) =>
-        Object.assign(file, {
-          preview: URL.createObjectURL(file),
-        })
-      );
+    const updatedFiles = files ? [...files, ...newFiles] : newFiles;
+    setFiles(updatedFiles);
 
-      const updatedFiles = files ? [...files, ...newFiles] : newFiles;
+    if (onUpload && updatedFiles.length > 0 && updatedFiles.length <= maxFiles) {
+      const target = updatedFiles.length > 0 ? `${updatedFiles.length} files` : `file`;
 
-      setFiles(updatedFiles);
+      toast.promise(onUpload(updatedFiles), {
+        loading: `Uploading ${target}...`,
+        success: () => {
+          setFiles([]);
+          return `${target} uploaded`;
+        },
+        error: `Failed to upload ${target}`,
+      });
+    }
+  };
 
-      if (rejectedFiles.length > 0) {
-        rejectedFiles.forEach(({ file }) => {
-          toast.error(`File ${file.name} was rejected`);
-        });
-      }
-
-      if (onUpload && updatedFiles.length > 0 && updatedFiles.length <= maxFiles) {
-        const target = updatedFiles.length > 0 ? `${updatedFiles.length} files` : `file`;
-
-        toast.promise(onUpload(updatedFiles), {
-          loading: `Uploading ${target}...`,
-          success: () => {
-            setFiles([]);
-            return `${target} uploaded`;
-          },
-          error: `Failed to upload ${target}`,
-        });
-      }
-    },
-    [files, maxFiles, multiple, onUpload, setFiles]
-  );
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      handleFiles(event.target.files);
+    }
+  };
 
   function onRemove(index: number) {
     if (!files) return;
@@ -106,55 +101,26 @@ export function FileUploader(props: FileUploaderProps) {
 
   return (
     <div className="relative flex flex-col gap-6 overflow-hidden">
-      <Dropzone
-        onDrop={onDrop}
+      <input
+        type="file"
         accept={accept}
-        maxSize={maxSize}
-        maxFiles={maxFiles}
-        multiple={maxFiles > 1 || multiple}
+        multiple={multiple}
+        onChange={handleFileChange}
+        className="hidden"
         disabled={isDisabled}
-      >
-        {({ getRootProps, getInputProps, isDragActive }) => (
-          <div
-            {...getRootProps()}
-            className={cn(
-              "group relative grid h-52 w-full cursor-pointer place-items-center rounded-lg border-2 border-dashed border-muted-foreground/25 px-5 py-2.5 text-center transition hover:bg-muted/25",
-              "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-              isDragActive && "border-muted-foreground/50",
-              isDisabled && "pointer-events-none opacity-60",
-              className
-            )}
-            {...dropzoneProps}
-          >
-            <input {...getInputProps()} />
-            {isDragActive ? (
-              <div className="flex flex-col items-center justify-center gap-4 sm:px-5">
-                <div className="rounded-full border border-dashed p-3">
-                  <UploadIcon className="size-7 text-muted-foreground" aria-hidden="true" />
-                </div>
-                <p className="font-medium text-muted-foreground">Drop the files here</p>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center gap-4 sm:px-5">
-                <div className="rounded-full border border-dashed p-3">
-                  <UploadIcon className="size-7 text-muted-foreground" aria-hidden="true" />
-                </div>
-                <div className="space-y-px">
-                  <p className="font-medium text-muted-foreground">
-                    Drag & drop files here, or click to select files
-                  </p>
-                  <p className="text-sm text-muted-foreground/70">
-                    You can upload
-                    {maxFiles > 1
-                      ? ` ${maxFiles === Infinity ? "multiple" : maxFiles} files of any size`
-                      : ` a file of any size`}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </Dropzone>
+        id="file-upload"
+      />
+      <div className="flex items-end justify-end">
+        <Button
+          type="button"
+          variant="outline"
+          className="flex items-center gap-2 rounded-3xl"
+          onClick={() => document.getElementById("file-upload")?.click()}
+          disabled={isDisabled}
+        >
+          Upload files
+        </Button>
+      </div>
       {files?.length ? (
         <ScrollArea className="h-fit w-full px-3">
           <div className="max-h-48 space-y-4">

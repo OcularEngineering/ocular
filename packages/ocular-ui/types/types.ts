@@ -119,3 +119,14 @@ import { type ClientUploadedFileData } from "uploadthing/types"
 
 export interface UploadedFile<T = unknown> extends ClientUploadedFileData<T> {}
 
+export interface Files {
+  id: string,
+  link: string,
+  title: string,
+  type: string,
+  source: string,
+  organisation_id: string,
+  updated_at: string,
+  created_at: string
+}
+
