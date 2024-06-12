@@ -188,7 +188,6 @@ export default function ManageApps() {
                             <Button>Configure</Button>
                             <Button variant={"secondary"}>Uninstall</Button>
                           </div>
-                          <p><strong>App ID:</strong> {row.original.id}</p>
                         </div>
                       </TableCell>
                     </TableRow>
