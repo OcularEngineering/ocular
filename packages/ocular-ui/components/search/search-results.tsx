@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import AppFilterOptions from "./app-filter-options";
 import ReactMarkdown from 'react-markdown';
-import { formatLabel } from '@/lib/utils';
+import { formatLabel, formatDate } from '@/lib/utils';
 import {
   ChevronDownIcon,
 } from "@heroicons/react/outline";
@@ -90,7 +90,7 @@ const Results = ({ results }) => (
                         <p className="font-regular line-clamp-3 text-sm text-gray-500">
                         {
                           !isNaN(new Date(result.documentMetadata.updated_at).getTime()) ?
-                          new Date(result.documentMetadata.updated_at).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) 
+                          formatDate(result.documentMetadata.updated_at)
                           : null
                         }
                         </p>

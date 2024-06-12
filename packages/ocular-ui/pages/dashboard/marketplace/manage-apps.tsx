@@ -24,19 +24,19 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import Image from 'next/image';
-import { formatLabel } from '@/lib/utils';
+import { formatLabel, formatDate } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
 // Define the App type
 export type App = {
   id: string;
-  name: string;
+  app_name: string;
 };
 
 // Define the columns for the apps table
 export const columns: ColumnDef<App>[] = [
   {
-    accessorKey: 'name',
+    accessorKey: 'app_name',
     header: 'App Name',
     cell: ({ row }) => (
       <div className="flex items-center">
@@ -46,31 +46,32 @@ export const columns: ColumnDef<App>[] = [
           }`}
         />
         <Image
-          src={`/${row.original.name}.svg`}
-          alt={`${row.original.name} logo`}
+          src={`/${row.original.app_name}.svg`}
+          alt={`${row.original.app_name} logo`}
           className="w-6 h-6 mr-2"
           width={24}
           height={24}
         />
-        <div className='text-md font-semibold'>{formatLabel(row.getValue('name'))}</div>
+        <div className='text-md font-semibold'>{formatLabel(row.getValue('app_name'))}</div>
       </div>
     ),
   },
   {
-    accessorKey: 'id',
-    header: 'Indexing Status',
-    cell: ({ row }) => <div>{row.getValue('id')}</div>,
+    accessorKey: 'created_at',
+    header: 'Date Installed',
+    cell: ({ row }) => <div>{formatDate(row.getValue('created_at'))}</div>,
   },
-  {
-    accessorKey: 'id',
-    header: 'Crawling Status',
-    cell: ({ row }) => <div>{row.getValue('id')}</div>,
-  },
-  {
-    accessorKey: 'id',
-    header: 'Assets',
-    cell: ({ row }) => <div>{row.getValue('id')}</div>,
-  },
+  // {
+  //   accessorKey: 'id',
+  //   header: 'Crawling Status',
+  //   cell: ({ row }) => <div>{row.getValue('id')}</div>,
+  // },
+  // {
+  //   accessorKey: 'id',
+  //   header: 'Assets',
+  //   cell: ({ row }) => <div>{row.getValue('id')}</div>,
+  // },
+
 ];
 
 export default function ManageApps() {
@@ -151,7 +152,7 @@ export default function ManageApps() {
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
-                        {cell.id.includes('name') && (
+                        {cell.id.includes('app_name') && (
                           <div className="flex items-center">
                             <ChevronRight
                               className={`mr-2 h-4 transition-transform ${
@@ -159,18 +160,18 @@ export default function ManageApps() {
                               }`}
                             />
                             <Image
-                              src={`/${row.original.name}.svg`}
-                              alt={`${row.original.name} logo`}
+                              src={`/${row.original.app_name}.svg`}
+                              alt={`${row.original.app_name} logo`}
                               className="w-6 h-6 mr-2"
                               width={24}
                               height={24}
                             />
                             <div className="text-md font-semibold">
-                              {formatLabel(row.getValue('name'))}
+                              {formatLabel(row.getValue('app_name'))}
                             </div>
                           </div>
                         )}
-                        {cell.id.includes('name') === false && (
+                        {cell.id.includes('app_name') === false && (
                           flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()
