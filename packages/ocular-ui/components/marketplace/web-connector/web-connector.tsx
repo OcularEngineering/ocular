@@ -57,42 +57,6 @@ export default function WebConnector({ appId }: { appId: string }) {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: '',
-      description: '',
-      link: '',
-    },
-  });
-
-  async function formSubmit(values: z.infer<typeof formSchema>) {
-    const { title, description, link } = values;
-
-    try {
-      const response = await api.apps.updateApp({
-        metadata: {
-          link,
-          title,
-          description,
-        },
-        name: 'web-connector',
-        app_id: appId,
-      });
-
-      const updatedLinkData: WebConnectorLink[] = [
-        ...linkData,
-        {
-          location: link,
-          status: response.status === 200 ? 'processing' : 'failed',
-        },
-      ];
-      setLinkData(updatedLinkData || []);
-    } catch (error) {
-      console.error('Error fetching integrations:', error);
-    }
-  }
-
   useEffect(() => {
     const fetchApp = async () => {
       if (!appId) {
@@ -137,7 +101,7 @@ export default function WebConnector({ appId }: { appId: string }) {
   }
 
   return (
-    <SectionContainer className="items-center justify-center space-y-16">
+    <SectionContainer className="items-center justify-center space-y-5 mt-10">
       <AddWebsiteDialog appId={appId} />
       <div className="rounded-2xl border hide-scrollbar flex flex-col">
         <Table>

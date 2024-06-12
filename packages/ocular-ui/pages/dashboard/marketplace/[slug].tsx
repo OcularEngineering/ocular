@@ -126,11 +126,11 @@ function Integrations() {
     if (!appId) {
       return <div>Loading...</div>;
     }
-    return <WebConnector appId={appId} />;
+    return (<WebConnector appId={appId} />);
   }
 
   return (
-    <div>
+    <div className='items-center mt-10'>
       <Head>
         <title>{integration.name} | Ocular Integrxation Marketplace</title>
         <meta name="description" content={integration.description}></meta>

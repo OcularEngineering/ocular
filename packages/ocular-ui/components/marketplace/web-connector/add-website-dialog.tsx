@@ -91,76 +91,74 @@ export default function AddWebsiteDialog({ appId }: { appId: string }) {
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <div className="flex items-center space-x-3 cursor-pointer">
-          <Button onClick={() => setIsDialogOpen(true)} className="">
-            Add Website
-          </Button>
-        </div>
+        <Button onClick={() => setIsDialogOpen(true)} variant="outline" className="flex items-center gap-2 rounded-3xl">
+          Add Website
+        </Button>
       </DialogTrigger>
-        <DialogContent className="flex flex-col w-[30vw] h-[55vh] max-h-[55vh] justify-between overflow-auto">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(formSubmit)}>
-              <CardHeader>
-                <CardTitle>Add Website</CardTitle>
-                <CardDescription>
-                  Extract and index website data
-                </CardDescription>
-              </CardHeader>
-              <CardContent className='flex flex-col justify-between space-y-[40px]'>
-                <div className="flex flex-col space-y-5">
-                  <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Title</FormLabel>
-                        <FormControl>
-                          <Input placeholder="E.g. Home Page (Optional)" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="link"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Base URL</FormLabel>
-                        <FormControl>
-                          <Input placeholder="E.g. https://www.useocular.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Description</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="E.g. This is the home page of Ocular. (Optional)"
-                            className="resize-none h-[180px]"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className='flex items-end justify-end'>
-                  <Button type="submit" variant="outline" className="flex items-center gap-2 rounded-3xl">
-                      Add Website
-                  </Button>
-                </div>
-              </CardContent>
-            </form>
-          </Form>
-        </DialogContent>
+      <DialogContent className="flex flex-col w-[30vw] h-[55vh] max-h-[55vh] justify-between overflow-auto">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(formSubmit)}>
+            <CardHeader>
+              <CardTitle>Add Website</CardTitle>
+              <CardDescription>
+                Extract and index website data
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='flex flex-col justify-between space-y-[40px]'>
+              <div className="flex flex-col space-y-5">
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title</FormLabel>
+                      <FormControl>
+                        <Input placeholder="E.g. Home Page (Optional)" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="link"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Base URL</FormLabel>
+                      <FormControl>
+                        <Input placeholder="E.g. https://www.useocular.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="E.g. This is the home page of Ocular. (Optional)"
+                          className="resize-none h-[180px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className='flex items-end justify-end'>
+                <Button type="submit" variant="outline" className="flex items-center gap-2 rounded-3xl">
+                    Add Website
+                </Button>
+              </div>
+            </CardContent>
+          </form>
+        </Form>
+      </DialogContent>
     </Dialog>
   );
 }
