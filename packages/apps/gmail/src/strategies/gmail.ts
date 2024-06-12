@@ -54,7 +54,7 @@ class GmailStrategy extends AbstractBatchJobStrategy {
 
     // Log The End of The Indexing Process
     stream.on("end", () => {
-      this.logger_.success(
+      this.logger_.error(
         oculationGmailActivity,
         `processJob:Starting oculation of Gmail for ${org.id} organisation`
       );
@@ -62,7 +62,7 @@ class GmailStrategy extends AbstractBatchJobStrategy {
 
     // Log The Error of The Indexing Process
     stream.on("end", () => {
-      this.logger_.error(
+      this.logger_.success(
         oculationGmailActivity,
         `processJob:Starting oculation of Gmail for ${org.id} organisation`
       );
