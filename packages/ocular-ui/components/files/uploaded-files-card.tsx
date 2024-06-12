@@ -15,7 +15,7 @@ export function UploadedFilesCard({ uploadedFiles }: UploadedFilesCardProps) {
         <ScrollArea className="pb-4">
           <div className="flex flex-col space-y-4">
             {uploadedFiles.map((file, key) => (
-              <div key={key} className="flex items-center space-x-4 p-4 hover:bg-gray-100/50 rounded-2xl">
+              <div key={key} className="flex items-center space-x-4 p-4 hover:bg-muted/30 rounded-2xl">
                 <div className="w-12 h-12 bg-muted rounded-xl relative"/>
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-semibold text-gray-800 dark:text-white">{file.title}</p>
