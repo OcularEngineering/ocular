@@ -6,6 +6,7 @@ import { ApplicationContext } from "@/context/context"
 import  api  from "@/services/api"
 import { DateRange } from "react-day-picker";
 import { Profile } from "@/types/types";
+import type { Files } from "@/types/types"
 
 import {
   Chat,
@@ -38,6 +39,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   // const [collections, setCollections] = useState<Tables<"collections">[]>([])
   const [chats, setChats] = useState<Chat[]>([])
   // const [files, setFiles] = useState<Tables<"files">[]>([])
+  const [files, setFiles] = useState<Files[]>([])
   // const [folders, setFolders] = useState<Tables<"folders">[]>([])
   // const [models, setModels] = useState<Tables<"models">[]>([])
   // const [presets, setPresets] = useState<Tables<"presets">[]>([])
@@ -231,8 +233,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setActiveFilter,
         resultFilterDate,
         setResultFilterDate,
-        // files,
-        // setFiles,
+        files,
+        setFiles,
         // folders,
         // setFolders,
         // models,

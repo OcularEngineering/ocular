@@ -9,34 +9,29 @@ interface UploadedFilesCardProps {
 
 export function UploadedFilesCard({ uploadedFiles }: UploadedFilesCardProps) {
 
-  console.log("File Object: ", uploadedFiles)
   return (
     <div>
       {uploadedFiles.length > 0 ? (
         <ScrollArea className="pb-4">
           <div className="flex flex-col space-y-4">
             {uploadedFiles.map((file, key) => (
-              <div key={key} className="flex items-center space-x-4 p-4 hover:bg-gray-100/50 rounded-2xl">
-                <div className="w-12 h-12 bg-gray-100 rounded-xl relative">
-                  {/* <Image
-                    src={""}
-                    alt={file.title}
-                    fill
-                    sizes="(min-width: 640px) 640px, 100vw"
-                    loading="lazy"
-                    className="rounded-md object-cover"
-                  /> */}
-                </div>
+              <div key={key} className="flex items-center space-x-4 p-4 hover:bg-muted/30 rounded-2xl">
+                <div className="w-12 h-12 bg-muted rounded-xl relative"/>
                 <div className="flex flex-col space-y-1">
-                  <p className="text-md font-semibold text-gray-800">{file.title}</p>
-                  <p className="text-sm text-gray-500">
-                    {new Date(file.created_at).toLocaleDateString(undefined, {
-                      day: 'numeric',
-                      month: 'long',
-                      hour: '2-digit',
-                      minute: '2-digit' 
-                    })}
-                  </p>
+                  <p className="text-sm font-semibold text-gray-800 dark:text-white">{file.title}</p>
+                  <div className='flex flex-row gap-2'>
+                    <p className="font-regular line-clamp-3 text-xs text-gray-500">
+                    {
+                      !isNaN(new Date(file.created_at).getTime()) ?
+                      new Date(file.created_at).toLocaleDateString(undefined, { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) 
+                      : null
+                    }
+                    </p>
+                    <span className="font-regular text-xs text-gray-500">·</span>
+                    <p className="font-regular line-clamp-3 text-xs text-gray-500">
+                      {file.type.toUpperCase()}
+                    </p>
+                   </div>
                 </div>
               </div>
             ))}
@@ -46,7 +41,7 @@ export function UploadedFilesCard({ uploadedFiles }: UploadedFilesCardProps) {
       ) : (
         <EmptyCard
           title="No files uploaded"
-          description="Upload some files to see them here"
+          description="This is where you'll see all uploaded files"
           className="w-full"
         />
       )}

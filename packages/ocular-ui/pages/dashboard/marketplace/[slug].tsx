@@ -7,7 +7,7 @@ import React, { use, useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import Layout from '@/components/layout';
-import WebConnector from '@/components/marketplace/web-connector';
+import WebConnector from '@/components/marketplace/web-connector/web-connector';
 import SectionContainer from '@/components/section-container';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -126,11 +126,11 @@ function Integrations() {
     if (!appId) {
       return <div>Loading...</div>;
     }
-    return <WebConnector appId={appId} />;
+    return (<WebConnector appId={appId} />);
   }
 
   return (
-    <div>
+    <div className='items-center mt-10'>
       <Head>
         <title>{integration.name} | Ocular Integrxation Marketplace</title>
         <meta name="description" content={integration.description}></meta>

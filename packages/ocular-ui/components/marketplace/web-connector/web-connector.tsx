@@ -1,24 +1,9 @@
 'use client';
 
 import SectionContainer from '@/components/section-container';
+import AddWebsiteDialog from './add-website-dialog';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+
 import {
   Table,
   TableBody,
@@ -72,42 +57,6 @@ export default function WebConnector({ appId }: { appId: string }) {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: '',
-      description: '',
-      link: '',
-    },
-  });
-
-  async function formSubmit(values: z.infer<typeof formSchema>) {
-    const { title, description, link } = values;
-
-    try {
-      const response = await api.apps.updateApp({
-        metadata: {
-          link,
-          title,
-          description,
-        },
-        name: 'web-connector',
-        app_id: appId,
-      });
-
-      const updatedLinkData: WebConnectorLink[] = [
-        ...linkData,
-        {
-          location: link,
-          status: response.status === 200 ? 'processing' : 'failed',
-        },
-      ];
-      setLinkData(updatedLinkData || []);
-    } catch (error) {
-      console.error('Error fetching integrations:', error);
-    }
-  }
-
   useEffect(() => {
     const fetchApp = async () => {
       if (!appId) {
@@ -152,83 +101,8 @@ export default function WebConnector({ appId }: { appId: string }) {
   }
 
   return (
-    <SectionContainer className="items-center justify-center space-y-16">
-      <div className="flex-1">
-        <Card className="w-full rounded-2xl">
-          <CardHeader>
-            <CardTitle>Web Connector</CardTitle>
-            <CardDescription>
-              Your Gateway to Efficient Web Data Extraction.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(formSubmit)}
-                className="space-y-8"
-              >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mx-auto">
-                  <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Title</FormLabel>
-                        <FormControl>
-                          <Input placeholder="title..." {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          This title will be displayed publically referencing
-                          the base URL
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Description</FormLabel>
-                        <FormControl>
-                          <Input placeholder="description..." {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          This is a short description about the data being
-                          extracted
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="link"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Base URL</FormLabel>
-                        <FormControl>
-                          <Input placeholder="base url..." {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          This is the base URL from where the data will be
-                          extracted and indexed.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit" className="my-auto">
-                    Submit
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-      </div>
-
+    <SectionContainer className="items-center justify-center space-y-5 mt-10">
+      <AddWebsiteDialog appId={appId} />
       <div className="rounded-2xl border hide-scrollbar flex flex-col">
         <Table>
           <TableHeader>

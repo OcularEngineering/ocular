@@ -31,3 +31,15 @@ export function formatBytes(
     sizeType === "accurate" ? accurateSizes[i] ?? "Bytest" : sizes[i] ?? "Bytes"
   }`
 }
+
+// Function to format a date string to a human-readable format
+
+export function formatDate(date: string) {
+  return new Date(date).toLocaleDateString(undefined, {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+}
