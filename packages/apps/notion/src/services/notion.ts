@@ -12,10 +12,24 @@ import {
   Logger,
   AppNameDefinitions,
   DocType,
+  Section,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 import { RateLimit } from "async-sema";
 import { RateLimiterQueue } from "rate-limiter-flexible";
+
+interface NotionBlock {
+  id: string;
+  text: string;
+}
+
+interface NotionPage {
+  id: string;
+  url: string;
+  last_edited_time: string;
+  created_time: string;
+  properties: Record<string, any>;
+}
 
 export default class NotionService extends TransactionBaseService {
   protected appAuthorizationService_: AppAuthorizationService;
@@ -23,6 +37,8 @@ export default class NotionService extends TransactionBaseService {
   protected container_: ConfigModule;
   protected rateLimiterService_: RateLimiterService;
   protected requestQueue_: RateLimiterQueue;
+  private indexedPages: Set<string> = new Set();
+  private accessToken: string;
 
   constructor(container) {
     super(arguments[0]);
@@ -35,17 +51,13 @@ export default class NotionService extends TransactionBaseService {
     );
   }
 
-  async getNotionPagesData(org: Organisation) {
-    return Readable.from(this.getNotionPagesAndBlocks(org));
+  async notionIndexableDocuments(org: Organisation) {
+    return Readable.from(this.fetchNotionData(org));
   }
 
-  async *getNotionPagesAndBlocks(
+  async *fetchNotionData(
     org: Organisation
   ): AsyncGenerator<IndexableDocument[]> {
-    this.logger_.info(
-      `Starting oculation of Notion for ${org.id} organisation`
-    );
-
     // Get Notion auth for the organisation
     const auth = await this.appAuthorizationService_.retrieve({
       id: org.id,
@@ -54,232 +66,314 @@ export default class NotionService extends TransactionBaseService {
 
     if (!auth) {
       this.logger_.error(`No Notion auth found for ${org.id} organisation`);
-      return;
+      return null;
     }
-
+    this.accessToken = auth.token;
     let documents: IndexableDocument[] = [];
 
     try {
-      const notionPages = await this.getNotionPages(auth.token);
-      for (const page of notionPages) {
-        const text = await this.processBlock(auth.token, page.id);
-        const title = this.generateTitleFromParagraph(text);
-        // Add Project To Documents
-        const pageDoc: IndexableDocument = {
-          id: page.id,
-          organisationId: org.id,
-          title: title,
-          source: AppNameDefinitions.NOTION,
-          sections: [
-            {
-              content: text,
-              link: page.url,
-            },
-          ],
-          type: DocType.TXT,
-          updatedAt: new Date(page.last_edited_time),
-          metadata: {},
-        };
-        documents.push(pageDoc);
+      const notionPageIndexDocs = await this.queryNotionPages(org);
 
+      for (const pageDoc of notionPageIndexDocs) {
+        documents.push(pageDoc);
         if (documents.length >= 100) {
           yield documents;
           documents = [];
         }
       }
-
       yield documents;
 
       await this.appAuthorizationService_.update(auth.id, {
         last_sync: new Date(),
       });
     } catch (error) {
-      console.error(error);
+      this.logger_.error(
+        `fetchNotionData : Error fetching Notion pages for ${org.id} organisation: ${error}`
+      );
     }
-
-    this.logger_.info(
-      `Finished oculation of Notion for ${org.id} organisation`
-    );
   }
 
-  // Get Notion Pages ID
-  getPagesInfo(data) {
-    // Iterate through array to get ID of all pages
-    return data.map((element) => {
-      const elementInfo = {
-        id: element.id,
-        url: element.url,
-        last_edited_time: element.last_edited_time,
-      };
-      return elementInfo;
-    });
-  }
-
-  async getNotionPages(accessToken: string) {
-    const resultPages = [];
-
-    const requestData = {
-      filter: {
-        value: "page",
-        property: "object",
-      },
-      sort: {
-        direction: "ascending",
-        timestamp: "last_edited_time",
-      },
-    };
+  /**
+   * Queries Notion API for pages and transforms them into indexable documents.
+   *
+   * @param {Organisation} org - The organisation that owns the pages.
+   * @returns {Promise<IndexableDocument[]>} - A promise that resolves to an array of indexable documents.
+   */
+  async queryNotionPages(org: Organisation): Promise<IndexableDocument[]> {
     const headers = {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${this.accessToken}`,
       "Content-Type": "application/json",
       "Notion-Version": "2022-06-28",
     };
 
+    const notionIndexPageDocs: IndexableDocument[] = [];
+
     try {
-      await this.requestQueue_.removeTokens(1, AppNameDefinitions.NOTION);
-      // First request to fetch initial pages
-      let response = await axios.post(
-        `https://api.notion.com/v1/search`,
-        requestData,
-        { headers }
-      );
-
-      // Extract page IDs from the initial response
-      resultPages.push(...this.getPagesInfo(response.data.results));
-
-      let hasMore = response.data.has_more;
-      let nextCursor = response.data.next_cursor;
-
-      // Loop until there are no more pages to fetch
-      while (hasMore) {
-        await this.requestQueue_.removeTokens(1, AppNameDefinitions.NOTION);
-        // Subsequent requests with pagination
-        response = await axios.post(
-          `https://api.notion.com/v1/search`,
-          {
-            ...requestData,
-            start_cursor: nextCursor,
+      while (true) {
+        const data = {
+          filter: {
+            value: "page",
+            property: "object",
           },
+          sort: {
+            direction: "descending",
+            timestamp: "last_edited_time",
+          },
+        };
+
+        await this.requestQueue_.removeTokens(1, AppNameDefinitions.NOTION);
+        const response = await axios.post(
+          `https://api.notion.com/v1/search`,
+          data,
           { headers }
         );
 
-        // Extract page IDs from the response and concatenate with existing ones
-        resultPages.push(...this.getPagesInfo(response.data.results));
+        const notionPages: NotionPage[] = this.extractNotionPages(
+          response.data.results
+        );
 
-        // Update loop control variables
-        hasMore = response.data.has_more;
-        nextCursor = response.data.next_cursor;
+        const notionPageDocs: IndexableDocument[] = await this.readPages(
+          notionPages,
+          org
+        );
+
+        notionIndexPageDocs.push(...notionPageDocs);
+
+        if (response.data.has_more) {
+          data["start_cursor"] = response.data["next_cursor"];
+          continue;
+        }
+        break;
       }
 
-      return resultPages;
+      return notionIndexPageDocs;
     } catch (error) {
-      console.error("Error fetching Notion pages:", error);
-      throw error;
+      this.logger_.error(
+        `queryNotionPages: Error querying Notion pages for ${org.id} organisation: ${error}`
+      );
+      return [];
     }
   }
 
-  getPlainTextFromRichText = (richText) => {
-    return richText.map((element) => element.plain_text).join("");
-  };
+  /**
+   * Extracts relevant Notion page properties from the data.
+   *
+   * @param data Array of objects containing raw Notion page data.
+   * @returns Array of NotionPage objects with selected properties.
+   */
+  extractNotionPages(data: object[]): NotionPage[] {
+    const keys: (keyof NotionPage)[] = [
+      "id",
+      "url",
+      "last_edited_time",
+      "created_time",
+      "properties",
+    ];
 
-  async retrieveBlockChildren(accessToken: string, blockID: string) {
-    const blocks = [];
+    return data.map((obj) => {
+      const result: Partial<NotionPage> = {};
 
+      for (const key of keys) {
+        if (key in obj) {
+          result[key] = obj[key as keyof typeof obj];
+        }
+      }
+
+      return result as NotionPage;
+    });
+  }
+
+  /**
+   * Reads a list of Notion pages and transforms them into indexable documents.
+   *
+   * @param {NotionPage[]} pages - The list of Notion pages to read.
+   * @param {Organisation} org - The organisation that owns the pages.
+   * @returns {Promise<IndexableDocument[]>} - A promise that resolves to an array of indexable documents.
+   */
+  async readPages(
+    pages: NotionPage[],
+    org: Organisation
+  ): Promise<IndexableDocument[]> {
+    const notionPageDocs: IndexableDocument[] = [];
+    for (const page of pages) {
+      if (page.id in this.indexedPages) {
+        continue;
+      }
+
+      const notionBlocks = await this.readBlocks(page.id);
+      const pageTitle: string = this.generateTitle(page);
+
+      const sections: Section[] = notionBlocks.map((block) => {
+        return {
+          content: block.text,
+          link: `${page.url}#${block.id.replace(/-/g, "")}`,
+        };
+      });
+
+      const pageDoc: IndexableDocument = {
+        id: page.id,
+        organisationId: org.id,
+        title: pageTitle,
+        source: AppNameDefinitions.NOTION,
+        sections,
+        type: DocType.TXT,
+        updatedAt: new Date(page.last_edited_time),
+        metadata: {},
+      };
+
+      notionPageDocs.push(pageDoc);
+      this.indexedPages.add(page.id);
+    }
+
+    return notionPageDocs;
+  }
+
+  /**
+   * Fetches a Notion page by its ID.
+   *
+   * @param {string} pageId - The ID of the Notion page to fetch.
+   * @returns {Promise<NotionPage>} - A promise that resolves to the fetched Notion page.
+   */
+  async fetchPage(pageId: string): Promise<NotionPage> {
     const headers = {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${this.accessToken}`,
       "Notion-Version": "2022-06-28",
     };
 
     try {
       await this.requestQueue_.removeTokens(1, AppNameDefinitions.NOTION);
-      // First request to fetch initial pages
-      let response = await axios.get(
-        `https://api.notion.com/v1/blocks/${blockID}/children`,
+      const response = await axios.get(
+        `https://api.notion.com/v1/pages/${pageId}`,
         { headers }
       );
 
-      // Extract page IDs from the initial response
-      blocks.push(...response.data.results);
+      const notionPages: NotionPage[] = this.extractNotionPages([
+        response.data,
+      ]);
 
-      let hasMore = response.data.has_more;
-      let nextCursor = response.data.next_cursor;
+      return notionPages[0];
+    } catch (error) {
+      this.logger_.error(
+        `fetchPage: Error fetching Notion page ${pageId}: ${error}`
+      );
+    }
+  }
 
-      // Loop until there are no more pages to fetch
-      while (hasMore) {
-        await this.requestQueue_.removeTokens(1, AppNameDefinitions.NOTION);
+  /**
+   * This asynchronous function fetches and processes blocks of data from the Notion API.
+   *
+   * @param {string} baseBlockID - The ID of the base block from which to start fetching data.
+   *
+   * @returns {Promise<NotionBlock[]>} A promise that resolves to an object containing two arrays:
+   * - notionBlocks: An array of NotionBlock objects, each containing an ID and text content.
+   *
+   *
+   * @async
+   */
+  async readBlocks(baseBlockID: string): Promise<NotionBlock[]> {
+    const notionBlocks: NotionBlock[] = [];
+    let cursor: string | null = null;
 
-        const queryParams = {
-          start_cursor: nextCursor,
-        };
+    while (true) {
+      const config: any = {
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`,
+          "Notion-Version": "2022-06-28",
+        },
+        params: {
+          start_cursor: cursor,
+        },
+      };
 
-        // Subsequent requests with pagination
-        response = await axios.get(
-          `https://api.notion.com/v1/blocks/${blockID}/children`,
-          { params: queryParams, headers }
+      try {
+        const { data } = await axios.get(
+          `https://api.notion.com/v1/blocks/${baseBlockID}/children`,
+          config
         );
 
-        // Extract page IDs from the response and concatenate with existing ones
-        blocks.push(...response.data.results);
-
-        // Update loop control variables
-        hasMore = response.data.has_more;
-        nextCursor = response.data.next_cursor;
-      }
-
-      return blocks;
-    } catch (error) {
-      console.error("Error fetching Children Blocks", error);
-      throw error;
-    }
-  }
-
-  async processBlock(accessToken: string, blockID: string) {
-    console.log("Handling Block with ID :", blockID);
-    const childrenBlocks = await this.retrieveBlockChildren(
-      accessToken,
-      blockID
-    );
-
-    let text = "";
-    for (const block of childrenBlocks) {
-      if (block.type === "paragraph") {
-        if (block[block.type].rich_text) {
-          text += this.getPlainTextFromRichText(block[block.type].rich_text);
+        if (!data.results) {
+          return notionBlocks;
         }
 
-        if (block.has_children) {
-          text += await this.processBlock(accessToken, block.id);
+        data.results.forEach(async (block: any) => {
+          const blockId: string = block.id;
+          const blockType: string = block.type;
+          const blockData: any = block[blockType];
+
+          if (blockType === "unsupported" || blockType === "ai_block") return;
+
+          let blockContent: string = "";
+          if (blockData.rich_text) {
+            for (const rich_text of blockData.rich_text) {
+              if (rich_text.text && rich_text.text.content) {
+                blockContent += rich_text.text.content;
+              }
+            }
+          }
+
+          if (blockData.has_children) {
+            try {
+              const childrenBlocksData = await this.readBlocks(blockId);
+              notionBlocks.push(...childrenBlocksData);
+            } catch (error) {
+              console.error(
+                `Failed to read blocks for child block ${blockId}`,
+                error
+              );
+            }
+          }
+
+          if (blockContent) {
+            notionBlocks.push({
+              id: blockId,
+              text: blockContent,
+            } as NotionBlock);
+          }
+        });
+
+        if (!data.has_more) {
+          break;
+        }
+
+        cursor = data.next_cursor;
+      } catch (error) {
+        this.logger_.error(
+          `readBlocks: Error reading blocks for ${baseBlockID}: ${error}`
+        );
+        return [];
+      }
+    }
+
+    return notionBlocks;
+  }
+
+  /**
+   * Generates a title for a Notion page based on its properties.
+   *
+   * @param {NotionPage} page - The Notion page object.
+   * @returns {string} - The generated title or a default title if no title is found.
+   */
+  generateTitle(page: NotionPage): string {
+    let pageTitle: string | null = null;
+
+    for (const propKey in page.properties) {
+      if (Object.prototype.hasOwnProperty.call(page.properties, propKey)) {
+        const prop = page.properties[propKey];
+
+        if (prop.type === "title" && prop.title && prop.title.length > 0) {
+          pageTitle = prop.title
+            .map((t) => t.plain_text)
+            .join(" ")
+            .trim();
+          break;
         }
       }
     }
 
-    return text;
-  }
-
-  generateTitleFromParagraph(paragraph: string) {
-    // Find the index of the first line break or full stop
-    const lineBreakIndex = paragraph.indexOf("\n");
-    const fullStopIndex = paragraph.indexOf(".");
-
-    // Determine the position of the title end (whichever comes first)
-    let titleEndIndex;
-    if (lineBreakIndex !== -1 && fullStopIndex !== -1) {
-      titleEndIndex = Math.min(lineBreakIndex, fullStopIndex);
-    } else if (lineBreakIndex !== -1) {
-      titleEndIndex = lineBreakIndex;
-    } else if (fullStopIndex !== -1) {
-      titleEndIndex = fullStopIndex;
-    } else {
-      // If no line break or full stop is found, use the entire paragraph as title
-      return paragraph.trim(); // Trim leading and trailing whitespace
+    if (!pageTitle) {
+      pageTitle = `Untitled Page [${page.id}]`;
     }
 
-    // Extract the title from the beginning of the paragraph up to titleEndIndex
-    let title = paragraph.substring(0, titleEndIndex).trim();
-
-    if (title.length === 0) {
-      // Provide a default title or appropriate fallback
-      title = "Notion Page"; // Example default title
-    }
-    return title;
+    return pageTitle;
   }
 }
