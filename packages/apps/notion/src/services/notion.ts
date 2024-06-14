@@ -58,10 +58,6 @@ export default class NotionService extends TransactionBaseService {
   async *fetchNotionData(
     org: Organisation
   ): AsyncGenerator<IndexableDocument[]> {
-    this.logger_.info(
-      `Starting oculation of Notion for ${org.id} organisation`
-    );
-
     // Get Notion auth for the organisation
     const auth = await this.appAuthorizationService_.retrieve({
       id: org.id,
@@ -95,10 +91,6 @@ export default class NotionService extends TransactionBaseService {
         `fetchNotionData : Error fetching Notion pages for ${org.id} organisation: ${error}`
       );
     }
-
-    this.logger_.info(
-      `Finished oculation of Notion for ${org.id} organisation`
-    );
   }
 
   /**

@@ -40,7 +40,7 @@ export default class NotionStrategy extends AbstractBatchJobStrategy {
     stream.on("end", () => {
       this.logger_.success(
         oculationNotionPagesActivity,
-        `processJob:Starting oculation of Notion Pages for ${org.id} organisation`
+        `processJob:Finished oculation of Notion Pages for ${org.id} organisation`
       );
     });
 
@@ -48,7 +48,7 @@ export default class NotionStrategy extends AbstractBatchJobStrategy {
     stream.on("end", () => {
       this.logger_.error(
         oculationNotionPagesActivity,
-        `processJob:Starting oculation of Notion Pages for ${org.id} organisation`
+        `processJob:Error in oculation of Notion Pages for ${org.id} organisation`
       );
     });
   }
