@@ -3,10 +3,9 @@
 "use client"
 
 import { ApplicationContext } from "@/context/context"
-import  api  from "@/services/api"
 import { DateRange } from "react-day-picker";
 import { Profile } from "@/types/types";
-import type { Files } from "@/types/types"
+import type { Files, WebConnectorLink } from "@/types/types"
 
 import {
   Chat,
@@ -130,6 +129,9 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   //   from: new Date(), // You can set initial values here
   //   to: new Date(),
   // });
+
+  // WEB CONNECTOR STORE
+  const [addedWebsitesLinks, setAddedWebsitesLinks] = useState<WebConnectorLink[]>([])
 
   const [resultFilterDate, setResultFilterDate] = useState<DateRange | undefined>({
     from: undefined,
@@ -346,6 +348,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         // setSelectedTools,
         // toolInUse,
         // setToolInUse
+        addedWebsitesLinks,
+        setAddedWebsitesLinks
       }}
     >
       {children}
