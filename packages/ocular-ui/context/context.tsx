@@ -5,14 +5,13 @@ import {
   // ChatSettings,
   Chat
 } from "@/types/chat"
-import type { Files } from "@/types/types"
 import { CancelToken, CancelTokenSource } from "axios"
 import { da } from "date-fns/locale"
 // import { AssistantImage } from "@/types/images/assistant-image"
 // import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { Dispatch, SetStateAction, createContext } from "react"
 import { DateRange } from "react-day-picker"
-import { Profile } from "@/types/types";
+import { Profile, WebConnectorLink, Files } from "@/types/types";
 
 interface ApplicationContext {
   // PROFILE STORE
@@ -144,6 +143,11 @@ interface ApplicationContext {
 
     resultFilterDate: DateRange | undefined;
     setResultFilterDate: Dispatch<SetStateAction<DateRange | undefined>>;
+
+    // WEB CONNECTOR STORE
+    addedWebsitesLinks: WebConnectorLink[] 
+    setAddedWebsitesLinks: Dispatch<SetStateAction<WebConnectorLink[]>>
+
 }
 
 export const ApplicationContext = createContext<ApplicationContext>({
@@ -279,5 +283,9 @@ export const ApplicationContext = createContext<ApplicationContext>({
   activeFilter: "",
   setActiveFilter: () => {},
   resultFilterDate: undefined,
-  setResultFilterDate: () => {}
+  setResultFilterDate: () => {},
+
+  // WEB CONNECTOR STORE
+  addedWebsitesLinks: [],
+  setAddedWebsitesLinks: () => {}
 })

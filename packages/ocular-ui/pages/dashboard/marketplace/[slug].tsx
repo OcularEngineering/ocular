@@ -1,24 +1,15 @@
+import 'swiper/css';
 import { marked } from 'marked';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';
-import Layout from '@/components/layout';
 import WebConnector from '@/components/marketplace/web-connector/web-connector';
 import SectionContainer from '@/components/section-container';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { formatLabel } from '@/lib/utils';
 import api from '@/services/admin-api';
@@ -27,6 +18,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronLeft, ExternalLink } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 
 const formSchema = z.object({
   apiToken: z
@@ -53,16 +53,18 @@ function Integrations() {
   });
 
   const authorizeApp = async (code: string) => {
-    if (code == null) return; // If OAuth code is not present, return
+    if (code == null) return; 
+    
     try {
       const response = await api.apps.authorizeApp({
         code: code as string,
         name: slug as string,
         installationId: installation_id,
-      }); // Adjust this to match your actual API call
+      }); 
+
       if (response) {
         setAuthorized(true);
-        router.push(`/dashboard/marketplace/${slug}`); // Redirect to the integration page
+        router.push(`/dashboard/marketplace/${slug}`); 
       }
     } catch (error) {
       console.error('Failed to authorize integration', error);
