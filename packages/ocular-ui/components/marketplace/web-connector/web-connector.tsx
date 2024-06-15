@@ -43,7 +43,7 @@ export default function WebConnector({ appId }: { appId: string }) {
   }
 
   return (
-    <SectionContainer className="items-center justify-center space-y-5 mt-10">
+    <SectionContainer className="items-center justify-center space-y-5 mt-10 mb-10">
       <AddWebsiteDialog appId={appId} />
       <div className="rounded-2xl border hide-scrollbar flex flex-col">
         <Table>
