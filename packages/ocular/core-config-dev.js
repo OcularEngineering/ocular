@@ -105,7 +105,7 @@ module.exports = {
           requests: 60, // Number of Requests
           interval: 60, // Interval in Seconds
         },
-        auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
+        auth_strategy: AuthStrategy.API_TOKEN_STRATEGY,
       },
     },
     {
