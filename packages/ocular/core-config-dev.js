@@ -105,7 +105,7 @@ module.exports = {
           requests: 60, // Number of Requests
           interval: 60, // Interval in Seconds
         },
-        auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
+        auth_strategy: AuthStrategy.API_TOKEN_STRATEGY,
       },
     },
     {
@@ -148,11 +148,11 @@ module.exports = {
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/gmail`,
+        auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
         rate_limiter_opts: {
           requests: 60, // Number of Requests
           interval: 60, // Interval in Seconds
         },
-        auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
       },
     },
     {
