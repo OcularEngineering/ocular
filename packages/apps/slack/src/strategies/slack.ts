@@ -35,6 +35,7 @@ export default class SlackStrategy extends AbstractBatchJobStrategy {
     );
 
     stream.on("data", (documents) => {
+      console.log("documents", documents);
       this.queueService_.sendBatch(APPS_INDEXING_TOPIC, documents);
     });
 
@@ -42,7 +43,7 @@ export default class SlackStrategy extends AbstractBatchJobStrategy {
     stream.on("error", () => {
       this.logger_.error(
         oculationSlackActivity,
-        `processJob:Starting oculation of Slack for ${org.id} organisation`
+        `processJob: Error oculation of Slack for ${org.id} organisation`
       );
     });
 
@@ -50,7 +51,7 @@ export default class SlackStrategy extends AbstractBatchJobStrategy {
     stream.on("end", () => {
       this.logger_.success(
         oculationSlackActivity,
-        `processJob:Starting oculation of Slack for ${org.id} organisation`
+        `processJob: Done oculation of Slack for ${org.id} organisation`
       );
     });
   }

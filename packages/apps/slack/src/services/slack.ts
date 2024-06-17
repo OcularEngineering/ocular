@@ -18,6 +18,7 @@ import {
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 import { RateLimiterQueue } from "rate-limiter-flexible";
+import { WebClient } from "@slack/web-api";
 
 export default class SlackService extends TransactionBaseService {
   protected appAuthorizationService_: AppAuthorizationService;
@@ -44,9 +45,7 @@ export default class SlackService extends TransactionBaseService {
   async *getSlackChannelsAndConversations(
     org: Organisation
   ): AsyncGenerator<IndexableDocument[]> {
-    this.logger_.info(`Starting oculation of Slack for ${org.id} organisation`);
-
-    // Get Slack auth for the organisation
+    // Get Slack Auth for the organisation
     const auth = await this.appAuthorizationService_.retrieve({
       id: org.id,
       app_name: AppNameDefinitions.SLACK,
@@ -57,27 +56,26 @@ export default class SlackService extends TransactionBaseService {
       return;
     }
 
-    const config: ApiConfig = {
-      headers: {
-        Authorization: `Bearer ${auth.token}`,
-        Accept: "application/json",
-      },
-    };
-
-    let documents: IndexableDocument[] = [];
-
     try {
-      const slackChannels = await this.fetchSlackChannels(config);
+      // Instatiate the Slack client
+      const slackClient = new WebClient(auth.token);
+
+      let documents: IndexableDocument[] = [];
+      const slackChannels = await this.fetchSlackChannels(slackClient);
       for (const channel of slackChannels) {
+        // Fetch All Conversations In A Slack Channel
         const conversations = await this.fetchChannelConversations(
+          slackClient,
           channel.id,
-          config
+          auth.last_sync
         );
+        console.log("All Convos:", conversations.length);
+
         for (const conversation of conversations) {
           const thread = await this.fetchThreadForConversation(
+            slackClient,
             channel.id,
-            conversation.id,
-            config
+            conversation.id
           );
 
           const sections: Section[] = thread.map((message, index) => ({
@@ -98,6 +96,7 @@ export default class SlackService extends TransactionBaseService {
             updatedAt: new Date(Date.now()),
           };
           documents.push(threadDoc);
+          console.log("Thread:", threadDoc);
           if (documents.length >= 100) {
             yield documents;
             documents = [];
@@ -131,61 +130,112 @@ export default class SlackService extends TransactionBaseService {
     this.logger_.info(`Finished oculation of Slack for ${org.id} organisation`);
   }
 
-  async fetchSlackChannels(config: ApiConfig) {
+  async fetchSlackChannels(slackClient: WebClient) {
     // Block Until Rate Limit Allows Request
     await this.requestQueue_.removeTokens(1, AppNameDefinitions.SLACK);
     try {
-      const response = await axios.get(
-        "https://slack.com/api/conversations.list",
-        config
-      );
-
-      if (!response.data) {
+      const response = await slackClient.conversations.list();
+      if (!response) {
         return [];
       }
-
-      const channels = response.data.channels;
+      const channels = response.channels;
+      for (const channel of channels) {
+        // Join All Discovered Slack Channels
+        await slackClient.conversations.join({ channel: channel.id });
+      }
       return channels;
     } catch (error) {
       this.logger_.error(
-        "Error fetching Slack Channels in fetchSlackChannels:",
+        "fetchSlackChannels: Error fetching Slack Channels in fetchSlackChannels",
         error
       );
       throw error;
     }
   }
 
-  async fetchChannelConversations(channelID: string, config: ApiConfig) {
+  async fetchChannelConversations(
+    slackClient: WebClient,
+    channelID: string,
+    lastSync: Date
+  ) {
     try {
-      // Block Until Rate Limit Allows Request
-      await this.requestQueue_.removeTokens(1, AppNameDefinitions.SLACK);
-      const conversationsEndpoint = `https://slack.com/api/conversations.history?channel=${channelID}`;
-      const response = await axios.get(conversationsEndpoint, config);
-      const conversationsArray = response.data.messages || [];
-      const conversations = conversationsArray.map((conversations) => ({
-        id: conversations.ts,
-        text: conversations.text,
-        user: conversations.user,
-      }));
+      let next_cursor = "";
+      let conversations = [];
+      while (next_cursor !== undefined) {
+        console.log("Next Cursor:", next_cursor, "Channel ID:", channelID);
+        // Block Until Rate Limit Allows Request
+        await this.requestQueue_.removeTokens(1, AppNameDefinitions.SLACK);
+
+        // Get Messages From Slack Channel After Last Sync Date
+        const conversationsResponse = await slackClient.conversations.history({
+          channel: channelID,
+          oldest: lastSync
+            ? Math.floor(lastSync.getTime() / 1000).toString()
+            : null,
+          limit: 10,
+          cursor: next_cursor,
+        });
+
+        const convos = conversationsResponse.messages.map((conversations) => ({
+          id: conversations.ts,
+          text: conversations.text,
+          user: conversations.user,
+        }));
+        conversations.push(...convos);
+        console.log("Conversations:", conversationsResponse.response_metadata);
+        next_cursor = conversationsResponse.response_metadata.next_cursor;
+        console.log("Next Cursor:", next_cursor, "Channel ID:", channelID);
+      }
       return conversations;
     } catch (error) {
-      throw new Error("Failed to fetch channel conversation.");
+      this.logger_.error(
+        "Failed to fetch channel conversation.",
+        error.message
+      );
     }
   }
 
   async fetchThreadForConversation(
+    slackClient: WebClient,
     channelID: string,
-    tsID: string,
-    config: ApiConfig
+    tsID: string
   ) {
     try {
       // Block Until Rate Limit Allows Request
-      await this.requestQueue_.removeTokens(1, AppNameDefinitions.SLACK);
-      const threadsEndpoint = `https://slack.com/api/conversations.replies?channel_id=${channelID}&ts=${tsID}`;
-      const response = await axios.get(threadsEndpoint, config);
-      return response.data.messages;
+      let next_cursor = "";
+      let messages = [];
+      while (next_cursor !== undefined) {
+        console.log(
+          "Next Cursor:",
+          next_cursor,
+          "Channel ID:",
+          channelID,
+          "TS ID:",
+          tsID
+        );
+        await this.requestQueue_.removeTokens(1, AppNameDefinitions.SLACK);
+        const threads = await slackClient.conversations.replies({
+          channel: channelID,
+          ts: tsID,
+          cursor: next_cursor,
+        });
+        messages.push(...threads.messages);
+        console.log(
+          "Next Cursor:",
+          threads.response_metadata.next_cursor,
+          "Channel ID:",
+          channelID,
+          "TS ID:",
+          tsID
+        );
+        next_cursor = threads.response_metadata.next_cursor;
+      }
+      return messages;
     } catch (error) {
-      throw new Error("Failed to fetch channel conversation.");
+      this.logger_.error(
+        "fetchThreadsForConversation: Error fetching Slack thread",
+        error.message
+      );
     }
   }
 }
