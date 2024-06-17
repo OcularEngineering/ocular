@@ -79,12 +79,27 @@ const Results = ({ results }) => (
                         />
                   }
                   <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                    <div className='space-y-1'>
+                    <div className='space-y-2'>
                       <a href={result.documentMetadata.link} target="_blank" rel="noopener noreferrer">
                         <h3 className="text-l mb-2 truncate font-semibold text-blue-800 group-hover:underline dark:text-blue-400">
                           {result.documentMetadata.title.charAt(0).toUpperCase() + result.documentMetadata.title.slice(1)}
                         </h3>
                       </a>
+                      <p className="font-regular line-clamp-3 text-sm text-gray-500">
+                        <span 
+                          className="hover:bg-gray-100 p-1 rounded-lg cursor-pointer" 
+                          onClick={() => {
+                            const el = document.createElement('textarea');
+                            el.value = result.documentMetadata.link;
+                            document.body.appendChild(el);
+                            el.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(el);
+                          }}
+                        >
+                          {result.documentMetadata.link}
+                        </span>
+                      </p>
                       <p className="font-regular line-clamp-3 text-sm max-w-3xl w-[770px]" dangerouslySetInnerHTML={{ __html: result.snippets.map(snippet => snippet.content).join(" ... ") }}></p>
                       <div className='flex flex-row gap-2'>
                         <p className="font-regular line-clamp-3 text-sm text-gray-500">

@@ -71,7 +71,6 @@ export const columns: ColumnDef<App>[] = [
   //   header: 'Assets',
   //   cell: ({ row }) => <div>{row.getValue('id')}</div>,
   // },
-
 ];
 
 export default function ManageApps() {
