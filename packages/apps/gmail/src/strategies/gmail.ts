@@ -40,7 +40,7 @@ class GmailStrategy extends AbstractBatchJobStrategy {
 
     // Start Tracking The Activity of The Indexing Process
     const oculationGmailActivity = this.logger_.activity(
-      `processJob: Oculating Google Drive for organisation: ${org.id} name: ${org.name}`
+      `processJob: Oculating Gmail for organisation: ${org.id} name: ${org.name}`
     );
 
     // Start The Indexing Process
@@ -53,7 +53,7 @@ class GmailStrategy extends AbstractBatchJobStrategy {
     });
 
     // Log The End of The Indexing Process
-    stream.on("end", () => {
+    stream.on("error", () => {
       this.logger_.error(
         oculationGmailActivity,
         `processJob:Starting oculation of Gmail for ${org.id} organisation`
