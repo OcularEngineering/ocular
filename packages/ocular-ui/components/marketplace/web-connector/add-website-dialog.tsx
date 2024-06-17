@@ -1,44 +1,37 @@
 "use client";
 
 import { useForm } from 'react-hook-form';
-import { useEffect, useContext, useState } from "react";
-import { useRouter } from 'next/router';
-import { buttonVariants, Button } from "@/components/ui/button";
+import { useContext, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { WebConnectorLink } from '@/types/types';
+import { Textarea } from "@/components/ui/textarea";
 import { z } from 'zod';
+import api from "@/services/admin-api";
+import { ApplicationContext } from "@/context/context";
+
 import {
   Dialog,
-  DialogClose,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+
 import {
-  Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Textarea } from "@/components/ui/textarea";
-
-
-import api from "@/services/admin-api";
-import { ApplicationContext } from "@/context/context";
 
 const formSchema = z.object({
   title: z.string().optional(),
@@ -47,9 +40,8 @@ const formSchema = z.object({
 });
 
 export default function AddWebsiteDialog({ appId }: { appId: string }) {
-  const router = useRouter();
-  const [linkData, setLinkData] = useState<WebConnectorLink[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { setAddedWebsitesLinks } = useContext(ApplicationContext);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -74,15 +66,13 @@ export default function AddWebsiteDialog({ appId }: { appId: string }) {
         app_id: appId,
       });
 
-      const updatedLinkData: WebConnectorLink[] = [
-        ...linkData,
-        {
-          location: link,
-          status: response.status === 200 ? 'processing' : 'failed',
-        },
-      ];
-      setLinkData(updatedLinkData || []);
-      setIsDialogOpen(false); // Close the dialog after successful form submission
+      const newLinkData: WebConnectorLink = {
+        location: link,
+        status: response.status === 200 ? 'processing' : 'failed',
+      };
+
+      setAddedWebsitesLinks((prevLinks) => [...prevLinks, newLinkData]);
+      setIsDialogOpen(false);
     } catch (error) {
       console.error('Error fetching integrations:', error);
     }
@@ -141,7 +131,7 @@ export default function AddWebsiteDialog({ appId }: { appId: string }) {
                       <FormControl>
                         <Textarea
                           placeholder="E.g. This is the home page of Ocular. (Optional)"
-                          className="resize-none h-[180px]"
+                          className="resize-none h-[180px] p-5"
                           {...field}
                         />
                       </FormControl>
@@ -152,7 +142,7 @@ export default function AddWebsiteDialog({ appId }: { appId: string }) {
               </div>
               <div className='flex items-end justify-end'>
                 <Button type="submit" variant="outline" className="flex items-center gap-2 rounded-3xl">
-                    Add Website
+                  Add Website
                 </Button>
               </div>
             </CardContent>

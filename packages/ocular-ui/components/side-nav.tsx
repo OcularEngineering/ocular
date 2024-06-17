@@ -101,9 +101,9 @@ export function SideNav({ links }: NavProps)  {
         </TooltipProvider>
       </ul>
       <ul className="flex flex-col items-center justify-center space-y-3">
+        <div className="bg-border h-px w-full"/>
         <ThemeToggle />
         <TooltipProvider delayDuration={0}>
-            <div className="bg-border h-px w-full"/>
             <div >
               <UserNav />
             </div>

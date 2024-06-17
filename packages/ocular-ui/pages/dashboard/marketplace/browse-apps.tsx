@@ -46,7 +46,6 @@ function BrowseApps() {
         if (response && response.data.apps) {
           setAllIntegrations(response.data.apps);
           setIntegrations(response.data.apps);
-          console.log("Integrations: ", response.data.apps)
         }
       } catch (error) {
         console.error('Error fetching integrations:', error);
