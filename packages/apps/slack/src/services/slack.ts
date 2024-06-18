@@ -102,6 +102,7 @@ export default class SlackService extends TransactionBaseService {
             documents = [];
           }
         }
+        yield documents;
       }
       yield documents;
       await this.appAuthorizationService_.update(auth.id, {
@@ -149,7 +150,6 @@ export default class SlackService extends TransactionBaseService {
         "fetchSlackChannels: Error fetching Slack Channels in fetchSlackChannels",
         error
       );
-      throw error;
     }
   }
 
@@ -192,6 +192,7 @@ export default class SlackService extends TransactionBaseService {
         "Failed to fetch channel conversation.",
         error.message
       );
+      return [];
     }
   }
 
@@ -236,6 +237,7 @@ export default class SlackService extends TransactionBaseService {
         "fetchThreadsForConversation: Error fetching Slack thread",
         error.message
       );
+      return [];
     }
   }
 }
