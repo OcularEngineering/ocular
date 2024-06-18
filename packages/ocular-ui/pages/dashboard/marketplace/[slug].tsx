@@ -1,4 +1,18 @@
 import 'swiper/css';
+import ApiTokenCard from '@/components/marketplace/api-token-cards';
+import WebConnector from '@/components/marketplace/web-connector/web-connector';
+import SectionContainer from '@/components/section-container';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { formatLabel } from '@/lib/utils';
+import api from '@/services/admin-api';
+import { Integration, AuthStrategy, AppNameDefinitions } from '@/types/types';
+import {
+  ArrowUpRight,
+  ChevronLeft,
+  ExternalLink,
+  InfoIcon,
+} from 'lucide-react';
 import { marked } from 'marked';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -6,37 +20,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import WebConnector from '@/components/marketplace/web-connector/web-connector';
-import SectionContainer from '@/components/section-container';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { formatLabel } from '@/lib/utils';
-import api from '@/services/admin-api';
-import { Integration, WebConnectorLink } from '@/types/types';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { ChevronLeft, ExternalLink } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-
-const formSchema = z.object({
-  apiToken: z
-    .string()
-    .min(1, { message: 'API Token is required' })
-    .describe('The API token for Integration of APP in Ocular'),
-});
-
-const OAUTHTOKEN = 'OAUTHTOKEN';
-const WEBCONNECTOR = 'web-connector';
 
 function Integrations() {
   const router = useRouter();
@@ -45,35 +28,25 @@ function Integrations() {
   const [authorized, setAuthorized] = useState(false);
   const [appId, setAppId] = useState<string | null>(null);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      apiToken: '',
-    },
-  });
+  const authorizeApp = async (code: string, metadata?: any) => {
+    if (code == null) return;
 
-  const authorizeApp = async (code: string) => {
-    if (code == null) return; 
-    
     try {
       const response = await api.apps.authorizeApp({
         code: code as string,
         name: slug as string,
         installationId: installation_id,
-      }); 
+        metadata: metadata,
+      });
 
       if (response) {
         setAuthorized(true);
-        router.push(`/dashboard/marketplace/${slug}`); 
+        router.push(`/dashboard/marketplace/${slug}`);
       }
     } catch (error) {
       console.error('Failed to authorize integration', error);
     }
   };
-
-  async function formSubmit(values: z.infer<typeof formSchema>) {
-    await authorizeApp(values.apiToken);
-  }
 
   const addWebConnector = async () => {
     await authorizeApp('Fake Code');
@@ -124,15 +97,15 @@ function Integrations() {
 
   if (!integration) return <div>Loading...</div>;
 
-  if (slug === WEBCONNECTOR && authorized) {
+  if (slug === AppNameDefinitions.WEBCONNECTOR && authorized) {
     if (!appId) {
       return <div>Loading...</div>;
     }
-    return (<WebConnector appId={appId} />);
+    return <WebConnector appId={appId} />;
   }
 
   return (
-    <div className='items-center mt-10'>
+    <div className="items-center mt-10">
       <Head>
         <title>{integration.name} | Ocular Integrxation Marketplace</title>
         <meta name="description" content={integration.description}></meta>
@@ -148,28 +121,184 @@ function Integrations() {
             </a>
           </Link>
 
-            {/* Integration header with logo and name */}
-            <div className="flex items-center justify-between space-x-4">
-              <div className="flex items-center justify-center gap-5">
-                <Image
-                  src={integration.logo}
-                  alt={integration.name}
-                  width={56}
-                  height={56}
-                  className="bg-scale-400 size-14"
-                />
-                <h1 className="font-heading sm:text-2xl md:text-3xl">
-                  {formatLabel(integration.name)}
-                </h1>
-              </div>
+          {/* Integration header with logo and name */}
+          <div className="flex items-center justify-between space-x-4">
+            <div className="flex items-center justify-center gap-5">
+              <Image
+                src={integration.logo}
+                alt={integration.name}
+                width={56}
+                height={56}
+                className="bg-scale-400 size-14"
+              />
+              <h1 className="font-heading sm:text-2xl md:text-3xl">
+                {formatLabel(integration.name)}
+              </h1>
+            </div>
 
+            {authorized ? (
+              <Button disabled>Installed</Button>
+            ) : (
+              <div>
+                {integration.auth_strategy ===
+                  AuthStrategy.OAUTH_TOKEN_STRATEGY && (
+                  <div>
+                    {slug === AppNameDefinitions.WEBCONNECTOR ? (
+                      <Button onClick={addWebConnector}>
+                        {' '}
+                        Add {integration.name} for Ocular
+                      </Button>
+                    ) : (
+                      <Link href={integration.oauth_url}>
+                        <Button>Add {integration.name} for Ocular</Button>
+                      </Link>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          {!authorized && (
+            <Alert className="w-full">
+              <InfoIcon className="h-4 w-4" />
+              <AlertDescription className="flex gap-2">
+                You can follow the installation steps
+                <Link
+                  href={integration.website}
+                  className="font-bold underline flex"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  here
+                  <ArrowUpRight className="h-4 w-4 font-bold underline" />
+                </Link>
+                to add {integration.name} for Ocular.
+              </AlertDescription>
+            </Alert>
+          )}
+          <div className="flex flex-row gap-2 justify-center items-center w-full h-full">
+            <Swiper
+              className="flex-1 h-full w-full"
+              initialSlide={0}
+              spaceBetween={0}
+              slidesPerView={4}
+              speed={300}
+              centerInsufficientSlides={true}
+              breakpoints={{
+                320: { slidesPerView: 1 },
+                720: { slidesPerView: 2 },
+                920: { slidesPerView: 3 },
+                1024: { slidesPerView: 4 },
+                1208: { slidesPerView: 5 },
+              }}
+            >
+              {integration.images.map((image, i) => (
+                <SwiperSlide key={i}>
+                  <div className="relative cursor-move w-full h-full overflow-hidden rounded-md ">
+                    <Image
+                      src={image}
+                      alt={integration.name}
+                      layout="responsive"
+                      width={1460}
+                      height={960}
+                      objectFit="contain"
+                    />
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+
+            {integration.auth_strategy === AuthStrategy.API_TOKEN_STRATEGY &&
+              !authorized && (
+                <ApiTokenCard
+                  integration={integration}
+                  authorizeApp={authorizeApp}
+                />
+              )}
+          </div>
+
+          <div className="grid gap-3 space-y-16 lg:grid-cols-5 lg:space-y-0">
+            <div className="lg:col-span-3 p-2">
+              <h2
+                style={{ fontSize: '2rem', marginBottom: '1rem' }}
+                className="font-heading sm:text-2xl md:text-3xl lg:text-2xl"
+              >
+                Overview
+              </h2>
+
+              <div
+                className="prose"
+                dangerouslySetInnerHTML={{ __html: integration.overview }}
+              />
+            </div>
+
+            <div className="flex flex-col justify-center space-y-6 lg:col-span-2 p-2">
+              <h2
+                style={{ fontSize: '2rem', marginBottom: '1rem' }}
+                className="font-heading justify-start text-left sm:text-2xl md:text-3xl lg:text-2xl"
+              >
+                Details
+              </h2>
+
+              <div className="text-scale-1200 space-y-3 divide-y">
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-scale-900 font-semibold">
+                    Developer
+                  </span>
+                  <span className="text-scale-1200">
+                    {integration.developer}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-scale-900 font-semibold">Category</span>
+                  <Link
+                    href={`/integrations}#${integration.category.toLowerCase()}`}
+                    legacyBehavior
+                  >
+                    <a className="text-brand-900 hover:text-brand-800 transition-colors">
+                      {integration.category}
+                    </a>
+                  </Link>
+                </div>
+
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-scale-900 font-semibold">Website</span>
+                  <a
+                    href={integration.website}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-brand-900 hover:text-brand-800 transition-colors"
+                  >
+                    {new URL(integration.website).host}
+                  </a>
+                </div>
+
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-scale-900 font-semibold">
+                    Documentation
+                  </span>
+                  <a
+                    href={integration.docs}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-brand-900 hover:text-brand-800 transition-colors"
+                  >
+                    <span className="flex items-center space-x-1">
+                      <span>Learn</span>
+                      <ExternalLink className="h-4" />
+                    </span>
+                  </a>
+                </div>
+              </div>
               {authorized ? (
                 <Button disabled>Installed</Button>
               ) : (
                 <div>
-                  {integration.auth_strategy === OAUTHTOKEN && (
+                  {integration.auth_strategy ===
+                    AuthStrategy.OAUTH_TOKEN_STRATEGY && (
                     <div>
-                      {slug === WEBCONNECTOR ? (
+                      {slug === AppNameDefinitions.WEBCONNECTOR ? (
                         <Button onClick={addWebConnector}>
                           {' '}
                           Add {integration.name} for Ocular
@@ -184,184 +313,9 @@ function Integrations() {
                 </div>
               )}
             </div>
-            {/* Swiper for images */}
-            <div className="flex flex-row gap-2 justify-center items-center w-full h-full">
-              <Swiper
-                className="flex-1 h-full w-full"
-                initialSlide={0}
-                spaceBetween={0}
-                slidesPerView={4}
-                speed={300}
-                centerInsufficientSlides={true}
-                breakpoints={{
-                  320: { slidesPerView: 1 },
-                  720: { slidesPerView: 2 },
-                  920: { slidesPerView: 3 },
-                  1024: { slidesPerView: 4 },
-                  1208: { slidesPerView: 5 },
-                }}
-              >
-                {integration.images.map((image, i) => (
-                  <SwiperSlide key={i}>
-                    <div className="relative cursor-move w-full h-full overflow-hidden rounded-md ">
-                      <Image
-                        src={image}
-                        alt={integration.name}
-                        layout="responsive"
-                        width={1460}
-                        height={960}
-                        objectFit="contain"
-                      />
-                    </div>
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-              {integration.auth_strategy === 'APITOKEN' && !authorized && (
-                <div className="flex justify-center items-center w-full h-full m-2 flex-1">
-                  <Card className="w-full max-w-3xl min-w-2xl p-4 border-0">
-                    <CardContent>
-                      <Form {...form}>
-                        <form
-                          onSubmit={form.handleSubmit(formSubmit)}
-                          className="flex flex-col items-center space-y-8"
-                        >
-                          <div className="w-full">
-                            <FormField
-                              control={form.control}
-                              name="apiToken"
-                              render={({ field }) => (
-                                <div className="flex flex-col space-y-3">
-                                  <FormLabel>
-                                    Service account API token
-                                  </FormLabel>
-                                  <FormControl>
-                                    <Input
-                                      placeholder="Enter your service account API token......"
-                                      {...field}
-                                      className="placeholder-gray-500"
-                                    />
-                                  </FormControl>
-                                  <FormDescription>
-                                    Make sure the token is of service account
-                                  </FormDescription>
-                                  <FormMessage />
-                                </div>
-                              )}
-                            />
-                          </div>
-                          <Button type="submit" className="w-full mt-4">
-                            Add {integration.name} for Ocular
-                          </Button>
-                        </form>
-                      </Form>
-                    </CardContent>
-                  </Card>
-                </div>
-              )}
-            </div>
-
-          <div className="grid gap-3 space-y-16 lg:grid-cols-4 lg:space-y-0">
-            <div className="lg:col-span-3">
-              <h2
-                style={{ fontSize: '2rem', marginBottom: '1rem' }}
-                className="font-heading sm:text-2xl md:text-3xl lg:text-2xl"
-              >
-                Overview
-              </h2>
-
-              <div
-                className="prose"
-                dangerouslySetInnerHTML={{ __html: integration.overview }}
-              />
-            </div>
-
-            <div className="flex flex-col justify-center space-y-6">
-              <h2
-                style={{ fontSize: '2rem', marginBottom: '1rem' }}
-                className="font-heading justify-start text-left sm:text-2xl md:text-3xl lg:text-2xl"
-              >
-                Details
-              </h2>
-
-                <div className="text-scale-1200 space-y-3 divide-y">
-                  <div className="flex items-center justify-between py-2">
-                    <span className="text-scale-900 font-semibold">
-                      Developer
-                    </span>
-                    <span className="text-scale-1200">
-                      {integration.developer}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between py-2">
-                    <span className="text-scale-900 font-semibold">
-                      Category
-                    </span>
-                    <Link
-                      href={`/integrations}#${integration.category.toLowerCase()}`}
-                      legacyBehavior
-                    >
-                      <a className="text-brand-900 hover:text-brand-800 transition-colors">
-                        {integration.category}
-                      </a>
-                    </Link>
-                  </div>
-
-                  <div className="flex items-center justify-between py-2">
-                    <span className="text-scale-900 font-semibold">
-                      Website
-                    </span>
-                    <a
-                      href={integration.website}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-brand-900 hover:text-brand-800 transition-colors"
-                    >
-                      {new URL(integration.website).host}
-                    </a>
-                  </div>
-
-                  <div className="flex items-center justify-between py-2">
-                    <span className="text-scale-900 font-semibold">
-                      Documentation
-                    </span>
-                    <a
-                      href={integration.docs}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-brand-900 hover:text-brand-800 transition-colors"
-                    >
-                      <span className="flex items-center space-x-1">
-                        <span>Learn</span>
-                        <ExternalLink className='h-4' />
-                      </span>
-                    </a>
-                  </div>
-                </div>
-                {authorized ? (
-                  <Button disabled>Installed</Button>
-                ) : (
-                  <div>
-                    {integration.auth_strategy === OAUTHTOKEN && (
-                      <div>
-                        {slug === WEBCONNECTOR ? (
-                          <Button onClick={addWebConnector}>
-                            {' '}
-                            Add {integration.name} for Ocular
-                          </Button>
-                        ) : (
-                          <Link href={integration.oauth_url}>
-                            <Button>Add {integration.name} for Ocular</Button>
-                          </Link>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
-        </SectionContainer>
+        </div>
+      </SectionContainer>
     </div>
   );
 }

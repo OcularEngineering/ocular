@@ -11,7 +11,7 @@ class BaseauthService extends TransactionBaseService {
     return obj?.constructor?._isAuthService;
   }
 
-  generateToken(code: string, installation_id?: string) {
+  generateToken(code: string, installation_id?: string, metadata?: any) {
     throw Error("generateToken must be overridden by the child class");
   }
 

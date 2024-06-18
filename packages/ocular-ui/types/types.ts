@@ -1,3 +1,7 @@
+// Files
+
+import { type ClientUploadedFileData } from 'uploadthing/types';
+
 // SEARCH TYPES
 
 export interface SearchBarProps {
@@ -8,7 +12,7 @@ export interface SearchBarProps {
 
 // SETTINGS TYPES
 export interface MarketplaceLayoutProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
@@ -54,6 +58,25 @@ export interface LinkProps {
 
 export interface NavProps {
   links: LinkProps[];
+}
+
+export enum AuthStrategy {
+  API_TOKEN_STRATEGY = 'APITOKEN',
+  OAUTH_TOKEN_STRATEGY = 'OAUTHTOKEN',
+}
+
+export enum AppNameDefinitions {
+  ASANA = 'asana',
+  CONFLUENCE = 'confluence',
+  GITHUB = 'github',
+  GMAIL = 'gmail',
+  GOOGLEDRIVE = 'google-drive',
+  JIRA = 'jira',
+  NOTION = 'notion',
+  SLACK = 'slack',
+  WEBCONNECTOR = 'web-connector',
+  BITBUCKET = 'bitbucket',
+  OCULAR_API = 'ocular-api',
 }
 
 export interface NavItem {
@@ -113,20 +136,15 @@ export interface Profile {
   metadata?: any;
 }
 
-// Files
-
-import { type ClientUploadedFileData } from "uploadthing/types"
-
 export interface UploadedFile<T = unknown> extends ClientUploadedFileData<T> {}
 
 export interface Files {
-  id: string,
-  link: string,
-  title: string,
-  type: string,
-  source: string,
-  organisation_id: string,
-  updated_at: string,
-  created_at: string
+  id: string;
+  link: string;
+  title: string;
+  type: string;
+  source: string;
+  organisation_id: string;
+  updated_at: string;
+  created_at: string;
 }
-
