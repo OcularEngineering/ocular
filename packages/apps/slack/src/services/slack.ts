@@ -52,15 +52,18 @@ export default class SlackService extends TransactionBaseService {
     });
 
     if (!auth) {
-      this.logger_.error(`No Slack auth found for ${org.id} organisation`);
+      this.logger_.error(
+        `getSlackChannelsAndConversations: No Slack auth found for ${org.id} organisation`
+      );
       return;
     }
 
     try {
-      // Instatiate the Slack client
+      // Instantiate Slack Client
       const slackClient = new WebClient(auth.token);
-
       let documents: IndexableDocument[] = [];
+
+      // Fetch All Public Slack Channels
       const slackChannels = await this.fetchSlackChannels(slackClient);
       for (const channel of slackChannels) {
         // Fetch All Conversations In A Slack Channel
@@ -69,8 +72,6 @@ export default class SlackService extends TransactionBaseService {
           channel.id,
           auth.last_sync
         );
-        console.log("All Convos:", conversations.length);
-
         for (const conversation of conversations) {
           const thread = await this.fetchThreadForConversation(
             slackClient,
@@ -83,7 +84,7 @@ export default class SlackService extends TransactionBaseService {
             link: `https://slack.com/api/conversations.replies?channel_id=${channel.id}&ts=${conversation.id}`,
           }));
           const threadDoc: IndexableDocument = {
-            id: conversation.id, // conversation id
+            id: `slack_${org.id}_${channel.id}_conv_${conversation.id}`, // conversation id
             organisationId: org.id,
             source: AppNameDefinitions.SLACK,
             title: conversation.text, // the main message which lead to conversation
@@ -93,10 +94,9 @@ export default class SlackService extends TransactionBaseService {
             }, // passing channel id just for top down reference
             sections: sections, // an array of messages in the specific conversation
             type: DocType.TXT,
-            updatedAt: new Date(Date.now()),
+            updatedAt: new Date(parseFloat(conversation.ts) * 1000),
           };
           documents.push(threadDoc);
-          console.log("Thread:", threadDoc);
           if (documents.length >= 100) {
             yield documents;
             documents = [];
@@ -109,33 +109,19 @@ export default class SlackService extends TransactionBaseService {
         last_sync: new Date(),
       });
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        // Check if it's an unauthorized error
-        this.logger_.info(`Refreshing Slack token for ${org.id} organisation`);
-
-        // Refresh the token
-        const authToken = await this.container_["slackOauth"].refreshToken(
-          auth.refresh_token
-        );
-
-        // Update the auth record with the new token
-        await this.appAuthorizationService_.update(auth.id, authToken);
-
-        // Retry the request
-        return this.getSlackChannelsAndConversations(org);
-      } else {
-        console.error(error);
-      }
+      this.logger_.error(
+        `getSlackChannelsAndConversations: Error fetching Slack data for ${org.id} organisation`,
+        error
+      );
     }
-
-    this.logger_.info(`Finished oculation of Slack for ${org.id} organisation`);
   }
 
   async fetchSlackChannels(slackClient: WebClient) {
     // Block Until Rate Limit Allows Request
-    await this.requestQueue_.removeTokens(1, AppNameDefinitions.SLACK);
     try {
-      const response = await slackClient.conversations.list();
+      const response = await slackClient.conversations.list({
+        types: "public_channel,private_channel",
+      });
       if (!response) {
         return [];
       }
@@ -162,34 +148,29 @@ export default class SlackService extends TransactionBaseService {
       let next_cursor = "";
       let conversations = [];
       while (next_cursor !== undefined) {
-        console.log("Next Cursor:", next_cursor, "Channel ID:", channelID);
         // Block Until Rate Limit Allows Request
         await this.requestQueue_.removeTokens(1, AppNameDefinitions.SLACK);
-
-        // Get Messages From Slack Channel After Last Sync Date
         const conversationsResponse = await slackClient.conversations.history({
           channel: channelID,
           oldest: lastSync
             ? Math.floor(lastSync.getTime() / 1000).toString()
             : null,
-          limit: 10,
+          limit: 200,
           cursor: next_cursor,
         });
-
         const convos = conversationsResponse.messages.map((conversations) => ({
           id: conversations.ts,
           text: conversations.text,
           user: conversations.user,
+          ts: conversations.ts,
         }));
         conversations.push(...convos);
-        console.log("Conversations:", conversationsResponse.response_metadata);
         next_cursor = conversationsResponse.response_metadata.next_cursor;
-        console.log("Next Cursor:", next_cursor, "Channel ID:", channelID);
       }
       return conversations;
     } catch (error) {
       this.logger_.error(
-        "Failed to fetch channel conversation.",
+        "fetchChanneConversations: Failed to fetch channel conversation.",
         error.message
       );
       return [];
@@ -206,14 +187,6 @@ export default class SlackService extends TransactionBaseService {
       let next_cursor = "";
       let messages = [];
       while (next_cursor !== undefined) {
-        console.log(
-          "Next Cursor:",
-          next_cursor,
-          "Channel ID:",
-          channelID,
-          "TS ID:",
-          tsID
-        );
         await this.requestQueue_.removeTokens(1, AppNameDefinitions.SLACK);
         const threads = await slackClient.conversations.replies({
           channel: channelID,
@@ -221,14 +194,6 @@ export default class SlackService extends TransactionBaseService {
           cursor: next_cursor,
         });
         messages.push(...threads.messages);
-        console.log(
-          "Next Cursor:",
-          threads.response_metadata.next_cursor,
-          "Channel ID:",
-          channelID,
-          "TS ID:",
-          tsID
-        );
         next_cursor = threads.response_metadata.next_cursor;
       }
       return messages;

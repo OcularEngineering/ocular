@@ -35,7 +35,6 @@ export default class SlackStrategy extends AbstractBatchJobStrategy {
     );
 
     stream.on("data", (documents) => {
-      console.log("documents", documents);
       this.queueService_.sendBatch(APPS_INDEXING_TOPIC, documents);
     });
 

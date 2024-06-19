@@ -44,7 +44,7 @@ class SlackOauth extends AppauthorizationService {
       images: ["/slack.svg"],
       overview:
         "Slack is a new way to communicate with your team. Its faster, better organised and more secure than email.",
-      docs: "https://api.slack.com/docs",
+      docs: "https://docs.useocular.com/application-connectors/slack/slack",
       website: "https://slack.com/",
     };
   }
