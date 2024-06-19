@@ -42,7 +42,7 @@ export default class SlackStrategy extends AbstractBatchJobStrategy {
     stream.on("error", () => {
       this.logger_.error(
         oculationSlackActivity,
-        `processJob:Starting oculation of Slack for ${org.id} organisation`
+        `processJob: Error oculation of Slack for ${org.id} organisation`
       );
     });
 
@@ -50,7 +50,7 @@ export default class SlackStrategy extends AbstractBatchJobStrategy {
     stream.on("end", () => {
       this.logger_.success(
         oculationSlackActivity,
-        `processJob:Starting oculation of Slack for ${org.id} organisation`
+        `processJob: Done oculation of Slack for ${org.id} organisation`
       );
     });
   }
