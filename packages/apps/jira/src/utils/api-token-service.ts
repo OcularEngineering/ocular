@@ -22,6 +22,7 @@ interface JiraProject {
     "24x24": string;
   };
   url: string;
+  last_updated: string;
 }
 
 interface IssueComment {
@@ -33,6 +34,7 @@ interface IssueComment {
 }
 
 interface JiraIssue {
+  key: string;
   description: string;
   comments: IssueComment[];
   status?: string;
@@ -85,8 +87,7 @@ class ApiTokenService {
 
       const sections: Section[] = issues.map((issue) => ({
         content: this.formatJiraIssues([issue]),
-        // link: `${this.jira_domain_name_}/browse/${issue.key}`, // yet to be resolved
-        link: "",
+        link: `${this.jira_domain_name_}/browse/${issue.key}`,
         metadata: this.generateIssueMetadata(issue),
       }));
 
@@ -98,7 +99,7 @@ class ApiTokenService {
         sections,
         type: DocType.TXT,
         metadata: this.generateProjectMetadata(project),
-        updatedAt: new Date(), // yet to be resolved
+        updatedAt: new Date(project.last_updated), // yet to be resolved
       };
       projectIndexableDocs.push(projectDoc);
     }
@@ -136,7 +137,7 @@ class ApiTokenService {
         const headers = this.headers_;
 
         const response = await axios.get(
-          `https://${this.jira_domain_name_}/rest/api/2/project/search?expand=description,lead,url`,
+          `https://${this.jira_domain_name_}/rest/api/2/project/search?expand=description,lead,url,insight`,
           { headers, params }
         );
 
@@ -157,12 +158,11 @@ class ApiTokenService {
               "24x24": project.avatarUrls["24x24"],
             },
             url: project.self,
+            last_updated: project.insight?.lastIssueUpdateTime || null,
           }));
-
           projectDocs.push(...filteredProjectDocs);
-          startAt += projects.length;
         }
-
+        startAt += projects.length;
         if (response.data.isLast) {
           break;
         }
@@ -207,6 +207,7 @@ class ApiTokenService {
           const issues = issuesArray.map((issue: any) => {
             const issueFields = issue.fields;
             const jiraIssue: JiraIssue = {
+              key: issue.key,
               description: issueFields.description,
               comments: issueFields.comment?.comments.map(
                 (issueComment: any) => ({
