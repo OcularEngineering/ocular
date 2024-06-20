@@ -66,6 +66,12 @@ export default class SlackService extends TransactionBaseService {
       // Fetch All Public Slack Channels
       const slackChannels = await this.fetchSlackChannels(slackClient);
       for (const channel of slackChannels) {
+        const channelMetadata = {
+          id: channel.id,
+          name: channel.name,
+          purpose: channel.purpose.value,
+          members: channel.num_members,
+        };
         // Fetch All Conversations In A Slack Channel
         const conversations = await this.fetchChannelConversations(
           slackClient,
@@ -73,11 +79,19 @@ export default class SlackService extends TransactionBaseService {
           auth.last_sync
         );
         for (const conversation of conversations) {
+          // Skip MessageType
+          if (conversation.type !== "message") continue;
           const thread = await this.fetchThreadForConversation(
             slackClient,
             channel.id,
-            conversation.id
+            conversation.ts
           );
+
+          const conversationMetadata = {
+            id: conversation.id,
+            text: conversation.text,
+            user: conversation.user,
+          };
 
           const sections: Section[] = thread.map((message, index) => ({
             content: message.text,
@@ -89,13 +103,14 @@ export default class SlackService extends TransactionBaseService {
             source: AppNameDefinitions.SLACK,
             title: conversation.text, // the main message which lead to conversation
             metadata: {
-              channel_id: channel.id,
-              channel_name: channel.name,
+              channel: channelMetadata,
+              conversation: conversationMetadata,
             }, // passing channel id just for top down reference
             sections: sections, // an array of messages in the specific conversation
             type: DocType.TXT,
             updatedAt: new Date(parseFloat(conversation.ts) * 1000),
           };
+          console.log(threadDoc);
           documents.push(threadDoc);
           if (documents.length >= 100) {
             yield documents;
@@ -159,10 +174,11 @@ export default class SlackService extends TransactionBaseService {
           cursor: next_cursor,
         });
         const convos = conversationsResponse.messages.map((conversations) => ({
-          id: conversations.ts,
+          id: conversations.client_msg_id,
           text: conversations.text,
           user: conversations.user,
           ts: conversations.ts,
+          type: conversations.type,
         }));
         conversations.push(...convos);
         next_cursor = conversationsResponse.response_metadata.next_cursor;
