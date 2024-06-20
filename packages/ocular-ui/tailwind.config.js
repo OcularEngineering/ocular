@@ -80,6 +80,11 @@ module.exports = {
       flexGrow: {
         '3': '3',
       },
+      zIndex: {
+        '100': 100,
+        '500': 500,
+        '1000': 1000,
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
