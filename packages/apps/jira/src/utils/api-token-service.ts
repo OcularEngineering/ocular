@@ -1,4 +1,4 @@
-import { Organisation } from "@ocular/ocular";
+import { Organisation, RateLimiterService } from "@ocular/ocular";
 import {
   IndexableDocument,
   Logger,
@@ -56,13 +56,17 @@ class ApiTokenService {
   private headers_: any;
   private logger_: Logger;
   private org_: Organisation;
+  private rateLimiterService_: RateLimiterService;
+  private last_sync_: Date;
 
   constructor(
     token: string,
     domain_name: string,
     user_name: string,
     org: Organisation,
-    logger: Logger
+    logger: Logger,
+    ratelimiterService: RateLimiterService,
+    last_sync: Date | null
   ) {
     this.jira_token_ = token;
     this.jira_domain_name_ = domain_name;
@@ -75,6 +79,8 @@ class ApiTokenService {
     };
     this.logger_ = logger;
     this.org_ = org;
+    this.rateLimiterService_ = ratelimiterService;
+    this.last_sync_ = last_sync;
   }
 
   async jiraIndexDOcs(): Promise<IndexableDocument[]> {
@@ -83,6 +89,18 @@ class ApiTokenService {
     const jiraProjects = await this.fetchJiraProjects();
 
     for (const project of jiraProjects) {
+      const last_updated = project.last_updated
+        ? new Date(project.last_updated)
+        : null;
+
+      // Little buggy Need to be takes care of
+      if (
+        (this.last_sync_ && !last_updated) ||
+        last_updated <= this.last_sync_
+      ) {
+        continue;
+      }
+
       const issues = await this.fetchProjectIssues(project.id);
 
       const sections: Section[] = issues.map((issue) => ({

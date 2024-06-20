@@ -61,7 +61,9 @@ export default class JiraService extends TransactionBaseService {
           auth.metadata.domain_name as string,
           auth.metadata.user_name as string,
           org,
-          this.logger_
+          this.logger_,
+          this.rateLimiterService_,
+          auth.last_sync
         );
 
         const projectIndexableDocs = await apiTokenService.jiraIndexDOcs();
