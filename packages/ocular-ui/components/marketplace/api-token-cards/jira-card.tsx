@@ -63,6 +63,7 @@ export default function JiraCard({ integration, authorizeApp }: Props) {
             >
               <div className="w-full">
                 <FormField
+                  key="username"
                   control={form.control}
                   name="username"
                   render={({ field }) => (
@@ -80,6 +81,7 @@ export default function JiraCard({ integration, authorizeApp }: Props) {
                   )}
                 />
                 <FormField
+                  key="apiToken"
                   control={form.control}
                   name="apiToken"
                   render={({ field }) => (
@@ -98,6 +100,7 @@ export default function JiraCard({ integration, authorizeApp }: Props) {
                   )}
                 />
                 <FormField
+                  key="domain"
                   control={form.control}
                   name="domain"
                   render={({ field }) => (
@@ -105,7 +108,7 @@ export default function JiraCard({ integration, authorizeApp }: Props) {
                       <FormLabel>Domain Name</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Enter domain name for Jira Cloud "
+                          placeholder="your-domain.atlassian.net"
                           {...field}
                           className="placeholder-gray-500"
                         />

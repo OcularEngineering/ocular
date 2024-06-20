@@ -159,15 +159,12 @@ class AppAuthorizationService extends TransactionBaseService {
         `An OAuth handler for ${app.name} could not be found make sure the app is registered in the Ocular Core.`
       );
     }
-    console.log(
-      "metadata of Jira App: from app-authorization service",
-      metadata
-    );
-    const token: AuthToken = await service.generateToken(
+
+    const token: AuthToken | null = await service.generateToken(
       code,
-      installationId,
-      metadata
+      installationId
     );
+
     const authToken = this.appAuthorizationRepository_.find({
       where: {
         organisation_id: this.loggedInUser_.organisation_id,
@@ -192,7 +189,10 @@ class AppAuthorizationService extends TransactionBaseService {
       refresh_token_expires_at: token.refresh_token_expires_at,
       organisation: this.loggedInUser_.organisation,
       app_name: app.name,
-      metadata: token.metadata,
+      metadata: {
+        user_name: metadata.username,
+        domain_name: metadata.domain,
+      },
     }).then(async (result) => {
       await this.eventBus_.emit(
         AppAuthorizationService.Events.TOKEN_GENERATED,

@@ -5,6 +5,7 @@ export const INDEX_DOCUMENT_EVENT = "INDEX_DOCUMENT_EVENT";
 export interface Section {
   content: string;
   link: string;
+  metadata?: Record<string, unknown>;
 }
 
 export enum DocType {

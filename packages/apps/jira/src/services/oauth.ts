@@ -9,7 +9,7 @@ import {
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 
-class JiarOauth extends AppauthorizationService {
+class JiraOauth extends AppauthorizationService {
   protected client_id_: string;
   protected client_secret_: string;
   protected configModule_: ConfigModule;
@@ -79,9 +79,8 @@ class JiarOauth extends AppauthorizationService {
       });
   }
 
-  async generateToken(code: string, metadata: any): Promise<AuthToken> {
+  async generateToken(code: string): Promise<AuthToken> {
     console.log("***** Generating token from the code:\n");
-    console.log("metadata of Jira App: ", metadata);
 
     if (this.auth_strategy_ === AuthStrategy.API_TOKEN_STRATEGY) {
       return {
@@ -90,10 +89,6 @@ class JiarOauth extends AppauthorizationService {
         token_expires_at: new Date(),
         refresh_token: "NO_REFRESH_TOKEN",
         auth_strategy: AuthStrategy.API_TOKEN_STRATEGY,
-        metadata: {
-          username: metadata.username,
-          domain: metadata.domain,
-        },
       } as AuthToken;
     }
 
@@ -128,4 +123,4 @@ class JiarOauth extends AppauthorizationService {
   }
 }
 
-export default JiarOauth;
+export default JiraOauth;

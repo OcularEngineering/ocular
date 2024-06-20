@@ -53,17 +53,15 @@ export default function NotionCard({ integration, authorizeApp }: Props) {
                   name="apiToken"
                   render={({ field }) => (
                     <div className="flex flex-col space-y-3">
-                      <FormLabel>Service account API token</FormLabel>
+                      <FormLabel>Notion Integration API token</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Enter your service account API token......"
+                          placeholder="Enter your integration API token"
                           {...field}
                           className="placeholder-gray-500"
                         />
                       </FormControl>
-                      <FormDescription>
-                        Make sure the token is of service account
-                      </FormDescription>
+
                       <FormMessage />
                     </div>
                   )}

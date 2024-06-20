@@ -19,8 +19,8 @@ export default async (req, res) => {
       validated.installationId,
       validated.metadata
     )
-    .then((org) => {
-      res.status(200).json({ apps: null });
+    .then((token) => {
+      res.status(200).json({ token: token });
     })
     .catch((error) => {
       console.error(error);
