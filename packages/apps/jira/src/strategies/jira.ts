@@ -42,7 +42,7 @@ export default class JiraStrategy extends AbstractBatchJobStrategy {
         `processJob:Finished oculation of Jira Data for ${org.id} organisation`
       );
     });
-    stream.on("end", () => {
+    stream.on("error", () => {
       this.logger_.error(
         oculationJiraActivity,
         `processJob:Error in oculation of Jira Data for ${org.id} organisation`
