@@ -4,14 +4,17 @@ import {
   AppNameDefinitions,
   AppCategoryDefinitions,
   AuthToken,
+  AuthStrategy,
+  TokenTypes,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 
-class JiarOauth extends AppauthorizationService {
+class JiraOauth extends AppauthorizationService {
   protected client_id_: string;
   protected client_secret_: string;
   protected configModule_: ConfigModule;
   protected redirect_uri_: string;
+  protected auth_strategy_: AuthStrategy;
 
   constructor(container, options) {
     super(arguments[0]);
@@ -19,6 +22,7 @@ class JiarOauth extends AppauthorizationService {
     this.client_secret_ = options.client_secret;
     this.redirect_uri_ = options.redirect_uri;
     this.configModule_ = container.configModule;
+    this.auth_strategy_ = options.auth_strategy;
   }
 
   static getAppDetails(projectConfig, options) {
@@ -78,6 +82,16 @@ class JiarOauth extends AppauthorizationService {
   async generateToken(code: string): Promise<AuthToken> {
     console.log("***** Generating token from the code:\n");
 
+    if (this.auth_strategy_ === AuthStrategy.API_TOKEN_STRATEGY) {
+      return {
+        type: TokenTypes.BEARER,
+        token: code,
+        token_expires_at: new Date(),
+        refresh_token: "NO_REFRESH_TOKEN",
+        auth_strategy: AuthStrategy.API_TOKEN_STRATEGY,
+      } as AuthToken;
+    }
+
     const body = {
       grant_type: "authorization_code",
       client_id: `${this.client_id_}`,
@@ -109,4 +123,4 @@ class JiarOauth extends AppauthorizationService {
   }
 }
 
-export default JiarOauth;
+export default JiraOauth;

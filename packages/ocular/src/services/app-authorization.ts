@@ -131,7 +131,8 @@ class AppAuthorizationService extends TransactionBaseService {
   async generateToken(
     name: string,
     code: string,
-    installationId?: string
+    installationId?: string,
+    metadata?: any
   ): Promise<AppAuthorization> {
     try {
       this.logger_.info(`generateToken: Generating Token for App ${name}`);
@@ -178,6 +179,7 @@ class AppAuthorizationService extends TransactionBaseService {
           app_name: app.name,
         });
       }
+      this.logger_.info(`generateToken: Done Generating Token for App ${name}`);
       // Create An OAuth For This App And Organisation
       return await this.create({
         type: token.type,
@@ -188,7 +190,10 @@ class AppAuthorizationService extends TransactionBaseService {
         refresh_token_expires_at: token.refresh_token_expires_at,
         organisation: this.loggedInUser_.organisation,
         app_name: app.name,
-        metadata: token.metadata,
+        metadata: {
+          user_name: metadata.username,
+          domain_name: metadata.domain,
+        },
       }).then(async (result) => {
         await this.eventBus_.emit(
           AppAuthorizationService.Events.TOKEN_GENERATED,
@@ -197,9 +202,9 @@ class AppAuthorizationService extends TransactionBaseService {
             app_name: app.name,
           }
         );
+        this.logger_.info(`generateToken: Done Saving Token for App ${name} `);
         return result;
       });
-      this.logger_.info(`generateToken: Done Generating Token for App ${name}`);
     } catch (error) {
       this.logger_.error(
         `generateToken: Failed to generate token for ${name} with error: ${error.message}`
