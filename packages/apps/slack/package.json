@@ -17,5 +17,8 @@
     "@babel/core": "^7.24.1",
     "@babel/preset-env": "^7.24.1",
     "@babel/preset-react": "^7.23.3"
+  },
+  "dependencies": {
+    "@slack/web-api": "^7.1.0"
   }
 }
