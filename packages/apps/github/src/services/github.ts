@@ -48,9 +48,17 @@ export default class GitHubService extends TransactionBaseService {
       id: org.id,
       app_name: AppNameDefinitions.GITHUB,
     });
+
     if (!auth) {
       this.logger_.error(
         `getGitHubRepositories: No Github Auth Cred found for ${org.id} organisation`
+      );
+      return;
+    }
+
+    if (!auth.metadata.organisation || !auth.metadata.repository) {
+      this.logger_.error(
+        `getGitHubRepositories: No Github Repository or Organization found ${org.id} organisation`
       );
       return;
     }
@@ -73,8 +81,8 @@ export default class GitHubService extends TransactionBaseService {
       // await this.requestQueue_.removeTokens(1, AppNameDefinitions.GITHUB);
       // Get Data From From Front End
       const { data } = await octokit.rest.repos.get({
-        owner: "OcularEngineering",
-        repo: "ocular",
+        owner: auth.metadata.organisation as string,
+        repo: auth.metadata.repository as string,
       });
       const repoMetadata = {
         name: data.name,

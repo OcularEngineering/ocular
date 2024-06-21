@@ -186,6 +186,11 @@ class AppAuthorizationService extends TransactionBaseService {
           user_name: metadata?.username,
           domain_name: metadata?.domain,
         };
+      } else if (AppNameDefinitions.GITHUB === app.name) {
+        metadata = {
+          organisation: metadata?.organisation,
+          repository: metadata?.repository,
+        };
       }
 
       return await this.create({
