@@ -11,30 +11,27 @@ export default async (req, res) => {
   const appAuthorizationService: AppAuthorizationService = req.scope.resolve(
     "appAuthorizationService"
   );
-  const organisationService: OrganisationService = req.scope.resolve(
-    "organisationService"
-  );
 
   appAuthorizationService
-    .generateToken(validated.name, validated.code, validated.installationId)
-    .then((data) => {
-      return organisationService.installApp(validated.name);
-    })
-    .then((org) => {
-      res.status(200).json({ apps: null });
+    .generateToken(
+      validated.name,
+      validated.code,
+      validated.installationId,
+      validated.metadata
+    )
+    .then((token) => {
+      res.status(200).json({ token: token });
     })
     .catch((error) => {
       // Handle error
-      console.error(error);
-      res
-        .status(500)
-        .json({ error: `Error Authorizing App ${validated.name}` });
+      res.status(500).json({ error: `Error Installing App ${validated.name}` });
+
     });
 };
 
 export class PostAppsReq {
-  @IsNotEmpty()
   @IsEnum(AppNameDefinitions)
+  @IsNotEmpty()
   name: AppNameDefinitions;
 
   @IsString()
@@ -44,4 +41,7 @@ export class PostAppsReq {
   @IsString()
   @IsOptional()
   installationId?: string;
+
+  @IsOptional()
+  metadata?: any;
 }

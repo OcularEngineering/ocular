@@ -102,6 +102,7 @@ class SlackOauth extends AppauthorizationService {
       this.logger_.error(
         `generateToken: Failed to generate token for Slack with error: ${error.message}`
       );
+      throw error;
       return null;
     }
   }
