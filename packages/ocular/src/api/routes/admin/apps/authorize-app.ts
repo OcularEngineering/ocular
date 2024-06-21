@@ -23,10 +23,9 @@ export default async (req, res) => {
       res.status(200).json({ token: token });
     })
     .catch((error) => {
-      console.error(error);
-      res
-        .status(500)
-        .json({ error: `Error Authorizing App ${validated.name}` });
+      // Handle error
+      res.status(500).json({ error: `Error Installing App ${validated.name}` });
+
     });
 };
 

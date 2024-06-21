@@ -209,7 +209,10 @@ class AppAuthorizationService extends TransactionBaseService {
       this.logger_.error(
         `generateToken: Failed to generate token for ${name} with error: ${error.message}`
       );
-      return null;
+      throw new AutoflowAiError(
+        AutoflowAiErrorTypes.INVALID_DATA,
+        `Failed to use token to index ${name}`
+      );
     }
   }
 
