@@ -62,7 +62,7 @@ class GithubOauth extends AppauthorizationService {
       const octokit = new Octokit({
         auth: code,
       });
-      const token = octokit.rest.users.getAuthenticated().then((res) => {
+      const token = await octokit.rest.users.getAuthenticated().then((res) => {
         return {
           type: "Bearer",
           token: code,
@@ -75,7 +75,7 @@ class GithubOauth extends AppauthorizationService {
       return token;
     } catch (error) {
       this.logger_.error(
-        "generatingToken: Error generationg token for Github with: " +
+        "generatingToken: Error generating token for Github with: " +
           error.message
       );
       throw error;

@@ -1,6 +1,6 @@
 import { Readable } from "stream";
 import { EntityManager } from "typeorm";
-import { App } from "octokit";
+import { Octokit } from "@octokit/rest";
 import {
   AppAuthorizationService,
   Organisation,
@@ -43,11 +43,6 @@ export default class GitHubService extends TransactionBaseService {
   async *getGitHubRepositories(
     org: Organisation
   ): AsyncGenerator<IndexableDocument[]> {
-    return;
-    this.logger_.info(
-      `Starting oculation of Github for ${org.id} organisation`
-    );
-
     // Check if the Auth record exists for this App in this Organisation.
     const auth = await this.appAuthorizationService_.retrieve({
       id: org.id,
@@ -55,7 +50,7 @@ export default class GitHubService extends TransactionBaseService {
     });
     if (!auth) {
       this.logger_.error(
-        `No Github Auth Cred found for ${org.id} organisation`
+        `getGitHubRepositories: No Github Auth Cred found for ${org.id} organisation`
       );
       return;
     }
@@ -69,123 +64,127 @@ export default class GitHubService extends TransactionBaseService {
     // Array storing the processed documents
     let documents: IndexableDocument[] = [];
 
-    const privateKey = fs.readFileSync(
-      process.env.GITHUB_PRIVATE_KEY_PATH,
-      "utf-8"
-    );
-    const app = new App({
-      appId: process.env.GITHUB_APP_ID,
-      privateKey: privateKey,
-    });
-
-    const octokit = await app.getInstallationOctokit(
-      Number(auth.metadata.installation_id)
-    );
     try {
+      // Instantiate the GitHub Client
+      const octokit = new Octokit({
+        auth: auth.token,
+      });
       // Block Until Rate Limit Allows Request
-      await this.requestQueue_.removeTokens(1, AppNameDefinitions.GITHUB);
-      const { data } =
-        await octokit.rest.apps.listReposAccessibleToInstallation();
+      // await this.requestQueue_.removeTokens(1, AppNameDefinitions.GITHUB);
+      // Get Data From From Front End
+      const { data } = await octokit.rest.repos.get({
+        owner: "OcularEngineering",
+        repo: "ocular",
+      });
+      const repoMetadata = {
+        name: data.name,
+        description: data.description,
+        html_url: data.html_url,
+        updated_at: data.updated_at,
+      };
 
-      for (const repo of data.repositories) {
-        console.log(repo.name);
-        console.log(repo.owner);
-        // Get Commits For This Repository
-        // Block Until Rate Limit Allows Request
-        await this.requestQueue_.removeTokens(1, AppNameDefinitions.GITHUB);
+      // Get Commits For This Repository
+      // Block Until Rate Limit Allows Request
+      // await this.requestQueue_.removeTokens(1, AppNameDefinitions.GITHUB);
+      const prs = await octokit.rest.pulls.list({
+        owner: "OcularEngineering",
+        repo: "ocular",
+        state: "all",
+        sort: "updated",
+        direction: "desc",
+        since: last_sync === "" ? undefined : last_sync,
+      });
 
-        const prs = await octokit.rest.pulls.list({
-          owner: repo.owner.login,
-          repo: repo.name,
-          state: "all",
-          sort: "updated",
-          direction: "desc",
-          since: last_sync === "" ? undefined : last_sync,
-        });
-        for (const pr of prs.data) {
-          const doc: IndexableDocument = {
-            id: String(pr.id),
-            organisationId: org.id,
-            title: pr.title,
-            source: AppNameDefinitions.GITHUB,
-            sections: [
-              {
-                link: pr.html_url,
-                content: pr.body,
-              },
-            ],
-            type: DocType.TXT,
-            updatedAt: new Date(pr.updated_at),
-            metadata: { state: pr.state },
-          };
-          documents.push(doc);
-          if (documents.length >= 100) {
-            yield documents;
-            documents = [];
-          }
-        }
+      const prsWithAuthor = await prs.data.map((pr) => ({
+        ...pr,
+        author: pr.user.login,
+      }));
 
-        // Block Until Rate Limit Allows Request
-        await this.requestQueue_.removeTokens(1, AppNameDefinitions.GITHUB);
-        // Get Issues For This Repository
-        const issues = await octokit.rest.issues.listForRepo({
-          owner: repo.owner.login,
-          repo: repo.name,
-          state: "all",
-          sort: "updated",
-          direction: "desc",
-          since: last_sync === "" ? undefined : last_sync,
-        });
-        for (const issue of issues.data) {
-          const doc: IndexableDocument = {
-            id: String(issue.id),
-            organisationId: org.id,
-            title: issue.title,
-            source: AppNameDefinitions.GITHUB,
-            sections: [
-              {
-                link: issue.html_url,
-                content: issue.body,
-              },
-            ],
-            type: DocType.TXT,
-            updatedAt: new Date(issue.updated_at),
-            metadata: { state: issue.state },
-          };
-          if (documents.length >= 100) {
-            yield documents;
-            documents = [];
-          }
-          documents.push(doc);
-        }
-        // Add Repository To Documents
-        const repoDoc: IndexableDocument = {
-          id: String(repo.id),
+      for (const pr of prsWithAuthor) {
+        const doc: IndexableDocument = {
+          id: String(pr.id),
           organisationId: org.id,
-          title: repo.name,
+          title: pr.title,
+          source: AppNameDefinitions.GITHUB,
           sections: [
             {
-              link: repo.html_url,
-              content: repo.description,
+              link: pr.html_url,
+              content: pr.body,
             },
           ],
           type: DocType.TXT,
-          source: AppNameDefinitions.GITHUB,
-          updatedAt: new Date(repo.updated_at),
-          metadata: {},
+          updatedAt: new Date(pr.updated_at),
+          metadata: {
+            repo: repoMetadata,
+            pull_request: {
+              state: pr.state,
+              author_name: pr.user.login,
+              author_avatar: pr.user.avatar_url,
+              author_url: pr.user.html_url,
+            },
+          },
         };
-        documents.push(repoDoc);
+        documents.push(doc);
+        if (documents.length >= 100) {
+          yield documents;
+          documents = [];
+        }
+      }
+
+      const issues = await octokit.rest.issues.list({
+        owner: "OcularEngineering",
+        repo: "ocular",
+        state: "all",
+        sort: "updated",
+        direction: "desc",
+        since: last_sync === "" ? undefined : last_sync,
+      });
+
+      const issuesWithAuthor = await issues.data.map((issue) => ({
+        ...issue,
+        author: issue.user.login,
+      }));
+
+      for (const issue of issuesWithAuthor) {
+        const doc: IndexableDocument = {
+          id: String(issue.id),
+          organisationId: org.id,
+          title: issue.title,
+          source: AppNameDefinitions.GITHUB,
+          sections: [
+            {
+              link: issue.html_url,
+              content: issue.body,
+            },
+          ],
+          type: DocType.TXT,
+          updatedAt: new Date(issue.updated_at),
+          metadata: {
+            repo: repoMetadata,
+            issue: {
+              state: issue.state,
+              author_name: issue.user.login,
+              author_avatar: issue.user.avatar_url,
+              author_url: issue.user.html_url,
+            },
+          },
+        };
+        documents.push(doc);
+        if (documents.length >= 100) {
+          yield documents;
+          documents = [];
+        }
       }
       await this.appAuthorizationService_.update(auth.id, {
         last_sync: new Date(),
       });
       yield documents;
     } catch (error) {
-      console.error(error);
+      this.logger_.error(
+        `getGitHubRepositories: Error fetching Slack data for ${org.id} organisation`,
+        error
+      );
+      throw error;
     }
-
-    this.logger_.info(
-      `Finished oculation of Github for ${org.id} organisation`
-    );
   }
 }

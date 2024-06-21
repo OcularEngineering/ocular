@@ -181,6 +181,13 @@ class AppAuthorizationService extends TransactionBaseService {
       }
       this.logger_.info(`generateToken: Done Generating Token for App ${name}`);
       // Create An OAuth For This App And Organisation
+      if (AppNameDefinitions.JIRA === app.name) {
+        metadata = {
+          user_name: metadata?.username,
+          domain_name: metadata?.domain,
+        };
+      }
+
       return await this.create({
         type: token.type,
         token: token.token,
@@ -190,10 +197,7 @@ class AppAuthorizationService extends TransactionBaseService {
         refresh_token_expires_at: token.refresh_token_expires_at,
         organisation: this.loggedInUser_.organisation,
         app_name: app.name,
-        metadata: {
-          user_name: metadata.username,
-          domain_name: metadata.domain,
-        },
+        metadata: metadata,
       }).then(async (result) => {
         await this.eventBus_.emit(
           AppAuthorizationService.Events.TOKEN_GENERATED,
