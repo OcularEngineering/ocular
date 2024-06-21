@@ -1,3 +1,4 @@
+import AsanaCard from './asana-card';
 import GithubCard from './github-card';
 import JiraCard from './jira-card';
 import NotionCard from './notion-card';
@@ -15,6 +16,7 @@ const ComponentMap: { [key: string]: (props: Props) => JSX.Element } = {
   [AppNameDefinitions.JIRA]: (props: Props) => <JiraCard {...props} />,
   [AppNameDefinitions.GITHUB]: (props: Props) => <GithubCard {...props} />,
   [AppNameDefinitions.SLACK]: (props: Props) => <SlackCard {...props} />,
+  [AppNameDefinitions.ASANA]: (props: Props) => <AsanaCard {...props} />,
 };
 
 export default function ApiTokenCard({ integration, authorizeApp }: Props) {
