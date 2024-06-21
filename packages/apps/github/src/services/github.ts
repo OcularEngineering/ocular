@@ -1,7 +1,11 @@
 import { Readable } from "stream";
 import { EntityManager } from "typeorm";
 import { App } from "octokit";
-import { AppAuthorizationService, Organisation, RateLimiterService } from "@ocular/ocular";
+import {
+  AppAuthorizationService,
+  Organisation,
+  RateLimiterService,
+} from "@ocular/ocular";
 import {
   IndexableDocument,
   TransactionBaseService,
@@ -39,6 +43,7 @@ export default class GitHubService extends TransactionBaseService {
   async *getGitHubRepositories(
     org: Organisation
   ): AsyncGenerator<IndexableDocument[]> {
+    return;
     this.logger_.info(
       `Starting oculation of Github for ${org.id} organisation`
     );
@@ -88,6 +93,7 @@ export default class GitHubService extends TransactionBaseService {
         // Get Commits For This Repository
         // Block Until Rate Limit Allows Request
         await this.requestQueue_.removeTokens(1, AppNameDefinitions.GITHUB);
+
         const prs = await octokit.rest.pulls.list({
           owner: repo.owner.login,
           repo: repo.name,
@@ -170,7 +176,9 @@ export default class GitHubService extends TransactionBaseService {
         };
         documents.push(repoDoc);
       }
-      await this.appAuthorizationService_.update(auth.id, { last_sync: new Date() });
+      await this.appAuthorizationService_.update(auth.id, {
+        last_sync: new Date(),
+      });
       yield documents;
     } catch (error) {
       console.error(error);

@@ -49,7 +49,7 @@ module.exports = {
         client_secret: process.env.ASANA_CLIENT_SECRET,
         scope: "openid email profile",
         redirect_uri: `${UI_CORS}/dashboard/marketplace/asana`,
-        auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
+        auth_strategy: AuthStrategy.API_TOKEN_STRATEGY,
         rate_limiter_opts: {
           requests: 1500, // Number of Requests
           interval: 60, // Interval in Seconds
@@ -126,7 +126,7 @@ module.exports = {
         app_id: process.env.GITHUB_APP_ID,
         private_key: process.env.GITHUB_PRIVATE_KEY_PATH,
         scope: "repo",
-        auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
+        auth_strategy: AuthStrategy.API_TOKEN_STRATEGY,
       },
     },
     {
