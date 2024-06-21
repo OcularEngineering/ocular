@@ -1,5 +1,7 @@
+import GithubCard from './github-card';
 import JiraCard from './jira-card';
 import NotionCard from './notion-card';
+import SlackCard from './slack-card';
 import { AppNameDefinitions } from '@/types/types';
 import { Integration } from '@/types/types';
 
@@ -11,6 +13,8 @@ interface Props {
 const ComponentMap: { [key: string]: (props: Props) => JSX.Element } = {
   [AppNameDefinitions.NOTION]: (props: Props) => <NotionCard {...props} />,
   [AppNameDefinitions.JIRA]: (props: Props) => <JiraCard {...props} />,
+  [AppNameDefinitions.GITHUB]: (props: Props) => <GithubCard {...props} />,
+  [AppNameDefinitions.SLACK]: (props: Props) => <SlackCard {...props} />,
 };
 
 export default function ApiTokenCard({ integration, authorizeApp }: Props) {
