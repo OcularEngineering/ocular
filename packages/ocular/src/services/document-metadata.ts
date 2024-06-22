@@ -97,6 +97,7 @@ class DocumentMetadataService extends TransactionBaseService {
             source: doc.source,
             organisation_id: doc.organisationId,
             updated_at: doc.updatedAt,
+            metadata: doc.metadata,
           })
         );
         const newCreatedDocuments = await documentRepository.save(
