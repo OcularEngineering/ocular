@@ -19,11 +19,18 @@ const formSchema = z.object({
     .string()
     .min(1, { message: 'API Token is required' })
     .describe('The API token for Integration of github in Ocular'),
-});
+    orgName: z
+    .string()
+    .min(1, { message: 'The organisation is required ' }),
+    repoName: z
+    .string()
+    .min(1, { message: 'The repo name is required ' })
+    .describe('The repository to index pull requests and issues from'),});
+
 
 interface Props {
   integration: Integration;
-  authorizeApp: (apiToken: string) => Promise<void>;
+  authorizeApp: (apiToken: string, metadata: any) => Promise<void>;
 }
 
 export default function GithubCard({ integration, authorizeApp }: Props) {
@@ -31,11 +38,17 @@ export default function GithubCard({ integration, authorizeApp }: Props) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       apiToken: '',
+      orgName: '',
+      repoName: '',
     },
   });
 
   async function formSubmit(values: z.infer<typeof formSchema>) {
-    await authorizeApp(values.apiToken);
+    const metadata = {
+      organisation: values.orgName,
+      repository: values.repoName,
+    };
+    await authorizeApp(values.apiToken, metadata);
   }
 
   return (
@@ -62,6 +75,42 @@ export default function GithubCard({ integration, authorizeApp }: Props) {
                         />
                       </FormControl>
 
+                      <FormMessage />
+                    </div>
+                  )}
+                />
+                   <FormField
+                  key="orgName"
+                  control={form.control}
+                  name="orgName"
+                  render={({ field }) => (
+                    <div className="flex flex-col space-y-3 pt-6">
+                      <FormLabel>Org Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter Organisation Name"
+                          {...field}
+                          className="placeholder-gray-500"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </div>
+                  )}
+                />
+                   <FormField
+                  key="repoName"
+                  control={form.control}
+                  name="repoName"
+                  render={({ field }) => (
+                    <div className="flex flex-col space-y-3 pt-6">
+                      <FormLabel>Repo Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter Repository Name"
+                          {...field}
+                          className="placeholder-gray-500"
+                        />
+                      </FormControl>
                       <FormMessage />
                     </div>
                   )}
