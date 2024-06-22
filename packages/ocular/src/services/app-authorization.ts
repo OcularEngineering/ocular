@@ -131,71 +131,98 @@ class AppAuthorizationService extends TransactionBaseService {
   async generateToken(
     name: string,
     code: string,
-    installationId?: string
+    installationId?: string,
+    metadata?: any
   ): Promise<AppAuthorization> {
-    this.logger_.info(`generateToken: Generating Token for App ${name}`);
-    // Check If The User Generating the Token Belongs To An Organisation
-    if (!this.loggedInUser_ || !this.loggedInUser_.organisation) {
-      throw new AutoflowAiError(
-        AutoflowAiErrorTypes.NOT_FOUND,
-        `User must belong to an "organisation" so as to add OAuth`
+    try {
+      this.logger_.info(`generateToken: Generating Token for App ${name}`);
+      // Check If The User Generating the Token Belongs To An Organisation
+      if (!this.loggedInUser_ || !this.loggedInUser_.organisation) {
+        throw new AutoflowAiError(
+          AutoflowAiErrorTypes.NOT_FOUND,
+          `User must belong to an "organisation" so as to add OAuth`
+        );
+      }
+
+      const app: App = await this.appService_.retrieveByName(name);
+
+      if (!app) {
+        throw new AutoflowAiError(
+          AutoflowAiErrorTypes.NOT_FOUND,
+          `Application ${name} not found`
+        );
+      }
+
+      const service = this.container_[`${app.name}Oauth`];
+      if (!service) {
+        throw new AutoflowAiError(
+          AutoflowAiErrorTypes.INVALID_DATA,
+          `An OAuth handler for ${app.name} could not be found make sure the app is registered in the Ocular Core.`
+        );
+      }
+
+      const token: AuthToken = await service.generateToken(
+        code,
+        installationId
       );
-    }
 
-    const app: App = await this.appService_.retrieveByName(name);
+      const authToken = this.appAuthorizationRepository_.find({
+        where: {
+          organisation_id: this.loggedInUser_.organisation_id,
+          app_name: app.name,
+        },
+      });
 
-    if (!app) {
-      throw new AutoflowAiError(
-        AutoflowAiErrorTypes.NOT_FOUND,
-        `Application ${name} not found`
+      if (authToken) {
+        await this.appAuthorizationRepository_.delete({
+          organisation_id: this.loggedInUser_.organisation_id,
+          app_name: app.name,
+        });
+      }
+      this.logger_.info(`generateToken: Done Generating Token for App ${name}`);
+      // Create An OAuth For This App And Organisation
+      if (AppNameDefinitions.JIRA === app.name) {
+        metadata = {
+          user_name: metadata?.username,
+          domain_name: metadata?.domain,
+        };
+      } else if (AppNameDefinitions.GITHUB === app.name) {
+        metadata = {
+          organisation: metadata?.organisation,
+          repository: metadata?.repository,
+        };
+      }
+
+      return await this.create({
+        type: token.type,
+        token: token.token,
+        token_expires_at: token.token_expires_at,
+        auth_strategy: token.auth_strategy,
+        refresh_token: token.refresh_token,
+        refresh_token_expires_at: token.refresh_token_expires_at,
+        organisation: this.loggedInUser_.organisation,
+        app_name: app.name,
+        metadata: metadata,
+      }).then(async (result) => {
+        await this.eventBus_.emit(
+          AppAuthorizationService.Events.TOKEN_GENERATED,
+          {
+            organisation: this.loggedInUser_.organisation,
+            app_name: app.name,
+          }
+        );
+        this.logger_.info(`generateToken: Done Saving Token for App ${name} `);
+        return result;
+      });
+    } catch (error) {
+      this.logger_.error(
+        `generateToken: Failed to generate token for ${name} with error: ${error.message}`
       );
-    }
-
-    const service = this.container_[`${app.name}Oauth`];
-    if (!service) {
       throw new AutoflowAiError(
         AutoflowAiErrorTypes.INVALID_DATA,
-        `An OAuth handler for ${app.name} could not be found make sure the app is registered in the Ocular Core.`
+        `Failed to use token to index ${name}`
       );
     }
-
-    const token: AuthToken = await service.generateToken(code, installationId);
-    const authToken = this.appAuthorizationRepository_.find({
-      where: {
-        organisation_id: this.loggedInUser_.organisation_id,
-        app_name: app.name,
-      },
-    });
-
-    if (authToken) {
-      await this.appAuthorizationRepository_.delete({
-        organisation_id: this.loggedInUser_.organisation_id,
-        app_name: app.name,
-      });
-    }
-    this.logger_.info(`generateToken: Done Generating Token for App ${name}`);
-    // Create An OAuth For This App And Organisation
-    return await this.create({
-      type: token.type,
-      token: token.token,
-      token_expires_at: token.token_expires_at,
-      auth_strategy: token.auth_strategy,
-      refresh_token: token.refresh_token,
-      refresh_token_expires_at: token.refresh_token_expires_at,
-      organisation: this.loggedInUser_.organisation,
-      app_name: app.name,
-      metadata: token.metadata,
-    }).then(async (result) => {
-      await this.eventBus_.emit(
-        AppAuthorizationService.Events.TOKEN_GENERATED,
-        {
-          organisation: this.loggedInUser_.organisation,
-          app_name: app.name,
-        }
-      );
-      return result;
-    });
-    return null;
   }
 
   async updateInstalledApp(

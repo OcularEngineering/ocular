@@ -7,6 +7,7 @@ import {
   AuthToken,
   AuthStrategy,
   TokenTypes,
+  Logger,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 
@@ -16,6 +17,7 @@ class NotionOauth extends AppauthorizationService {
   protected configModule_: ConfigModule;
   protected redirect_uri_: string;
   protected auth_strategy_: AuthStrategy;
+  protected logger_: Logger;
 
   constructor(container, options) {
     super(arguments[0]);
@@ -24,6 +26,7 @@ class NotionOauth extends AppauthorizationService {
     this.redirect_uri_ = options.redirect_uri;
     this.configModule_ = container.configModule;
     this.auth_strategy_ = options.auth_strategy;
+    this.logger_ = container.logger;
   }
 
   static getAppDetails(projectConfig, options) {
@@ -70,7 +73,7 @@ class NotionOauth extends AppauthorizationService {
         token: token,
         token_expires_at: new Date(),
         refresh_token: "NO_REFRESH_TOKEN",
-        auth_strategy: AuthStrategy.API_TOKEN_STRATEGY, 
+        auth_strategy: AuthStrategy.API_TOKEN_STRATEGY,
       };
     }
 
@@ -101,14 +104,14 @@ class NotionOauth extends AppauthorizationService {
       return {
         type: response.data.token_type as TokenTypes,
         token: response.data.access_token,
-        token_expires_at: new Date(), 
+        token_expires_at: new Date(),
         refresh_token: "NO_REFRESH_TOKEN",
         auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
         refresh_token_expires_at: new Date(),
       };
     } catch (error) {
-      throw new Error(
-        `generateToken: Error generating token for Notion with error: ${error.message}`
+      this.logger_.error(
+        `NotionOauth.generateToken: Error generating token: ${error}`
       );
     }
   }

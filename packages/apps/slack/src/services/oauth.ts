@@ -1,17 +1,21 @@
-import axios from 'axios';
+import axios from "axios";
 import {
   AppauthorizationService,
   AppNameDefinitions,
   AppCategoryDefinitions,
   AuthToken,
-} from '@ocular/types';
-import { ConfigModule } from '@ocular/ocular/src/types';
+  Logger,
+  AuthStrategy,
+} from "@ocular/types";
+import { ConfigModule } from "@ocular/ocular/src/types";
+import { WebClient } from "@slack/web-api";
 
 class SlackOauth extends AppauthorizationService {
   protected client_id_: string;
   protected client_secret_: string;
   protected configModule_: ConfigModule;
   protected redirect_uri_: string;
+  protected logger_: Logger;
 
   constructor(container, options) {
     super(arguments[0]);
@@ -19,6 +23,7 @@ class SlackOauth extends AppauthorizationService {
     this.client_secret_ = options.client_secret;
     this.redirect_uri_ = options.redirect_uri;
     this.configModule_ = container.configModule;
+    this.logger_ = container.logger;
   }
 
   static getAppDetails(projectConfig, options) {
@@ -39,7 +44,7 @@ class SlackOauth extends AppauthorizationService {
       images: ["/slack.svg"],
       overview:
         "Slack is a new way to communicate with your team. Its faster, better organised and more secure than email.",
-      docs: "https://api.slack.com/docs",
+      docs: "https://docs.useocular.com/application-connectors/slack/slack",
       website: "https://slack.com/",
     };
   }
@@ -74,36 +79,32 @@ class SlackOauth extends AppauthorizationService {
   }
 
   async generateToken(code: string): Promise<AuthToken> {
-    console.log("***** Generating token from the code:\n");
-
-    const body = {
-      grant_type: "authorization_code",
-      client_id: `${this.client_id_}`,
-      client_secret: `${this.client_secret_}`,
-      code: code,
-      redirect_uri: `${this.redirect_uri_}`,
-    };
-
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-
-    return axios
-      .post("https:/slack.com/api/oauth.v2.access", body, config)
-      .then((res) => {
-        return {
-          type: res.data.token_type,
-          token: res.data.access_token,
-          token_expires_at: new Date(Date.now() + res.data.expires_in * 1000),
-          refresh_token: res.data.refresh_token,
-        } as AuthToken;
-      })
-      .catch((err) => {
-        console.error(err);
-        throw err;
-      });
+    try {
+      this.logger_.info(
+        "generateToken: Generating Auth Token for Slack the code:\n"
+      );
+      return new WebClient(code).auth
+        .test()
+        .then((res) => {
+          return {
+            type: "Bearer",
+            token: code,
+            token_expires_at: new Date(Date.now()),
+            refresh_token: "",
+            refresh_token_expires_at: new Date(Date.now() + 172800000),
+            auth_strategy: AuthStrategy.API_TOKEN_STRATEGY,
+          } as AuthToken;
+        })
+        .catch((err) => {
+          throw err;
+        });
+    } catch (error) {
+      this.logger_.error(
+        `generateToken: Failed to generate token for Slack with error: ${error.message}`
+      );
+      throw error;
+      return null;
+    }
   }
 }
 
