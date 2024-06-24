@@ -120,12 +120,7 @@ module.exports = {
     {
       resolve: "github",
       options: {
-        client_id: process.env.GITHUB_CLIENT_ID,
-        client_secret: process.env.GITHUB_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/github`,
-        app_id: process.env.GITHUB_APP_ID,
-        private_key: process.env.GITHUB_PRIVATE_KEY_PATH,
-        scope: "repo",
         rate_limiter_opts: {
           requests: 60, // Number of Requests
           interval: 60, // Interval in Seconds
