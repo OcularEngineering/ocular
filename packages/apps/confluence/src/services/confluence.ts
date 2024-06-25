@@ -1,5 +1,3 @@
-import fs from "fs";
-import axios from "axios";
 import { Readable } from "stream";
 import {
   AppAuthorizationService,
@@ -12,10 +10,11 @@ import {
   Logger,
   AppNameDefinitions,
   DocType,
-  ApiConfig,
+  AuthStrategy,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 import { RateLimiterQueue } from "rate-limiter-flexible";
+import ApiTokenService from "../utils/api-token-service";
 
 export default class ConfluenceService extends TransactionBaseService {
   protected appAuthorizationService_: AppAuthorizationService;
@@ -42,10 +41,6 @@ export default class ConfluenceService extends TransactionBaseService {
   async *getConfluenceSpaceAndPages(
     org: Organisation
   ): AsyncGenerator<IndexableDocument[]> {
-    this.logger_.info(
-      `Starting oculation of Confluence for ${org.id} organisation`
-    );
-
     // Get Confluence Auth for the organisation
     const auth = await this.appAuthorizationService_.retrieve({
       id: org.id,
@@ -57,167 +52,42 @@ export default class ConfluenceService extends TransactionBaseService {
       return;
     }
 
-    const config: ApiConfig = {
-      headers: {
-        Authorization: `Bearer ${auth.token}`,
-        Accept: "application/json",
-      },
-    };
+    let documents: IndexableDocument[] = [];
 
     try {
-      const cloudID = await this.fetchConfluenceCloudID(config);
+      if (auth.auth_strategy === AuthStrategy.API_TOKEN_STRATEGY) {
+        const apiTokenService = new ApiTokenService(
+          auth.token,
+          auth.metadata.domain_name as string,
+          auth.metadata.user_name as string,
+          org,
+          this.logger_,
+          this.rateLimiterService_,
+          auth.last_sync
+        );
 
-      if (!cloudID) {
-        this.logger_.error("Failed to retrieve Confluence Cloud ID");
-        return;
-      }
+        const pageIndexableDocs =
+          await apiTokenService.confluenceIndexableDocuments();
 
-      const pages = await this.fetchConfluencePages(cloudID, config);
+        for (const doc of pageIndexableDocs) {
+          documents.push(doc);
 
-      if (!pages) {
-        this.logger_.error("No accesible pages found in conflunece instance.");
-      }
-
-      let documents: IndexableDocument[] = [];
-      for (const pageID of pages) {
-        const pageInfo = await this.fetchPageContent(pageID, cloudID, config);
-        if (pageInfo.text) {
-          const pageDocument: IndexableDocument = {
-            id: pageInfo.id,
-            organisationId: org.id,
-            title: pageInfo.title,
-            source: AppNameDefinitions.CONFLUENCE,
-            sections: [
-              {
-                content: pageInfo.text,
-                link: pageInfo.location,
-              },
-            ],
-            type: DocType.TXT,
-            updatedAt: new Date(),
-            metadata: {},
-          };
-
-          documents.push(pageDocument);
+          if (documents.length >= 100) {
+            yield documents;
+            documents = [];
+          }
         }
 
-        if (documents.length >= 100) {
-          yield documents;
-          documents = [];
-        }
+        yield documents;
       }
-
-      yield documents;
       await this.appAuthorizationService_.update(auth.id, {
         last_sync: new Date(),
       });
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        this.logger_.info(
-          `Refreshing Confluence token for ${org.id} organisation`
-        );
-
-        const authToken = await this.container_["confluenceOauth"].refreshToken(
-          auth.refresh_token
-        );
-
-        await this.appAuthorizationService_.update(auth.id, authToken);
-
-        return this.getConfluenceSpaceAndPages(org);
-      } else {
-        console.error("Error fetching Confluence page content:", error);
-      }
-    }
-
-    this.logger_.info(
-      `Finished oculation of Confluence for ${org.id} organisation`
-    );
-  }
-
-  async fetchPageContent(pageID: string, cloudID: string, config: ApiConfig) {
-    try {
-      // Block Until Rate Limit Allows Request
-      await this.requestQueue_.removeTokens(1, AppNameDefinitions.CONFLUENCE);
-      const baseUrl = `https://api.atlassian.com/ex/confluence/${cloudID}/wiki/api/v2/pages`;
-      const pageContentUrl = `${baseUrl}/${pageID}?body-format=atlas_doc_format`;
-
-      const response = await axios.get(pageContentUrl, config);
-
-      const { title, _links, body } = response.data;
-      const pageLinkBase = _links.base;
-      const pageLinkWebUI = _links.webui;
-      const pageLink = `${pageLinkBase}${pageLinkWebUI}`;
-
-      const pageInformation = body.atlas_doc_format.value;
-      const contentArray = JSON.parse(pageInformation).content;
-
-      let pageText = "";
-
-      for (const element of contentArray) {
-        if (element.type === "paragraph" && element.content) {
-          const textArray = element.content.filter(
-            (textElement) => textElement.type === "text" && textElement.text
-          );
-          const paratext = textArray
-            .map((textElement) => textElement.text)
-            .join(" ");
-          pageText += paratext + " ";
-        }
-      }
-
-      return {
-        id: pageID,
-        title: title,
-        location: pageLink,
-        text: pageText.trim(),
-      };
-    } catch (error) {
-      console.error("Error in Fetching Page Content:", error.message);
-      throw error;
-    }
-  }
-
-  async fetchConfluenceCloudID(config: ApiConfig) {
-    try {
-      const accessibleResourcesResponse = await axios.get(
-        "https://api.atlassian.com/oauth/token/accessible-resources",
-        config
-      );
-
-      const accessibleResources = accessibleResourcesResponse.data;
-
-      if (!accessibleResources || accessibleResources.length === 0) {
-        throw new Error("No accessible resources found.");
-      }
-
-      const cloudId = accessibleResources[0].id;
-
-      if (!cloudId) {
-        throw new Error("Invalid cloud ID.");
-      }
-
-      return cloudId;
-    } catch (error) {
-      this.logger_.error(`Error in fetching Cloud ID of Confluence Instance.`);
-      throw error;
-    }
-  }
-
-  async fetchConfluencePages(cloudID: string, config: ApiConfig) {
-    try {
-      // Block Until Rate Limit Allows Request
-      await this.requestQueue_.removeTokens(1, AppNameDefinitions.CONFLUENCE);
-      const pagesEndpoint = `https://api.atlassian.com/ex/confluence/${cloudID}/wiki/rest/api/content`;
-
-      const pagesResponse = await axios.get(pagesEndpoint, config);
-
-      const pagesResults = pagesResponse.data.results;
-      const pages = pagesResults.map((page) => page.id);
-
-      return pages;
-    } catch (error) {
-      this.logger_.error(`Failed to retrieve Confluence pages:`, error.message);
-      throw error;
+      this.logger_.error(`
+        getConfluenceSpaceAndPages: Error while fetching Confluence data for org: ${org.id}
+        organisation: ${error}
+      `);
     }
   }
 }

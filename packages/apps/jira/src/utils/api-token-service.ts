@@ -83,7 +83,7 @@ class ApiTokenService {
     this.last_sync_ = last_sync;
   }
 
-  async jiraIndexDOcs(): Promise<IndexableDocument[]> {
+  async jiraIndexDocs(): Promise<IndexableDocument[]> {
     const projectIndexableDocs: IndexableDocument[] = [];
 
     const jiraProjects = await this.fetchJiraProjects();
