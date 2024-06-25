@@ -1,5 +1,5 @@
 import AsanaCard from './asana-card';
-import ConfluenceCard from './confluence';
+import ConfluenceCard from './confluence-card';
 import GithubCard from './github-card';
 import JiraCard from './jira-card';
 import NotionCard from './notion-card';

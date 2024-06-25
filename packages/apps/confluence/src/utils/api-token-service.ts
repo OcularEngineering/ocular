@@ -7,6 +7,7 @@ import {
   Section,
 } from "@ocular/types";
 import axios from "axios";
+import { RateLimiterQueue } from "rate-limiter-flexible";
 
 interface ConfluencePage {
   id: string;
@@ -32,6 +33,7 @@ class ApiTokenService {
   private logger_: Logger;
   private org_: Organisation;
   private rateLimiterService_: RateLimiterService;
+  private requestQueue_: RateLimiterQueue;
   private last_sync_: Date;
 
   constructor(
@@ -56,6 +58,9 @@ class ApiTokenService {
       ).toString("base64")}`,
       Accept: "application/json",
     };
+    this.requestQueue_ = this.rateLimiterService_.getRequestQueue(
+      AppNameDefinitions.CONFLUENCE
+    );
   }
 
   /**
@@ -133,6 +138,8 @@ class ApiTokenService {
           "body-format": "atlas_doc_format",
           cursor: cursor,
         };
+
+        await this.requestQueue_.removeTokens(1, AppNameDefinitions.CONFLUENCE);
         const { data } = await axios.get(
           `https://${this.confluence_domain_name_}/wiki/api/v2/pages`,
           { headers, params }
@@ -184,6 +191,7 @@ class ApiTokenService {
           "body-format": "atlas_doc_format",
           cursor: cursor,
         };
+        await this.requestQueue_.removeTokens(1, AppNameDefinitions.CONFLUENCE);
         const { data } = await axios.get(
           `https://${this.confluence_domain_name_}/wiki/api/v2/pages/${id}/footer-comments`,
           { headers, params }

@@ -7,6 +7,7 @@ import {
   Section,
 } from "@ocular/types";
 import axios from "axios";
+import { RateLimiterQueue } from "rate-limiter-flexible";
 
 interface JiraProject {
   id: string;
@@ -58,6 +59,7 @@ class ApiTokenService {
   private org_: Organisation;
   private rateLimiterService_: RateLimiterService;
   private last_sync_: Date;
+  private requestQueue_: RateLimiterQueue;
 
   constructor(
     token: string,
@@ -81,6 +83,9 @@ class ApiTokenService {
     this.org_ = org;
     this.rateLimiterService_ = ratelimiterService;
     this.last_sync_ = last_sync;
+    this.requestQueue_ = this.rateLimiterService_.getRequestQueue(
+      AppNameDefinitions.JIRA
+    );
   }
 
   async jiraIndexDocs(): Promise<IndexableDocument[]> {
@@ -154,6 +159,8 @@ class ApiTokenService {
         const params = { startAt, maxResults };
         const headers = this.headers_;
 
+        await this.requestQueue_.removeTokens(1, AppNameDefinitions.JIRA);
+
         const response = await axios.get(
           `https://${this.jira_domain_name_}/rest/api/2/project/search?expand=description,lead,url,insight`,
           { headers, params }
@@ -214,6 +221,7 @@ class ApiTokenService {
           jql: `project = ${projectId}`,
         };
 
+        await this.requestQueue_.removeTokens(1, AppNameDefinitions.JIRA);
         const { data } = await axios.get(
           `https://${this.jira_domain_name_}/rest/api/2/search?fields=comment,assignee,status,priority,description,summary,project`,
           { headers, params }
