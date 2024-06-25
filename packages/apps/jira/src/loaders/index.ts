@@ -4,7 +4,7 @@ import { AutoflowAiError, AutoflowAiErrorTypes } from "@ocular/utils";
 
 export default async (container, options) => {
   try {
-    // Register Rate Limiter For Google Drive
+    // Register Rate Limiter For Jira App
     if (!options.rate_limiter_opts) {
       throw new AutoflowAiError(
         AutoflowAiErrorTypes.INVALID_DATA,
