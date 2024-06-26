@@ -21,7 +21,7 @@
     "@ocular/ocular": "*",
     "@ocular/types": "*",
     "@ocular/utils": "*",
-    "axios": "^1.7.2",
+    "axios": "^0.28.0",
     "randomatic": "^3.1.1"
   }
 }
