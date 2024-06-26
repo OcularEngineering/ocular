@@ -8,21 +8,21 @@ import {
   OneToMany,
   UpdateDateColumn,
   CreateDateColumn,
-  PrimaryColumn
-} from 'typeorm';
-import { AppNameDefinitions, DocType } from "@ocular/types"
-import { Organisation } from './organisation';
-import { DbAwareColumn, resolveDbType } from '@ocular/utils';
+  PrimaryColumn,
+} from "typeorm";
+import { AppNameDefinitions, DocType } from "@ocular/types";
+import { Organisation } from "./organisation";
+import { DbAwareColumn, resolveDbType } from "@ocular/utils";
 
 @Entity()
 export class DocumentMetadata {
   @PrimaryColumn()
   id: string;
 
-  @Column({type: "varchar", nullable: false, unique: true})
+  @Column({ type: "varchar", nullable: false, unique: true })
   link: string;
 
-  @Column({type: "varchar", nullable: false})
+  @Column({ type: "varchar", nullable: false })
   title: string;
 
   @DbAwareColumn({
@@ -30,22 +30,25 @@ export class DocumentMetadata {
     enum: DocType,
     nullable: false,
   })
-  type: DocType
+  type: DocType;
 
   @DbAwareColumn({
     type: "enum",
     enum: AppNameDefinitions,
     nullable: false,
   })
-  source: AppNameDefinitions
+  source: AppNameDefinitions;
 
-  @Column({type: "varchar", nullable: false})
+  @Column({ type: "varchar", nullable: false })
   organisation_id: string;
 
+  @DbAwareColumn({ type: "jsonb", nullable: true })
+  metadata: Record<string, unknown> | null;
+
   @CreateDateColumn({ type: resolveDbType("timestamptz") })
-  created_at: Date
+  created_at: Date;
 
   // Note: This is manually updated whenever we index or reindex a document.
-  @Column({ type: resolveDbType("timestamptz"), nullable: false})
-  updated_at: Date
+  @Column({ type: resolveDbType("timestamptz"), nullable: false })
+  updated_at: Date;
 }

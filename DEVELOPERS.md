@@ -90,7 +90,7 @@ To contribute code to Ocular, you must fork the [Ocular repo](https://github.com
 6. Start the backend.
 
 ```sh
-   npm run start # start the backend
+   npm run dev # start the backend
 ```
 
 ### Start UI
