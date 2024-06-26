@@ -89,7 +89,6 @@ export default class SlackService extends TransactionBaseService {
 
           const conversationMetadata = {
             id: conversation.id,
-            text: conversation.text,
             user: conversation.user,
           };
 
@@ -110,7 +109,6 @@ export default class SlackService extends TransactionBaseService {
             type: DocType.TXT,
             updatedAt: new Date(parseFloat(conversation.ts) * 1000),
           };
-          console.log(threadDoc);
           documents.push(threadDoc);
           if (documents.length >= 100) {
             yield documents;
