@@ -66,7 +66,7 @@ export default class JiraService extends TransactionBaseService {
           auth.last_sync
         );
 
-        const projectIndexableDocs = await apiTokenService.jiraIndexDOcs();
+        const projectIndexableDocs = await apiTokenService.jiraIndexDocs();
 
         for (const doc of projectIndexableDocs) {
           documents.push(doc);

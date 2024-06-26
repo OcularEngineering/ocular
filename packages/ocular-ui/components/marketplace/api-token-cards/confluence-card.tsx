@@ -3,13 +3,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Integration, AuthStrategy } from '@/types/types';
+import { Integration } from '@/types/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -18,36 +17,37 @@ const formSchema = z.object({
   apiToken: z
     .string()
     .min(1, { message: 'API Token is required' })
-    .describe('The API token for Integration of github in Ocular'),
-    orgName: z
+    .describe('The API token for Integration of APP in Ocular'),
+  username: z
     .string()
-    .min(1, { message: 'The organisation is required ' }),
-    repoName: z
+    .email({ message: 'Invalid email address' })
+    .min(1, { message: 'Username is required' })
+    .describe('The username for Integration of APP in Ocular'),
+  domain: z
     .string()
-    .min(1, { message: 'The repo name is required ' })
-    .describe('The repository to index pull requests and issues from'),});
-
+    .min(1, { message: 'Domain Name is required' })
+    .describe('The domain anme for Confluence cloud Integration'),
+});
 
 interface Props {
   integration: Integration;
   authorizeApp: (apiToken: string, metadata: any) => Promise<void>;
 }
 
-export default function GithubCard({ integration, authorizeApp }: Props) {
+export default function ConfluenceCard({ integration, authorizeApp }: Props) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       apiToken: '',
-      orgName: '',
-      repoName: '',
+      username: '',
+      domain: '',
     },
   });
 
   async function formSubmit(values: z.infer<typeof formSchema>) {
-
     const metadata = {
-      organisation: values.orgName,
-      repository: values.repoName,
+      username: values.username,
+      domain: values.domain,
     };
     await authorizeApp(values.apiToken, metadata);
   }
@@ -63,52 +63,52 @@ export default function GithubCard({ integration, authorizeApp }: Props) {
             >
               <div className="w-full">
                 <FormField
+                  key="username"
+                  control={form.control}
+                  name="username"
+                  render={({ field }) => (
+                    <div className="flex flex-col space-y-3">
+                      <FormLabel>Username of Confluence Cloud</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="user@ocular.com"
+                          {...field}
+                          className="placeholder-gray-500"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </div>
+                  )}
+                />
+                <FormField
+                  key="apiToken"
                   control={form.control}
                   name="apiToken"
                   render={({ field }) => (
-                    <div className="flex flex-col space-y-3">
-                      <FormLabel>Github API token</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter your integration API token"
-                          {...field}
-                          className="placeholder-gray-500"
-                        />
-                      </FormControl>
-
-                      <FormMessage />
-                    </div>
-                  )}
-                />
-
-                   <FormField
-                  key="orgName"
-                  control={form.control}
-                  name="orgName"
-                  render={({ field }) => (
                     <div className="flex flex-col space-y-3 pt-6">
-                      <FormLabel>Org Name</FormLabel>
+                      <FormLabel>API Token</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Enter Organisation Name"
+                          placeholder="Enter API token for Confluence Cloud "
                           {...field}
                           className="placeholder-gray-500"
+                          type="password"
                         />
                       </FormControl>
                       <FormMessage />
                     </div>
                   )}
                 />
-                   <FormField
-                  key="repoName"
+                <FormField
+                  key="domain"
                   control={form.control}
-                  name="repoName"
+                  name="domain"
                   render={({ field }) => (
                     <div className="flex flex-col space-y-3 pt-6">
-                      <FormLabel>Repo Name</FormLabel>
+                      <FormLabel>Domain Name</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Enter Repository Name"
+                          placeholder="your-domain.atlassian.net"
                           {...field}
                           className="placeholder-gray-500"
                         />
@@ -119,7 +119,10 @@ export default function GithubCard({ integration, authorizeApp }: Props) {
                 />
               </div>
               <Button type="submit" className="w-full mt-4">
-                Add {integration.name} for Ocular
+                Add{' '}
+                {integration.name.charAt(0).toUpperCase() +
+                  integration.name.slice(1)}{' '}
+                for Ocular
               </Button>
             </form>
           </Form>
