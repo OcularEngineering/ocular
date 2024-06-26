@@ -15,6 +15,12 @@ interface ConfluencePage {
   url: string;
   body: any;
   status: string;
+  createdBy: {
+    display_name: string;
+    email: string;
+    avatar_url: string;
+  };
+  lastUpdated: string;
 }
 
 interface ConfluenceComment {
@@ -51,7 +57,7 @@ class ApiTokenService {
     this.org_ = org;
     this.logger_ = logger;
     this.rateLimiterService_ = ratelimiterService;
-    this.last_sync_ = last_sync || new Date();
+    this.last_sync_ = last_sync;
     this.headers_ = {
       Authorization: `Basic ${Buffer.from(
         `${this.confluence_user_name_}:${this.confluence_token_}`
@@ -76,7 +82,6 @@ class ApiTokenService {
         await this.fetchConfluencePages();
 
       for (const page of confluencePages) {
-        // only last sync issue need to be handled
         try {
           const pageComments = await this.fetchConfluencePageComments(page.id);
           const sections: Section[] = pageComments.map((comment) => {
@@ -91,6 +96,16 @@ class ApiTokenService {
             };
           });
 
+          sections.push({
+            link: `https://${this.confluence_domain_name_}/wiki${page.url}`,
+            content: this.extractDataFromBlocks(page.body),
+            metadata: {
+              status: page.status,
+              title: page.title,
+              id: page.id,
+            },
+          });
+
           const pageIndexableDocument: IndexableDocument = {
             id: page.id,
             organisationId: this.org_.id,
@@ -101,8 +116,9 @@ class ApiTokenService {
             metadata: {
               url: `https://${this.confluence_domain_name_}/wiki${page.url}`,
               status: page.status,
+              createdBy: page.createdBy,
             },
-            updatedAt: new Date(),
+            updatedAt: new Date(page.lastUpdated),
           };
 
           indexableDocs.push(pageIndexableDocument);
@@ -112,7 +128,7 @@ class ApiTokenService {
           );
         }
       }
-
+      console.log("indexableDocs", indexableDocs);
       return indexableDocs;
     } catch (error) {
       this.logger_.error(
@@ -134,14 +150,24 @@ class ApiTokenService {
 
     try {
       while (true) {
-        const params = {
-          "body-format": "atlas_doc_format",
+        const params: any = {
           cursor: cursor,
+          cql: this.last_sync_
+            ? `type=page AND lastmodified >= ${this.formatDateToCustomString(
+                this.last_sync_
+              )} ORDER BY lastmodified DESC`
+            : `type=page ORDER BY lastmodified DESC`,
         };
+
+        const expandParams = [
+          "history.lastUpdated",
+          "history.createdBy",
+          "body.atlas_doc_format",
+        ].join(",");
 
         await this.requestQueue_.removeTokens(1, AppNameDefinitions.CONFLUENCE);
         const { data } = await axios.get(
-          `https://${this.confluence_domain_name_}/wiki/api/v2/pages`,
+          `https://${this.confluence_domain_name_}/wiki/rest/api/content/search?expand=${expandParams}`,
           { headers, params }
         );
         const results = data.results;
@@ -155,6 +181,12 @@ class ApiTokenService {
               page.body.atlas_doc_format.value
             ),
             status: page.status,
+            lastUpdated: page.history.lastUpdated.when,
+            createdBy: {
+              display_name: page.history.createdBy.displayName,
+              email: page.history.createdBy.email,
+              avatar_url: page.history.createdBy.profilePicture["path"],
+            },
           }))
         );
 
@@ -253,7 +285,7 @@ class ApiTokenService {
    */
   extractDataFromBlocks(blocks: any[]): string {
     let data = "";
-    const types = new Set(["paragraph", "heading"]);
+    const types = new Set(["paragraph", "heading", "doc"]);
 
     for (const block of blocks) {
       if (block && typeof block === "object" && types.has(block.type)) {
@@ -275,6 +307,27 @@ class ApiTokenService {
       }
     }
     return data.trim();
+  }
+
+  /**
+   * Converts a Date object to a string in the format yyyy/MM/dd HH:mm.
+   * @param {Date} date - The Date object to be converted.
+   * @returns {string} The formatted date string.
+   */
+  formatDateToCustomString(date) {
+    if (!(date instanceof Date)) {
+      throw new TypeError("Invalid input: Expected a Date object");
+    }
+
+    const padZero = (num) => num.toString().padStart(2, "0");
+
+    const year = date.getFullYear();
+    const month = padZero(date.getMonth() + 1); // Months are 0-based in JavaScript
+    const day = padZero(date.getDate());
+    const hours = padZero(date.getHours());
+    const minutes = padZero(date.getMinutes());
+
+    return `${year}/${month}/${day} ${hours}:${minutes}`;
   }
 }
 
