@@ -128,7 +128,6 @@ class ApiTokenService {
           );
         }
       }
-      console.log("indexableDocs", indexableDocs);
       return indexableDocs;
     } catch (error) {
       this.logger_.error(
