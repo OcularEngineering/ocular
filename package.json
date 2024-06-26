@@ -19,9 +19,11 @@
   },
   "dependencies": {
     "@types/jest": "^29.5.12",
+    "axios": "^1.7.2",
     "ocular-telemetry": "^1.0.0",
     "pdf-parse": "^1.1.1",
-    "scrypt-kdf": "^2.0.1"
+    "scrypt-kdf": "^2.0.1",
+    "ws": "^8.17.1"
   },
   "devDependencies": {
     "eslint-config-next": "^14.1.4"

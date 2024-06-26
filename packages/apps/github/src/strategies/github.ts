@@ -1,4 +1,8 @@
-import { AbstractBatchJobStrategy, APPS_INDEXING_TOPIC } from "@ocular/types";
+import {
+  AbstractBatchJobStrategy,
+  APPS_INDEXING_TOPIC,
+  Logger,
+} from "@ocular/types";
 import { BatchJobService, Organisation, QueueService } from "@ocular/ocular";
 import { EntityManager } from "typeorm";
 import GitHubService from "../services/github";
@@ -11,18 +15,23 @@ class GithubStrategy extends AbstractBatchJobStrategy {
   protected batchJobService_: BatchJobService;
   protected githubService_: GitHubService;
   protected queueService_: QueueService;
+  protected logger_: Logger;
 
   constructor(container) {
     super(arguments[0]);
     this.githubService_ = container.githubService;
     this.batchJobService_ = container.batchJobService;
     this.queueService_ = container.queueService;
+    this.logger_ = container.logger;
   }
 
   async processJob(batchJobId: string): Promise<void> {
-    console.log("Processing Github Indexing Job", batchJobId);
-
     const batchJob = await this.batchJobService_.retrieve(batchJobId);
+    const org = batchJob.context?.org as Organisation;
+
+    const oculationGithubActivity = this.logger_.activity(
+      `processJob: Oculating GitHub for organisation: ${org.id} name: ${org.name}`
+    );
 
     const stream = await this.githubService_.getRepositoriesOcular(
       batchJob.context?.org as Organisation
@@ -33,7 +42,17 @@ class GithubStrategy extends AbstractBatchJobStrategy {
     });
 
     stream.on("end", () => {
-      console.log("No more data");
+      this.logger_.success(
+        oculationGithubActivity,
+        `processJob: Done oculation of GitHub for ${org.id} organisation`
+      );
+    });
+
+    stream.on("error", () => {
+      this.logger_.error(
+        oculationGithubActivity,
+        `processJob: Error oculation of GitHub for ${org.id} organisation`
+      );
     });
   }
 
