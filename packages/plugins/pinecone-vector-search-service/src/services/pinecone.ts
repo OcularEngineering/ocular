@@ -40,7 +40,10 @@ export default class PineconeService extends AbstractVectorDBService {
       // Check if the index already exists
       const existingIndexes: IndexList =
         await this.pineconeClient_.listIndexes();
-      if (existingIndexes.indexes.some((index) => index.name === indexName)) {
+      if (
+        existingIndexes.indexes &&
+        existingIndexes.indexes.some((index) => index.name === indexName)
+      ) {
         console.log(`Index ${indexName} already exists`);
         return;
       }
