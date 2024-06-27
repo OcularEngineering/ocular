@@ -162,7 +162,7 @@ module.exports = {
         redirect_uri: `${UI_CORS}/dashboard/marketplace/webConnector`,
         auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
       },
-    }
+    },
   ],
   plugins: [
     {
@@ -206,6 +206,13 @@ module.exports = {
       resolve: `qdrant-vector-search-service`,
       options: {
         quadrant_db_url: process.env.QDRANT_DB_URL || "http://localhost:6333",
+        embedding_size: 768,
+      },
+    },
+    {
+      resolve: `pinecone-vector-search-service`,
+      options: {
+        pinecone_api_token: process.env.PINECONE_API_TOKEN,
         embedding_size: 768,
       },
     },
