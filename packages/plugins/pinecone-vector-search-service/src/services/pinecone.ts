@@ -69,4 +69,25 @@ export default class PineconeService extends AbstractVectorDBService {
       this.logger_.error(`deleteIndex: Error Deleting Index ${indexName}`);
     }
   }
+
+  addDocuments(indexName: string, doc: IndexableDocChunk[]): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+  deleteDocuments(indexName: string, docIds: string[]): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+  searchDocuments(
+    org_id: string,
+    vector: number[],
+    context?: SearchContext
+  ): Promise<SearchResults> {
+    throw new Error("Method not implemented.");
+  }
+  searchDocumentChunks(
+    indexName: string,
+    vector: number[],
+    context?: SearchContext
+  ): Promise<SearchChunk[]> {
+    throw new Error("Method not implemented.");
+  }
 }
