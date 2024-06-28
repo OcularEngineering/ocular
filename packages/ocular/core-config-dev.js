@@ -66,7 +66,7 @@ module.exports = {
           requests: 10, // Number of Requests
           interval: 1, // Interval in Seconds
         },
-        auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
+        auth_strategy: AuthStrategy.API_TOKEN_STRATEGY,
       },
     },
     {
@@ -120,12 +120,7 @@ module.exports = {
     {
       resolve: "github",
       options: {
-        client_id: process.env.GITHUB_CLIENT_ID,
-        client_secret: process.env.GITHUB_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/github`,
-        app_id: process.env.GITHUB_APP_ID,
-        private_key: process.env.GITHUB_PRIVATE_KEY_PATH,
-        scope: "repo",
         rate_limiter_opts: {
           requests: 60, // Number of Requests
           interval: 60, // Interval in Seconds
@@ -167,7 +162,7 @@ module.exports = {
         redirect_uri: `${UI_CORS}/dashboard/marketplace/webConnector`,
         auth_strategy: AuthStrategy.OAUTH_TOKEN_STRATEGY,
       },
-    }
+    },
   ],
   plugins: [
     {
@@ -211,6 +206,13 @@ module.exports = {
       resolve: `qdrant-vector-search-service`,
       options: {
         quadrant_db_url: process.env.QDRANT_DB_URL || "http://localhost:6333",
+        embedding_size: 768,
+      },
+    },
+    {
+      resolve: `pinecone-vector-search-service`,
+      options: {
+        pinecone_api_token: process.env.PINECONE_API_TOKEN,
         embedding_size: 768,
       },
     },
