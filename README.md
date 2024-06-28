@@ -41,9 +41,6 @@ AI Powered Search and Chat for Companies - Think ChatGPT meets Google Search but
     
   </p>
 
-<br>
-
-<div align="center"><img src="img/search.gif" width="100%" ></div>
 
 ## 🚀 Introduction
 
