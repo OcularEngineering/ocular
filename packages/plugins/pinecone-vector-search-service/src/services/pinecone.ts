@@ -13,6 +13,11 @@ import {
 import { v5 as uuidv5 } from "uuid";
 import { IndexList, Pinecone } from "@pinecone-database/pinecone";
 
+enum PineconeNamespaceType {
+  CONTENT = "content",
+  TITLE = "title",
+}
+
 export default class PineconeService extends AbstractVectorDBService {
   protected pineconeClient_: Pinecone;
   protected embeddingSize_: number;
@@ -73,12 +78,96 @@ export default class PineconeService extends AbstractVectorDBService {
     }
   }
 
-  addDocuments(indexName: string, doc: IndexableDocChunk[]): Promise<void> {
-    throw new Error("Method not implemented.");
+  async deleteDocuments(indexName: string, docIds: string[]) {
+    try {
+      this.logger_.info(
+        `deleteDocuments: Deleting Docs From Pinecone ${docIds.length}`
+      );
+
+      const index = this.pineconeClient_.index(indexName);
+      await index.namespace(PineconeNamespaceType.CONTENT).deleteMany(docIds);
+      await index.namespace(PineconeNamespaceType.TITLE).deleteMany(docIds);
+
+      this.logger_.info(
+        `deleteDocuments: Done Deleting Docs From Quadrant ${docIds.length}`
+      );
+    } catch (error) {
+      this.logger_.error(
+        `deleteDocuments: Error Deleting Docs From Quadrant ${error.message}`
+      );
+    }
   }
-  deleteDocuments(indexName: string, docIds: string[]): Promise<void> {
-    throw new Error("Method not implemented.");
+
+  async addDocuments(indexName: string, docs: IndexableDocChunk[]) {
+    try {
+      this.logger_.info(
+        `addDocuments: Adding Docs Chunks To Pinecone ${docs.length}`
+      );
+      // Split the docs into batches of 100
+      const docBatches = [];
+      for (let i = 0; i < docs.length; i += 100) {
+        docBatches.push(docs.slice(i, i + 100));
+      }
+      // Process each batch
+
+      for (const docBatch of docBatches) {
+        const contentRecords = docBatch.map((doc) =>
+          this.fomratIndexableDocToPineconeRecords(
+            doc,
+            PineconeNamespaceType.CONTENT
+          )
+        );
+        const titleRecords = docBatch.map((doc) =>
+          this.fomratIndexableDocToPineconeRecords(
+            doc,
+            PineconeNamespaceType.TITLE
+          )
+        );
+        const index = this.pineconeClient_.index(indexName);
+        await index.namespace("content").upsert(contentRecords);
+        await index.namespace("title").upsert(titleRecords);
+      }
+      this.logger_.info(
+        `addDocuments: Done Adding Doc Chunks To Pinecone ${docs.length}`
+      );
+    } catch (error) {
+      this.logger_.error(
+        `addDocuments: Error Adding Docs Chunks To Pinecone ${error.message}`
+      );
+    }
   }
+
+  private createDocUUID(doc: IndexableDocChunk) {
+    let name = `${doc.organisationId}-${doc.documentId}-${doc.chunkId}`;
+    return uuidv5(name, this.UUIDHASH);
+  }
+
+  private fomratIndexableDocToPineconeRecords = (
+    doc: IndexableDocChunk,
+    namespace: string
+  ) => {
+    const vectors =
+      namespace === PineconeNamespaceType.CONTENT
+        ? doc.contentEmbeddings
+        : doc.titleEmbeddings;
+    return {
+      id: this.createDocUUID(doc),
+      metadata: {
+        chunkId: doc.chunkId,
+        organisationId: doc.organisationId,
+        documentId: doc.documentId,
+        title: doc.title,
+        source: doc.source,
+        type: doc.type,
+        content: doc.content,
+        chunkLinks: doc.chunkLinks,
+        metadata: doc.metadata,
+        updatedAt: doc.updatedAt,
+      },
+      values: vectors,
+    };
+  };
+
   searchDocuments(
     org_id: string,
     vector: number[],
