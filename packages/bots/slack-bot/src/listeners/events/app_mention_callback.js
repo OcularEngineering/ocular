@@ -1,4 +1,4 @@
-const { reloadAppHome } = require('../../utilities');
+// const { reloadAppHome } = require('../../utilities');
 
 const appMentionCallback = async ({ event, context, client, say }) => {
   try {
