@@ -1,6 +1,7 @@
 {
   "name": "slack-bot",
   "version": "0.0.0",
+  "type": "commonjs",
   "main": "app.js",
   "description": "Slack Bot Application for Ocular",
   "author": "Louis Luxa Murerwa",

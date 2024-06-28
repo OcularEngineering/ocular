@@ -1,9 +1,8 @@
-const { App, LogLevel } = require('@slack/bolt');
-const {registerListeners} = require('../listeners/index.js');
+import { App } from '@slack/bolt';
+import registerListeners from '../listeners/index.js';
+import { BotNameDefinitions, AbstractBotService } from '@ocular/types';
 
-const { BotNameDefinitions, AbstractBotService } = require("@ocular/types");
-
- class SlackBotService extends AbstractBotService {
+export default class SlackBotService extends AbstractBotService {
   static identifier = BotNameDefinitions.SLACKBOT;
 
   constructor(container, options) {
@@ -44,5 +43,3 @@ const { BotNameDefinitions, AbstractBotService } = require("@ocular/types");
     })();
   }
 }
-
-module.exports = SlackBotService;

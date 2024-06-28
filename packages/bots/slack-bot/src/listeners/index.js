@@ -1,5 +1,10 @@
-const eventsListener = require('./events');
+// Import eventsListener from './events'
+import eventsListener from './events/index.js';
 
-module.exports.registerListeners = (app) => {
-  eventsListener.register(app);
+// Define registerListeners function
+const registerListeners = (app) => {
+  eventsListener(app);
 };
+
+// Export registerListeners as default
+export default registerListeners;

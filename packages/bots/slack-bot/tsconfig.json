@@ -4,6 +4,7 @@
      "target": "es2020",
      "rootDir": "src",
      "outDir": "./dist",
+     "module": "commonjs",
      "esModuleInterop": true,
      "declaration": false,
      "moduleResolution": "node",

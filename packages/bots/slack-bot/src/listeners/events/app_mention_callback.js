@@ -9,7 +9,7 @@ const appMentionCallback = async ({ event, context, client, say }) => {
         "type": "section",
         "text": {
           "type": "mrkdwn",
-          "text": `Thanks for the mention <@${event.user}>! Here's a button`
+          "text": `Ocular To The MOON >>>>> Revenue Over Load <@${event.user}>! Here's a button`
         },
         "accessory": {
           "type": "button",
@@ -29,4 +29,4 @@ const appMentionCallback = async ({ event, context, client, say }) => {
   }
 };
 
-module.exports = { appMentionCallback };
+export { appMentionCallback };
