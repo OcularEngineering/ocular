@@ -47,7 +47,6 @@ export default async ({
   activityId,
 }: Options): Promise<void> => {
   const resolved = getResolvedBots(rootDirectory, configModule) || [];
-  console.log("resolved", resolved);
 
   await promiseAll(
     resolved.map(async (BotDetails) => await runSetupFunctions(BotDetails))
@@ -113,21 +112,22 @@ export async function registerServices(
       const loaded = require(fn).default;
       const name = formatRegistrationName(fn);
 
-      console.log("name", loaded);
-
       if (typeof loaded !== "function") {
         throw new Error(
           `Cannot register ${name}. Make sure to default export a service class in ${fn}`
         );
       }
 
-      const instanceOfLoaded = new loaded(container.cradle, BotDetails.options);
+      const instanceOfLoaded = new loaded(container, BotDetails.options);
 
       container.register({
         [name]: asFunction(() => instanceOfLoaded, {
           lifetime: loaded.LIFE_TIME || Lifetime.SCOPED,
         }),
       });
+      // container.build(
+      //   asFunction((cradle) => new loaded(cradle, BotDetails.options)).scoped()
+      // );
     })
   );
 }
