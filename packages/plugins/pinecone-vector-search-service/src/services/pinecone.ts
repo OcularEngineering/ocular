@@ -143,6 +143,10 @@ export default class PineconeService extends AbstractVectorDBService {
     return uuidv5(name, this.UUIDHASH);
   }
 
+  dateToUnixTimestamp(date: Date): number {
+    return Math.floor(date.getTime() / 1000);
+  }
+
   private fomratIndexableDocToPineconeRecords = (
     doc: IndexableDocChunk,
     namespace: string
@@ -162,7 +166,7 @@ export default class PineconeService extends AbstractVectorDBService {
         type: doc.type,
         content: doc.content,
         chunkLinks: doc.chunkLinks,
-        updatedAt: doc.updatedAt,
+        updatedAt: this.dateToUnixTimestamp(doc.updatedAt),
       },
       values: vectors,
     };
@@ -189,13 +193,17 @@ export default class PineconeService extends AbstractVectorDBService {
     if (context.date) {
       if (context.date.from) {
         filter.push({
-          updatedAt: { $gte: context.date.from },
+          updatedAt: {
+            $gte: this.dateToUnixTimestamp(new Date(context.date.from)),
+          },
         });
       }
 
       if (context.date.to) {
         filter.push({
-          updatedAt: { $lte: context.date.to },
+          updatedAt: {
+            $lte: this.dateToUnixTimestamp(new Date(context.date.to)),
+          },
         });
       }
     }
