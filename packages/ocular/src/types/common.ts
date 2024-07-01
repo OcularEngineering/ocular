@@ -68,6 +68,14 @@ export type QueryConfig<TEntity extends BaseEntity> = {
   isList?: boolean
 }
 
+export type PaginatedResponse = { limit: number; offset: number; count: number }
+
+export type DeleteResponse = {
+  id: string
+  object: string
+  deleted: boolean
+}
+
 /**
  * Parameters that can be used to configure how data is retrieved.
  */
@@ -85,6 +93,40 @@ export class FindParams {
   @IsString()
   @IsOptional()
   fields?: string
+}
+
+export class FindPaginationParams {
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  offset?: number = 0
+
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  limit?: number = 20
+}
+
+export function extendedFindParamsMixin({
+  limit,
+  offset,
+}: {
+  limit?: number
+  offset?: number
+} = {}): Constructor<FindParams & FindPaginationParams> {
+  class FindExtendedPaginationParams extends FindParams {
+    @IsNumber()
+    @IsOptional()
+    @Type(() => Number)
+    offset?: number = offset ?? 0
+
+    @IsNumber()
+    @IsOptional()
+    @Type(() => Number)
+    limit?: number = limit ?? 20
+  }
+
+  return FindExtendedPaginationParams
 }
 
 
