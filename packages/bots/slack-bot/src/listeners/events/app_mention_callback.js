@@ -1,26 +1,23 @@
 // const { reloadAppHome } = require('../../utilities');
 
-const appMentionCallback = async ({ event, context, client, say }) => {
+const appMentionCallback = async ( cbArgs ,container) => {
   try {
-    console.log('appMentionCallback');
+    const { event, context, client, say } = cbArgs.event;
+    const registeredKeys = Object.keys(container.registrations);
+    const chatApproach = container.resolve("askRetrieveReadApproache")
+    const results = await chatApproach.run("ocular", extractTextFromEvent(event) ,{
+      top: 5, stream: true
+    });
 
+    console.log(results);
+  
     await say({"blocks": [
       {
         "type": "section",
         "text": {
           "type": "mrkdwn",
-          "text": `Ocular To The MOON >>>>> Revenue Over Load <@${event.user}>! Here's a button`
+          "text": `<@${event.user}>! ${results.chat_completion.content}`
         },
-        "accessory": {
-          "type": "button",
-          "text": {
-            "type": "plain_text",
-            "text": "Button",
-            "emoji": true
-          },
-          "value": "click_me_123",
-          "action_id": "first_button"
-        }
       }
     ]});
   } catch (error) {
@@ -28,5 +25,11 @@ const appMentionCallback = async ({ event, context, client, say }) => {
     console.error(error);
   }
 };
+
+function extractTextFromEvent(event) {
+  const textPattern = /<@\w+>\s(.*)/;
+  const matches = event.text.match(textPattern);
+  return matches ? matches[1] : '';
+}
 
 export { appMentionCallback };

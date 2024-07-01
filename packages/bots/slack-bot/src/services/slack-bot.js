@@ -10,9 +10,8 @@ export default class SlackBotService extends AbstractBotService {
     // BOT OPTIONS
     this.botToken_ = options.slack_bot_token;
     this.appToken_ = options.slack_app_token;
-    console.log("SlackBotService constructor", this.botToken_, this.appToken_);
 
-    // this.logger_ = container.resolve("logger");
+    this.logger_ = container.logger
 
     // Initializes your app with your bot token and signing secret
     const app = new App({
@@ -23,21 +22,24 @@ export default class SlackBotService extends AbstractBotService {
 
     // Register all listeners
     // Expose Container To Listeners So That They Can Access Services And Make Queries To Ocular.
-    registerListeners(app);
+    registerListeners(app, container);
 
     (async () => {
       try {
+        console.log('Slack Bot Connection has been established successfully.');
         // this.logger_.info(
         //   "Slack Bot Connection has been established successfully."
         // );
-        console.log("Slack Bot Connection has been established successfully.");
-        // Start your app
+
         await app.start();
 
-        console.log("Slack Bot is running!");
+        // this.logger_.info(
+        //   "Slack Bot is running!."
+        // );
       } catch (error) {
         // eslint-disable-next-line no-console
-        console.log("Unable to start Slack Bot", error);
+        console.error('Unable to start Slack Bot', error);
+        // this.logger_.error("Unable to start Slack Bot", error);
         process.exit(1);
       }
     })();

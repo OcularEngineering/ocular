@@ -2,8 +2,8 @@
 import eventsListener from './events/index.js';
 
 // Define registerListeners function
-const registerListeners = (app) => {
-  eventsListener(app);
+const registerListeners = (app,container) => {
+  eventsListener(app, container);
 };
 
 // Export registerListeners as default
