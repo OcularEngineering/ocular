@@ -5,6 +5,7 @@ import {
   SearchContext,
   DocType,
   SearchDocument,
+  SearchSnippet,
   SearchResults,
   SearchChunk,
   AppNameDefinitions,
@@ -49,7 +50,7 @@ export default class PineconeService extends AbstractVectorDBService {
         existingIndexes.indexes &&
         existingIndexes.indexes.some((index) => index.name === indexName)
       ) {
-        console.log(`Index ${indexName} already exists`);
+        this.logger_.error(`Index with name ${indexName} exists`);
         return;
       }
       await this.pineconeClient_.createIndex({
@@ -89,11 +90,11 @@ export default class PineconeService extends AbstractVectorDBService {
       await index.namespace(PineconeNamespaceType.TITLE).deleteMany(docIds);
 
       this.logger_.info(
-        `deleteDocuments: Done Deleting Docs From Quadrant ${docIds.length}`
+        `deleteDocuments: Done Deleting Docs From Pinecone ${docIds.length}`
       );
     } catch (error) {
       this.logger_.error(
-        `deleteDocuments: Error Deleting Docs From Quadrant ${error.message}`
+        `deleteDocuments: Error Deleting Docs From Pinecone ${error.message}`
       );
     }
   }
@@ -142,6 +143,10 @@ export default class PineconeService extends AbstractVectorDBService {
     return uuidv5(name, this.UUIDHASH);
   }
 
+  dateToUnixTimestamp(date: Date): number {
+    return Math.floor(date.getTime() / 1000);
+  }
+
   private fomratIndexableDocToPineconeRecords = (
     doc: IndexableDocChunk,
     namespace: string
@@ -161,25 +166,177 @@ export default class PineconeService extends AbstractVectorDBService {
         type: doc.type,
         content: doc.content,
         chunkLinks: doc.chunkLinks,
-        metadata: doc.metadata,
-        updatedAt: doc.updatedAt,
+        updatedAt: this.dateToUnixTimestamp(doc.updatedAt),
       },
       values: vectors,
     };
   };
 
-  searchDocuments(
-    org_id: string,
+  private pineconeMetadataFilter(context: SearchContext) {
+    const filter = [];
+
+    // Filter by source
+    if (context.sources && context.sources.length > 0) {
+      filter.push({
+        source: { $in: [...context.sources] },
+      });
+    }
+
+    // Filter by organisation_id
+    if (context.organisation_id) {
+      filter.push({
+        organisationId: { $eq: context.organisation_id },
+      });
+    }
+
+    // Filter by date
+    if (context.date) {
+      if (context.date.from) {
+        filter.push({
+          updatedAt: {
+            $gte: this.dateToUnixTimestamp(new Date(context.date.from)),
+          },
+        });
+      }
+
+      if (context.date.to) {
+        filter.push({
+          updatedAt: {
+            $lte: this.dateToUnixTimestamp(new Date(context.date.to)),
+          },
+        });
+      }
+    }
+
+    // Filter by types
+    if (context.types && context.types.length > 0) {
+      filter.push({
+        type: { $in: [...context.types] },
+      });
+    }
+
+    const pineconeMetadataFilter = {
+      $and: filter,
+    };
+
+    return pineconeMetadataFilter;
+  }
+
+  // This function returns a list of documents that match the search query. This is useful for the search service which cares about the document level search results.
+  async searchDocuments(
+    indexName: string,
     vector: number[],
     context?: SearchContext
   ): Promise<SearchResults> {
-    throw new Error("Method not implemented.");
+    try {
+      // Construct Search Filters
+      const filter = this.pineconeMetadataFilter(context);
+
+      // Build a Search Query
+      const query = {
+        vector,
+        topK: context?.top ? Number(context?.top) : 10,
+        filter: filter,
+        includeMetadata: true,
+      };
+
+      const index = this.pineconeClient_.index(indexName);
+      const pineconeSearchResults = await index
+        .namespace(PineconeNamespaceType.CONTENT)
+        .query(query);
+
+      const formattedSearchResults = this.formatPineconeSearchResults(
+        pineconeSearchResults
+      );
+
+      return formattedSearchResults;
+    } catch (error) {
+      this.logger_.error(
+        `searchDocuments: Error Searching Docs From Pinecone ${error.message}`
+      );
+    }
   }
-  searchDocumentChunks(
+
+  private formatPineconeSearchResults = (pineconeResults): SearchResults => {
+    const documentMap = new Map<string, SearchSnippet[]>();
+
+    pineconeResults.matches?.forEach((result) => {
+      const documentId = result.metadata.documentId;
+      const snippet: SearchSnippet = {
+        score: result.score,
+        content: result.metadata.content,
+        updatedAt: result.metadata.updatedAt,
+      };
+
+      if (documentMap.has(documentId)) {
+        const docs = documentMap.get(documentId)!;
+        docs.push(snippet);
+        documentMap.set(documentId, docs);
+      } else {
+        documentMap.set(documentId, [snippet]);
+      }
+    });
+
+    const hits: SearchDocument[] = [];
+
+    documentMap.forEach((docCollection, documentId) => {
+      hits.push({
+        documentId: documentId,
+        snippets: docCollection,
+      });
+    });
+
+    return {
+      hits,
+    };
+  };
+
+  async searchDocumentChunks(
     indexName: string,
     vector: number[],
     context?: SearchContext
   ): Promise<SearchChunk[]> {
-    throw new Error("Method not implemented.");
+    try {
+      this.logger_.info("Search Chunks Called");
+      // Construct Search Filters
+      context.top = 3;
+      const filter = this.pineconeMetadataFilter(context);
+
+      // Build a Search Query
+      const query = {
+        vector,
+        topK: context?.top ? Number(context?.top) : 10,
+        filter: filter,
+        includeMetadata: true,
+      };
+
+      const index = this.pineconeClient_.index(indexName);
+      const pineconeSearchResults = await index
+        .namespace(PineconeNamespaceType.CONTENT)
+        .query(query);
+
+      const chunks: SearchChunk[] = pineconeSearchResults.matches?.map(
+        (result) => {
+          return {
+            score: Number(result.score),
+            content: String(result.metadata.content),
+            documentId: String(result.metadata.documentId),
+            organisationId: String(result.metadata.organisationId),
+            chunkId: Number(result.metadata.chunkId),
+            type: result.metadata.type as DocType,
+            source: String(result.metadata.source) as AppNameDefinitions,
+            title: String(result.metadata.title),
+            updatedAt: String(result.metadata.updatedAt),
+          };
+        }
+      );
+      this.logger_.info(`Search Chunks ${chunks}`);
+
+      return chunks;
+    } catch (error) {
+      this.logger_.error(
+        `searchDocumentChunks: Error Searching Docs From Pinecone ${error}`
+      );
+    }
   }
 }
