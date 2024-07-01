@@ -5,6 +5,7 @@ import {
   SearchContext,
   DocType,
   SearchDocument,
+  SearchSnippet,
   SearchResults,
   SearchChunk,
   AppNameDefinitions,
@@ -49,7 +50,7 @@ export default class PineconeService extends AbstractVectorDBService {
         existingIndexes.indexes &&
         existingIndexes.indexes.some((index) => index.name === indexName)
       ) {
-        console.log(`Index ${indexName} already exists`);
+        this.logger_.error(`Index with name ${indexName} exists`);
         return;
       }
       await this.pineconeClient_.createIndex({
@@ -89,7 +90,7 @@ export default class PineconeService extends AbstractVectorDBService {
       await index.namespace(PineconeNamespaceType.TITLE).deleteMany(docIds);
 
       this.logger_.info(
-        `deleteDocuments: Done Deleting Docs From Prinecone ${docIds.length}`
+        `deleteDocuments: Done Deleting Docs From Pinecone ${docIds.length}`
       );
     } catch (error) {
       this.logger_.error(
@@ -161,7 +162,6 @@ export default class PineconeService extends AbstractVectorDBService {
         type: doc.type,
         content: doc.content,
         chunkLinks: doc.chunkLinks,
-        // metadata: doc.metadata,
         updatedAt: doc.updatedAt,
       },
       values: vectors,
@@ -186,18 +186,19 @@ export default class PineconeService extends AbstractVectorDBService {
     }
 
     // Filter by date
-    // if (context.date) {
-    //   if (context.date.from) {
-    //     filter.push({
-    //       updatedAt: { $gte: context.date.from },
-    //     });
-    //   }
-    //   if (context.date.to) {
-    //     filter.push({
-    //       updatedAt: { $lte: context.date.to },
-    //     });
-    //   }
-    // }
+    if (context.date) {
+      if (context.date.from) {
+        filter.push({
+          updatedAt: { $gte: context.date.from },
+        });
+      }
+
+      if (context.date.to) {
+        filter.push({
+          updatedAt: { $lte: context.date.to },
+        });
+      }
+    }
 
     // Filter by types
     if (context.types && context.types.length > 0) {
@@ -249,18 +250,32 @@ export default class PineconeService extends AbstractVectorDBService {
   }
 
   private formatPineconeSearchResults = (pineconeResults): SearchResults => {
-    const hits: SearchDocument[] = pineconeResults.matches?.map((result) => {
-      return {
-        documentId: result.id,
-        documentMetadata: result.metadata,
-        snippets: [
-          {
-            score: result.score,
-            content: result.metadata.content,
-            updatedAt: result.metadata.updatedAt,
-          },
-        ],
+    const documentMap = new Map<string, SearchSnippet[]>();
+
+    pineconeResults.matches?.forEach((result) => {
+      const documentId = result.metadata.documentId;
+      const snippet: SearchSnippet = {
+        score: result.score,
+        content: result.metadata.content,
+        updatedAt: result.metadata.updatedAt,
       };
+
+      if (documentMap.has(documentId)) {
+        const docs = documentMap.get(documentId)!;
+        docs.push(snippet);
+        documentMap.set(documentId, docs);
+      } else {
+        documentMap.set(documentId, [snippet]);
+      }
+    });
+
+    const hits: SearchDocument[] = [];
+
+    documentMap.forEach((docCollection, documentId) => {
+      hits.push({
+        documentId: documentId,
+        snippets: docCollection,
+      });
     });
 
     return {
