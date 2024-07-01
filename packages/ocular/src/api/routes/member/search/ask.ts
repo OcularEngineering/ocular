@@ -21,6 +21,7 @@ export default async (req, res) => {
     const searchApproach = req.scope.resolve("askRetrieveReadApproache");
     const loggedInUser = req.scope.resolve("loggedInUser");
     if (context && context.stream) {
+      console.log("Search API: Ask Request Streamed", req.context);
       const chunks = await searchApproach.runWithStreaming(
         q,
         (context as any) ?? {}

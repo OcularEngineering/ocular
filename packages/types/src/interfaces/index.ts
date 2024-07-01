@@ -13,3 +13,4 @@ export * from "./vector-db-interface";
 export * from "./queue";
 export * from "./file-service";
 export * from "./embedder-interface";
+export * from "./bot-service";

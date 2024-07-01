@@ -296,6 +296,7 @@ export default class qdrantService extends AbstractVectorDBService {
           score: hit.score,
           content: hit.payload.content,
           updatedAt: hit.payload.updatedAt,
+          links: hit.payload.chunkLinks,
         });
       }
       hits.push(searchHit);

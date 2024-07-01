@@ -1,0 +1,41 @@
+{
+  "name": "slackapi-tasks-app",
+  "version": "1.0.0",
+  "description": "Tasks App is a sample Task Management app built on the Slack Platform.",
+  "main": "app.js",
+  "scripts": {
+    "test": "jest --no-cache",
+    "lint": "eslint . --ext .js",
+    "build": "npx sequelize-cli db:migrate"
+  },
+  "jest": {
+    "collectCoverage": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/slackapi/tasks-app.git"
+  },
+  "keywords": [
+    "slackapi"
+  ],
+  "author": "Louis Murerwa",
+  "dependencies": {
+    "@slack/bolt": "^3.8.1",
+    "dotenv": "^10.0.0",
+    "eslint-plugin-jest": "^24.4.2",
+    "luxon": "^1.28.1",
+    "nodemon": "^3.1.4",
+    "pluralize": "^8.0.0",
+    "sequelize": "^6.6.5",
+    "slack-block-builder": "^2.1.1",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.24.2",
+    "jest": "^27.2.0",
+    "sequelize-cli": "^6.3.0"
+  }
+}

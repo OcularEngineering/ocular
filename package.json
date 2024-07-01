@@ -8,6 +8,7 @@
     "packages/ocular",
     "packages/plugins/*",
     "packages/apps/*",
+    "packages/bots/*",
     "packages/ocular-telemetry"
   ],
   "scripts": {

@@ -17,7 +17,6 @@ async function kafkaLoader({
   configModule,
   logger,
 }: Options): Promise<void> {
-  console.log("Kafka Loader", configModule.projectConfig.kafka_url);
   if (configModule.projectConfig.kafka_url) {
     try {
       const kafkaClient = new Kafka({
