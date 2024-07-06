@@ -13,6 +13,7 @@ import {
   Section,
   TransactionBaseService,
   ApiConfig,
+  AuthStrategy,
 } from "@ocular/types";
 import { ConfigModule } from "@ocular/ocular/src/types";
 import { RateLimiterQueue } from "rate-limiter-flexible";
@@ -67,7 +68,15 @@ export default class BitBucketService extends TransactionBaseService {
     let documents: IndexableDocument[] = [];
 
     try {
-      const workspaces = await this.fetchWorkspaces(config);
+      let workspaces = await this.fetchWorkspaces(config);
+      if(auth.auth_strategy === AuthStrategy.API_TOKEN_STRATEGY){
+        const workspace = auth?.metadata?.workspace
+        if(!workspace){
+          throw new Error("No workspace found in metadata")
+        }
+        workspaces = [auth?.metadata?.workspace]
+      }
+      
       for (const workspace of workspaces) {
         const repositories = await this.fetchRepositoriesForWorkspace(
           workspace.slug,

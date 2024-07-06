@@ -1,4 +1,5 @@
 import AsanaCard from './asana-card';
+import BitBucketCard from './bitbucket-card';
 import ConfluenceCard from './confluence-card';
 import GithubCard from './github-card';
 import JiraCard from './jira-card';
@@ -18,6 +19,7 @@ const ComponentMap: { [key: string]: (props: Props) => JSX.Element } = {
   [AppNameDefinitions.GITHUB]: (props: Props) => <GithubCard {...props} />,
   [AppNameDefinitions.SLACK]: (props: Props) => <SlackCard {...props} />,
   [AppNameDefinitions.ASANA]: (props: Props) => <AsanaCard {...props} />,
+  [AppNameDefinitions.BITBUCKET]: (props: Props) => <BitBucketCard {...props} />,
   [AppNameDefinitions.CONFLUENCE]: (props: Props) => (
     <ConfluenceCard {...props} />
   ),
