@@ -1,6 +1,7 @@
 import { EntityManager } from "typeorm";
 import {
   AppNameDefinitions,
+  AuthStrategy,
   Logger,
   TransactionBaseService,
 } from "@ocular/types";
@@ -191,6 +192,12 @@ class AppAuthorizationService extends TransactionBaseService {
           organisation: metadata?.organisation,
           repository: metadata?.repository,
         };
+      }
+      else if(AppNameDefinitions.BITBUCKET === app.name && app.auth_strategy === AuthStrategy.API_TOKEN_STRATEGY){
+        metadata = {
+          workspace: metadata?.workspace,
+          repository: metadata?.repository
+        }
       }
 
       return await this.create({
