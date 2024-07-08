@@ -105,11 +105,10 @@ export async function registerServices(
   BotDetails: BotDetails,
   container: AutoflowContainer
 ): Promise<void> {
-  console.log("BotDetails", BotDetails);
   const registerServicesGlob = pathByOS(
     `${BotDetails.resolve}/dist/services/*.js`
   );
-  console.log("registerServicesGlob", registerServicesGlob);
+
   const files = glob.sync(registerServicesGlob, {});
 
   await promiseAll(
@@ -123,7 +122,6 @@ export async function registerServices(
         );
       }
 
-      console.log("BotDetails.options", BotDetails.options);
       const instanceOfLoaded = new loaded(container, BotDetails.options);
 
       container.register({
