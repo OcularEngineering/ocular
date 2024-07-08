@@ -105,8 +105,13 @@ export async function registerServices(
   BotDetails: BotDetails,
   container: AutoflowContainer
 ): Promise<void> {
-  const registerServicesGlob = pathByOS(`${BotDetails.resolve}/services/*.js`);
+  console.log("BotDetails", BotDetails);
+  const registerServicesGlob = pathByOS(
+    `${BotDetails.resolve}/dist/services/*.js`
+  );
+  console.log("registerServicesGlob", registerServicesGlob);
   const files = glob.sync(registerServicesGlob, {});
+
   await promiseAll(
     files.map(async (fn) => {
       const loaded = require(fn).default;
@@ -118,6 +123,7 @@ export async function registerServices(
         );
       }
 
+      console.log("BotDetails.options", BotDetails.options);
       const instanceOfLoaded = new loaded(container, BotDetails.options);
 
       container.register({
@@ -178,7 +184,7 @@ function resolveApp(appName: string): {
   // Only find apps when we're not given an absolute path
   if (!existsSync(appName)) {
     // Find the app in the local apps folder
-    const resolvedPath = path.resolve(`../apps/${appName}`);
+    const resolvedPath = path.resolve(`../bots/${appName}`);
 
     if (existsSync(resolvedPath)) {
       if (existsSync(`${resolvedPath}/package.json`)) {
