@@ -1,4 +1,3 @@
-// Import appMentionCallback from './app_mention_callback.js'
 import { appMentionCallback } from './app_mention_callback.js';
 
 // Define register function

@@ -1,4 +1,4 @@
-# Asana
+# Slack Bot
 
 Intergrate Ocular with a Slack Bot.
 
@@ -7,13 +7,12 @@ Intergrate Ocular with a Slack Bot.
 
 - Answer Slack Channel Questions With Ocular!
 
-
 ## How to Install
 
-1\. In `ocular/core-config.js` add the following at the end of the `apps` array:
+1\. In `ocular/core-config-*.js` add the following at the end of the `bots` array:
 
   ```js
-  const apps = [
+  const bots = [
     // ...
     {
       resolve: `slack-bot`,
@@ -24,5 +23,3 @@ Intergrate Ocular with a Slack Bot.
     },
   ]
   ```
-
----

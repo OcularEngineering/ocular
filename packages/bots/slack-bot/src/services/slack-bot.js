@@ -20,26 +20,22 @@ export default class SlackBotService extends AbstractBotService {
       appToken: process.env.SLACK_APP_TOKEN,
     });
 
-    // Register all listeners
-    // Expose Container To Listeners So That They Can Access Services And Make Queries To Ocular.
     registerListeners(app, container);
 
     (async () => {
       try {
-        console.log('Slack Bot Connection has been established successfully.');
-        // this.logger_.info(
-        //   "Slack Bot Connection has been established successfully."
-        // );
+        this.logger_.info(
+          "Slack Bot Connection has been established successfully."
+        );
 
         await app.start();
 
-        // this.logger_.info(
-        //   "Slack Bot is running!."
-        // );
+        this.logger_.info(
+          "Slack Bot is running!."
+        );
       } catch (error) {
         // eslint-disable-next-line no-console
-        console.error('Unable to start Slack Bot', error);
-        // this.logger_.error("Unable to start Slack Bot", error);
+        this.logger_.error("Unable to start Slack Bot", error);
         process.exit(1);
       }
     })();

@@ -1,5 +1,3 @@
-// const { reloadAppHome } = require('../../utilities');
-
 const appMentionCallback = async ( cbArgs ,container) => {
   try {
     const { event, context, client, say } = cbArgs.event;
@@ -8,8 +6,6 @@ const appMentionCallback = async ( cbArgs ,container) => {
     const results = await chatApproach.run("ocular", extractTextFromEvent(event) ,{
       top: 5, stream: true
     });
-
-    console.log(results);
   
     await say({"blocks": [
       {
