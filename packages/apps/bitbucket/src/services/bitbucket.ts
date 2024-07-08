@@ -68,15 +68,17 @@ export default class BitBucketService extends TransactionBaseService {
     let documents: IndexableDocument[] = [];
 
     try {
-      let workspaces = await this.fetchWorkspaces(config);
+      let workspaces = []
       if(auth.auth_strategy === AuthStrategy.API_TOKEN_STRATEGY){
-        const workspace = auth?.metadata?.workspace
-        if(!workspace){
+        if(!auth?.metadata?.workspace){
           throw new Error("No workspace found in metadata")
         }
-        workspaces = [auth?.metadata?.workspace]
+        const workspace = await this.fetchWorkspace(auth?.metadata?.workspace as string, config)
+        workspaces = [workspace]
       }
-      
+      else{
+        workspaces = await this.fetchWorkspaces(config);
+      }      
       for (const workspace of workspaces) {
         const repositories = await this.fetchRepositoriesForWorkspace(
           workspace.slug,
@@ -191,10 +193,23 @@ export default class BitBucketService extends TransactionBaseService {
     );
   }
 
+  async fetchWorkspace(workspaceName: string, config: ApiConfig){
+    try{
+      await this.requestQueue_.removeTokens(1, AppNameDefinitions.BITBUCKET);
+      const url = `https://api.bitbucket.org/2.0/workspaces/${workspaceName}`
+      const workspace = await axios.get(url, config)
+      if(workspace.status !== 200) throw new Error(`Failed to fetch workspace ${workspaceName}`);
+      return workspace.data
+    }
+    catch(error){
+      throw new Error(`Failed to fetch workspace ${workspaceName}`);
+    }
+  }
+
   async fetchWorkspaces(config: ApiConfig) {
     // Block Until Rate Limit Allows Request
-    await this.requestQueue_.removeTokens(1, AppNameDefinitions.BITBUCKET);
     try {
+      await this.requestQueue_.removeTokens(1, AppNameDefinitions.BITBUCKET);
       const workspaceEndpoint = await axios.get(
         "https://api.bitbucket.org/2.0/workspaces",
         config
@@ -210,8 +225,8 @@ export default class BitBucketService extends TransactionBaseService {
     workspace_slug: string,
     config: ApiConfig
   ) {
-    await this.requestQueue_.removeTokens(1, AppNameDefinitions.BITBUCKET);
     try {
+      await this.requestQueue_.removeTokens(1, AppNameDefinitions.BITBUCKET);
       const repoEndpoint = await axios.get(
         `https://api.bitbucket.org/2.0/repositories/${workspace_slug}`,
         config
@@ -237,7 +252,8 @@ export default class BitBucketService extends TransactionBaseService {
       const prArray = prEndpoint.data.values || [];
       return prArray;
     } catch (err) {
-      throw new Error("Failed to fetch pull requests");
+      console.error(err)
+      return []
     }
   }
   async fetchIssueForRepositories(
@@ -254,7 +270,8 @@ export default class BitBucketService extends TransactionBaseService {
       const issueArray = issueEndpoint.data.values || [];
       return issueArray;
     } catch (err) {
-      throw new Error("Failed to fetch issues");
+      console.error(err)
+      return []
     }
   }
 
@@ -273,7 +290,8 @@ export default class BitBucketService extends TransactionBaseService {
       const commentsArray = commentsEndpoint.data.values || [];
       return commentsArray;
     } catch (err) {
-      throw new Error("Failed to fetch comments");
+      console.error(err)
+      return []
     }
   }
 
@@ -292,7 +310,8 @@ export default class BitBucketService extends TransactionBaseService {
       const commentsArray = commentsEndpoint.data.values || [];
       return commentsArray;
     } catch (err) {
-      throw new Error("Failed to fetch comments");
+      console.error(err)
+      return []
     }
   }
 }

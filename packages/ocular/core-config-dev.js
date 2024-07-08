@@ -115,6 +115,10 @@ module.exports = {
         client_secret: process.env.BITBUCKET_CLIENT_SECRET,
         redirect_uri: `${UI_CORS}/dashboard/marketplace/bitbucket`,
         auth_strategy: AuthStrategy.API_TOKEN_STRATEGY,
+        rate_limiter_opts: {
+          requests: 60, // Number of Requests
+          interval: 60, // Interval in Seconds
+        },
       },
     },
     {
@@ -202,20 +206,20 @@ module.exports = {
         },
       },
     },
-    // {
-    //   resolve: `qdrant-vector-search-service`,
-    //   options: {
-    //     quadrant_db_url: process.env.QDRANT_DB_URL || "http://localhost:6333",
-    //     embedding_size: 768,
-    //   },
-    // },
     {
-      resolve: `pinecone-vector-search-service`,
+      resolve: `qdrant-vector-search-service`,
       options: {
-        pinecone_api_token: process.env.PINECONE_API_TOKEN,
+        quadrant_db_url: process.env.QDRANT_DB_URL || "http://localhost:6333",
         embedding_size: 768,
       },
     },
+    // {
+    //   resolve: `pinecone-vector-search-service`,
+    //   options: {
+    //     pinecone_api_token: process.env.PINECONE_API_TOKEN,
+    //     embedding_size: 768,
+    //   },
+    // },
     {
       resolve: `embedder`,
       options: {
