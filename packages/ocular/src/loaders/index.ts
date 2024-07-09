@@ -16,6 +16,7 @@ import { track } from "ocular-telemetry";
 
 // import defaultsLoader from "./defaults"
 import appsLoader from "./apps";
+import botsLoader from "./bots";
 import approachesLoader from "./approaches";
 import expressLoader from "./express";
 // import loadOcularApp from "./ocular-app"
@@ -130,8 +131,20 @@ export default async ({
     app: expressApp,
     activityId: appsActivity,
   });
-  const aAct = Logger.success(appsActivity, "Apps intialized") || {};
+  const aAct = Logger.success(appsActivity, "Bots intialized") || {};
   track("APPS_INIT_COMPLETED", { duration: aAct.duration });
+
+  const botsActivity = Logger.activity(`Initializing bots${EOL}`);
+  track("BOTS_INIT_STARTED");
+  await botsLoader({
+    container,
+    rootDirectory,
+    configModule,
+    app: expressApp,
+    activityId: appsActivity,
+  });
+  const bAct = Logger.success(botsActivity, "Bots intialized") || {};
+  track("BOTS_INIT_COMPLETED", { duration: aAct.duration });
 
   const pluginsActivity = Logger.activity(`Initializing plugins${EOL}`);
   track("PLUGINS_INIT_STARTED");

@@ -1,8 +1,6 @@
 
 FROM node:18-alpine
 
-RUN apk add --no-cache build-base
-
 RUN apk update && apk add chromium
 
 WORKDIR /usr/src/app
