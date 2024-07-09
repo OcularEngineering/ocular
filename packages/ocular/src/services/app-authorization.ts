@@ -244,7 +244,7 @@ class AppAuthorizationService extends TransactionBaseService {
               );
             }
 
-            const metadata = authToken.metadata;
+            const metadata = authToken.metadata?authToken.metadata:{};
 
             // Ensure metadata.links is initialized as an array
             if (!metadata.links) {
