@@ -19,6 +19,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@pinecone-database/pinecone": "^2.2.2",
     "@types/jest": "^29.5.12",
     "axios": "^1.7.2",
     "ocular-telemetry": "^1.0.0",
