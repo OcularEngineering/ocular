@@ -223,4 +223,13 @@ module.exports = {
       },
     },
   ],
+  bots: [
+    // {
+    //   resolve: `slack-bot`,
+    //   options: {
+    //     slack_app_token: process.env.SLACK_APP_TOKEN,
+    //     slack_bot_token: process.env.SLACK_BOT_TOKEN,
+    //   },
+    // },
+  ]
 };

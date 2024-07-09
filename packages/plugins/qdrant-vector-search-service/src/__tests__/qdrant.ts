@@ -152,19 +152,19 @@ describe("qdrantService", () => {
       mockVector,
       { top: 1 }
     );
-    expect(result1.hits.length).toEqual(1);
+    expect(result1.hits?.length).toEqual(1);
     const result2 = await service.searchDocuments(
       "OcularTestIndex",
       mockVector,
       { top: 2 }
     );
-    expect(result2.hits.length).toEqual(2);
+    expect(result2.hits?.length).toEqual(2);
     const result3 = await service.searchDocuments(
       "OcularTestIndex",
       mockVector,
       { top: 3 }
     );
-    expect(result3.hits.length).toEqual(3);
+    expect(result3.hits?.length).toEqual(3);
   });
 
   it("Filter By One Source", async () => {
@@ -278,7 +278,7 @@ describe("qdrantService", () => {
     );
 
     // Sort the results by content for comparison
-    expect(result.hits.length).toEqual(3);
+    expect(result.hits?.length).toEqual(3);
 
     await service.deleteIndex("OcularTestIndex");
   });

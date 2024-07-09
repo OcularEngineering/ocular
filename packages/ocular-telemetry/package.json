@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "@babel/cli": "^7.24.5",
-    "axios": "^1.7.2",
     "axios-retry": "^3.1.9",
     "boxen": "^5.0.1",
     "ci-info": "^3.2.0",

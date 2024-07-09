@@ -67,6 +67,7 @@ export interface SearchDocChunk {
 }
 
 export interface SearchSnippet {
+  score: string;
   content: string;
   updatedAt: Date;
 }

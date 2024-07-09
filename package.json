@@ -8,6 +8,7 @@
     "packages/ocular",
     "packages/plugins/*",
     "packages/apps/*",
+    "packages/bots/*",
     "packages/ocular-telemetry"
   ],
   "scripts": {
@@ -23,7 +24,7 @@
     "ocular-telemetry": "^1.0.0",
     "pdf-parse": "^1.1.1",
     "scrypt-kdf": "^2.0.1",
-    "ws": "^8.17.1"
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "eslint-config-next": "^14.1.4"

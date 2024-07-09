@@ -67,5 +67,6 @@ export default (rootDirectory: string): ConfigModule => {
     // modules: configModule?.modules ?? {},
     apps: configModule?.apps ?? [],
     plugins: configModule?.plugins ?? [],
+    bots: configModule?.bots ?? [],
   };
 };

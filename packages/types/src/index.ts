@@ -1,4 +1,5 @@
 export * from "./apps";
+export * from "./bots";
 export * from "./common";
 export * from "./logger";
 export * from "./modules-sdk";

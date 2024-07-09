@@ -1,25 +1,35 @@
-import { IsIn, ValidateNested, IsNumber, IsOptional, IsString, IsArray, IsBoolean, IsNotEmpty,IsEnum } from "class-validator"
-import { SearchService, UserService } from "../../../../services"
-import { Type } from "class-transformer"
-import { validator } from "@ocular/utils"
-import { ApproachDefinitions, SearchContext} from "@ocular/types";
-
+import {
+  IsIn,
+  ValidateNested,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsArray,
+  IsBoolean,
+  IsNotEmpty,
+  IsEnum,
+} from "class-validator";
+import { SearchService, UserService } from "../../../../services";
+import { Type } from "class-transformer";
+import { validator } from "@ocular/utils";
+import { ApproachDefinitions, SearchContext } from "@ocular/types";
 
 export default async (req, res) => {
-
-  const validated = await validator(PostChatReq, req.body)
+  const validated = await validator(PostChatReq, req.body);
   const { approach } = validated ?? {};
 
   // const askApproach = fastify.approaches.ask[approach ?? 'rtr'];
   try {
-    const loggedInUser = req.scope.resolve("loggedInUser")
+    const loggedInUser = req.scope.resolve("loggedInUser");
     const { q, messages, context, stream } = req.body;
 
     if (approach === ApproachDefinitions.CHAT_RETRIEVE_READ) {
-      console.log(req.scope.registrations)
-      const chatApproach = req.scope.resolve("chatRetrieveReadRetrieveApproache")
-      const results = await chatApproach.run( messages, (context as any) ?? {});
-      return res.status(200).send(results)
+      console.log(req.scope.registrations);
+      const chatApproach = req.scope.resolve(
+        "chatRetrieveReadRetrieveApproache"
+      );
+      const results = await chatApproach.run(messages, (context as any) ?? {});
+      return res.status(200).send(results);
     }
 
     // if(approach === ApproachDefinitions.ASK_RETRIEVE_READ){
@@ -43,30 +53,31 @@ export default async (req, res) => {
     // }
   } catch (_error: unknown) {
     const error = _error as Error & { error?: any; status?: number };
-    console.log(error)
+    console.log(error);
     if (error.error) {
-      return res.status(error.status ?? 500).send("Error: Failed to execute Chat");
+      return res
+        .status(error.status ?? 500)
+        .send("Error: Failed to execute Chat");
     }
     return res.status(500).send("Error: Failed to execute Chat");
   }
   return res.status(500).send(`Error: Failed to execute Chat.`);
-}
+};
 
 export class PostChatReq {
-
   @IsNotEmpty()
   @IsEnum(ApproachDefinitions)
-  approach: ApproachDefinitions
-  
+  approach: ApproachDefinitions;
+
   @IsString()
   @IsNotEmpty()
-  message: string
+  message: string;
 
   @ValidateNested()
-  context?: PostApproachContext 
+  context?: PostApproachContext;
 
   @IsBoolean()
-  stream: Boolean
+  stream: Boolean;
 }
 
 class Message {
@@ -79,8 +90,8 @@ class Message {
 
 class PostApproachContext {
   @IsOptional()
-  @IsIn(['hybrid', 'text', 'vectors'])
-  retrieval_mode?: 'hybrid' | 'text' | 'vectors';
+  @IsIn(["hybrid", "text", "vectors"])
+  retrieval_mode?: "hybrid" | "text" | "vectors";
 
   @IsOptional()
   @IsBoolean()
