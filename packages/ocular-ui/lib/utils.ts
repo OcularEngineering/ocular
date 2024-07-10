@@ -43,3 +43,11 @@ export function formatDate(date: string) {
     minute: "2-digit",
   })
 }
+
+export function formatLink(url: string) {
+  const prefix = "doc.link";
+  if (url.startsWith(prefix)) {
+    return url.substring(prefix.length);
+  }
+  return url;
+}
