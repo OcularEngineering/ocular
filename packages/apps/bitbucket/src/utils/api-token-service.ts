@@ -68,94 +68,96 @@ export default class ApiTokenService extends TransactionBaseService {
     let documents: IndexableDocument[] = [];
 
     try {
-    if(!auth?.metadata?.workspace){
-        throw new Error("No workspace found in metadata")
-    }
-    const workspace = await this.fetchWorkspace(auth?.metadata?.workspace as string, config)
-    const workspaces = [workspace]
-      for (const workspace of workspaces) {
-        const repositories = await this.fetchRepositoriesForWorkspace(
+      if (!auth?.metadata?.workspace) {
+        throw new Error("No workspace found in metadata");
+      }
+      const workspace = await this.fetchWorkspace(
+        auth?.metadata?.workspace as string,
+        config
+      );
+
+      const repositories = await this.fetchRepositoriesForWorkspace(
+        workspace.slug,
+        config
+      );
+      for (const repository of repositories) {
+        const prs = await this.fetchPRForRepositories(
           workspace.slug,
+          repository.uuid,
           config
         );
-        for (const repository of repositories) {
-          const prs = await this.fetchPRForRepositories(
+        for (const pr of prs) {
+          // add comment section reference in section tag
+          const comments = await this.fetchCommentsForPR(
             workspace.slug,
             repository.uuid,
+            pr.id,
             config
           );
-          for (const pr of prs) {
-            // add comment section reference in section tag
-            const comments = await this.fetchCommentsForPR(
-              workspace.slug,
-              repository.uuid,
-              pr.id,
-              config
-            );
-            const sections: Section[] = comments.map((comment, index) => ({
-              offset: index,
-              content: comment.type,
-              link: `https://api.bitbucket.org/2.0/repositories/${workspace.slug}/${repository.uuid}/pullrequests/${pr.id}/comments`,
-            }));
-            const prDoc: IndexableDocument = {
-              id: pr.id,
-              organisationId: org.id,
-              source: AppNameDefinitions.BITBUCKET,
-              title: pr.title,
-              metadata: {
-                repository_id: repository.uuid,
-                workspace_id: workspace.uuid,
-              },
-              sections: sections,
-              type: DocType.TXT,
-              updatedAt: new Date(Date.now()),
-            };
-            documents.push(prDoc);
-            if (documents.length >= 100) {
-              yield documents;
-              documents = [];
-            }
+          const sections: Section[] = comments.map((comment, index) => ({
+            offset: index,
+            content: comment.type,
+            link: `https://api.bitbucket.org/2.0/repositories/${workspace.slug}/${repository.uuid}/pullrequests/${pr.id}/comments`,
+          }));
+          const prDoc: IndexableDocument = {
+            id: pr.id,
+            organisationId: org.id,
+            source: AppNameDefinitions.BITBUCKET,
+            title: pr.title,
+            metadata: {
+              repository_id: repository.uuid,
+              workspace_id: workspace.uuid,
+            },
+            sections: sections,
+            type: DocType.TXT,
+            updatedAt: new Date(Date.now()),
+          };
+          documents.push(prDoc);
+          if (documents.length >= 100) {
+            yield documents;
+            documents = [];
           }
+        }
 
-          const issues = await this.fetchIssueForRepositories(
+        const issues = await this.fetchIssueForRepositories(
+          workspace.slug,
+          repository.uuid,
+          config
+        );
+        for (const issue of issues) {
+          // add comment section reference in section tag
+          const comments = await this.fetchCommentsForIssue(
             workspace.slug,
             repository.uuid,
+            issue.id,
             config
           );
-          for (const issue of issues) {
-            // add comment section reference in section tag
-            const comments = await this.fetchCommentsForIssue(
-              workspace.slug,
-              repository.uuid,
-              issue.id,
-              config
-            );
-            const sections: Section[] = comments.map((comment, index) => ({
-              offset: index,
-              content: comment.type,
-              link: `https://api.bitbucket.org/2.0/repositories/${workspace.slug}/${repository.uuid}/issues/${issue.id}/comments`,
-            }));
-            const issueDoc: IndexableDocument = {
-              id: issue.id,
-              organisationId: org.id,
-              source: AppNameDefinitions.BITBUCKET,
-              title: issue.title,
-              metadata: {
-                repository_id: repository.uuid,
-                workspace_id: workspace.uuid,
-              },
-              sections: sections,
-              type: DocType.TXT,
-              updatedAt: new Date(Date.now()),
-            };
-            documents.push(issueDoc);
-            if (documents.length >= 100) {
-              yield documents;
-              documents = [];
-            }
+          const sections: Section[] = comments.map((comment, index) => ({
+            offset: index,
+            content: comment.type,
+            link: `https://api.bitbucket.org/2.0/repositories/${workspace.slug}/${repository.uuid}/issues/${issue.id}/comments`,
+          }));
+          const issueDoc: IndexableDocument = {
+            id: issue.id,
+            organisationId: org.id,
+            source: AppNameDefinitions.BITBUCKET,
+            title: issue.title,
+            metadata: {
+              repository_id: repository.uuid,
+              workspace_id: workspace.uuid,
+            },
+            sections: sections,
+            type: DocType.TXT,
+            updatedAt: new Date(Date.now()),
+          };
+          documents.push(issueDoc);
+          if (documents.length >= 100) {
+            yield documents;
+            documents = [];
           }
         }
       }
+
       yield documents;
       await this.appAuthorizationService_.update(auth.id, {
         last_sync: new Date(),
@@ -178,6 +180,7 @@ export default class ApiTokenService extends TransactionBaseService {
         // Retry the request
         return this.getBitBucketInformation(org);
       } else {
+        this.logger_.error(error)
         throw new Error(error);
       }
     }
@@ -187,15 +190,18 @@ export default class ApiTokenService extends TransactionBaseService {
     );
   }
 
-  async fetchWorkspace(workspaceName: string, config: ApiConfig){
-    try{
+  async fetchWorkspace(workspaceName: string, config: ApiConfig) {
+    try {
       await this.requestQueue_.removeTokens(1, AppNameDefinitions.BITBUCKET);
-      const url = `https://api.bitbucket.org/2.0/workspaces/${workspaceName}`
-      const workspace = await axios.get(url, config)
-      if(workspace.status !== 200) throw new Error(`Failed to fetch workspace ${workspaceName}`);
-      return workspace.data
-    }
-    catch(error){
+      const url = `https://api.bitbucket.org/2.0/workspaces/${workspaceName}`;
+      const workspace = await axios.get(url, config);
+      if (workspace.status !== 200){
+        this.logger_.error(`Failed to fetch workspace ${workspaceName}`)
+        throw new Error(`Failed to fetch workspace ${workspaceName}`);
+      }
+      return workspace.data;
+    } catch (error) {
+      this.logger_.error(`Failed to fetch workspace ${workspaceName}`)
       throw new Error(`Failed to fetch workspace ${workspaceName}`);
     }
   }
@@ -213,6 +219,7 @@ export default class ApiTokenService extends TransactionBaseService {
       const repoArray = repoEndpoint.data.values || [];
       return repoArray;
     } catch (err) {
+      this.logger_.error("Repositoes not able to fetch")
       throw new Error("Repositoes not able to fetch");
     }
   }
@@ -231,8 +238,8 @@ export default class ApiTokenService extends TransactionBaseService {
       const prArray = prEndpoint.data.values || [];
       return prArray;
     } catch (err) {
-      console.error(err)
-      return []
+      this.logger_.error("Repositoes not able to fetch")
+      return [];
     }
   }
   async fetchIssueForRepositories(
@@ -249,8 +256,8 @@ export default class ApiTokenService extends TransactionBaseService {
       const issueArray = issueEndpoint.data.values || [];
       return issueArray;
     } catch (err) {
-      console.error(err)
-      return []
+      this.logger_.error("Repositoes not able to fetch")
+      return [];
     }
   }
 
@@ -269,8 +276,8 @@ export default class ApiTokenService extends TransactionBaseService {
       const commentsArray = commentsEndpoint.data.values || [];
       return commentsArray;
     } catch (err) {
-      console.error(err)
-      return []
+      this.logger_.error("Repositoes not able to fetch")
+      return [];
     }
   }
 
@@ -289,8 +296,8 @@ export default class ApiTokenService extends TransactionBaseService {
       const commentsArray = commentsEndpoint.data.values || [];
       return commentsArray;
     } catch (err) {
-      console.error(err)
-      return []
+      this.logger_.error("Repositoes not able to fetch")
+      return [];
     }
   }
 }

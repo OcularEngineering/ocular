@@ -184,6 +184,7 @@ export default class BitBucketService extends TransactionBaseService {
         // Retry the request
         return this.getBitBucketInformation(org);
       } else {
+        this.logger_.error(error)
         throw new Error(error);
       }
     }
@@ -202,6 +203,7 @@ export default class BitBucketService extends TransactionBaseService {
       return workspace.data
     }
     catch(error){
+      this.logger_.error(`Failed to fetch workspace ${workspaceName}`)
       throw new Error(`Failed to fetch workspace ${workspaceName}`);
     }
   }
@@ -217,6 +219,7 @@ export default class BitBucketService extends TransactionBaseService {
       const workspaceArray = workspaceEndpoint.data.values || [];
       return workspaceArray;
     } catch (error) {
+      this.logger_.error("Failed to fetch workspaces")
       throw new Error("Failed to fetch workspaces");
     }
   }
@@ -234,6 +237,7 @@ export default class BitBucketService extends TransactionBaseService {
       const repoArray = repoEndpoint.data.values || [];
       return repoArray;
     } catch (err) {
+      this.logger_.error("Repositoes not able to fetch")
       throw new Error("Repositoes not able to fetch");
     }
   }
@@ -252,7 +256,7 @@ export default class BitBucketService extends TransactionBaseService {
       const prArray = prEndpoint.data.values || [];
       return prArray;
     } catch (err) {
-      console.error(err)
+      this.logger_.error(err)
       return []
     }
   }
@@ -270,7 +274,7 @@ export default class BitBucketService extends TransactionBaseService {
       const issueArray = issueEndpoint.data.values || [];
       return issueArray;
     } catch (err) {
-      console.error(err)
+      this.logger_.error(err)
       return []
     }
   }
@@ -290,7 +294,7 @@ export default class BitBucketService extends TransactionBaseService {
       const commentsArray = commentsEndpoint.data.values || [];
       return commentsArray;
     } catch (err) {
-      console.error(err)
+      this.logger_.error(err)
       return []
     }
   }
@@ -310,7 +314,7 @@ export default class BitBucketService extends TransactionBaseService {
       const commentsArray = commentsEndpoint.data.values || [];
       return commentsArray;
     } catch (err) {
-      console.error(err)
+      this.logger_.error(err)
       return []
     }
   }
