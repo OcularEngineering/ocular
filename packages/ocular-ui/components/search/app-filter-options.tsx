@@ -39,7 +39,7 @@ export default function AppFilterOptions({results, resultSources}: AppFilterOpti
                         <LayoutGrid size={20} className='dark:text-white'/>
                         <p className="hidden font-semibold text-sm sm:inline-flex dark:text-white">All</p>
                     </div>
-                    <p className="hidden text-sm text-gray-500 sm:inline-flex">3</p>
+                    {/* <p className="hidden text-sm text-gray-500 sm:inline-flex">3</p> */}
                 </div>
                 {mappedResultSources.map((iconName) => (
                     <AppFilterOption src={iconName.icon} label={iconName.label} key={iconName.value} value={iconName.value} />

@@ -96,7 +96,7 @@ const Results = ({ results }) => (
                             document.body.removeChild(el);
                           }}
                         >
-                          {result.documentMetadata.link}
+                          {formatLink(result.documentMetadata.link)}
                         </span>
                       </p>
                       <p className="font-regular line-clamp-3 text-sm max-w-3xl w-[770px]" dangerouslySetInnerHTML={{ __html: result.snippets.map(snippet => snippet.content).join(" ... ") }}></p>

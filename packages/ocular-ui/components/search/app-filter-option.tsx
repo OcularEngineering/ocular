@@ -35,9 +35,9 @@ export default function AppFilterOption({ src, label, value, results }: AppFilte
           {label}
         </p>
       </div>
-      <p className="hidden text-sm text-gray-500 sm:inline-flex">
+      {/* <p className="hidden text-sm text-gray-500 sm:inline-flex">
         3
-      </p>
+      </p> */}
     </div>
   );
 }
