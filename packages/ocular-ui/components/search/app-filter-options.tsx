@@ -5,6 +5,7 @@ import AppFilterOption from "./app-filter-option";
 import Image from 'next/image';
 import { ApplicationContext } from "@/context/context";
 import { formatLabel } from '@/lib/utils';
+import { LayoutGrid } from 'lucide-react';
 
 type AppFilterOptionsProps = {
     results: any; 
@@ -35,7 +36,7 @@ export default function AppFilterOptions({results, resultSources}: AppFilterOpti
                     onClick={handleClick}
                 >
                     <div className='flex grow gap-2'>
-                        <Image src="/All.svg" alt="All" width={20} height={20} />
+                        <LayoutGrid size={20} className='dark:text-white'/>
                         <p className="hidden font-semibold text-sm sm:inline-flex dark:text-white">All</p>
                     </div>
                     <p className="hidden text-sm text-gray-500 sm:inline-flex">3</p>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import AppFilterOptions from "./app-filter-options";
 import ReactMarkdown from 'react-markdown';
-import { formatLabel, formatDate } from '@/lib/utils';
+import { formatLabel, formatDate, formatLink } from '@/lib/utils';
 import {
   ChevronDownIcon,
 } from "@heroicons/react/outline";
@@ -80,9 +80,9 @@ const Results = ({ results }) => (
                   }
                   <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                     <div className='space-y-2'>
-                      <a href={result.documentMetadata.link} target="_blank" rel="noopener noreferrer">
-                        <h3 className="text-l mb-2 truncate font-semibold text-blue-800 group-hover:underline dark:text-blue-400">
-                          {result.documentMetadata.title.charAt(0).toUpperCase() + result.documentMetadata.title.slice(1)}
+                      <a href={formatLink(result.documentMetadata.link)} target="_blank" rel="noopener noreferrer">
+                        <h3 className="text-l mb-2 truncate font-semibold text-blue-800 group-hover:underline dark:text-blue-400 max-w-3xl w-[770px]">
+                          {formatLink(result.documentMetadata.title.charAt(0).toUpperCase() + result.documentMetadata.title.slice(1))}
                         </h3>
                       </a>
                       <p className="font-regular line-clamp-3 text-sm text-gray-500">

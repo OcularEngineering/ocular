@@ -22,7 +22,7 @@ export default function Header() {
   console.log("123")
 
   return (
-    <header className={`bg-background sticky flex flex-col justify-center items-center top-0 dark:text-white shadow-sm dark:border-b z-1000`}>
+    <header className={`bg-background sticky flex flex-col justify-center items-center top-0 dark:text-white shadow-sm dark:border-b`}>
       <div className="w-full max-w-7xl mx-auto px-6 pt-5">
         <div className="flex flex-col items-start space-y-5">
           <form className="bg-background flex w-full grow items-center rounded-full py-3 px-6 border">
