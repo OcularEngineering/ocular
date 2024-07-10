@@ -159,7 +159,7 @@ function Integrations() {
             )}
           </div>
           {!authorized && (
-            <Alert className="w-full">
+            <Alert className="w-full bg-blue-100 border dark:bg-muted">
               <InfoIcon className="h-4 w-4" />
               <AlertDescription className="flex gap-2">
                 You can follow the installation steps

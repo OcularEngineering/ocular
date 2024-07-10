@@ -6,7 +6,6 @@ import { formatLabel, formatDate, formatLink } from '@/lib/utils';
 import {
   ChevronDownIcon,
 } from "@heroicons/react/outline";
-import { Skeleton } from "@/components/ui/skeleton"
 
 import { SearchCopilotSkeleton, SearchResultsSkeleton, SearchByAppFilterSkeleton } from '@/components/ui/skeletons';
 
