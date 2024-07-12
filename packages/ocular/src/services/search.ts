@@ -74,7 +74,7 @@ class SearchService extends AbstractSearchService {
 
     // Join The Document Metadata With The Search Results
     const hits = searchResults.hits.map((hit) => {
-      const metadata = docMetadata.find((doc) => doc.id === hit.documentId);
+      const metadata = docMetadata.find((doc) => doc.id?.toString() === hit.documentId?.toString());
       return { ...hit, documentMetadata: { ...metadata } };
     });
     return hits;
