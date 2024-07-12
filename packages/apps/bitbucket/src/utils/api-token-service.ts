@@ -1,5 +1,4 @@
 import axios from "axios";
-import { Readable } from "stream";
 import {
   AppAuthorizationService,
   Organisation,
@@ -11,38 +10,32 @@ import {
   IndexableDocument,
   Logger,
   Section,
-  TransactionBaseService,
   ApiConfig,
-  AuthStrategy,
 } from "@ocular/types";
-import { ConfigModule } from "@ocular/ocular/src/types";
 import { RateLimiterQueue } from "rate-limiter-flexible";
 
-export default class ApiTokenService extends TransactionBaseService {
+export default class ApiTokenService {
   protected appAuthorizationService_: AppAuthorizationService;
   protected logger_: Logger;
-  protected container_: ConfigModule;
   protected rateLimiterService_: RateLimiterService;
   protected requestQueue_: RateLimiterQueue;
 
-  constructor(container) {
-    super(arguments[0]);
-    this.appAuthorizationService_ = container.appAuthorizationService;
-    this.logger_ = container.logger;
-    this.container_ = container;
-    this.rateLimiterService_ = container.rateLimiterService;
-    this.requestQueue_ = this.rateLimiterService_.getRequestQueue(
+  constructor(
+    appAuthorizationService_: AppAuthorizationService,
+    logger_: Logger,
+    rateLimiterService_: RateLimiterService,
+  ) {
+    this.appAuthorizationService_ = appAuthorizationService_;
+    this.logger_ = logger_;
+    this.rateLimiterService_ = rateLimiterService_;
+    this.requestQueue_ = rateLimiterService_.getRequestQueue(
       AppNameDefinitions.BITBUCKET
     );
   }
 
-  async getBitBucketData(org: Organisation) {
-    return Readable.from(this.getBitBucketInformation(org));
-  }
-
-  async *getBitBucketInformation(
+  async bitbucketIndexDocs(
     org: Organisation
-  ): AsyncGenerator<IndexableDocument[]> {
+  ): Promise<IndexableDocument[]> {
     this.logger_.info(
       `Starting oculation of BitBucket for ${org.id} organisation`
     );
@@ -113,10 +106,6 @@ export default class ApiTokenService extends TransactionBaseService {
             updatedAt: new Date(Date.now()),
           };
           documents.push(prDoc);
-          if (documents.length >= 100) {
-            yield documents;
-            documents = [];
-          }
         }
 
         const issues = await this.fetchIssueForRepositories(
@@ -151,17 +140,14 @@ export default class ApiTokenService extends TransactionBaseService {
             updatedAt: new Date(Date.now()),
           };
           documents.push(issueDoc);
-          if (documents.length >= 100) {
-            yield documents;
-            documents = [];
-          }
         }
       }
 
-      yield documents;
       await this.appAuthorizationService_.update(auth.id, {
         last_sync: new Date(),
       });
+
+      return documents
     } catch (error) {
       if (error.response && error.response.status === 401) {
         // Check if it's an unauthorized error
@@ -169,16 +155,8 @@ export default class ApiTokenService extends TransactionBaseService {
           `Refreshing bitbucket token for ${org.id} organisation`
         );
 
-        // Refresh the token
-        const authToken = await this.container_["bitbucketOauth"].refreshToken(
-          auth.refresh_token
-        );
-
-        // Update the Auth record with the new token
-        await this.appAuthorizationService_.update(auth.id, authToken);
-
         // Retry the request
-        return this.getBitBucketInformation(org);
+        return this.bitbucketIndexDocs(org);
       } else {
         this.logger_.error(error)
         throw new Error(error);

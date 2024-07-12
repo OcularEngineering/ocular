@@ -24,7 +24,7 @@ export default class BitBucketStrategy extends AbstractBatchJobStrategy {
     const org = batchJob.context?.org as Organisation
 
     const oculationBitbucketActivity = this.logger_.activity(
-      `processJob: Oculating Jira Data for organisation: ${org.id} name: ${org.name}`
+      `processJob: Oculating Bitbucket Data for organisation: ${org.id} name: ${org.name}`
     );
 
     const stream = await this.bitbucketService_.getBitBucketData(org);
