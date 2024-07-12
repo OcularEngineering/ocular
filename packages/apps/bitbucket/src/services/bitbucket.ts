@@ -100,8 +100,15 @@ export default class BitBucketService extends TransactionBaseService {
             );
             const sections: Section[] = comments.map((comment, index) => ({
               offset: index,
-              content: comment.type,
+              content: comment.content.raw,
               link: `https://api.bitbucket.org/2.0/repositories/${workspace.slug}/${repository.uuid}/pullrequests/${pr.id}/comments`,
+              metadata: {
+                user: comment.user?.display_name,
+                user_type: comment.user?.type,
+                deleted: comment.deleted,
+                pending: comment.pending,
+                type: comment.type,
+              }
             }));
             const prDoc: IndexableDocument = {
               id: pr.id,
@@ -111,6 +118,13 @@ export default class BitBucketService extends TransactionBaseService {
               metadata: {
                 repository_id: repository.uuid,
                 workspace_id: workspace.uuid,
+                description: pr.description,
+                state: pr.state,
+                closed_by: pr.closed_by,
+                created_on: pr.created_on,
+                updated_on: pr.updated_on,
+                author_name: pr.author?.display_name,
+                author_type: pr.author?.type
               },
               sections: sections,
               type: DocType.TXT,
@@ -136,6 +150,8 @@ export default class BitBucketService extends TransactionBaseService {
               issue.id,
               config
             );
+            
+            // need to add metadata
             const sections: Section[] = comments.map((comment, index) => ({
               offset: index,
               content: comment.type,
@@ -149,6 +165,15 @@ export default class BitBucketService extends TransactionBaseService {
               metadata: {
                 repository_id: repository.uuid,
                 workspace_id: workspace.uuid,
+                title: issue.title,
+                reporter_type: issue.reporter?.type,
+                assignee_type: issue.assignee?.type,
+                created_on: issue.created_on,
+                updated_on: issue.updated_on,
+                edited_on: issue.edited_on,
+                kind: issue.kind,
+                priority: issue.priority,
+                content: issue.content?.raw
               },
               sections: sections,
               type: DocType.TXT,
