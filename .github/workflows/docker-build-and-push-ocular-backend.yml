@@ -31,4 +31,4 @@ jobs:
         file: ./packages/ocular/Dockerfile.local
         push: true
         tags:
-          ocular/ocular:latest
+          ocularengineering/ocular-backend:latest
