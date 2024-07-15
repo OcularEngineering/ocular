@@ -33,6 +33,5 @@ jobs:
         context: ./
         file: ./packages/ocular/Dockerfile.local
         push: true
-        tags: |
-          ${{ env.REGISTRY_IMAGE }}:${{ github.ref_name }}
+        tags:
           ${{ env.REGISTRY_IMAGE }}:latest
