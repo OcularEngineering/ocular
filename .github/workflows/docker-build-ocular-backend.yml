@@ -17,7 +17,7 @@ jobs:
     - name: Set Up Docker Builders
       uses: docker/setup-buildx-action@v3
   
-    - name: Build and Push Ocular Backend To Docker
+    - name: Build Ocular Backend Image
       uses: docker/build-push-action@v6
       with:
         context: ./
