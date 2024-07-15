@@ -28,7 +28,7 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         context: ./
-        file: ./packages/ocular/Dockerfile.local
+        file: ./packages/ocular-ui/Dockerfile
         push: true
         tags:
           ocularengineering/ocular-ui:latest
