@@ -22,5 +22,5 @@ jobs:
       with:
         context: ./
         file: ./packages/ocular/Dockerfile.local
-        push: true
+        push: false
         tags: ocular:latest
