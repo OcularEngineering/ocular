@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ "main" ]
 
-env:
-  REGISTRY_NAME: ocular/ocular
-
 jobs:
   push_to_docker_registry:
     name: Push Ocular Backend To Docker Hub
@@ -34,4 +31,4 @@ jobs:
         file: ./packages/ocular/Dockerfile.local
         push: true
         tags:
-          ${{ env.REGISTRY_IMAGE }}:latest
+          ocular/ocular:latest
