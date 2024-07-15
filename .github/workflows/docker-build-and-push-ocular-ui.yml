@@ -1,0 +1,34 @@
+name: Build and Push Ocular Web UI Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  push_to_docker_registry:
+    name: Push Ocular Web UI To Docker Hub
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check Out Branch
+      uses: actions/checkout@v4
+
+    - name: Log In To Docker
+      uses: docker/login-action@v3
+      with: 
+        username: ${{secrets.DOCKER_USERNAME}}
+        password: ${{ secrets.DOCKER_TOKEN }}
+
+    - name: Set Up Docker Builders
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build and Push Ocular Backend Image
+      uses: docker/build-push-action@v6
+      with:
+        context: ./
+        file: ./packages/ocular/Dockerfile.local
+        push: true
+        tags:
+          ocularengineering/ocular-ui:latest
