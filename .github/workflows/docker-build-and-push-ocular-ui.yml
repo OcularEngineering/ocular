@@ -3,7 +3,7 @@ name: Build and Push Ocular Web UI Docker Image CI
 on:
   push:
     tags:        
-      - '**'
+      - '*'
 
 jobs:
   push_to_docker_registry:
@@ -29,6 +29,6 @@ jobs:
         context: ./
         file: ./packages/ocular-ui/Dockerfile
         push: true
-        tags:
+        tags: |
           ocularengineering/ocular-ui:${{ github.ref_name }}
           ocularengineering/ocular-ui:latest

@@ -3,7 +3,7 @@ name: Build and Push Ocular Models Server on Release and Tag
 on:
   push:
     tags:        
-      - '**'
+      - '*'
 
 jobs:
   build-and-push:
@@ -28,6 +28,6 @@ jobs:
         context: ./
         file: ./packages/ocular-models-server/Dockerfile.models
         push: true
-        tags:
+        tags: |
           ocularengineering/ocular-model-server:${{ github.ref_name }}
           ocularengineering/ocular-model-server:latest
