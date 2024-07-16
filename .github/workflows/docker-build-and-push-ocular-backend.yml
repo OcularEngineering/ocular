@@ -2,9 +2,8 @@ name: Build and Push Ocular Backend Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    tags:        
+      - '*'       
 
 jobs:
   push_to_docker_registry:
