@@ -30,4 +30,5 @@ jobs:
         file: ./packages/ocular-ui/Dockerfile
         push: true
         tags:
+          ocularengineering/ocular-ui:${{ github.ref_name }}
           ocularengineering/ocular-ui:latest
