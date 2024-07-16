@@ -29,4 +29,5 @@ jobs:
         file: ./packages/ocular-models-server/Dockerfile.models
         push: true
         tags:
+          ocularengineering/ocular-model-server:${{ github.ref_name }}
           ocularengineering/ocular-model-server:latest
