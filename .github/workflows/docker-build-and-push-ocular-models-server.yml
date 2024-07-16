@@ -2,9 +2,8 @@ name: Build and Push Ocular Models Server on Release and Tag
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    tags:        
+      - '*'
 
 jobs:
   build-and-push:
