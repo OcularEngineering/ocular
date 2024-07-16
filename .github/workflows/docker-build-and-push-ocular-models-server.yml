@@ -3,7 +3,7 @@ name: Build and Push Ocular Models Server on Release and Tag
 on:
   push:
     tags:        
-      - '*'
+      - '**'
 
 jobs:
   build-and-push:
