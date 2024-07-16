@@ -2,9 +2,8 @@ name: Build and Push Ocular Backend Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    tags:        
+      - '*'       
 
 jobs:
   push_to_docker_registry:
@@ -31,4 +30,5 @@ jobs:
         file: ./packages/ocular/Dockerfile.local
         push: true
         tags:
+          ocularengineering/ocular-backend:${{ github.ref_name }}
           ocularengineering/ocular-backend:latest
