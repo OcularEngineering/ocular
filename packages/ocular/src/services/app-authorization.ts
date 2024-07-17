@@ -1,6 +1,7 @@
 import { EntityManager } from "typeorm";
 import {
   AppNameDefinitions,
+  AuthStrategy,
   Logger,
   TransactionBaseService,
 } from "@ocular/types";
@@ -180,19 +181,8 @@ class AppAuthorizationService extends TransactionBaseService {
         });
       }
       this.logger_.info(`generateToken: Done Generating Token for App ${name}`);
-      // Create An OAuth For This App And Organisation
-      if (AppNameDefinitions.JIRA === app.name) {
-        metadata = {
-          user_name: metadata?.username,
-          domain_name: metadata?.domain,
-        };
-      } else if (AppNameDefinitions.GITHUB === app.name) {
-        metadata = {
-          organisation: metadata?.organisation,
-          repository: metadata?.repository,
-        };
-      }
 
+      // Create An OAuth For This App And Organisation
       return await this.create({
         type: token.type,
         token: token.token,
@@ -202,7 +192,7 @@ class AppAuthorizationService extends TransactionBaseService {
         refresh_token_expires_at: token.refresh_token_expires_at,
         organisation: this.loggedInUser_.organisation,
         app_name: app.name,
-        metadata: metadata,
+        metadata: this.getMetadata(app.name, metadata),
       }).then(async (result) => {
         await this.eventBus_.emit(
           AppAuthorizationService.Events.TOKEN_GENERATED,
@@ -222,6 +212,28 @@ class AppAuthorizationService extends TransactionBaseService {
         AutoflowAiErrorTypes.INVALID_DATA,
         `Failed to use token to index ${name}`
       );
+    }
+  }
+
+  getMetadata(app_name: string, metadata: any): Record<string, unknown> {
+    switch(app_name){
+      case AppNameDefinitions.JIRA:
+        return {
+          user_name: metadata?.username,
+          domain_name: metadata?.domain,
+        }
+      case AppNameDefinitions.GITHUB:
+        return {
+          organisation: metadata?.organisation,
+          repository: metadata?.repository,
+        }
+      case AppNameDefinitions.BITBUCKET:
+        return {
+          workspace: metadata?.workspace,
+          repository: metadata?.repository
+        }
+      default:
+        return metadata
     }
   }
 
