@@ -5,6 +5,7 @@ import {
   SearchResultChunk,
   ChatContext,
   ChatResponse,
+  ChatResponseChunk,
 } from "../common";
 import { SearchContext } from "../common";
 
@@ -31,5 +32,5 @@ export interface IChatApproach {
   runWithStreaming(
     messages: Message[],
     context?: ChatContext
-  ): AsyncGenerator<SearchResultChunk, void>;
+  ): AsyncGenerator<ChatResponseChunk, void>;
 }

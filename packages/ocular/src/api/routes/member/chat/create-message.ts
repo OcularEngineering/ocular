@@ -8,8 +8,12 @@ export default async (req, res) => {
   try {
     const { message } = validated;
     const chatService = req.scope.resolve("chatService") as ChatService
-    const chatResponse = await chatService.chat(id, message, {})
-    return res.status(200).send(chatResponse)
+    const chatResponse = await chatService.chatWithStreaming(id, message, {})
+    for await (const chunk of chatResponse) {
+      res.write(JSON.stringify(chunk) + "\n");
+    }
+    res.status(200);
+    res.end();
   } catch (_error: unknown) {
     console.error(_error)
     return res.status(500).send("Error: Failed to execute Chat");

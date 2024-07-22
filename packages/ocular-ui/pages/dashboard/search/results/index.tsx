@@ -56,7 +56,6 @@ export default function Search() {
         .then(async response => {
           console.log("Streaming Copilot 1")
           setIsLoadingCopilot(false);
-
           if (stream) {
             const reader = createReader(response.body);
             const chunks = readStream(reader);

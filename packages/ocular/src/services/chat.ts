@@ -1,5 +1,5 @@
 import { EntityManager} from "typeorm"
-import { TransactionBaseService, ChatContext, ILLMInterface, IChatApproach, ChatResponse } from "@ocular/types"
+import { TransactionBaseService, ChatContext, ILLMInterface, IChatApproach, ChatResponse, ChatResponseChunk } from "@ocular/types"
 import {Chat, Message, MessageRoles, User} from "../models"
 import { ChatRepository, MessageRepository } from "../repositories"
 import { CreateChatInput } from "../types/chat"
@@ -66,9 +66,50 @@ class ChatService extends TransactionBaseService {
     return chat
   }
 
-  async chat(chatId: string, message:string, context: ChatContext): Promise<ChatResponse> {
-    return await this.atomicPhase_(
-      async (transactionManager: EntityManager) => {
+  // async chat(chatId: string, message:string, context: ChatContext): Promise<ChatResponse> {
+  //   return await this.atomicPhase_(
+  //     async (transactionManager: EntityManager) => {
+  //       const chatRepository = transactionManager.withRepository(
+  //         this.chatRepository_
+  //       )
+  //       const chat = await chatRepository.findOne({
+  //         where: {
+  //           id: chatId,
+  //           organisation_id: this.loggedInUser_.organisation_id,
+  //           user_id: this.loggedInUser_.id
+  //         },
+  //         relations: ["messages"]
+  //       });
+  //       if (!chat) {
+  //         throw new AutoflowAiError(
+  //           AutoflowAiError.Types.NOT_FOUND,
+  //           `Chat with id: ${chatId} was not found`
+  //         )
+  //       }
+  //       const messageRepository = transactionManager.withRepository(
+  //         this.messageRepository_
+  //       )
+  //       const userMessage = messageRepository.create({chat_id:chatId, user_id:this.loggedInUser_.id, content: message, role: MessageRoles.USER})
+  //       await messageRepository.save(userMessage)
+  //       let messages = chat?.messages.map(message => ({
+  //         role: message.role,
+  //         content: message.content
+  //       }));
+  //       messages.push({role: MessageRoles.USER, content: message})
+  //       const chatResponse = await this.chatApproach_.run(messages, context)
+  //       const assistantMessage = messageRepository.create({chat_id:chatId, user_id: this.loggedInUser_.id, content: chatResponse.message.content, role: MessageRoles.ASSISTANT})
+  //       const savedAssistantMessage = await messageRepository.save(assistantMessage)
+  //       return {
+  //         message: savedAssistantMessage,
+  //         data_points: chatResponse.data_points
+  //       }
+  //     }
+  //   )
+  // }
+
+  async* chatWithStreaming(chatId: string, message:string, context: ChatContext): AsyncGenerator<ChatResponseChunk,void> {
+    const transactionManager = this.activeManager_
+
         const chatRepository = transactionManager.withRepository(
           this.chatRepository_
         )
@@ -96,15 +137,20 @@ class ChatService extends TransactionBaseService {
           content: message.content
         }));
         messages.push({role: MessageRoles.USER, content: message})
-        const chatResponse = await this.chatApproach_.run(messages, context)
-        const assistantMessage = messageRepository.create({chat_id:chatId, user_id: this.loggedInUser_.id, content: chatResponse.message.content, role: MessageRoles.ASSISTANT})
-        const savedAssistantMessage = await messageRepository.save(assistantMessage)
-        return {
-          message: savedAssistantMessage,
-          data_points: chatResponse.data_points
+        const chatResponse = await this.chatApproach_.runWithStreaming(messages, context);
+        let chatResponseContent =""
+        for await (const chunk of chatResponse) {
+          chatResponseContent = chunk.choices[0].delta.content;
+          chunk.metadata={
+            chat_id:chatId,
+            user_id:this.loggedInUser_.id,
+            role:MessageRoles.ASSISTANT
+          }
+          yield chunk;
         }
-      }
-    )
+        const assistantMessage = messageRepository.create({chat_id:chatId, user_id: this.loggedInUser_.id, content: chatResponseContent, role: MessageRoles.ASSISTANT})
+        const savedAssistantMessage = await messageRepository.save(assistantMessage)
+        // yeild a chunk with the saved message metadata and make the transaction atomic
   }
 
   async list(selector, config = {}): Promise<Chat[]> {

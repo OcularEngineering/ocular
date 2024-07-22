@@ -16,6 +16,8 @@ import router from "next/router"
 import React from "react"
 import { toast } from "sonner"
 import { v4 as uuidv4 } from "uuid"
+import { createReader,readStream } from '@/lib/stream';
+import { da, ro } from "date-fns/locale"
 
 
 export const handleChat = async (
@@ -40,16 +42,6 @@ export const handleChat = async (
     setIsGenerating,
     setChatMessages
   )
-
-
-  return await processResponse(
-    response,
-    // true,
-    cancelTokenSource,
-    setFirstTokenReceived,
-    setChatMessages,
-    // setToolInUse
-  )
 }
 
 export const fetchChatResponse = async (
@@ -60,18 +52,59 @@ export const fetchChatResponse = async (
   setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>,
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>
 ) => {
-  const response = await api.chats.sendMessage(chat.id,{message:content,stream:false},cancelTokenSource)
-  if (!response.data.ok) {
-    if (response.status === 404) {
-      toast.error(
-        "Failed To Chat",
-      )
-    }
-    const errorData = await response.data
-    toast.error(errorData.message)
-    setIsGenerating(false)
-  }
-  return response.data
+
+  let idx=0;
+  api.chats.sendMessage(chat.id,{message:content,stream:true},cancelTokenSource)
+        .then(async response => {
+          console.log("Streaming Copilot Response")
+          const reader = createReader(response.body);
+          const chunks = readStream(reader);
+          for await (const chunk of chunks) {
+            setChatMessages(prevChatMessages => {
+              const updatedMessages = [...prevChatMessages];
+              if (idx=== 0) {
+                updatedMessages.push({
+                  message: {
+                    chat_id: chunk.metadata?.chat_id,
+                    content: chunk.choices[0].delta.content,
+                    created_at: new Date(),
+                    id: "123",
+                    role: chunk.metadata.role,
+                    updated_at: new Date(),
+                    user_id: chunk.metadata.user_id
+                  },
+                  fileItems: []
+                });
+                idx++;
+              } else {
+                const lastMessage = updatedMessages[updatedMessages.length - 1];
+                lastMessage.message.content = chunk.choices[0].delta.content;
+                lastMessage.message.updated_at = new Date();
+              }
+              return updatedMessages;
+            });
+          }
+          
+          // setChatMessages(prevChatMessages => [...prevChatMessages, 
+          //   {
+          //     message: {
+          //       chat_id: data.metadata?.chat_id,
+          //       content: data.choices[0].delta.content,
+          //       created_at: new Date(),
+          //       id: "123",
+          //       role: data.metadata.role,
+          //       updated_at: new Date(),
+          //       user_id: data.metadata.user_id
+          //     },
+          //     fileItems: []
+          //   }
+          // ]);
+          
+        })
+        .catch(error => {
+          console.error(error);
+          setIsGenerating(false)
+        });
 }
 
   // lastChatMessage: ChatMessage,
@@ -85,7 +118,7 @@ export const processResponse = async (
   let fullText = ""
   let contentToAdd = ""
 
-
+  
   if (response) {
     
     router.push(`/dashboard/chat/${response.message.chat_id}`)
@@ -127,3 +160,5 @@ export const handleCreateChat = async (
 
   return createdChat.data.chat
 }
+
+
