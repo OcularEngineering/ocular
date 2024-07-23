@@ -1,5 +1,4 @@
 import { ApplicationContext } from "@/context/context"
-import { buildFinalMessages } from "@/lib/build-prompt"
 import { useRouter } from "next/navigation"
 import { useContext, useEffect, useRef } from "react"
 import axios from "axios";
@@ -7,6 +6,7 @@ import {
   handleCreateChat,
   handleChat,
 } from "../chat-helpers/index"
+
 
 export const useChatHandler = () => {
   const router = useRouter()
@@ -62,11 +62,13 @@ export const useChatHandler = () => {
       // setIsFilePickerOpen(false)
       // setNewMessageImages([])
 
-      const cancelTokenSource  = axios.CancelToken.source();
+      
+      const cancelTokenSource = axios.CancelToken.source();
       setCancelTokenSource(cancelTokenSource);
 
       let currentChat = selectedChat ? { ...selectedChat } : null
 
+      
 
       if (!currentChat) {
         currentChat = await handleCreateChat(
@@ -80,14 +82,29 @@ export const useChatHandler = () => {
 
       if (!currentChat) return
 
-      let generatedText = ""
-      generatedText = await handleChat(
-            currentChat,
-            messageContent,
-            cancelTokenSource,
-            setIsGenerating,
-            setFirstTokenReceived,
-            setChatMessages,
+      setChatMessages(prevChatMessages => [...prevChatMessages, 
+        {
+          message: {
+            chat_id: currentChat?.id,
+            content: messageContent,
+            created_at: new Date(),
+            id: "123",
+            role: "user",
+            updated_at: new Date(),
+            user_id: currentChat?.user_id
+          },
+          fileItems: []
+        }
+      ]);
+
+
+      await handleChat(
+        currentChat,
+        messageContent,
+        cancelTokenSource,
+        setIsGenerating,
+        setFirstTokenReceived,
+        setChatMessages,
       )
 
       setIsGenerating(false)

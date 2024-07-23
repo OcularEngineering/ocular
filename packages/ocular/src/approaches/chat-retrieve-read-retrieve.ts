@@ -11,6 +11,8 @@ import {
   IChatApproach,
   ChatContext,
   ChatResponse,
+  SearchChunk,
+  ChatResponseChunk,
 } from "@ocular/types";
 import { MessageBuilder } from "../utils/message";
 import { IndexableDocChunk } from "@ocular/types";
@@ -79,68 +81,65 @@ export default class ChatReadRetrieveRead implements IChatApproach {
   // }
 
   async run(messages: Message[], context?: ChatContext): Promise<ChatResponse> {
-    const { completionRequest, thoughts } = await this.baseRun(
-      messages,
-      context
-    );
-    let hits = [];
-    const chatCompletion = await this.openaiService_.completeChat(
-      completionRequest.messages
-    );
-    return {
-      // choices: [
-      //   {
-      //     index: 0,
-      //     message: {
-      //       content: chatCompletion,
-      //       role: 'assistant',
-      //       context: {
-      //         data_points: hits,
-      //         thoughts: thoughts,
-      //       },
-      //     },
-      //   },
-      // ],
-      message: {
-        role: "assistant",
-        content: chatCompletion,
-      },
-      data_points: hits,
-    };
+    // const { completionRequest, thoughts } = await this.baseRun(
+    //   messages,
+    //   context
+    // );
+    // let hits = [];
+    // const chatCompletion = await this.openaiService_.completeChat(
+    //   completionRequest.messages
+    // );
+    // return {
+    //   // choices: [
+    //   //   {
+    //   //     index: 0,
+    //   //     message: {
+    //   //       content: chatCompletion,
+    //   //       role: 'assistant',
+    //   //       context: {
+    //   //         data_points: hits,
+    //   //         thoughts: thoughts,
+    //   //       },
+    //   //     },
+    //   //   },
+    //   // ],
+    //   message: {
+    //     role: "assistant",
+    //     content: chatCompletion,
+    //   },
+    //   data_points: hits,
+    // };
+    return {} as ChatResponse;
   }
 
   async *runWithStreaming(
     messages: Message[],
-    context?: SearchContext
-  ): AsyncGenerator<SearchResultChunk, void> {
-    // const { completionRequest, dataPoints, thoughts } = await this.baseRun(messages, context);
-    // const openAiChat = await this.openai.calculateTokens();
-    // const chatCompletion = await openAiChat.completions.create({
-    //   ...completionRequest,
-    //   stream: true,
-    // });
-    // let id = 0;
-    // for await (const chunk of chatCompletion) {
-    //   const responseChunk = {
-    //     choices: [
-    //       {
-    //         index: 0,
-    //         delta: {
-    //           content: chunk.choices[0].delta.content ?? '',
-    //           role: 'assistant' as const,
-    //           context: {
-    //             data_points: id === 0 ? { text: dataPoints } : undefined,
-    //             thoughts: id === 0 ? thoughts : undefined,
-    //           },
-    //         },
-    //         finish_reason: chunk.choices[0].finish_reason,
-    //       },
-    //     ],
-    //     object: 'chat.completion.chunk' as const,
-    //   };
-    //   yield responseChunk;
-    //   id++;
-    // }
+    context?: ChatContext
+  ): AsyncGenerator<ChatResponseChunk, void> {
+    const { completionRequest, hits, thoughts } = await this.baseRun(messages, context);
+    const chatCompletion = await this.openaiService_.completeChatWithStreaming(
+      completionRequest.messages
+    );
+    let id = 0;
+    for await (const chunk of chatCompletion) {
+      const responseChunk = {
+        choices: [
+          {
+            index: 0,
+            delta: {
+              content: chunk ?? '',
+              role: 'assistant' as const,
+              context: {
+                data_points: id === 0 ? { text: hits } : undefined,
+                thoughts: id === 0 ? thoughts : undefined,
+              },
+            },
+          },
+        ],
+      };
+      yield responseChunk;
+      id++;
+    }
   }
 
   private async baseRun(messages: Message[], context?: SearchContext) {
@@ -155,11 +154,11 @@ export default class ChatReadRetrieveRead implements IChatApproach {
       QUERY_PROMPT_FEW_SHOTS,
       this.openaiService_.getTokenLimit() - userQuery.length
     );
-
+    
     const chatCompletion = await this.openaiService_.completeChat(
       initialMessages
     );
-
+    
     let queryText = chatCompletion.trim();
     if (queryText === "0") {
       // Use the last user input if we failed to generate a better query
@@ -168,19 +167,14 @@ export default class ChatReadRetrieveRead implements IChatApproach {
 
     // STEP 2: Retrieve relevant documents from the search index with the GPT optimized query
     // -----------------------------------------------------------------------
-
-    // let hits = await this.searchService_.search(null, queryText, context);
-    let hits: SearchResults = { hits: [] };
-
-    // hits = hits.filter((doc) => doc !== null);
-    // hits
-    console.log("Found Docs", hits);
-    const sources = [];
-    // const sources = hits.map((c) => c.content).join(", ");
+    
+    let hits = await this.searchService_.searchChunks(null, queryText, context);
+    hits = hits.filter((doc) => doc !== null);
+    const sources = hits.map((c) => c.content).join("");
 
     const followUpQuestionsPrompt = context?.suggest_followup_questions
       ? FOLLOW_UP_QUESTIONS_PROMPT_CONTENT
-      : "";
+      : " ";
 
     // STEP 3: Generate a contextual and content specific answer using the search results and chat history
     // -----------------------------------------------------------------------
@@ -217,9 +211,13 @@ export default class ChatReadRetrieveRead implements IChatApproach {
 
     const firstQuery = MessageBuilder.messagesToString(initialMessages);
     const secondQuery = MessageBuilder.messagesToString(finalMessages);
+    
     const thoughts =
-      `Search query:${queryText} Conversations: ${firstQuery} ${secondQuery}`.replace(
-        /\n/g,
+      `Search query:
+      ${queryText} 
+      
+      Conversations: ${firstQuery} ${secondQuery}`.replace(
+        '\n',
         "<br>"
       );
 
@@ -227,12 +225,9 @@ export default class ChatReadRetrieveRead implements IChatApproach {
     return {
       completionRequest: {
         messages: finalMessages,
-        temperature: 0.7,
-        max_tokens: 1024,
-        n: 1,
       },
       thoughts,
-      // hits: hits as IndexableDocChunk[],
+      hits: hits as SearchChunk[],
     };
   }
 

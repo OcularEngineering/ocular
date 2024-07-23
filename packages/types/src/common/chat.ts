@@ -1,4 +1,4 @@
-import { IndexableDocChunk } from './document';
+import { IndexableDocChunk, SearchChunk } from './document';
 import { Message } from './message';
 
 export type ChatContext = {
@@ -6,8 +6,27 @@ export type ChatContext = {
   suggest_followup_questions?: boolean;
 };
 
-export type ChatResponse = {
-  message: Message;
-  data_points?: IndexableDocChunk[]
-  thoughts?: string;
+
+export type ChatResponse ={
+  choices: Array<{
+    index: number;
+    message: ApproachResponseMessage;
+  }>;
+}
+
+export type ChatResponseChunk ={
+  choices: Array<{
+    index: number;
+    delta: Partial<ApproachResponseMessage>;
+  }>;
+  metadata?:Record<string,unknown>
+}
+
+export type ApproachResponseMessage = Message & {
+  context?: Record<string, any> & {
+    data_points?: {
+      text?: SearchChunk[];
+    };
+    thoughts?: string;
+  };
 };

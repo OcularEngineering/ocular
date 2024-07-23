@@ -47,7 +47,7 @@ export default {
       console.log('controller', cancelToken);
       const path = `/chat/${id}/message`;
       console.log('path', data);
-      return ocularRequest('POST', path, data, false, cancelToken);
+      return ocularStreamingRequest('POST', path, data, true, cancelToken);
     },
     getMessages(id) {
       const path = `/chat/${id}/messages`;
