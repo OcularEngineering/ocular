@@ -154,11 +154,11 @@ export default class ChatReadRetrieveRead implements IChatApproach {
       QUERY_PROMPT_FEW_SHOTS,
       this.openaiService_.getTokenLimit() - userQuery.length
     );
-
+    
     const chatCompletion = await this.openaiService_.completeChat(
       initialMessages
     );
-
+    
     let queryText = chatCompletion.trim();
     if (queryText === "0") {
       // Use the last user input if we failed to generate a better query
@@ -167,12 +167,9 @@ export default class ChatReadRetrieveRead implements IChatApproach {
 
     // STEP 2: Retrieve relevant documents from the search index with the GPT optimized query
     // -----------------------------------------------------------------------
-
+    
     let hits = await this.searchService_.searchChunks(null, queryText, context);
-
     hits = hits.filter((doc) => doc !== null);
-    // hits
-    console.log("Found Docs", hits);
     const sources = hits.map((c) => c.content).join("");
 
     const followUpQuestionsPrompt = context?.suggest_followup_questions

@@ -28,11 +28,8 @@ export const handleChat = async (
   setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
 ) => {
-  const requestBody = {
-    // chatSettings: payload.chatSettings,
   
-    // customModelId: provider === "custom" ? modelData.hostedId : ""
-  }
+  
 
   const response = await fetchChatResponse(
     chat,

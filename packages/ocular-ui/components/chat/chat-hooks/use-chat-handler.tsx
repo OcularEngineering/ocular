@@ -62,11 +62,13 @@ export const useChatHandler = () => {
       // setIsFilePickerOpen(false)
       // setNewMessageImages([])
 
+      
       const cancelTokenSource = axios.CancelToken.source();
       setCancelTokenSource(cancelTokenSource);
 
       let currentChat = selectedChat ? { ...selectedChat } : null
 
+      
 
       if (!currentChat) {
         currentChat = await handleCreateChat(
@@ -79,6 +81,21 @@ export const useChatHandler = () => {
       }
 
       if (!currentChat) return
+
+      setChatMessages(prevChatMessages => [...prevChatMessages, 
+        {
+          message: {
+            chat_id: currentChat?.id,
+            content: messageContent,
+            created_at: new Date(),
+            id: "123",
+            role: "user",
+            updated_at: new Date(),
+            user_id: currentChat?.user_id
+          },
+          fileItems: []
+        }
+      ]);
 
 
       await handleChat(
