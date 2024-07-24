@@ -7,3 +7,4 @@ export * from "./app-authorization";
 export * from "./organisation";
 export * from "./staged-job";
 export * from "./user";
+export * from "./publishable-api-key"
