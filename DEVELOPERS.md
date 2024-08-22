@@ -54,19 +54,13 @@ To contribute code to Ocular, you must fork the [Ocular repo](https://github.com
       turbo build
    ```
 
-2. Copy the example `env.dev.example` to `.env.dev`
-
-   ```sh
-      cp env.dev.example packages/ocular/.env.dev
-   ```
-
-3. Navigate to Ocular Dir
+2. Navigate to Ocular Dir
 
    ```sh
       cd packages/ocular/
    ```
 
-4. Configure .env with app and plugin secrets of the apps and plugins you want to connect.
+3. Configure .env with app and plugin secrets of the apps and plugins you want to connect.
 
    - Azure Keys are **required** since they allow Ocular to connect to an LLM Service
 
@@ -81,13 +75,13 @@ To contribute code to Ocular, you must fork the [Ocular repo](https://github.com
 
    - Additional ApiKeys for other apps are optionnal but needed if you intend to connect Ocular to other apps.
 
-5. Run Postgress DB + Redis + QDrant in Docker
+4. Run Postgress DB + Redis + QDrant in Docker
 
 ```sh
    docker compose -f docker-compose.dev.yml up
 ```
 
-6. Start the backend.
+5. Start the backend.
 
 ```sh
    npm run dev # start the backend
@@ -98,7 +92,7 @@ To contribute code to Ocular, you must fork the [Ocular repo](https://github.com
 1. Navigate to Ocular UI in "packages/ocular-ui".
 
    ```sh
-      cd packages/ocular/
+      cd packages/ocular-ui/
    ```
 
 2. Install front end dependencies with the following command.
