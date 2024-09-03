@@ -8,6 +8,7 @@ import { ChatMessages } from "./chat-messages"
 import { ChatSecondaryButtons } from "./chat-secondary-buttons"
 
 import api from "@/services/api"
+import { set } from "nprogress"
 
 
 interface ChatUIProps {}
@@ -17,6 +18,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
   const params = useParams()
 
   const {
+    chatMessages,
     setChatMessages,
     selectedChat,
     setSelectedChat,
@@ -51,7 +53,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     } else {
       setLoading(false)
     }
-  }, [params])
+  }, [params]);
 
   const fetchMessages = async () => {
     const fetchedMessages = await api.chats.retrieve(params.chatid as string)
@@ -60,7 +62,12 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
         message,
       }
     })
-    setChatMessages(fetchedChatMessages)
+    const currentChatMessages = localStorage.getItem(params.chatid as string);
+    if(currentChatMessages){
+      setChatMessages(JSON.parse(currentChatMessages));
+      return;
+    }
+    setChatMessages(fetchedChatMessages);
   }
 
   const fetchChat = async () => {

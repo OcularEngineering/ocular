@@ -25,7 +25,7 @@ export type ChatResponseChunk ={
 export type ApproachResponseMessage = Message & {
   context?: Record<string, any> & {
     data_points?: {
-      text?: SearchChunk[];
+      points?: SearchChunk[];
     };
     thoughts?: string;
   };

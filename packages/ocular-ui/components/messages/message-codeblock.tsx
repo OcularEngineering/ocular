@@ -3,7 +3,7 @@ import { useCopyToClipboard } from "@/lib/hooks/use-copy-to-clipboard"
 import { IconCheck, IconCopy, IconDownload } from "@tabler/icons-react"
 import { FC, memo } from "react"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
-import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism"
+import { dracula } from "react-syntax-highlighter/dist/cjs/styles/prism"
 
 interface MessageCodeBlockProps {
   language: string
@@ -86,7 +86,7 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
     }
 
     return (
-      <div className="codeblock relative w-full bg-zinc-950 font-sans">
+      <div className="codeblock relative w-full bg-zinc-950 font-sans b-2 border border-gray-800 rounded-md">
         <div className="flex w-full items-center justify-between bg-zinc-700 px-4 text-white">
           <span className="text-xs lowercase">{language}</span>
           <div className="flex items-center space-x-1">
@@ -111,12 +111,15 @@ export const MessageCodeBlock: FC<MessageCodeBlockProps> = memo(
         </div>
         <SyntaxHighlighter
           language={language}
-          style={oneDark}
+          style={dracula}
           showLineNumbers
           customStyle={{
             margin: 0,
             width: "100%",
-            background: "transparent"
+            background: "transparent", 
+            backdropFilter: "blur(10px)", 
+            borderRadius: "8px", 
+            padding: "10px" 
           }}
           codeTagProps={{
             style: {

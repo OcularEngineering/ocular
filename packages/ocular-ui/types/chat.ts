@@ -1,3 +1,5 @@
+import { AppNameDefinitions } from '@/types/types';
+
 export interface Announcement {
   id: string
   title: string
@@ -39,10 +41,19 @@ export interface ChatFile {
   file: File | null
 }
 
+export interface SearchChunk {
+  score: number;
+  chunkId: number;
+  documentId: string;
+  title: string;
+  content: string;
+  source: AppNameDefinitions;
+}
 
 export interface ChatMessage {
   message: Message
-  fileItems: string[]
+  fileItems: SearchChunk[]
+  followUpQuestions:string[]
 }
 
 

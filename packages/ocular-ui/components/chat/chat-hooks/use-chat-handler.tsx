@@ -6,6 +6,8 @@ import {
   handleCreateChat,
   handleChat,
 } from "../chat-helpers/index"
+import { v4 as uuidv4 } from 'uuid';
+
 
 
 export const useChatHandler = () => {
@@ -88,12 +90,13 @@ export const useChatHandler = () => {
             chat_id: currentChat?.id,
             content: messageContent,
             created_at: new Date(),
-            id: "123",
+            id: uuidv4(),
             role: "user",
             updated_at: new Date(),
             user_id: currentChat?.user_id
           },
-          fileItems: []
+          fileItems: [],
+          followUpQuestions:[]
         }
       ]);
 

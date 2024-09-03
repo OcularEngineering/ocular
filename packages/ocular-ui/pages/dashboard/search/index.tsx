@@ -55,7 +55,7 @@ export function Search() {
                 ref={searchInputRef}
                 type="text"
                 className="dark:bg-transparent custom-input w-full grow focus:outline-none"
-                placeholder="Search for anything here"
+                placeholder="Search for anything here..."
               />
           </div>
           <div className="mt-8 flex w-[90%] flex-row justify-center space-x-3 space-y-0 sm:space-x-4">

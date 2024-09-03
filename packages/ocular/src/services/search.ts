@@ -98,7 +98,7 @@ class SearchService extends AbstractSearchService {
         context
       );
 
-    return chunks;
+    return chunks||[];
   }
 }
 

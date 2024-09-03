@@ -8,6 +8,7 @@ import {
 } from "@heroicons/react/outline";
 
 import { SearchCopilotSkeleton, SearchResultsSkeleton, SearchByAppFilterSkeleton } from '@/components/ui/skeletons';
+import { MessageMarkdown } from '../messages/message-markdown';
 
 export const AIResults = ({ content, ai_citations }) => {
   const [showResults, setShowResults] = useState(false);
@@ -20,7 +21,9 @@ export const AIResults = ({ content, ai_citations }) => {
           <h1 className="font-semibold text-l">Copilot</h1>
         </div>
       </div>
-      <ReactMarkdown className="font-regular text-md space-y-4 text-left">{content}</ReactMarkdown>
+      <div className="font-regular text-md space-y-4 text-left">
+        <MessageMarkdown content={content} />
+      </div>
       <div className="mt-2 mb-3 text-left w-full">
         {ai_citations && ai_citations.length > 0 && (
           <button onClick={() => setShowResults(!showResults)} className="text-left">
@@ -58,7 +61,7 @@ const Results = ({ results }) => (
   <>
     <div className="w-3/5 max-w-5xl items-start justify-start">
       {
-        (results && results.length > 0) ? 
+        (results && results.length > 0) ?
           results
             .filter(result => result.snippets && result.snippets.length > 0) // Filter out results without snippets
             .map((result, index) => (
@@ -69,13 +72,13 @@ const Results = ({ results }) => (
                 >
                   {
                     result && result.documentMetadata.source === 'ocular-api'
-                      ? <div className="overflow-hidden dark:bg-muted bg-gray-200 min-h-[40px] h-[40px] min-w-[40px] w-[40px] rounded-xl mr-4"/>
-                      : <Image src={result && result.documentMetadata.source === 'pagerduty' ? '/PagerDuty.png' : result && result.documentMetadata.source ? `/${result.documentMetadata.source}.svg` : '/default.png'} 
-                          alt={result.documentMetadata.title} 
-                          className="mr-4 size-[40px]" 
-                          width={10} 
-                          height={10} 
-                        />
+                      ? <div className="overflow-hidden dark:bg-muted bg-gray-200 min-h-[40px] h-[40px] min-w-[40px] w-[40px] rounded-xl mr-4" />
+                      : <Image src={result && result.documentMetadata.source === 'pagerduty' ? '/PagerDuty.png' : result && result.documentMetadata.source ? `/${result.documentMetadata.source}.svg` : '/default.png'}
+                        alt={result.documentMetadata.title}
+                        className="mr-4 size-[40px]"
+                        width={10}
+                        height={10}
+                      />
                   }
                   <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                     <div className='space-y-2'>
@@ -85,8 +88,8 @@ const Results = ({ results }) => (
                         </h3>
                       </a>
                       <p className="font-regular line-clamp-3 text-sm text-gray-500">
-                        <span 
-                          className="hover:bg-gray-100 p-1 rounded-lg cursor-pointer" 
+                        <span
+                          className="hover:bg-gray-100 p-1 rounded-lg cursor-pointer"
                           onClick={() => {
                             const el = document.createElement('textarea');
                             el.value = result.documentMetadata.link;
@@ -102,11 +105,11 @@ const Results = ({ results }) => (
                       <p className="font-regular line-clamp-3 text-sm max-w-3xl w-[770px]" dangerouslySetInnerHTML={{ __html: result.snippets.map(snippet => snippet.content).join(" ... ") }}></p>
                       <div className='flex flex-row gap-2'>
                         <p className="font-regular line-clamp-3 text-sm text-gray-500">
-                        {
-                          !isNaN(new Date(result.documentMetadata.updated_at).getTime()) ?
-                          formatDate(result.documentMetadata.updated_at)
-                          : null
-                        }
+                          {
+                            !isNaN(new Date(result.documentMetadata.updated_at).getTime()) ?
+                              formatDate(result.documentMetadata.updated_at)
+                              : null
+                          }
                         </p>
                         <span className="font-regular text-sm text-gray-500">·</span>
                         <p className="font-regular line-clamp-3 text-sm text-gray-500">
@@ -119,8 +122,8 @@ const Results = ({ results }) => (
               </div>
             ))
           : <div className="w-[850px]">
-             <p>No results found for this query</p>
-            </div>
+            <p>No results found for this query</p>
+          </div>
       }
     </div>
   </>
@@ -131,9 +134,9 @@ const ResultsFilter = ({ results, resultSources }) => (
   <div className="flex w-2/5 flex-col items-end">
     <div className="flex flex-col">
       {
-        results ? 
+        results ?
           <AppFilterOptions results={results.searchInformation?.formattedTotalResults} resultSources={resultSources} />
-        : <SearchByAppFilterSkeleton />
+          : <SearchByAppFilterSkeleton />
       }
     </div>
   </div>
@@ -143,23 +146,23 @@ const ResultsFilter = ({ results, resultSources }) => (
 export default function SearchResults({ search_results, ai_content, isLoadingResults, isLoadingCopilot, resultSources, ai_citations }) {
   return (
     <div className="font-open-sans dark:bg-background flex flex-row dark:text-white items-center justify-start">
-      <div style={{flex: 1}} />
-      <div style={{flex: 3}} className='bg-background flex flex-col'>
+      <div style={{ flex: 1 }} />
+      <div style={{ flex: 3 }} className='bg-background flex flex-col'>
         {isLoadingCopilot ? (
           <SearchCopilotSkeleton />
-        ): (
-          <AIResults content={ai_content} ai_citations={ai_citations}/>
-          )}
+        ) : (
+          <AIResults content={ai_content} ai_citations={ai_citations} />
+        )}
         <div className='flex flex-row max-w-full justify-center mt-5'>
           {isLoadingResults ? (
             <SearchResultsSkeleton />
-            ) : (
-              <Results results={search_results} />
+          ) : (
+            <Results results={search_results} />
           )}
           <ResultsFilter results={search_results} resultSources={resultSources} />
         </div>
       </div>
-      <div style={{flex: 1}} />
+      <div style={{ flex: 1 }} />
     </div>
   );
 }
