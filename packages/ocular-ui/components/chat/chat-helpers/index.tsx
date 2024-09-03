@@ -18,6 +18,8 @@ import { toast } from "sonner"
 import { v4 as uuidv4 } from "uuid"
 import { createReader,readStream } from '@/lib/stream';
 import { da, ro } from "date-fns/locale"
+import { set } from "nprogress"
+import { processStreamChatResponse } from "@/lib/parse-chat-stream"
 
 
 export const handleChat = async (
@@ -54,49 +56,7 @@ export const fetchChatResponse = async (
   api.chats.sendMessage(chat.id,{message:content,stream:true},cancelTokenSource)
         .then(async response => {
           console.log("Streaming Copilot Response")
-          const reader = createReader(response.body);
-          const chunks = readStream(reader);
-          for await (const chunk of chunks) {
-            setChatMessages(prevChatMessages => {
-              const updatedMessages = [...prevChatMessages];
-              if (idx=== 0) {
-                updatedMessages.push({
-                  message: {
-                    chat_id: chunk.metadata?.chat_id,
-                    content: chunk.choices[0].delta.content,
-                    created_at: new Date(),
-                    id: "123",
-                    role: chunk.metadata.role,
-                    updated_at: new Date(),
-                    user_id: chunk.metadata.user_id
-                  },
-                  fileItems: []
-                });
-                idx++;
-              } else {
-                const lastMessage = updatedMessages[updatedMessages.length - 1];
-                lastMessage.message.content = chunk.choices[0].delta.content;
-                lastMessage.message.updated_at = new Date();
-              }
-              return updatedMessages;
-            });
-          }
-          
-          // setChatMessages(prevChatMessages => [...prevChatMessages, 
-          //   {
-          //     message: {
-          //       chat_id: data.metadata?.chat_id,
-          //       content: data.choices[0].delta.content,
-          //       created_at: new Date(),
-          //       id: "123",
-          //       role: data.metadata.role,
-          //       updated_at: new Date(),
-          //       user_id: data.metadata.user_id
-          //     },
-          //     fileItems: []
-          //   }
-          // ]);
-          
+          processStreamChatResponse(response,setChatMessages,chat.id);
         })
         .catch(error => {
           console.error(error);
@@ -104,41 +64,6 @@ export const fetchChatResponse = async (
         });
 }
 
-  // lastChatMessage: ChatMessage,
-export const processResponse = async (
-  response: Response,
-  cancelTokenSource: CancelTokenSource,
-  setFirstTokenReceived: React.Dispatch<React.SetStateAction<boolean>>,
-  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-  // setToolInUse: React.Dispatch<React.SetStateAction<string>>
-) => {
-  let fullText = ""
-  let contentToAdd = ""
-
-  
-  if (response) {
-    
-    router.push(`/dashboard/chat/${response.message.chat_id}`)
-    setChatMessages(prevChatMessages => [...prevChatMessages, 
-      {
-        message: {
-          chat_id: response.message.chat_id,
-          content: response.message.content,
-          created_at: response.message.created_at,
-          id: response.message.id,
-          role: response.message.role,
-          updated_at: response.message.updated_at,
-          user_id: response.message.user_id
-        },
-        fileItems: []
-      }
-    ]);
-    // return fullText
-    return response.message.content
-  } else {
-    throw new Error("Response body is null")
-  }
-}
 
 export const handleCreateChat = async (
   messageContent: string,

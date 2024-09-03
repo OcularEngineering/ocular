@@ -8,7 +8,9 @@ export default async (req, res) => {
   try {
     const { message } = validated;
     const chatService = req.scope.resolve("chatService") as ChatService
-    const chatResponse = await chatService.chatWithStreaming(id, message, {})
+    const chatResponse = await chatService.chatWithStreaming(id, message, {
+      suggest_followup_questions: true,
+    })
     for await (const chunk of chatResponse) {
       res.write(JSON.stringify(chunk) + "\n");
     }

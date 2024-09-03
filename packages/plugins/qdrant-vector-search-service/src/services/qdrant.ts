@@ -177,6 +177,9 @@ export default class qdrantService extends AbstractVectorDBService {
       );
 
       const chunks: SearchChunk[] = qdrantSearchResults.map((result) => {
+        if(result.score<0.8){
+          return;
+        }
         return {
           score: result.score,
           content: String(result.payload.content),
@@ -191,7 +194,7 @@ export default class qdrantService extends AbstractVectorDBService {
         };
       });
       console.log("Search Chunks", chunks);
-      return chunks;
+      return chunks ||[];
     } catch (error) {
       console.log("Qdrant: Error Searching Docs From Quadrant", error);
     }

@@ -17,13 +17,22 @@ import {
 import { MessageBuilder } from "../utils/message";
 import { IndexableDocChunk } from "@ocular/types";
 
-const SYSTEM_MESSAGE_CHAT_CONVERSATION = `Assistant helps Employees At Ocular answer questions about work. Be brief in your answers.
-Answer ONLY with the facts listed in the list of sources below. If there isn't enough information below, say you don't know. Do not generate answers that don't use the sources below. If asking a clarifying question to the user would help, ask the question.
-For tabular information return it as an html table. Do not return markdown format. If the question is not in English, answer in the language used in the question.
+const SYSTEM_MESSAGE_CHAT_CONVERSATION = `
+You are Ocular Co-pilot, an AI Assistant designed to help employees at Ocular answer work-related questions. Answer concisely and directly based on the available
+information in the provided sources. Follow these guidelines:
 
-Each source has a name followed by colon and the actual information, always include the source name for each fact you use in the response. Use square brackets to reference the source, for example: [info1.txt]. Don't combine sources, list each source separately, for example: [info1.txt][info2.pdf].
+1. **Fact-Based Answers Only**: Provide answers only using information from the sources listed below. If there isn't adequate information, state that you don't know.
+2. **Ask Clarifying Questions**: If the question is unclear, ask for more details.
+3. **Language Consistency**: Respond in the language used by the user.
+4. **Tabular Data**: For questions requiring tabular answers, use HTML tables.
+5. **Citations**: Always reference the source for each fact you use in your answer using square brackets, for example: [source1.txt].
+6. **Examples and Code Snippets**: Where applicable, provide examples or code snippets from the sources provided.
+7. **Formatted Responses**: Provide formatted responses with titles, sections, and paragraphs as needed.
+
+Please provide your inquiry and I will assist you based on the information available in the sources.
 {follow_up_questions_prompt}
 {injected_prompt}
+
 `;
 
 const FOLLOW_UP_QUESTIONS_PROMPT_CONTENT = `Generate 3 very brief follow-up questions that the user would likely ask next.
@@ -35,13 +44,33 @@ Enclose the follow-up questions in double angle brackets. Example:
 Do no repeat questions that have already been asked.
 Make sure the last question ends with ">>".`;
 
-const QUERY_PROMPT_TEMPLATE = `Below is a history of the conversation so far, and a new question asked by the user that needs to be answered by searching in a knowledge base about terms of service, privacy policy, and questions about support requests.
-Generate a search query based on the conversation and the new question.
-Do not include cited source filenames and document names e.g info.txt or doc.pdf in the search query terms.
-Do not include any text inside [] or <<>> in the search query terms.
-Do not include any special characters like '+'.
-If the question is not in English, translate the question to English before generating the search query.
-If you cannot generate a search query, return just the number 0.
+const QUERY_PROMPT_TEMPLATE = `
+
+1.Extract the following relevant metadata fields from the user query and format them in JSON such as:
+
+  Date 
+  Source like (e.g., Jira, Confluence, Web-Connector, Slack)
+
+  if you can not extract relevant metadata fields from the user query return metadata fields as null.
+
+2.Generate a optimized search query based on the conversation history and the new user question, following these rules:
+
+  Exclude special characters like ‘+’.
+  Exclude cited source filenames and document names.
+  Exclude text inside [] or <<>>.
+  Translate non-English questions into anglish before generating the search query.
+  If unable to generate a search query, return the number 0.
+
+  Return the output in the following format:
+  Output:
+
+    {
+      "metadata": {
+        "Date": "...revlevant date metadata...",
+        'sources':['...relevant sources...'],
+      },
+      "search_query": "... generate the search query here ..."
+    }
 `;
 
 const QUERY_PROMPT_FEW_SHOTS: Message[] = [
@@ -56,13 +85,13 @@ type InjectedDependencies = AutoflowContainer & {
   searchService: ISearchService;
 };
 
-/**
+/*
  * Simple retrieve-then-read implementation, using the AI Search and OpenAI APIs directly.
  * It first retrieves top documents from search, then constructs a prompt with them, and then uses
  * OpenAI to generate an completion (answer) with that prompt.
  */
 export default class ChatReadRetrieveRead implements IChatApproach {
-  identifier = ApproachDefinitions.ASK_RETRIEVE_READ;
+  identifier = ApproachDefinitions.CHAT_RETRIEVE_READ;
   private openaiService_: ILLMInterface;
   private searchService_: ISearchService;
 
@@ -130,7 +159,7 @@ export default class ChatReadRetrieveRead implements IChatApproach {
               content: chunk ?? '',
               role: 'assistant' as const,
               context: {
-                data_points: id === 0 ? { text: hits } : undefined,
+                data_points: id === 0 ? { points: hits } : undefined,
                 thoughts: id === 0 ? thoughts : undefined,
               },
             },
@@ -151,26 +180,33 @@ export default class ChatReadRetrieveRead implements IChatApproach {
       QUERY_PROMPT_TEMPLATE,
       messages,
       userQuery,
-      QUERY_PROMPT_FEW_SHOTS,
+      [],
       this.openaiService_.getTokenLimit() - userQuery.length
     );
-    
+
+
     const chatCompletion = await this.openaiService_.completeChat(
       initialMessages
     );
     
+    
     let queryText = chatCompletion.trim();
+    let metadata;
     if (queryText === "0") {
       // Use the last user input if we failed to generate a better query
       queryText = messages[messages.length - 1].content;
+    }
+    else{
+      metadata = JSON.parse(queryText);
+      queryText = metadata.search_query;
     }
 
     // STEP 2: Retrieve relevant documents from the search index with the GPT optimized query
     // -----------------------------------------------------------------------
     
-    let hits = await this.searchService_.searchChunks(null, queryText, context);
-    hits = hits.filter((doc) => doc !== null);
-    const sources = hits.map((c) => c.content).join("");
+    let hits = await this.searchService_.searchChunks(null,  queryText, context);
+    hits = hits.filter((doc) => doc !== undefined);
+    const sources = hits.map((c) => c.content).join("\n");
 
     const followUpQuestionsPrompt = context?.suggest_followup_questions
       ? FOLLOW_UP_QUESTIONS_PROMPT_CONTENT
@@ -198,35 +234,35 @@ export default class ChatReadRetrieveRead implements IChatApproach {
         followUpQuestionsPrompt
       ).replace("{injected_prompt}", "");
     }
-
+  
     const finalMessages = this.getMessagesFromHistory(
       systemMessage,
       messages,
       // Model does not handle lengthy system messages well.
       // Moving sources to latest user conversation to solve follow up questions prompt.
-      `${messages[messages.length - 1].content}\n\nSources:\n${sources}`,
+      `${messages[messages.length - 1].content}\n\nSources:\n${sources===''?'NO SOURCES AVAILABLE':sources}`,
       [],
       this.openaiService_.getTokenLimit()
     );
 
-    const firstQuery = MessageBuilder.messagesToString(initialMessages);
-    const secondQuery = MessageBuilder.messagesToString(finalMessages);
+    // const firstQuery = MessageBuilder.messagesToString(initialMessages);
+    // const secondQuery = MessageBuilder.messagesToString(finalMessages);
     
-    const thoughts =
-      `Search query:
-      ${queryText} 
+    // const thoughts =
+    //   `Search query:
+    //   ${queryText} 
       
-      Conversations: ${firstQuery} ${secondQuery}`.replace(
-        '\n',
-        "<br>"
-      );
+    //   Conversations: ${firstQuery} ${secondQuery}`.replace(
+    //     '\n',
+    //     "<br>"
+    //   );
 
     // temperature: Number(context?.temperature ?? 0.7),
     return {
       completionRequest: {
         messages: finalMessages,
       },
-      thoughts,
+      thoughts:"",
       hits: hits as SearchChunk[],
     };
   }
@@ -281,4 +317,5 @@ export default class ChatReadRetrieveRead implements IChatApproach {
 
     return messageBuilder.messages;
   }
+
 }

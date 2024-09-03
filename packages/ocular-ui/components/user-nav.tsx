@@ -28,6 +28,7 @@ export function UserNav()  {
     event.preventDefault()
     try {
       await api.auth.deauthenticate()
+      localStorage.clear();
       router.push(`/sign-in`)
     } catch (error) {
       console.error(error)
